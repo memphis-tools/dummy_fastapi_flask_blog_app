@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}MAIL_NOT_SENT{% endblock title %}
+
+{% block content %}
+<div class="container px-4 px-lg-5">
+  <h1>DUMMY BLOG - MAIL NOT SENT</h1>
+    <div class="gx-4 gx-lg-5 d-flex flex-row justify-content-center">
+        <div class=" flex-column justify-content-center">
+          <p>{{ name|upper }} VOTRE EMAIL N'A PAS ETE ENVOYE</p>
+            <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="{{ url_for('books') }}">RETOUR AUX LIVRES</a></div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

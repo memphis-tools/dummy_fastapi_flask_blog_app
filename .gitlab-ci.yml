@@ -1,0 +1,156 @@
+variables:
+  GIT_COMMIT: $CI_COMMIT_SHORT_SHA
+  IMAGE_REPO: $CI_REGISTRY_USER/public_repo
+  POSTGRES_USER: "postgres"
+  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  POSTGRES_PORT: "5432"
+  FLASK_APP: "project/__init__.py"
+  FLASK_DEBUG: 0
+  APP_FOLDER: "/home/dummy-operator/flask"
+  HOST_USER: "dummy_user"
+  LOGGING_LEVEL: "DEBUG"
+  POSTGRES_PRODUCTION_DB_NAME: "dummy_blog"
+  POSTGRES_TEST_DB_NAME: "test_dummy_blog"
+  EMAIL_SERVER: "localhost"
+  LOCAL_EMAIL_LOGS_FILE: "/var/log/gunicorn/flask.logs"
+
+stages:
+  - test
+  - build_init_certbot
+  - build
+  - deploy_init_vault
+  - deploy
+
+services:
+  - postgres:latest
+
+before_script:
+  - pip install -r app/requirements.txt
+  - pip install -r app/packages/flask_app/requirements.txt
+
+unit_tests:
+  stage: test
+  image: python:3.11.6
+  variables:
+    SCOPE: "local_test"
+    ADMIN_LOGIN: "admin"
+    ADMIN_PASSWORD: "dummy_password_for_test_to_run"
+    ADMIN_EMAIL: "admin@whatever.fr"
+    POSTGRES_HOST: "postgres"
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "$POSTGRES_PASSWORD"
+    TEST_USER_PWD: $TEST_USER_PWD"
+    SECRET_KEY: "dummy_secret_for_test_to_run"
+    DATABASE_URL: "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_TEST_DB_NAME"
+  script:
+    - echo "Running tests"
+    - coverage run -m pytest -vs app/
+    - coverage report
+    - coveralls
+  coverage: '/^TOTAL.*\s+(\d+\%)$/'
+
+build_init_certbot_images:
+  stage: build_init_certbot
+  image: docker:24.0.9
+  services:
+    - docker:24.0.9-dind
+  variables:
+    SCOPE: "production"
+    GIT_COMMIT: $CI_COMMIT_SHORT_SHA
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_TOKEN
+  script:
+    - docker-compose -f build_init-certbot-docker-compose.yml build
+    - docker tag "dummy_fastapi_flask_blog_app-nginx_init_certbot" $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_init_certbot_$GIT_COMMIT
+    - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_init_certbot_$GIT_COMMIT
+
+build_docker_images:
+  stage: build
+  image: docker:24.0.9
+  services:
+    - docker:24.0.9-dind
+  variables:
+    SCOPE: "production"
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_TOKEN
+  script:
+    - docker-compose -f build_docker-compose.yml build
+    - docker tag "dummy_fastapi_flask_blog_app-nginx" $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_$GIT_COMMIT
+    - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_$GIT_COMMIT
+    - docker tag "dummy_fastapi_flask_blog_app-fastapi:latest" $IMAGE_REPO:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT
+    - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT
+    - docker tag "dummy_fastapi_flask_blog_app-flask_front:latest" $IMAGE_REPO:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT
+    - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT
+
+deploy_init:
+  stage: deploy_init_vault
+  only:
+    - master
+  before_script:
+    - eval $(ssh-agent -s)
+    - mkdir ~/.ssh
+    - chmod 0700 ~/.ssh
+    - echo 'echo $SSH_PASSPHRASE' > ~/.ssh/tmp && chmod 700 ~/.ssh/tmp
+    - chmod 0600 $SSH_PRIVATE_KEY
+    - DISPLAY=0 SSH_ASKPASS=~/.ssh/tmp ssh-add $SSH_PRIVATE_KEY < /dev/null
+  script:
+    - scp -o StrictHostKeyChecking=no deploy_vault_docker-compose.yml $HOST_USER@$HOST_IP:/home/$HOST_USER/
+    - scp -o StrictHostKeyChecking=no deploy_docker-compose.yml $HOST_USER@$HOST_IP:/home/$HOST_USER/
+    - ssh -o StrictHostKeyChecking=no $HOST_USER@$HOST_IP "
+        docker-compose -f deploy_docker-compose.yml down ;
+        docker-compose -f deploy_vault_docker-compose.yml down ;
+        docker image prune --force ;
+        docker volume rm dummy_user_vault-data --force ;
+        docker network prune --force ;
+        docker image ls -q | xargs docker image rm ;
+        docker-compose -f deploy_vault_docker-compose.yml up -d --build ;
+        echo '[+] vault built, we start it, create the secrets and unseal it' &&
+        docker exec vault bash vault/scripts/build_it_up.sh &&
+        echo '[+] the dummy vault is ready sir' "
+
+deploy:
+  stage: deploy
+  only:
+    - master
+  before_script:
+    - eval $(ssh-agent -s)
+    - mkdir ~/.ssh
+    - chmod 0700 ~/.ssh
+    - echo 'echo $SSH_PASSPHRASE' > ~/.ssh/tmp && chmod 700 ~/.ssh/tmp
+    - chmod 0600 $SSH_PRIVATE_KEY
+    - DISPLAY=0 SSH_ASKPASS=~/.ssh/tmp ssh-add $SSH_PRIVATE_KEY < /dev/null
+  id_tokens:
+      VAULT_ID_TOKEN:
+        aud: https://dummy-ops.dev:8200
+  variables:
+    SCOPE: "production"
+    GIT_COMMIT: $CI_COMMIT_SHORT_SHA
+    POSTGRES_HOST: "db"
+    VAULT_ADDR: https://dummy-ops.dev:8200
+  script:
+    - scp -o StrictHostKeyChecking=no deploy_init-certbot-docker-compose.yml $HOST_USER@$HOST_IP:/home/$HOST_USER/
+    - scp -o StrictHostKeyChecking=no get_secrets_into_envrc.sh $HOST_USER@$HOST_IP:/home/$HOST_USER/
+    - ssh -o StrictHostKeyChecking=no $HOST_USER@$HOST_IP "
+        echo 'export SCOPE=\"$SCOPE\"' > /home/dummy_user/envrc &&
+        echo 'export GIT_COMMIT=\"$GIT_COMMIT\"' >> /home/dummy_user/envrc &&
+        echo 'export POSTGRES_USER=\"$POSTGRES_USER\"' >> /home/dummy_user/envrc &&
+        echo 'export POSTGRES_PRODUCTION_DB_NAME=\"$POSTGRES_PRODUCTION_DB_NAME\"' >> /home/dummy_user/envrc &&
+        echo 'export POSTGRES_PORT=\"$POSTGRES_PORT\"' >> /home/dummy_user/envrc &&
+        echo 'export POSTGRES_HOST=\"$POSTGRES_HOST\"' >> /home/dummy_user/envrc &&
+        echo 'export FLASK_APP=\"$FLASK_APP\"' >> /home/dummy_user/envrc &&
+        echo 'export FLASK_DEBUG=\"$FLASK_DEBUG\"' >> /home/dummy_user/envrc &&
+        echo 'export APP_FOLDER=\"$APP_FOLDER\"' >> /home/dummy_user/envrc &&
+        echo 'export EMAIL_SERVER=\"$EMAIL_SERVER\"' >> /home/dummy_user/envrc &&
+        echo 'export LOCAL_EMAIL_LOGS_FILE=\"$LOCAL_EMAIL_LOGS_FILE\"' >> /home/dummy_user/envrc &&
+        echo 'export LOGGING_DEVEL=\"$LOGGING_DEVEL\"' >> /home/dummy_user/envrc &&
+        echo 'export TEST_USER_PWD=\"$TEST_USER_PWD\"' >> /home/dummy_user/envrc &&
+        bash get_secrets_into_envrc.sh $VAULT_ADDR $VAULT_ID_TOKEN &&
+        source /home/dummy_user/envrc &&
+        docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_init_certbot_$GIT_COMMIT &&
+        docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_$GIT_COMMIT &&
+        docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT &&
+        docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT &&
+        docker pull certbot/certbot:latest &&
+        docker-compose -f deploy_init-certbot-docker-compose.yml up -d  --build &&
+        docker-compose -f deploy_init-certbot-docker-compose.yml down &&
+        docker-compose --env-file ./envrc -f deploy_docker-compose.yml up -d "

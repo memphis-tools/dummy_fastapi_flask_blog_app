@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}USERS{% endblock title %}
+
+{% block content %}
+<div class="container px-4 px-lg-5">
+  <h1>DUMMY BLOG - UTILISATEURS</h1>
+  <div class="gx-4 gx-lg-5 d-flex flex-column justify-content-center align-items-center">
+    <div class="d-flex flex-column justify-content-center w-50">
+          {% for user in users %}
+              <div class="user-preview">
+                  <p class="post-title">{{ user.username|upper }}</p>
+                  <a class="btn btn-primary" href="{{ url_for('delete_user', user_id=user.id) }}">SUPPRIMER UTILISATEUR</a>
+              </div>
+              <hr />
+          {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

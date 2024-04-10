@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}OPS{% endblock title %}
+
+{% block content %}
+<div class="container">
+  <h1>DUMMY BLOG - OPS</h1>
+    <div class="d-flex flex-column justify-content-center">
+        <div class="ops-container d-flex flex-column justify-content-center">
+            <h2>Côté OPS mise en place d'une infra pour l'apprentissage (notamment pour les programmes LPIC).</h2>
+            <div class="op-container d-flex flex-column justify-content-start">
+                <p>Usage de <a href="https://www.proxmox.com/en/" target="blank">Proxmox</a>, en cluster (sans ceph).</p>
+                <p>1er noeud</p>
+                <img src="{{ url_for('static', filename='proxlab_noeud_1.png') }}" align="middle" alt="vue noeud1"/>
+                <p>2eme noeud</p>
+                <img src="{{ url_for('static', filename='proxlab_noeud_2.png') }}" align="middle" alt="vue noeud2"/>
+                <p>Noeud Odroid (NAS pour sauvegarder les snapshots et dump)</p>
+                <img src="{{ url_for('static', filename='proxlab_noeud_3.png') }}" align="middle" alt="vue odroid"/>
+                <p>Vue logique des 2 noeuds</p>
+                <img src="{{ url_for('static', filename='proxlab_vue_logique.png') }}" align="middle" alt="vue logique"/>
+            </div>
+            <hr />
+            <h3>Résumé des technologies utilisées</h3>
+            <ul>
+              <li>ANSIBLE</li>
+              <li>APACHE</li>
+              <li>CLUSTER GALERA</li>
+              <li>CLUSTER GLUSTERFS</li>
+              <li>CLUSTER PCS</li>
+              <li>DJANGO</li>
+              <li>DNS</li>
+              <li>DHCP</li>
+              <li>DOCKER, DOCKER SWARM</li>
+              <li>DOVECOT</li>
+              <li>ELASTIC-SEARCH</li>
+              <li>FASTAPI</li>
+              <li>FLASK</li>
+              <li>GITLAB</li>
+              <li>GLPI</li>
+              <li>GRAFANA</li>
+              <li>HAPROXY</li>
+              <li>JENKINS</li>
+              <li>MARIADB</li>
+              <li>MAXSCALE</li>
+              <li>MEDIAWIKI</li>
+              <li>MEMCACHED</li>
+              <li>NAGIOS</li>
+              <li>NEXUS SONATYPE</li>
+              <li>NGINX</li>
+              <li>OPENLDAP</li>
+              <li>OPENSCAP</li>
+              <li>OPENVAS</li>
+              <li>POSTGRESQL</li>
+              <li>PROMETHEUS</li>
+              <li>RUNDECK</li>
+              <li>SQUID</li>
+              <li>VARNISH</li>
+              <li>VAULT</li>
+              <li>WILDFLY</li>
+            </ul>
+            <hr />
+            <h3>Distributions Linux utilisées</h3>
+            <p>Volontairement, des versions obsolètes sont laissées en place</p>
+            <img src="{{ url_for('static', filename='proxlab_grafana_vue_os.png') }}" align="middle" alt="vue grafana"/>
+        </div>
+    </div>
+</div>
+{% endblock content %}

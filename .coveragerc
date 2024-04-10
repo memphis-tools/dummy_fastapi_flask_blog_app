@@ -1,0 +1,15 @@
+[run]
+branch = True
+omit = app/tests/conftest.py, \
+  app/tests/*, \
+  app/packages/__init__.py, \
+  app/packages/database/__init__.py, \
+  app/packages/database/models/__init__.py, \
+  app/packages/fastapi/models/__init__.py, \
+  app/packages/fastapi/routes/__init__.py, \
+  app/packages/flask_app/__init__.py, \
+  app/packages/flask_app/project/config.py, \
+  app/packages/settings.py, \
+  app/packages/utils.py, \
+  app/packages/logtail_handler.py, \
+  app/__init__.py

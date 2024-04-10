@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}CONTACT{% endblock title %}
+
+{% block content %}
+<div class="container px-4 px-lg-5">
+  <h1>DUMMY BLOG - CONTACTEZ NOUS</h1>
+    <div class="d-flex flex-column justify-content-center align-items-center">
+        <div class="d-flex flex-column justify-content-center w-50">
+            <form class="form" action="" method="post">
+              {{ form.csrf_token }}
+              <label for="name">{{ form.name.label }}</label>{{ form.name }}
+              <label for="email">{{ form.email.label }}</label>{{ form.email }}
+              <label for="message">{{ form.message.label }}</label>{{ form.message(class="contact-message") }}
+              <button type="submit" class="btn btn-primary" name="button">ENVOYER</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

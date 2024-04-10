@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}LOGIN{% endblock title %}
+
+{% block content %}
+<div class="container px-4 px-lg-5">
+  <h1>DUMMY BLOG - SE CONNECTER</h1>
+  <div class="gx-4 gx-lg-5 d-flex flex-column justify-content-center align-items-center">
+    <div class="d-flex flex-column justify-content-center w-50">
+      <form class="form" action="" method="post">
+        {{ form.csrf_token }}
+        <label for="login">{{ form.login.label }}</label>{{ form.login }}
+        <label for="password">{{ form.password.label }}</label>{{ form.password }}
+        <label for="email">{{ form.email.label }}</label>{{ form.email }}
+        <button type="submit" class="btn btn-primary" name="button">SE CONNECTER</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}

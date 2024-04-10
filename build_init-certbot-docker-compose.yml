@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  nginx_init_certbot:
+    build:
+      context: .
+      dockerfile: ./nginx/init-certbot-Dockerfile
+    ports:
+      - 80:80

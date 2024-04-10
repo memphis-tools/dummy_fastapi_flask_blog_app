@@ -1,0 +1,23 @@
+Include /etc/ssh/sshd_config.d/*.conf
+Port 22
+HostKey /etc/ssh/ssh_host_ecdsa_key
+SyslogFacility AUTH
+LogLevel VERBOSE
+# we should not allow root direct access
+PermitRootLogin yes
+MaxAuthTries 3
+MaxSessions 2
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+UsePAM yes
+AllowAgentForwarding no
+AllowTcpForwarding no
+X11Forwarding no
+PrintMotd no
+TCPKeepAlive no
+Compression no
+ClientAliveCountMax 2
+AcceptEnv LANG LC_*
+Subsystem	sftp	/usr/lib/openssh/sftp-server
+ClientAliveInterval 120

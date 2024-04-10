@@ -1,0 +1,4 @@
+path "kv/data/dummy_vault" {
+  capabilities = ["read", "list"]
+}
+

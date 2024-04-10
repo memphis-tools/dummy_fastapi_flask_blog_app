@@ -1,0 +1,103 @@
+version: '3.9'
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/local-Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - fastapi
+      - flask_front
+    networks:
+      - app-network
+    volumes:
+      - ./nginx/local_conf:/etc/nginx/conf.d
+      - static_volume:/home/dummy-operator/flask/staticfiles
+      - media_volume:/home/dummy-operator/flask/media
+
+  flask_front:
+    build:
+      context: .
+      dockerfile: ./gunicorn_flask/Dockerfile
+    command: gunicorn --bind 0.0.0.0:8001 app.packages.flask_app.manage:app
+    expose:
+      - 8001
+    environment:
+      - SCOPE
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_TEST_DB_NAME
+      - POSTGRES_PORT
+      - POSTGRES_HOST
+      - ADMIN_EMAIL
+      - ADMIN_LOGIN
+      - ADMIN_PASSWORD
+      - TEST_USER_PWD
+      - SECRET_KEY
+      - BETTERSTACK_SOURCE_TOKEN
+    networks:
+      - app-network
+    depends_on:
+      - fastapi
+    volumes:
+      - static_volume:/home/dummy-operator/flask/staticfiles
+      - media_volume:/home/dummy-operator/flask/media
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: ./uvicorn_fastapi/Dockerfile
+    expose:
+      - 8000
+    environment:
+      - SCOPE
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_TEST_DB_NAME
+      - POSTGRES_PORT
+      - POSTGRES_HOST
+      - ADMIN_EMAIL
+      - ADMIN_LOGIN
+      - ADMIN_PASSWORD
+      - TEST_USER_PWD
+      - SECRET_KEY
+      - BETTERSTACK_SOURCE_TOKEN
+    networks:
+      - app-network
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: postgres:15.0-alpine
+    expose:
+      - 5432
+    environment:
+      - SCOPE
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_TEST_DB_NAME
+      - POSTGRES_PORT
+      - POSTGRES_HOST
+      - ADMIN_EMAIL
+      - ADMIN_LOGIN
+      - ADMIN_PASSWORD
+    networks:
+      - app-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+
+networks:
+  app-network:
+    driver: bridge

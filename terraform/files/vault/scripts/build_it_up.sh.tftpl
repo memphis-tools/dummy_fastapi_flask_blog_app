@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+# Start vault
+vault server -config=/vault/config/vault-config.json &>/dev/null
+
+# Init the vault
+vault operator init > /vault/generated_keys.txt
+
+# Parse unsealed keys
+vault operator unseal $(grep 'Unseal Key 1' < /vault/generated_keys.txt | cut -d ":" -f2 | cut -c2-) &>/dev/null
+vault operator unseal $(grep 'Unseal Key 2' < /vault/generated_keys.txt | cut -d ":" -f2 | cut -c2-) &>/dev/null
+vault operator unseal $(grep 'Unseal Key 3' < /vault/generated_keys.txt | cut -d ":" -f2 | cut -c2-) &>/dev/null
+
+# Get root token and source it
+export VAULT_TOKEN=$(grep 'Initial Root Token:' < /vault/generated_keys.txt | cut -d ":" -f2 | cut -c2-) &>/dev/null
+echo "ROOT TOKEN: $VAULT_TOKEN" > /vault/infos.txt
+
+# Enable kv (version 2 here)
+vault secrets enable -version=2 kv &> /dev/null
+
+# Add test value to kv/dummy_vault secret
+vault kv put kv/dummy_vault \
+	SECRET_KEY="${SECRET_KEY}" \
+	ADMIN_PASSWORD="${ADMIN_PASSWORD}" \
+	POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
+	ADMIN_LOGIN="${ADMIN_LOGIN}" \
+	ADMIN_EMAIL="${ADMIN_EMAIL}" \
+	BETTERSTACK_SOURCE_TOKEN="${BETTERSTACK_SOURCE_TOKEN}" &> /dev/null
+
+# Enable audit logs
+vault audit enable file file_path=/vault/logs/audit.log &>/dev/null
+
+# Enable approle method
+vault auth enable approle &>/dev/null
+
+# JWT auth setup
+vault auth enable jwt &>/dev/null
+
+# Before creating a role, create a gitlab_jwt policy
+vault policy write gitlab_jwt /vault/policies/gitlab.json &>/dev/null
+
+# Set the token duration
+vault write auth/approle/role/gitlab secret_id_ttl=15m  token_ttl=10m  token_max_tll=15m  token_policies="gitlab_jwt" &>/dev/null
+
+# Set the jwt auth config
+vault write auth/jwt/config jwt_supported_algs=RS256 oidc_discovery_url="https://gitlab.com" &>/dev/null
+
+# Set the claims
+vault write auth/jwt/role/gitlab_jwt - <<EOF
+{
+  "role_type": "jwt",
+  "policies": ["gitlab_jwt"],
+  "token_explicit_max_ttl": 30,
+  "token_not_before": 0,
+  "token_policies": "gitlab_jwt",
+  "token_type": "default",
+  "user_claim": "sub",
+  "user_login": "${GITLAB_USER}",
+  "groups_claims": "${GITLAB_GROUP}",
+  "bound_claims_type": "glob",
+  "bound_claims": {
+    "project_id": "${GITLAB_PROJECT_ID}",
+    "ref_protected": "true",
+    "ref": "master",
+    "ref_type": "branch",
+    "groups_direct": ["${GITLAB_GROUP}"]
+  }
+}
+EOF
+
+unset VAULT_TOKEN
+rm /vault/generated_keys.txt

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}BOOKS{% endblock title %}
+
+{% block content %}
+<div class="container">
+  <h1>DUMMY BLOG - LES LIVRES</h1>
+    <div class="d-flex flex-column justify-content-center">
+        <div class="home-books-container">
+          {% for book in books %}
+              <div class="post-preview">
+                  <p class="post-title">{{ book.title }}</p>
+                  <p class="post-meta m-0">
+                      Publié par {{ book.user_id|format_user() }} le {{ book.publication_date|format_datetime() }}
+                  </p>
+                  <p>
+                    <a class="about-book" href="{{ url_for('book', book_id=book.id) }}">A propos du livre</a>
+                  </p>
+                  <img src="{{ url_for('static', filename=book.book_picture_name) }}" align="middle" />
+                  <legend>Auteur: {{ book.author }}</legend>
+                  <div class="counters">
+                      <legend>Commentaires: {{ book.nb_comments }}</legend>
+                      <legend>Favoris: {{ book.nb_starred }}</legend>
+                  </div>
+              </div>
+              <hr />
+          {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

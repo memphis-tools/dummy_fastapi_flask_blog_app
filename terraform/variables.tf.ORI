@@ -1,0 +1,33 @@
+variable "your_virtual_machine_hostname" {
+  type = string
+  default = "YOUR DIGITAL OCEAN DROPLET'S HOSTNAME"
+}
+
+variable "your_ssh_public_key" {
+  type = string
+  default = "YOUR USER SSH PUBLIC KEY TO CONNECT TO DROPLET"
+}
+
+variable "dummy_username" {
+  type = string
+  default = "YOUR LOCAL APP USER ON DROPLET"
+}
+
+variable "host_fqdn" {
+  type = string
+  default = "YOUR APP FQDN"
+}
+
+variable "vault_script_vars" {
+  default = {
+    "SECRET_KEY": "YOUR FLASK-FASTAPI SECRET KEY",
+    "ADMIN_PASSWORD": "YOUR ADMIN APP USER PASSWORD",
+    "POSTGRES_PASSWORD": "YOUR POSTGRES PASSWORD (NOT THE ONE USED DURING TESTS)",
+    "ADMIN_LOGIN": "YOUR ADMIN APP USER NAME",
+    "ADMIN_EMAIL": "USED BY CERTBOT YOUR ADMIN APP USER EMAIL",
+    "GITLAB_USER": "USED IN VAULT CLAIM, A GITLAB USER WHO OWNS GITLAB PROJECT",
+    "GITLAB_PROJECT_ID": "USED IN VAULT CLAIM, YOUR GITLAB PROJECT ID",
+    "GITLAB_GROUP": "USED IN VAULT CLAIM, YOUR GITLAB USERS GROUP ALLOWED TO EXECUTE THE GITLAB CI-CD",
+    "BETTERSTACK_SOURCE_TOKEN": "YOUR BETTERSTACK TOKEN"
+  }
+}

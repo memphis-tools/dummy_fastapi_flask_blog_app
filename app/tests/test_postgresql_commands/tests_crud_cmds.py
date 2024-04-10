@@ -1,0 +1,112 @@
+"""
+All the tests functions dedicatd to test sgbd crud commands.
+Notice that by default we already add dummies data through the application utils module.
+"""
+
+from sqlalchemy import and_
+try:
+    from app.packages import settings
+    from app.packages import utils
+    from app.packages.database.commands import database_crud_commands
+    from app.packages.database.models import models
+except ModuleNotFoundError:
+    from packages import settings
+    from packages import utils
+    from packages.database.commands import database_crud_commands
+    from packages.database.models import models
+
+
+def test_add_user_instance(get_session):
+    """ Description: test if we can add an user instance"""
+    session = get_session
+    instance = models.User(
+        username="fifi",
+        email="fifi@localhost.fr",
+        hashed_password=utils.set_a_hash_password(settings.TEST_USER_PWD),
+        role="user",
+        disabled=False,
+    )
+    query = database_crud_commands.add_instance(session, instance)
+    assert query is True
+
+
+def test_get_user_instance(get_session):
+    """ Description: test if we can get an user instance"""
+    session = get_session
+    instance = session.query(models.User).filter_by(username="fifi").scalar()
+    assert isinstance(instance, models.User)
+    # notice that the __str__ method from user instance returns the username
+    assert str(instance).lower() == "fifi"
+
+
+def test_delete_user_instance(get_session):
+    """ Description: test if we can delete an user instance"""
+    session = get_session
+    instance = session.query(models.User).filter_by(username="fifi").scalar()
+    query = database_crud_commands.delete_instance(session, instance)
+    assert query is True
+
+
+def test_add_book_instance(get_session):
+    """ Description: test if we can add a book instance"""
+    session = get_session
+    instance = models.Book(
+        title="This is a dummy title sir",
+        summary="This is a dummy summary sir",
+        content="This is a dummy content sir",
+        author="Dummy Sapiens",
+        book_picture_name="dummy_book_image.jpg",
+        user_id=2,
+    )
+    query = database_crud_commands.add_instance(session, instance)
+    assert query is True
+
+
+def test_get_book_instance(get_session):
+    """ Description: test if we can get a book instance"""
+    session = get_session
+    instance = session.query(models.Book).filter_by(title="This is a dummy title sir").scalar()
+    assert isinstance(instance, models.Book)
+    # notice that the __str__ method from book instance returns the title
+    assert str(instance) == "This is a dummy title sir"
+
+
+def test_delete_book_instance(get_session):
+    """ Description: test if we can delete a book instance"""
+    session = get_session
+    instance = session.query(models.Book).filter_by(title="This is a dummy title sir").scalar()
+    query = database_crud_commands.delete_instance(session, instance)
+    assert query is True
+
+
+def test_add_comment_instance(get_session):
+    """ Description: test if we can add a comment instance"""
+    session = get_session
+    instance = models.Comment(
+        text="Dummy comment sir",
+        author_id=2,
+        book_id=4,
+    )
+    query = database_crud_commands.add_instance(session, instance)
+    assert query is True
+
+
+def test_get_comment_instance(get_session):
+    """ Description: test if we can get a comment instance"""
+    session = get_session
+    instance = session.query(models.Comment).filter(
+        and_(
+            models.Comment.author_id == 2,
+            models.Comment.book_id == 4,
+            models.Comment.text == "Dummy comment sir",
+        )
+    ).scalar()
+    assert isinstance(instance, models.Comment)
+
+
+def test_delete_comment_instance(get_session):
+    """ Description: test if we can delete an user instance"""
+    session = get_session
+    instance = session.query(models.Comment).filter_by(text="Dummy comment sir").scalar()
+    query = database_crud_commands.delete_instance(session, instance)
+    assert query is True

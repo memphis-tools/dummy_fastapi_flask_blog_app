@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}ADD BOOK{% endblock title %}
+
+{% block content %}
+<div class="container px-4 px-lg-5">
+  <h1>DUMMY BLOG - AJOUTER UN LIVRE</h1>
+  <div class="gx-4 gx-lg-5 d-flex flex-column justify-content-center align-items-center">
+    <div class="d-flex flex-column justify-content-center w-75">
+      <form class="form" method="post" enctype="multipart/form-data">
+          {{ form.csrf_token }}
+          <label for="title">{{ form.title.label }}</label>{{ form.title }}
+          <label for="summary">{{ form.summary.label }}</label>{{ form.summary }}
+          <label for="author">{{ form.author.label }}</label>{{ form.author }}
+          <label for="content">{{ form.content.label }}</label>{{ form.content }}
+          <label for="photo">{{ form.photo.label }}</label>{{ form.photo }}
+          <button type="submit" class="btn btn-primary" name="button">PUBLIER</button>
+        </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}

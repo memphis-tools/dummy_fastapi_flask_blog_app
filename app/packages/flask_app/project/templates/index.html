@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}INDEX{% endblock title %}
+
+{% block content %}
+<div class="container">
+  <h1>DUMMY BLOG</h1>
+  <div class="gx-4 gx-lg-5">
+    <p>Blog perso dédié à l'apprentissage, la répétition. Une chaine ci-cd complète est mise en place, avec des tests avant de publier.</p>
+    <p>Usage de Docker afin de servir Flask, FastAPI, Postgresql en SGBD. Le domaine a été réservé sur NameCheap.</p>
+    <p>Içi la machine virtuelle a été créée chez DigitalOcean.</p>
+    <p>Usage de Betterstack pour adresser des logs.</p>
+    <div class="home-books-container">
+      {% for book in books %}
+      <div class="post-preview">
+        <p class="post-title m-0">{{ book.title }}</p>
+        <p class="post-meta m-0">
+          Publié par {{ book.user_id|format_user() }} le {{ book.publication_date|format_datetime() }}
+        </p>
+        <p>
+            <a class="about-book" href="{{ url_for('book', book_id=book.id) }}">A propos du livre</a>
+        </p>
+        <div class="book-image">
+            <img src="{{ url_for('static', filename=book.book_picture_name) }}" align="middle" />
+            <legend>Auteur: {{ book.author }}</legend>
+            <div class="counters">
+                <legend>Commentaires: {{ book.nb_comments }}</legend>
+                <legend>Favoris: {{ book.nb_starred }}</legend>
+            </div>
+        </div>
+      </div>
+      <hr />
+      {% endfor %}
+    </div>
+    <div class="d-flex flex-column align-items-center justify-content-center mb-4 mt-1">
+      {% if books|length > 0 %}
+          <a class="btn btn-primary text-uppercase w-15" href="{{ url_for('books') }}">TOUS LES LIVRES</a>
+      {% else %}
+          <p>Aucuns livres pour le moment.</p>
+          <a class="btn btn-primary text-uppercase" href="{{ url_for('add_book') }}">AJOUTER UN LIVRE</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock content %}

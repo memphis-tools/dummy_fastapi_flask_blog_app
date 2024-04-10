@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}DELETE BOOK{% endblock title %}
+
+{% block content %}
+<div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+        <h1>DUMMY BLOG - SUPPRIMER LIVRE {{ book_to_delete.title }}</h1>
+        <div class="d-flex flex-column justify-content-center w-75">
+            <form class="form" method="post">
+                {{ form.csrf_token }}
+                <button type="submit" class="btn btn-primary" name="button">SUPPRIMER LIVRE</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

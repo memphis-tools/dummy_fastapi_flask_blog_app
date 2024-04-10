@@ -1,0 +1,16 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:		ssh sshd
+# Required-Start:	$remote_fs $syslog
+# Required-Stop:	$remote_fs $syslog
+# Default-Start:	2 3 4 5
+# Default-Stop:
+# Short-Description:	OpenBSD Secure Shell server
+### END INIT INFO
+
+if test -f /home/dummy_user/deploy_docker-compose.yml
+then
+   docker-compose -f /home/dummy_user/deploy_docker-compose.yml down
+   docker-compose -f /home/dummy_user/deploy_vault_docker-compose.yml down
+fi

@@ -1,0 +1,113 @@
+version: '3.9'
+
+services:
+  nginx:
+    image: memphistools/public_repo:dummy_fastapi_flask_blog_app-nginx_$GIT_COMMIT
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - fastapi
+      - flask_front
+    networks:
+      - app-network
+    volumes:
+      - web-root:/var/www/html
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - static_volume:/home/dummy-operator/flask/staticfiles
+      - media_volume:/home/dummy-operator/flask/mediafiles
+
+  flask_front:
+    image: memphistools/public_repo:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT
+    command: gunicorn --bind 0.0.0.0:8001 app.packages.flask_app.manage:app
+    expose:
+      - 8001
+    environment:
+      - SCOPE
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_TEST_DB_NAME
+      - POSTGRES_PORT
+      - POSTGRES_HOST
+      - ADMIN_LOGIN
+      - ADMIN_PASSWORD
+      - ADMIN_EMAIL
+      - TEST_USER_PWD
+      - SECRET_KEY
+      - BETTERSTACK_SOURCE_TOKEN
+    networks:
+      - app-network
+    depends_on:
+      - fastapi
+    volumes:
+      - static_volume:/home/dummy-operator/flask/staticfiles
+      - media_volume:/home/dummy-operator/flask/mediafiles
+
+  fastapi:
+    image: memphistools/public_repo:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT
+    expose:
+      - 8000
+    environment:
+      - SCOPE
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_TEST_DB_NAME
+      - POSTGRES_PORT
+      - POSTGRES_HOST
+      - ADMIN_LOGIN
+      - ADMIN_PASSWORD
+      - ADMIN_EMAIL
+      - TEST_USER_PWD
+      - SECRET_KEY
+      - BETTERSTACK_SOURCE_TOKEN
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15.0-alpine
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_PORT
+      - POSTGRES_HOST
+      - ADMIN_LOGIN
+      - ADMIN_PASSWORD
+      - ADMIN_EMAIL
+    networks:
+      - app-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - web-root:/var/www/html
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+    environment:
+      - ADMIN_EMAIL
+    depends_on:
+      - nginx
+    command: certonly --webroot --webroot-path /var/www/html --email $ADMIN_EMAIL --agree-tos --no-eff-email --force-renewal -d dummy-ops.dev -d www.dummy-ops.dev
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+  certbot-etc:
+  certbot-var:
+  web-root:
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}OPS{% endblock title %}
+
+{% block content %}
+<div class="container">
+  <h1>DUMMY BLOG - MOOCS</h1>
+    <div class="d-flex flex-column align-items-center">
+        <div class="moocs_container">
+            <h2>MOOCS SUGGERES</h2>
+            <div class="d-flex align-items-center flex-column">
+                <a href="https://www.udemy.com" target="blank">UDEMY</a>
+                <a href="https://www.stationx.net/" target="blank">STATION X</a>
+                <a href="https://realpython.com/" target="blank">REAL PYTHON</a>
+                <a href="https://testdriven.io/" target="blank">TEST DRIVEN</a>
+                <p class="dummy_icon">🗿</p>
+            </div>
+            <hr />
+            <h2>A FUIR</h2>
+            <div class="">
+                <div class="run_fool_container">
+                  <img src="{{ url_for('static', filename='fuyez_pauvres_fous.jpg') }}" align="middle" />
+                  <img src="{{ url_for('static', filename='openclassroom_dev_python.png') }}" align="middle" />
+                </div>
+            </div>
+            <hr />
+        </div>
+    </div>
+</div>
+{% endblock content %}
