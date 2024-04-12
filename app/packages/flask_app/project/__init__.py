@@ -87,7 +87,7 @@ def format_datetime(value):
     """
     Description: a custom filter for date to be used in templates
     """
-    # to use for an english output (import calendar)
+    # to use for an english output (import calendar), example below
     # formated_date = f"{calendar.month_name[int(value.strftime('%m'))]} {value.strftime('%d')} {value.strftime('%Y')}"
     formated_date = (
         f"{value.strftime('%d')}/{value.strftime('%m')}/{value.strftime('%Y')}"
