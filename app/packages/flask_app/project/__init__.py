@@ -263,7 +263,9 @@ def add_book():
         logs_context = {"current_user": f"{current_user.username}", "book_title": new_book.title}
         LOGGER.info("[+] Flask - Ajout livre", extra=logs_context)
         session.close()
-        return redirect(url_for("books"))
+        return render_template(
+            "index.html", is_authenticated=current_user.is_authenticated
+        )
     session.close()
     return render_template(
         "add_book.html", form=form, is_authenticated=current_user.is_authenticated
@@ -297,7 +299,7 @@ def login():
                 session.close()
                 return render_template(
                     "index.html",
-                    books=first_books,
+                    first_books=first_books,
                     is_authenticated=current_user.is_authenticated,
                 )
             else:
