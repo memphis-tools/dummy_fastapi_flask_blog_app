@@ -96,6 +96,13 @@ input {
   list-style: none;
 }
 
+.section_intro {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 5%;
+}
+
 .home-books-container {
   display: flex;
   flex-direction: row;
@@ -126,10 +133,18 @@ input {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+
 }
 
-.run_fool_container img {
-  width: 50%;
+.run_image {
+  height: auto;
+  width: 25%;
+}
+
+.run_mooc{
+  width: 75%;
 }
 
 .post-preview {
@@ -196,6 +211,7 @@ footer {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: white;
 }
 
 footer ul {
@@ -293,6 +309,15 @@ footer #footer_date {
     max-width: 550px;
   }
 
+  .run_image {
+    width: 50%;
+    height: auto;
+  }
+
+  .run_mooc{
+    width: 100%;
+  }
+
   legend {
     padding: 0;
     display: flex;
@@ -366,7 +391,12 @@ footer #footer_date {
     flex-wrap: nowrap;
   }
 
-  .run_fool_container img {
+  .run_image {
+    width: 50%;
+    height: auto;
+  }
+
+  .run_mooc{
     width: 100%;
   }
 

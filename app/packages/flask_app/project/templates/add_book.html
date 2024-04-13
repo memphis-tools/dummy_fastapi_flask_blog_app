@@ -4,9 +4,10 @@
 {% block title %}ADD BOOK{% endblock title %}
 
 {% block content %}
-<div class="container px-4 px-lg-5">
+<div class="container">
   <h1>DUMMY BLOG - AJOUTER UN LIVRE</h1>
-  <div class="gx-4 gx-lg-5 d-flex flex-column justify-content-center align-items-center">
+  <div class="section_intro"></div>
+  <div class="d-flex flex-column justify-content-center align-items-center">
     <div class="d-flex flex-column justify-content-center w-75">
       <form class="form" method="post" enctype="multipart/form-data">
           {{ form.csrf_token }}

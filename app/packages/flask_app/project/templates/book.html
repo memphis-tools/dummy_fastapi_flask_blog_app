@@ -4,56 +4,54 @@
 {% block title %}BOOK{% endblock title %}
 
 {% block content %}
-        <div class="container px-4 px-lg-5">
-            <div class="row gx-4 gx-lg-5 justify-content-center">
-              <h1>DUMMY BLOG - LIVRE</h1>
-                <div class="col-md-10 col-lg-8 col-xl-7">
-                        <!-- Post preview-->
-                        <div class="post-preview w-100">
-                            <h2 class="d-flex flex-column">Titre: {{ book.title }}</h2>
-                            <h3 class="post-author d-flex flex-column">Auteur: {{ book.author }}</h3>
-                            <h4 class="post-subtitle">Sous-titre: {{ book.summary }}</h4>
-                            <img style="width:200px;height:auto;" src="{{ url_for('static', filename=book.book_picture_name) }}" align="middle" />
-                            <p class="post-publisher">
-                                Publié par {{ book.user_id|format_user() }}
-                                on {{ book.publication_date|format_datetime() }}
-                            </p>
-                            <p>{{ book.content }}</p>
-                            {% if current_user.id == book.user_id or current_user.role == 'admin' %}
-                              <div class="buttons_container">
-                                  <a class="btn btn-primary w-25" href="{{ url_for('delete_book', book_id=book.id)}}">Delete book</a>
-                                  <a class="btn btn-primary w-25" href="{{ url_for('update_book', book_id=book.id)}}">Update book</a>
-                              </div>
-                            {% endif %}
-                        </div>
-                        <!-- Divider-->
-                        <hr class="my-4" />
-                    <!-- Pager-->
-                    <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="{{ url_for('books') }}">TOUS LES LIVRES</a></div>
-                </div>
-                <!--  Comments Area -->
-                <form class="form" action="" method="post">
-                  {{ form.csrf_token }}
-                  <label for="comment_text">{{ form.comment_text.label }}</label>{{ form.comment_text }}
-                  <button type="submit" class="btn btn-primary" name="button">AJOUTER COMMENTAIRE</button>
-                </form>
-                <div class="col-lg-8 col-md-10 mx-auto comments">
-                        <ul class="commentList">
-                              {% for comment in comments: %}
-                              <li>
-                                  <div class="commentText" id="comment_text">
-                                    <p class="comment_user">Utilisateur: {{ comment.author_id|format_user() }}</p>
-                                    <p class="comment">Commentaire: {{ comment }}</p>
-                                    {% if current_user.id == comment.author_id or current_user.role == 'admin' %}
-                                        <a class="btn btn-primary" href="{{ url_for('delete_comment', comment_id=comment.id)}}">Delete comment</a>
-                                        <a class="btn btn-primary" href="{{ url_for('update_comment', comment_id=comment.id)}}">Update comment</a>
-                                    {% endif %}
-                                  </div>
-                              </li>
-                              <hr />
-                              {% endfor %}
-                        </ul>
-                  </div>
+<div class="container">
+      <h1>DUMMY BLOG - LIVRE</h1>
+      <div class="section_intro"></div>
+      <!-- Post preview-->
+      <div class="post-preview w-100">
+          <h2 class="d-flex flex-column">Titre: {{ book.title }}</h2>
+          <h3 class="post-author d-flex flex-column">Auteur: {{ book.author }}</h3>
+          <h4 class="post-subtitle">Sous-titre: {{ book.summary }}</h4>
+          <img style="width:200px;height:auto;" src="{{ url_for('static', filename=book.book_picture_name) }}" align="middle" />
+          <p class="post-publisher">
+              Publié par {{ book.user_id|format_user() }}
+              on {{ book.publication_date|format_datetime() }}
+          </p>
+          <p>{{ book.content }}</p>
+          {% if current_user.id == book.user_id or current_user.role == 'admin' %}
+            <div class="buttons_container">
+                <a class="btn btn-primary w-25" href="{{ url_for('delete_book', book_id=book.id)}}">Delete book</a>
+                <a class="btn btn-primary w-25" href="{{ url_for('update_book', book_id=book.id)}}">Update book</a>
             </div>
-        </div>
+          {% endif %}
+      </div>
+      <!-- Divider-->
+      <hr class="my-4" />
+      <!-- Pager-->
+      <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="{{ url_for('books') }}">TOUS LES LIVRES</a></div>
+
+      <!--  Comments Area -->
+      <form class="form" action="" method="post">
+        {{ form.csrf_token }}
+        <label for="comment_text">{{ form.comment_text.label }}</label>{{ form.comment_text }}
+        <button type="submit" class="btn btn-primary" name="button">AJOUTER COMMENTAIRE</button>
+      </form>
+      <div class="col-lg-8 col-md-10 mx-auto comments">
+          <ul class="commentList">
+            {% for comment in comments: %}
+            <li>
+                <div class="commentText" id="comment_text">
+                  <p class="comment_user">Utilisateur: {{ comment.author_id|format_user() }}</p>
+                  <p class="comment">Commentaire: {{ comment }}</p>
+                  {% if current_user.id == comment.author_id or current_user.role == 'admin' %}
+                      <a class="btn btn-primary" href="{{ url_for('delete_comment', comment_id=comment.id)}}">Delete comment</a>
+                      <a class="btn btn-primary" href="{{ url_for('update_comment', comment_id=comment.id)}}">Update comment</a>
+                  {% endif %}
+                </div>
+            </li>
+            <hr />
+            {% endfor %}
+          </ul>
+      </div>
+</div>
 {% endblock content %}
