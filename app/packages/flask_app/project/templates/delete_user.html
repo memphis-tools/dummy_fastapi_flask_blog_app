@@ -5,8 +5,8 @@
 
 {% block content %}
 <div class="container">
-    <h1>DUMMY BLOG - SUPPRIMER UTILISATEUR {{ user_to_delete.username }}</h1>
     <div class="section_intro"></div>
+    <h1>DUMMY BLOG - SUPPRIMER UTILISATEUR {{ user_to_delete.username }}</h1>
     <div class="d-flex flex-column justify-content-center w-75">
       <form class="form" method="post" enctype="multipart/form-data">
           {{ form.csrf_token }}
