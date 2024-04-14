@@ -25,7 +25,7 @@ h1, h2, h3, h4, h5 {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin-bottom: 2%;
+  margin: 2% 0% 2% 0%;
 }
 
 h2 {
@@ -100,7 +100,12 @@ input {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0 5%;
+  border-bottom: 1px dashed blue;
+  padding: 0 5% 2% 5%;
+}
+
+.section_intro p {
+  margin-bottom: 0.5rem;
 }
 
 .home-books-container {
@@ -109,16 +114,16 @@ input {
   flex-wrap: wrap;
   align-items: start;
   justify-content: start;
-  padding-bottom: 5%;
+  padding-bottom: 3%;
   padding-left: 10%;
 }
 
 .op-container {
-  padding: 0 5% 0 5%;
+  padding: 0 0;
 }
 
 .op-container img {
-  width: 1050px;
+  width: 100%;
   height: auto;
   padding-bottom: 2%;
 }
@@ -450,6 +455,8 @@ footer #footer_date {
   }
 
   .social-networks {
+    display: flex;
+    flex-direction: column;
     width: 100%;
     padding: 0%;
     margin: 0%;
