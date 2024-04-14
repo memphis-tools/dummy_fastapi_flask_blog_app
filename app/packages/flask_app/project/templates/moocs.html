@@ -4,23 +4,28 @@
 
 {% block content %}
 <div class="container">
-  <h1>DUMMY BLOG - MOOCS</h1>
+    <h1>DUMMY BLOG - MOOCS</h1>
+    <div class="section_intro"></div>
     <div class="d-flex flex-column align-items-center">
         <div class="moocs_container">
             <h2>MOOCS SUGGERES</h2>
             <div class="d-flex align-items-center flex-column">
+                <a href="https://www.cnam.fr/portail/conservatoire-national-des-arts-et-metiers-accueil-821166.kjsp" target="blank">CNAM</a>
                 <a href="https://www.udemy.com" target="blank">UDEMY</a>
                 <a href="https://www.stationx.net/" target="blank">STATION X</a>
                 <a href="https://realpython.com/" target="blank">REAL PYTHON</a>
                 <a href="https://testdriven.io/" target="blank">TEST DRIVEN</a>
+                <a href="https://www.elephorm.com/" target="blank">ELEPHORM</a>
                 <p class="dummy_icon">🗿</p>
             </div>
             <hr />
             <h2>A FUIR</h2>
-            <div class="">
-                <div class="run_fool_container">
-                  <img src="{{ url_for('static', filename='fuyez_pauvres_fous.jpg') }}" align="middle" />
-                  <img src="{{ url_for('static', filename='openclassroom_dev_python.png') }}" align="middle" />
+            <p class="d-flex justify-content-center dummy_icon">💩</p>
+            <div class="run_fool_container">
+                <div class="d-flex flex-column align-items-center">
+                  <img class="run_image" src="/static/fuyez_pauvres_fous.jpg" />
+                  <p class="pt-3">Titre RNCP obtenu. 4500€ CPF. Organisme viable, mais cycle trop fourre-tout.</p>
+                  <img class="run_mooc" src="/static/openclassroom_dev_python.png" />
                 </div>
             </div>
             <hr />
