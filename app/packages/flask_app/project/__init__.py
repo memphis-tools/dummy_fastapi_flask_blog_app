@@ -19,13 +19,13 @@ from werkzeug.utils import secure_filename
 
 
 try:
-    from app.packages import logtail_handler
+    from app.packages import logtail_handler, settings
     from app.packages.database.commands import session_commands
-    from app.packages.database.models.models import Book, Comment, User
+    from app.packages.database.models.models import Book, Comment, User, BookCategory
 except ModuleNotFoundError:
-    from packages import logtail_handler
+    from packages import logtail_handler, settings
     from packages.database.commands import session_commands
-    from packages.database.models.models import Book, Comment, User
+    from packages.database.models.models import Book, Comment, User, BookCategory
 
 from . import forms
 
@@ -109,6 +109,17 @@ def format_user(id):
     return user
 
 
+@app.template_filter()
+def format_book_category(id):
+    """
+    Description: a custom filter for book category to be used in templates
+    """
+    session = session_commands.get_a_database_session("postgresql")
+    category = session.get(BookCategory, id)
+    session.close()
+    return category
+
+
 @app.route("/front")
 @app.route("/front/home/")
 def index():
@@ -121,14 +132,6 @@ def index():
     return render_template(
         "index.html", books=first_books, is_authenticated=current_user.is_authenticated
     )
-
-
-@app.route("/front/about/")
-def about():
-    """
-    Description: the about Flask route.
-    """
-    return render_template("about.html", is_authenticated=current_user.is_authenticated)
 
 
 @app.route("/front/contact/", methods=["GET", "POST"])
@@ -217,6 +220,24 @@ def book(book_id):
     )
 
 
+def check_book_fields(book):
+    """
+    Description: vérifier que l'utilisateur renseigne le livre correctement.
+    """
+    if any([
+        book.title == "string",
+        book.author == "string",
+        book.summary == "string",
+        book.content == "string",
+    ]):
+        error = "Saisie invalide, mot clef string non utilisable."
+        return error
+    if type(book.year_of_publication) is not int:
+        error = "Saisie invalide, annee publication livre doit etre un entier."
+        return error
+    return True
+
+
 @app.route("/front/add_book/", methods=["GET", "POST"])
 @login_required
 def add_book():
@@ -226,44 +247,52 @@ def add_book():
     session = session_commands.get_a_database_session("postgresql")
     form = forms.BookForm()
     if form.validate_on_submit():
-        if any([
-            form.title.data == "string",
-            form.author.data == "string",
-            form.summary.data == "string",
-            form.content.data == "string",
-            form.photo.data == "string",
-        ]):
-            session.close()
-            flash("Saisie invalide, mot clef string non utilisable.", "error")
-            return render_template(
-                "add_book.html", form=form, is_authenticated=current_user.is_authenticated
-            )
         title = form.title.data
         summary = form.summary.data
         content = form.content.data
         author = form.author.data
+        category = form.categories.data[0]["intitule"]
+        try:
+            category_id = session.query(BookCategory).filter(BookCategory.title==category).first().id
+        except Exception:
+            flash("Saisie invalide, categorie livre non prevue.", "error")
+            return render_template(
+                "add_book.html", form=form, is_authenticated=current_user.is_authenticated
+                )
+        year_of_publication = form.year_of_publication.data
         book_picture = form.photo.data
         filename = secure_filename(book_picture.filename)
         new_book = Book(
-            title=title,
-            summary=summary,
-            content=content,
-            author=author,
-            book_picture_name=filename,
-            user_id=current_user.get_id(),
+        title=title,
+        summary=summary,
+        content=content,
+        author=author,
+        category=category_id,
+        year_of_publication=year_of_publication,
+        book_picture_name=filename,
+        user_id=current_user.get_id(),
         )
-        book_picture.save(os.path.join(app.instance_path, "staticfiles", filename))
-        session.add(new_book)
-        session.commit()
-        session.refresh(new_book)
-        user = session.query(User).get(new_book.user_id)
-        total_user_publications = user.nb_publications + 1
-        user.nb_publications = total_user_publications
-        session.commit()
-        logs_context = {"current_user": f"{current_user.username}", "book_title": new_book.title}
-        LOGGER.info("[+] Flask - Ajout livre", extra=logs_context)
-        session.close()
-        return redirect(url_for("books"))
+        book_is_valid = check_book_fields(new_book)
+        if book_is_valid is True:
+            if os.getenv("SCOPE") == "production":
+                book_picture.save(os.path.join(app.instance_path, "staticfiles", filename))
+            session.add(new_book)
+            session.commit()
+            session.refresh(new_book)
+            user = session.get(User, new_book.user_id)
+            total_user_publications = user.nb_publications + 1
+            user.nb_publications = total_user_publications
+            session.commit()
+            logs_context = {"current_user": f"{current_user.username}", "book_title": new_book.title}
+            LOGGER.info("[+] Flask - Ajout livre", extra=logs_context)
+            session.close()
+            return redirect(url_for("books"))
+        else:
+            flash(book_is_valid, "error")
+            session.close()
+            return render_template(
+            "add_book.html", form=form, is_authenticated=current_user.is_authenticated
+            )
     session.close()
     return render_template(
         "add_book.html", form=form, is_authenticated=current_user.is_authenticated
@@ -407,44 +436,65 @@ def update_book(book_id):
     """
     session = session_commands.get_a_database_session("postgresql")
     book = session.get(Book, book_id)
-    book_picture_filename = book.book_picture_name
-    edit_form = forms.UpdateBookForm(
-        title=book.title,
-        summary=book.summary,
-        content=book.content,
-        author=book.author,
-    )
-    if edit_form.validate_on_submit():
-        title = edit_form.title.data
-        summary = edit_form.summary.data
-        content = edit_form.content.data
-        author = edit_form.author.data
-        book_picture = edit_form.photo.data
-        if book_picture is not None:
-            filename = secure_filename(book_picture.filename)
-        else:
-            filename = book_picture_filename
-        publication_date = book.publication_date
-        updated_book = Book(
-            title=title,
-            summary=summary,
-            content=content,
-            author=author,
-            book_picture_name=filename,
-            publication_date=publication_date,
-            user_id=book.user_id,
+    category = session.query(BookCategory).filter(BookCategory.id==book.category).first()
+    if book:
+        book_picture_filename = book.book_picture_name
+        edit_form = forms.UpdateBookForm(
+            title=book.title,
+            summary=book.summary,
+            content=book.content,
+            category=book.category,
+            year_of_publication=book.year_of_publication,
+            author=book.author,
         )
-        if book_picture_filename != filename:
-            book_picture.save(os.path.join(app.instance_path, "staticfiles", filename))
-            os.remove(f"{app.instance_path}staticfiles/{book_picture_filename}")
-
-        session.query(Book).where(Book.id == book_id).update(
-            updated_book.get_json_for_update()
-        )
-        session.commit()
-        session.refresh(book)
-        session.close()
-        return redirect(url_for("book", book_id=book.id))
+        if edit_form.validate_on_submit():
+            title = edit_form.title.data
+            summary = edit_form.summary.data
+            content = edit_form.content.data
+            author = edit_form.author.data
+            category = edit_form.categories.data[0]["intitule"]
+            category_id = session.query(BookCategory).filter(BookCategory.title==category).first().id
+            year_of_publication = edit_form.year_of_publication.data
+            book_picture = edit_form.photo.data
+            if book_picture is not None:
+                filename = secure_filename(book_picture.filename)
+            else:
+                filename = book_picture_filename
+            publication_date = book.publication_date
+            updated_book = Book(
+                title=title,
+                summary=summary,
+                content=content,
+                author=author,
+                category=category_id,
+                year_of_publication=year_of_publication,
+                book_picture_name=filename,
+                publication_date=publication_date,
+                user_id=book.user_id,
+            )
+            if book_picture_filename != filename:
+                book_picture.save(os.path.join(app.instance_path, "staticfiles", filename))
+                try:
+                    os.remove(f"{app.instance_path}staticfiles/{book_picture_filename}")
+                except FileNotFoundError:
+                    pass
+            book_is_valid = check_book_fields(new_book)
+            if book_is_valid is True:
+                session.query(Book).where(Book.id == book_id).update(
+                    updated_book.get_json_for_update()
+                )
+                session.commit()
+                session.close()
+                return redirect(url_for("book", book_id=book.id))
+            else:
+                flash(book_is_valid, "error")
+                session.close()
+                return render_template(
+                "update_book.html", form=edit_form, is_authenticated=current_user.is_authenticated
+                )
+    else:
+        flash("Livre non trouvé", "error")
+        return redirect(url_for("books"))
     session.close()
     return render_template(
         "update_book.html",

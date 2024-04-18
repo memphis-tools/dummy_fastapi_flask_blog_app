@@ -7,10 +7,10 @@ from sqlalchemy.sql import text
 from sqlalchemy_utils import create_database, database_exists
 
 try:
-    from app.packages import utils
+    from app.packages import utils, settings
     from app.packages.database.models import models
 except ModuleNotFoundError:
-    from packages import utils
+    from packages import utils, settings
     from packages.database.models import models
 
 
@@ -58,14 +58,16 @@ def get_a_database_session(engine_name):
         db_name = os.getenv("POSTGRES_PRODUCTION_DB_NAME")
     else:
         db_name = os.getenv("POSTGRES_TEST_DB_NAME")
-    username = os.getenv("POSTGRES_USER")
-    password = os.getenv("POSTGRES_PASSWORD")
-    host = os.getenv("POSTGRES_HOST")
-    port = os.getenv("POSTGRES_PORT")
-    url = f"postgresql+psycopg://{username}:{password}@{host}:{port}/{db_name}"
-    engine = create_engine(url)
-    session_maker = sessionmaker(bind=engine)
-    session = session_maker()
+
+    if engine_name == "postgresql":
+        username = os.getenv("POSTGRES_USER")
+        password = os.getenv("POSTGRES_PASSWORD")
+        host = os.getenv("POSTGRES_HOST")
+        port = os.getenv("POSTGRES_PORT")
+        url = f"postgresql+psycopg://{username}:{password}@{host}:{port}/{db_name}"
+        engine = create_engine(url)
+        session_maker = sessionmaker(bind=engine)
+        session = session_maker()
     return session
 
 
@@ -93,13 +95,31 @@ def init_database(engine_name):
         models.BASE.metadata.drop_all(engine)
         models.BASE.metadata.create_all(engine)
         create_application_admin_user_if_not_exist(session)
+        create_books_categories_if_not_exist(session)
         reset_and_populate_database(session)
     else:
         create_application_admin_user_if_not_exist(session)
+        create_books_categories_if_not_exist(session)
         update_default_postgres_password(engine_name, session)
     print("[+] The database application is ready sir.")
 
     return session
+
+
+def create_books_categories_if_not_exist(session):
+    """
+    Description: create all books categories declared in settings.
+    """
+    categories = session.query(models.BookCategory).all()
+    if len(categories) == 0:
+        for category in settings.BOOKS_CATEGORIES:
+            book_category = models.BookCategory(
+                title = category
+            )
+            session.add(book_category)
+            session.commit()
+        return True
+    return '[+] Books categories already set sir, nothing to do.'
 
 
 def create_application_admin_user_if_not_exist(session):

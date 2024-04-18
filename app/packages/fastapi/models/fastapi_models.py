@@ -22,6 +22,8 @@ class BookModel(BaseModel):
     author: str
     summary: str
     content: str
+    category: str
+    year_of_publication: int
     publication_date: dt.datetime
     book_picture_name: str
     user_id: int
@@ -35,6 +37,8 @@ class NewBookModel(BaseModel):
     author: str
     summary: str
     content: str
+    category: str
+    year_of_publication: int
     book_picture_name: str
 
 
@@ -44,6 +48,8 @@ class UpdateBookModel(BaseModel):
     author: Optional[str] | None = None
     summary: Optional[str] | None = None
     content: Optional[str] | None = None
+    category: Optional[str] | None = None
+    year_of_publication: Optional[int] | None = None
     book_picture_name: Optional[str] | None = None
 
 

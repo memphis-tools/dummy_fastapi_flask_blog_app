@@ -72,7 +72,7 @@ def flask_app():
     """
     app = project.app
     app.config.update(
-        {"TESTING": True, "WTF_CSRF_ENABLED": True, "LOGIN_DISABLED": False}
+        {"TESTING": True, "WTF_CSRF_ENABLED": True, "LOGIN_DISABLED": False, "DEBUG": True}
     )
     yield app
 
@@ -129,9 +129,9 @@ def access_session_as_admin(client, get_flask_csrf_token):
 
 
 @pytest.fixture
-def mock_function(mocker):
+def mock_function_delete_book(mocker):
     """
-    Description: we mock the delete_book functions.
+    Description: we mock the delete_book function.
     We do not want to really remove the book's illustration file (image).
     """
     mocker.patch("app.packages.flask_app.project.__init__.delete_book", return_value=True)

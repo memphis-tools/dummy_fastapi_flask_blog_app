@@ -1,11 +1,15 @@
 """ The Flask forms definitions """
 
+import datetime as dt
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from wtforms import StringField, PasswordField, TextAreaField, EmailField
+from wtforms import StringField, PasswordField, TextAreaField, EmailField, IntegerField, FieldList, Form, FormField, SelectField
+from wtforms.validators import DataRequired, Length, Email, NumberRange
 
-# from wtforms.fields import EmailField
-from wtforms.validators import DataRequired, Length, Email
+try:
+    from app.packages import settings
+except ModuleNotFoundError:
+    from packages import settings
 
 
 class LoginForm(FlaskForm):
@@ -39,10 +43,21 @@ class RegisterForm(FlaskForm):
     email = EmailField("EMAIL", validators=[DataRequired(), Email()])
 
 
+class BookCategory(Form):
+    categories_tupple_list = []
+    for category in settings.BOOKS_CATEGORIES:
+        categories_tupple_list.append((f'{category.lower()}', f'{category.upper()}'))
+    intitule = SelectField("CATEGORIE", choices=categories_tupple_list)
+
+
 class BookForm(FlaskForm):
     """
     Description: the book FlaskForm form.
     """
+    max_year = dt.date.today().year
+    def validate_category(form, field):
+        if field.data not in settings.BOOKS_CATEGORIES:
+            raise ValidationError("Catégorie livre non prévue")
 
     title = StringField(
         label="TITRE", validators=[DataRequired(), Length(min=3, max=80)]
@@ -52,6 +67,11 @@ class BookForm(FlaskForm):
     )
     content = TextAreaField(
         label="DESCRIPTION", validators=[DataRequired(), Length(max=2500)]
+    )
+    categories = FieldList(FormField(BookCategory), min_entries=1, max_entries=1)
+    year_of_publication = IntegerField(
+        label="ANNEE PUBLICATION",
+        validators=[DataRequired(), NumberRange(min=1, max=max_year)],
     )
     author = StringField(
         label="AUTEUR", validators=[DataRequired(), Length(min=3, max=120)]
@@ -71,6 +91,10 @@ class UpdateBookForm(FlaskForm):
     """
     Description: the update book FlaskForm form.
     """
+    max_year = dt.date.today().year
+    def validate_category(form, field):
+        if field.data not in settings.BOOKS_CATEGORIES:
+            raise ValidationError("Catégorie livre non prévue")
 
     title = StringField(
         label="TITRE", validators=[DataRequired(), Length(min=3, max=80)]
@@ -80,6 +104,11 @@ class UpdateBookForm(FlaskForm):
     )
     content = TextAreaField(
         label="DESCRIPTION", validators=[DataRequired(), Length(max=2500)]
+    )
+    categories = FieldList(FormField(BookCategory), min_entries=1, max_entries=1)
+    year_of_publication = IntegerField(
+        label="ANNEE PUBLICATION",
+        validators=[DataRequired(), NumberRange(min=1, max=max_year)],
     )
     author = StringField(
         label="AUTEUR", validators=[DataRequired(), Length(min=3, max=120)]
