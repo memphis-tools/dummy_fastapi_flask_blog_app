@@ -11,7 +11,9 @@
       <div class="post-preview w-100">
           <h2 class="d-flex flex-column">Titre: {{ book.title }}</h2>
           <h3 class="post-author d-flex flex-column">Auteur: {{ book.author }}</h3>
-          <h4 class="post-subtitle">Sous-titre: {{ book.summary }}</h4>
+          <h4 class="d-flex flex-column">Catégorie: {{ book.category|format_book_category() }}</h4>
+          <h4 class="d-flex flex-column">Année édition: {{ book.year_of_publication }}</h4>
+          <h4 class="d-flex flex-column">Sous-titre: {{ book.summary }}</h4>
           <img style="width:200px;height:auto;" src="{{ url_for('static', filename=book.book_picture_name) }}" align="middle" />
           <p class="post-publisher">
               Publié par {{ book.user_id|format_user() }}

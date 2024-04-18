@@ -3,13 +3,16 @@ All the tests functions for the status from FastAPI's uri /urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
+import os
 from pathlib import Path
-
+from werkzeug.datastructures import FileStorage
 try:
     from app.packages.database.models.models import Book, User
+    from app.packages.flask_app.project.__init__ import check_book_fields
     from app.packages import settings
 except ModuleNotFoundError:
     from packages.database.models.models import Book, User
+    from packages.flask_app.project.__init__ import check_book_fields
     from packages import settings
 
 
@@ -167,6 +170,7 @@ def test_flask_post_add_book_with_authentication(
     Description: check if we can add a book being authenticated and without following redirect.
     """
     # get the resources folder in the tests folder
+    #rb flag means "Open in binary mode (read/write using byte data)" - https://realpython.com/read-write-files-python/
     resources = Path(__file__).parent
     headers = {
         "Content-Type": "multipart/form-data",
@@ -223,6 +227,24 @@ def test_flask_post_add_book_without_authentication_with_invalid_datas(client):
         "title": "This is a dummy title sir",
         "summary": "This is a dummy summary sir",
         "content": "This is a dummy content sir",
+    }
+
+    url = "http://localhost/front/add_book/"
+    response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
+    assert response.status_code == 400
+
+
+def test_flask_post_add_book_without_authentication_with_invalid_book_category(client):
+    """
+    Description: check if we can add a book without being authenticated and without a csrf token.
+    """
+    headers = {"Content-Type": "multipart/form-data"}
+    book_form = {
+        "title": "This is a dummy title sir",
+        "summary": "This is a dummy summary sir",
+        "content": "This is a dummy content sir",
+        "year_of_publication": "2023",
+        "category": "supplication"
     }
 
     url = "http://localhost/front/add_book/"
@@ -491,13 +513,14 @@ def test_flask_post_delete_book_being_authenticated_without_being_the_publisher(
         follow_redirects=True,
     )
     assert response.status_code == 403
+    assert b"You don&#39;t have the permission to access the requested resource." in response.data
 
 
 def test_flask_post_delete_book_being_authenticated_being_the_publisher(
     client, access_session,
     get_flask_csrf_token,
     get_session,
-    mock_function,
+    mock_function_delete_book,
 ):
     """
     Description: check if we can delete book route being authenticated being the book's publisher.
@@ -702,3 +725,163 @@ def test_flask_post_update_comment_when_user_is_not_the_author(
         follow_redirects=True,
     )
     assert response.status_code == 403
+
+
+def test_add_book_check_book_fields(
+    client,
+    access_session,
+    get_flask_csrf_token
+):
+    """
+    Description: check if we can add a book with 'string' keyword as content.
+    """
+    # get the resources folder in the tests folder
+    #rb flag means "Open in binary mode (read/write using byte data)" - https://realpython.com/read-write-files-python/
+    resources = Path(__file__).parent
+    headers = {
+        "Content-Type": "multipart/form-data",
+        "Cookie": f"session={access_session}",
+    }
+    book_form = {
+        "title": "This is a dummy title sir",
+        "summary": "string",
+        "content": "This is a dummy content sir",
+        "year_of_publication": "2023",
+        "categories-0-intitule": "histoire",
+        "author": "Dummy Boy",
+        "photo": FileStorage(
+            stream=(resources / "photo_pexels.com_by_inga_seliverstova.jpg").open("rb"),
+            filename="photo_pexels.com_by_inga_seliverstova.jpg",
+            content_type="image/jpeg",
+        ),
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/add_book/",
+        headers=headers,
+        data=book_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"Saisie invalide, mot clef string non utilisable" in response.data
+
+
+def test_check_book_fields(access_session):
+    """
+    Description: check the book's year of publication.
+    """
+    new_book = Book(
+        title="This is a dummy title sir",
+        summary="This is a dummy summary sir",
+        content="This is a dummy content sir",
+        author="This is a dummy author sir",
+        category=1,
+        year_of_publication="abcd",
+        book_picture_name="dummy_filename.png",
+        user_id=2,
+    )
+    response = check_book_fields(new_book)
+    assert "Saisie invalide, annee publication livre doit etre un entier." == response
+
+
+def test_flask_login_with_valid_credentials(client, get_flask_csrf_token):
+    """
+    Description: check the login
+    """
+    headers = {
+        "Content-Type": "multipart/form-data"
+    }
+    login_form = {
+        "login": "donald",
+        "email": "donald@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/login/",
+        headers=headers,
+        data=login_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"Vous nous avez manq" in response.data
+
+def test_flask_login_with_invalid_login(client, get_flask_csrf_token):
+    """
+    Description: check the login with invalid login
+    """
+    headers = {
+        "Content-Type": "multipart/form-data"
+    }
+    login_form = {
+        "login": "tintin",
+        "email": "donald@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/login/",
+        headers=headers,
+        data=login_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"Identifiants invalides" in response.data
+
+
+def test_flask_login_with_invalid_email(client, get_flask_csrf_token):
+    """
+    Description: check the login with invalid email
+    """
+    headers = {
+        "Content-Type": "multipart/form-data"
+    }
+    login_form = {
+        "login": "donald",
+        "email": "tintin@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/login/",
+        headers=headers,
+        data=login_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"Identifiants invalides" in response.data
+
+
+def test_flask_login_with_invalid_password(client, get_flask_csrf_token):
+    """
+    Description: check the login with invalid password
+    """
+    headers = {
+        "Content-Type": "multipart/form-data"
+    }
+    login_form = {
+        "login": "donald",
+        "email": "donald@localhost.fr",
+        "password": "bebopalula",
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/login/",
+        headers=headers,
+        data=login_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"Mot de passe invalide" in response.data
+
+
+def test_flask_get_logout(client, access_session):
+    """
+    Description: check if logout works.
+    """
+    headers = {
+        "Cookie": f"session={access_session}"
+    }
+    response = client.get("http://localhost/front/logout/", headers=headers, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"plus connect" in response.data

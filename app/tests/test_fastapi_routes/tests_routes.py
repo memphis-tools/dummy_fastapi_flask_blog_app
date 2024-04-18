@@ -432,7 +432,11 @@ async def test_update_book_with_authentication_with_valid_datas(get_fastapi_clie
     The book has been published by authenticated user.
     """
     access_token = get_fastapi_token
-    json = {"summary": "such a book"}
+    json = {
+        "summary": "such a book",
+        "year_of_publication": "2013",
+        "category": "art"
+    }
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
@@ -453,7 +457,9 @@ async def test_post_book_with_authentication_with_valid_datas(get_fastapi_client
         "author": "Carl Barks",
         "summary": "Donald a trouvé un emploi au musée : il doit dépoussiérer la collection de pierres.",
         "content": "what a great story sir",
-        "book_picture_name": "dummy_photo_name.jpg"
+        "book_picture_name": "dummy_photo_name.jpg",
+        "year_of_publication": "2013",
+        "category": "art"
     }
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -468,10 +474,62 @@ async def test_post_book_with_authentication_with_valid_datas(get_fastapi_client
 @pytest.mark.asyncio
 async def test_post_book_with_authentication_without_valid_datas(get_fastapi_client, get_fastapi_token):
     """
-    Description: test add book route with FastAPI TestClient with token.
+    Description: test add book route with FastAPI TestClient with token, without valid datas.
+    We must supply all attributes in order to post a book.
     """
     access_token = get_fastapi_token
     json = {"summary": "such a book", "other_id": "1"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.post("/api/v1/books/", headers=headers, json=json)
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_post_book_with_authentication_without_valid_book_category(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test add book route with FastAPI TestClient with token, without valid datas.
+    Category "supplication" does not exist so FastAPI will return a 422 error.
+    """
+    access_token = get_fastapi_token
+    json = {
+        "title": "Perdus dans les Andes",
+        "author": "Carl Barks",
+        "summary": "Donald a trouvé un emploi au musée : il doit dépoussiérer la collection de pierres.",
+        "content": "what a great story sir",
+        "book_picture_name": "dummy_photo_name.jpg",
+        "year_of_publication": "2013",
+        "category": "supplication"
+    }
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.post("/api/v1/books/", headers=headers, json=json)
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_post_book_with_authentication_without_valid_publication_year(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test add book route with FastAPI TestClient with token, without valid datas.
+    Publication year is relative to the publication year (in real world, not published on the app).
+    A String will return a 422 error.
+    """
+    access_token = get_fastapi_token
+    json = {
+        "title": "Perdus dans les Andes",
+        "author": "Carl Barks",
+        "summary": "Donald a trouvé un emploi au musée : il doit dépoussiérer la collection de pierres.",
+        "content": "what a great story sir",
+        "book_picture_name": "dummy_photo_name.jpg",
+        "year_of_publication": "bebopalula",
+        "category": "supplication"
+    }
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
@@ -508,7 +566,7 @@ async def test_delete_book_with_authentication(get_fastapi_client, get_fastapi_t
         "accept": "application/json"
     }
     response = get_fastapi_client.delete("/api/v1/books/1/", headers={"Authorization": f"Bearer {access_token}"})
-    assert response.status_code == 200
+    assert response.status_code == 204
 
 
 @pytest.mark.asyncio
