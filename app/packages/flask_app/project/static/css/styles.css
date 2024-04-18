@@ -43,6 +43,13 @@ input {
   margin-bottom: 2%;
 }
 
+
+#categories-0 tr {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 1%;
+}
+
 .collapse {
   display: flex;
   flex-direction: row;

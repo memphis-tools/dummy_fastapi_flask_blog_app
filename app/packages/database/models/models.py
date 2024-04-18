@@ -57,6 +57,22 @@ class Comment(BASE):
         }
 
 
+class BookCategory(BASE):
+    """
+    Description: a book category model for the dummy blog.
+    """
+
+    __tablename__ = "book_categories_table"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String(200), nullable=False)
+
+    def __str__(self, *args, **kwargs):
+        """
+        Description: rewrite the __str__ function for the model object.
+        """
+        return self.title
+
+
 class Book(BASE):
     """
     Description: a book model for the dummy blog.
@@ -68,6 +84,8 @@ class Book(BASE):
     summary = Column(Text, nullable=False)
     content = Column(String(2500), nullable=False)
     author = Column(String(150), nullable=False)
+    category =  Column(Integer, ForeignKey("book_categories_table.id"))
+    year_of_publication = Column(Integer, nullable=True)
     book_picture_name = Column(String(250), nullable=False)
     publication_date = Column(
         DateTime(timezone=True), default=datetime.datetime.utcnow()
@@ -96,6 +114,8 @@ class Book(BASE):
             "author": self.author,
             "summary": self.summary,
             "content": self.content,
+            "category": self.category,
+            "year_of_publication": self.year_of_publication,
             "publication_date": self.publication_date,
             "user_id": self.user_id,
             "nb_comments": self.nb_comments,
@@ -112,6 +132,8 @@ class Book(BASE):
             "author": self.author,
             "summary": self.summary,
             "content": self.content,
+            "category": self.category,
+            "year_of_publication": self.year_of_publication,
             "publication_date": self.publication_date,
             "book_picture_name": self.book_picture_name,
             "user_id": self.user_id,

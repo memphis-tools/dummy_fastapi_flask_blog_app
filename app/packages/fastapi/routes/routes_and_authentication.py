@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
 try:
-    from app.packages import logtail_handler
+    from app.packages import logtail_handler, settings
     from app.packages.database.commands import database_crud_commands, session_commands
     from app.packages.database.models import models
     from app.packages.fastapi.models.fastapi_models import (
@@ -24,7 +24,7 @@ try:
         TokenData,
     )
 except ModuleNotFoundError:
-    from packages import logtail_handler
+    from packages import logtail_handler, settings
     from packages.database.commands import database_crud_commands, session_commands
     from packages.database.models import models
     from packages.fastapi.models.fastapi_models import (
@@ -222,6 +222,29 @@ async def register(
         return user
 
 
+def check_book_fields(book):
+    """
+    Description: vérifier que l'utilisateur renseigne le livre correctement.
+    """
+    if any([
+        book.title == "string",
+        book.author == "string",
+        book.summary == "string",
+        book.content == "string",
+        book.category == "string",
+        book.book_picture_name == "string",
+    ]):
+        raise HTTPException(
+            status_code=401,
+            detail="Saisie invalide, mot clef string non utilisable."
+        )
+    if type(book.year_of_publication) is not int:
+        raise HTTPException(
+            status_code=401,
+            detail="Saisie invalide, annee publication livre doit etre un entier."
+        )
+
+
 @app.post("/api/v1/books/")
 async def post_book(
     book: NewBookModel, current_user: Annotated[UserModel, Depends(get_current_active_user)]
@@ -229,29 +252,31 @@ async def post_book(
     """
     add a book.
     """
-    if any([
-        book.title == "string",
-        book.author == "string",
-        book.summary == "string",
-        book.content == "string",
-        book.book_picture_name == "string",
-    ]):
+    check_book_fields(book)
+    category = book.category
+    try:
+        category_id = session.query(models.BookCategory).filter(models.BookCategory.title==category).first().id
+    except Exception:
         raise HTTPException(
-            status_code=401,
-            detail="Saisie invalide, mot clef string non utilisable."
+            status_code=404,
+            detail="Saisie invalide, categorie livre non connue."
         )
     new_book = models.Book(
         title=book.title,
         author=book.author,
         summary=book.summary,
         content=book.content,
-        book_picture_name=book.book_picture_name
+        category=category_id,
+        year_of_publication=book.year_of_publication,
+        book_picture_name=book.book_picture_name,
+        user_id=current_user.id
     )
     total_user_publications = current_user.nb_publications + 1
     current_user.nb_publications = total_user_publications
     logs_context = {"current_user": f"{current_user.username}", "book_title": new_book.title}
     LOGGER.info("[+] FastAPI - Ajout livre", extra=logs_context)
     session.add(new_book)
+    session.commit()
     return new_book
 
 
@@ -271,6 +296,15 @@ async def update_book(
                 book.author = book_updated.author
             if book_updated.summary is not None:
                 book.summary = book_updated.summary
+            if book_updated.category is not None:
+                category = book_updated.category
+                category_id = session.query(models.BookCategory).filter(models.BookCategory.title==category).first().id
+                book.category = category_id
+            if book_updated.year_of_publication is not None:
+                book.year_of_publication = book_updated.year_of_publication
+            if book_updated.book_picture_name is not None:
+                book.book_picture_name = book_updated.book_picture_name
+            check_book_fields(book)
             session.query(models.Book).where(models.Book.id == id).update(
                 book.get_json_for_update()
             )
@@ -529,7 +563,10 @@ async def delete_book(
             session.commit()
             total_user_publications = current_user.nb_publications - 1
             current_user.nb_publications = total_user_publications
-            return {"204": f"book with id {id} removed"}
+            raise HTTPException(
+                status_code=204,
+                detail= f"book with id {id} removed."
+            )
         logs_context = {"current_user": f"{current_user.username}", "book_title": book.title}
         LOGGER.info("[+] FastAPI - Suppression livre refusée", extra=logs_context)
         raise HTTPException(
