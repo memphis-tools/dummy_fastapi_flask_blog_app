@@ -478,7 +478,7 @@ def update_book(book_id):
                     os.remove(f"{app.instance_path}staticfiles/{book_picture_filename}")
                 except FileNotFoundError:
                     pass
-            book_is_valid = check_book_fields(new_book)
+            book_is_valid = check_book_fields(updated_book)
             if book_is_valid is True:
                 session.query(Book).where(Book.id == book_id).update(
                     updated_book.get_json_for_update()
