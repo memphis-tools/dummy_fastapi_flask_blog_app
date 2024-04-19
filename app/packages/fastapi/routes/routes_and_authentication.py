@@ -298,7 +298,13 @@ async def update_book(
                 book.summary = book_updated.summary
             if book_updated.category is not None:
                 category = book_updated.category
-                category_id = session.query(models.BookCategory).filter(models.BookCategory.title==category).first().id
+                try:
+                    category_id = session.query(models.BookCategory).filter(models.BookCategory.title==category).first().id
+                except Exception:
+                    raise HTTPException(
+                        status_code=401,
+                        detail="Saisie invalide, categorie livre non prevue."
+                    )
                 book.category = category_id
             if book_updated.year_of_publication is not None:
                 book.year_of_publication = book_updated.year_of_publication
