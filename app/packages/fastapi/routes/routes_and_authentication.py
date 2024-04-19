@@ -180,10 +180,10 @@ async def register(
     register new user.
     """
     if any([
-        user.username == "string",
-        user.email == "string",
-        user.password == "string",
-        user.password_check == "string"
+        str(user.username) == "string",
+        str(user.email) == "string",
+        str(user.password) == "string",
+        str(user.password_check) == "string"
     ]):
         raise HTTPException(
             status_code=401,
@@ -227,12 +227,12 @@ def check_book_fields(book):
     Description: vérifier que l'utilisateur renseigne le livre correctement.
     """
     if any([
-        book.title == "string",
-        book.author == "string",
-        book.summary == "string",
-        book.content == "string",
-        book.category == "string",
-        book.book_picture_name == "string",
+        str(book.title).lower() == "string",
+        str(book.author).lower() == "string",
+        str(book.summary).lower() == "string",
+        str(book.content).lower() == "string",
+        str(book.category).lower() == "string",
+        str(book.book_picture_name).lower() == "string",
     ]):
         raise HTTPException(
             status_code=401,
