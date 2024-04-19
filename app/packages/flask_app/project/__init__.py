@@ -225,10 +225,10 @@ def check_book_fields(book):
     Description: vérifier que l'utilisateur renseigne le livre correctement.
     """
     if any([
-        book.title == "string",
-        book.author == "string",
-        book.summary == "string",
-        book.content == "string",
+        str(book.title).lower() == "string",
+        str(book.author).lower() == "string",
+        str(book.summary).lower() == "string",
+        str(book.content).lower() == "string",
     ]):
         error = "Saisie invalide, mot clef string non utilisable."
         return error
@@ -358,10 +358,10 @@ def register():
     form = forms.RegisterForm()
     if form.validate_on_submit():
         if any([
-            form.login.data == "string",
-            form.email.data == "string",
-            form.password.data == "string",
-            form.password_check.data == "string"
+            str(form.login.data).lower() == "string",
+            str(form.email.data).lower() == "string",
+            str(form.password.data).lower() == "string",
+            str(form.password_check.data).lower() == "string"
         ]):
             flash("Saisie invalide, mot clef string non utilisable.", "error")
             session.close()
@@ -478,14 +478,14 @@ def update_book(book_id):
                     os.remove(f"{app.instance_path}staticfiles/{book_picture_filename}")
                 except FileNotFoundError:
                     pass
+            session.query(Book).where(Book.id == book_id).update(
+                updated_book.get_json_for_update()
+            )
             book_is_valid = check_book_fields(updated_book)
             if book_is_valid is True:
-                session.query(Book).where(Book.id == book_id).update(
-                    updated_book.get_json_for_update()
-                )
                 session.commit()
                 session.close()
-                return redirect(url_for("book", book_id=book.id))
+                return redirect(url_for("book", book_id=book_id))
             else:
                 flash(book_is_valid, "error")
                 session.close()
