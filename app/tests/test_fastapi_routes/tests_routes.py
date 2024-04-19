@@ -540,6 +540,49 @@ async def test_post_book_with_authentication_without_valid_publication_year(get_
 
 
 @pytest.mark.asyncio
+async def test_post_book_with_authentication_with_invalid_keyword_string(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test add book route with FastAPI TestClient with token, with the invalid keyword string.
+    """
+    access_token = get_fastapi_token
+    json = {
+        "title": "Perdus dans les Andes",
+        "author": "StRing",
+        "summary": "Donald a trouvé un emploi au musée : il doit dépoussiérer la collection de pierres.",
+        "content": "what a great story sir",
+        "book_picture_name": "dummy_photo_name.jpg",
+        "year_of_publication": "1984",
+        "category": "art"
+    }
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.post("/api/v1/books/", headers=headers, json=json)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_put_book_with_authentication_with_invalid_keyword_string(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test put book route with FastAPI TestClient with token, with the invalid keyword string.
+    """
+    access_token = get_fastapi_token
+    json = {
+        "title": "Perdus dans les Andes",
+        "author": "StRing",
+    }
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.put("/api/v1/books/1/", headers=headers, json=json)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_delete_book_with_authentication_with_forbidden_user(get_fastapi_client, get_fastapi_token):
     """
     Description: test delete_books id 2 route with FastAPI TestClient with token.

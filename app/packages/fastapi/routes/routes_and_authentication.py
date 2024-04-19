@@ -180,10 +180,10 @@ async def register(
     register new user.
     """
     if any([
-        user.username == "string",
-        user.email == "string",
-        user.password == "string",
-        user.password_check == "string"
+        str(user.username) == "string",
+        str(user.email) == "string",
+        str(user.password) == "string",
+        str(user.password_check) == "string"
     ]):
         raise HTTPException(
             status_code=401,
@@ -227,12 +227,12 @@ def check_book_fields(book):
     Description: vérifier que l'utilisateur renseigne le livre correctement.
     """
     if any([
-        book.title == "string",
-        book.author == "string",
-        book.summary == "string",
-        book.content == "string",
-        book.category == "string",
-        book.book_picture_name == "string",
+        str(book.title).lower() == "string",
+        str(book.author).lower() == "string",
+        str(book.summary).lower() == "string",
+        str(book.content).lower() == "string",
+        str(book.category).lower() == "string",
+        str(book.book_picture_name).lower() == "string",
     ]):
         raise HTTPException(
             status_code=401,
@@ -298,7 +298,13 @@ async def update_book(
                 book.summary = book_updated.summary
             if book_updated.category is not None:
                 category = book_updated.category
-                category_id = session.query(models.BookCategory).filter(models.BookCategory.title==category).first().id
+                try:
+                    category_id = session.query(models.BookCategory).filter(models.BookCategory.title==category).first().id
+                except Exception:
+                    raise HTTPException(
+                        status_code=401,
+                        detail="Saisie invalide, categorie livre non prevue."
+                    )
                 book.category = category_id
             if book_updated.year_of_publication is not None:
                 book.year_of_publication = book_updated.year_of_publication
