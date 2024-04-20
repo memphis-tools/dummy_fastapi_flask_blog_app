@@ -127,9 +127,9 @@ async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> Token:
     """ return a jwt access token to authenticated user """
-    user = authenticate_user(form_data.username, form_data.password)
+    user = authenticate_user(str(form_data.username).lower(), form_data.password)
     if not user:
-        logs_context = {"user": f"{form_data.username}"}
+        logs_context = {"user": f"{str(form_data.username).lower()}"}
         LOGGER.info("[+] FastAPI - Utilisateur inconnu cherche à obtenir un token", extra=logs_context)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -192,13 +192,13 @@ async def register(
     hashed_password = generate_password_hash(
         user.password, "pbkdf2:sha256", salt_length=8
     )
-    user_in_db = session.query(models.User).filter_by(username=user.username).first()
+    user_in_db = session.query(models.User).filter_by(username=str(user.username).lower()).first()
     if user_in_db:
         raise HTTPException(
             status_code=401,
             detail="Nom utilisateur existe deja, veuillez le modifier"
         )
-    user_email = session.query(models.User).filter_by(email=user.email).first()
+    user_email = session.query(models.User).filter_by(email=str(user.email).lower()).first()
     if user_email:
         raise HTTPException(
             status_code=401,
@@ -211,11 +211,11 @@ async def register(
         )
     else:
         new_user = models.User(
-            username=user.username,
-            email=user.email,
+            username=str(user.username).lower(),
+            email=str(user.email).lower(),
             hashed_password=hashed_password,
         )
-        logs_context = {"username": f"{user.username}", "email": f"{user.email}"}
+        logs_context = {"username": f"{str(user.username).lower()}", "email": f"{str(user.email).lower()}"}
         LOGGER.info("[+] Flask - Création compte utilisateur.", extra=logs_context)
         session.add(new_user)
         session.commit()
