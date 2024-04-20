@@ -42,3 +42,16 @@ def view_all_instances(session, instance):
         else:
             instances_list.append(elem.get_json())
     return instances_list
+
+
+def view_all_user_instances(session, user_id, Book):
+    """view all instances from an user_id """
+    instances_query = session.query(models.Book).filter(models.Book.user_id.in_([user_id,]))
+    instances = instances_query.all()
+    instances_list = []
+    for instance in instances:
+        if instance == models.User:
+            instances_list.append(instance.get_restricted_json())
+        else:
+            instances_list.append(instance.get_json())
+    return instances_list

@@ -172,6 +172,24 @@ async def view_book(
         return books
 
 
+@app.get("/api/v1/{user_id}/books/")
+async def user_books(
+    user_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+):
+    """
+    view_books from a valid user return his books.
+    """
+    user = session.get(models.User, user_id)
+    if user:
+        books = database_crud_commands.view_all_user_instances(session, user_id, id)
+        return books
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Aucun utilisateur avec id {user_id} en base"
+        )
+
+
 @app.post("/api/v1/register/")
 async def register(
     user: NewUserInDBModel
