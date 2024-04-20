@@ -20,19 +20,6 @@ services:
     command: gunicorn --bind 0.0.0.0:8001 app.packages.flask_app.manage:app
     expose:
       - 8001
-    environment:
-      - SCOPE
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_PRODUCTION_DB_NAME
-      - POSTGRES_TEST_DB_NAME
-      - POSTGRES_PORT
-      - POSTGRES_HOST
-      - ADMIN_LOGIN
-      - ADMIN_PASSWORD
-      - SECRET_KEY
-    networks:
-      - app-network
     volumes:
       - static_volume:/home/dummy-operator/flask/staticfiles
       - media_volume:/home/dummy-operator/flask/mediafiles
@@ -43,19 +30,6 @@ services:
       dockerfile: ./uvicorn_fastapi/Dockerfile
     expose:
       - 8000
-    environment:
-      - SCOPE
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_PRODUCTION_DB_NAME
-      - POSTGRES_TEST_DB_NAME
-      - POSTGRES_PORT
-      - POSTGRES_HOST
-      - ADMIN_LOGIN
-      - ADMIN_PASSWORD
-      - SECRET_KEY
-    networks:
-      - app-network
 
 volumes:
   static_volume:
