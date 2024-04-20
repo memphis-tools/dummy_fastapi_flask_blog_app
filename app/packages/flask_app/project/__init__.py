@@ -308,8 +308,8 @@ def login():
     form = forms.LoginForm()
     if form.validate_on_submit():
         session = session_commands.get_a_database_session("postgresql")
-        email = form.email.data
-        username = form.login.data
+        email = str(form.email.data).lower()
+        username = str(form.login.data).lower()
         password = form.password.data
         user = session.query(User).filter_by(username=username).first()
         if not user or user.email != email:
@@ -368,11 +368,11 @@ def register():
             return render_template(
                 "register.html", form=form, is_authenticated=current_user.is_authenticated
             )
-        username = form.login.data
+        username = str(form.login.data).lower()
         hashed_password = generate_password_hash(
             form.password.data, "pbkdf2:sha256", salt_length=8
         )
-        email = form.email.data
+        email = str(form.email.data).lower()
         user = session.query(User).filter_by(username=username).first()
         user_email = session.query(User).filter_by(email=email).first()
 
