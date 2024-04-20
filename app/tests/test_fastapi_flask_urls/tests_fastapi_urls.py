@@ -45,6 +45,34 @@ async def test_read_main_without_valid_token():
 
 
 @pytest.mark.asyncio
+async def test_get_user_books(get_fastapi_token):
+    """
+    Description:
+    Ensure that we can get any user book's diffusion.
+    """
+    user_id = 2
+    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+        response = await ac.get(
+            f"/api/v1/{user_id}/books/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+        )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_get_invalid_user_books(get_fastapi_token):
+    """
+    Description:
+    Ensure that we can get any invalid user diffusion.
+    """
+    user_id = 2555
+    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+        response = await ac.get(
+            f"/api/v1/{user_id}/books/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+        )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_view_users(get_fastapi_token):
     """
     Description:

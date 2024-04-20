@@ -885,3 +885,41 @@ def test_flask_get_logout(client, access_session):
     response = client.get("http://localhost/front/logout/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
     assert b"plus connect" in response.data
+
+
+def test_get_current_user_books(client, access_session):
+    """
+    Description: check if we can get all published books by an user. Try with dummy user id 2 (donald).
+    """
+    headers = {
+        "Cookie": f"session={access_session}"
+    }
+    response = client.get("/front/user/2/books/", headers=headers, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'DUMMY BLOG - VOS LIVRES' in response.data
+
+
+def test_get_any_valid_user_books(client, access_session):
+    """
+    Description: check if we can get all published books by a valid user.
+    Try with dummy user id 3 (daisy).
+    """
+    headers = {
+        "Cookie": f"session={access_session}"
+    }
+    response = client.get("/front/user/3/books/", headers=headers, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'DUMMY BLOG - LIVRES DE ' in response.data
+
+
+def test_get_invalid_user_books(client, access_session):
+    """
+    Description: check if we can get all published books by an invalid user.
+    Try with dummy user id 5555.
+    """
+    headers = {
+        "Cookie": f"session={access_session}"
+    }
+    response = client.get("/front/user/5555/books/", headers=headers, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Utilisateur id 5555 inexistant' in response.data
