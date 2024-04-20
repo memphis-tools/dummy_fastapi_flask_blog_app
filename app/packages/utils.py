@@ -111,7 +111,7 @@ def set_dummies_books():
             que les espèces n'ont pas été créées indépendamment et ne sont pas immuables.
             """,
             author="Charles Darwin",
-            book_picture_name="darwin_origine_des_especes.jpg",
+            book_picture_name="dummy_blank_book.png",
             user_id=2,
             nb_comments=1,
         ),
@@ -120,7 +120,7 @@ def set_dummies_books():
             summary="Dde brèves histoires autour de chocs géopolitiques",
             content="ras lectus nisi, aliquet vel nulla eget.",
             author="Pascal Bonniface",
-            book_picture_name="boniface_guerre_ukraine.jpg",
+            book_picture_name="dummy_blank_book.png",
             user_id=3,
             nb_comments=1,
         ),
@@ -129,7 +129,7 @@ def set_dummies_books():
             summary="Une brève histoire d'interractions entre humains au grand coeur",
             content="C bibendum pharetra purus.",
             author="Deplhine de Vighan",
-            book_picture_name="devighan_les_gratitudes.jpg",
+            book_picture_name="dummy_blank_book.png",
             user_id=4,
             nb_comments=2,
         ),
@@ -138,7 +138,7 @@ def set_dummies_books():
             summary="De brèves histoires autour de l'histoire du monde, une guerre incessante",
             content="Donec vitae enim diam. Vivamus dignissim risus.",
             author="Alain Bauer",
-            book_picture_name="bauer_au-commencement_etait_la_guerre.jpg",
+            book_picture_name="dummy_blank_book.png",
             user_id=3,
         ),
         models.Book(
@@ -153,7 +153,7 @@ def set_dummies_books():
             services de renseignements durant la guerre froide.
             """,
             author="Chloé Aeberhardt",
-            book_picture_name="chloe_aeberhardt_les_espionnes_racontent.jpg",
+            book_picture_name="dummy_blank_book.png",
             user_id=2,
             nb_comments=1,
         ),
@@ -171,7 +171,7 @@ def set_dummies_books():
             une histoire qui interpelle et invite à réfléchir sur le monde qui nous entoure.
             """,
             author="Marc Levy",
-            book_picture_name="noa-marc-levy.jpg",
+            book_picture_name="dummy_blank_book.png",
             user_id=3,
             nb_comments=2,
         ),
@@ -185,7 +185,7 @@ def set_dummies_books():
             grandes puissances comme agents secrets ou aventuriers.
             """,
             author="Taline Ter Minassian",
-            book_picture_name="Sur-l-echiquier-du-Grand-Jeu.jpg",
+            book_picture_name="dummy_blank_book.png",
             user_id=4,
         ),
         models.Book(
@@ -199,7 +199,7 @@ def set_dummies_books():
             en 1981, et à observer la naissance de l’islam en France dans ses significations multiformes.
             """,
             author="Gilles Kepel",
-            book_picture_name="gilles_kepel_prophete_en_son_pays.jpg",
+            book_picture_name="dummy_blank_book.png",
             user_id=2,
         ),
     ]
