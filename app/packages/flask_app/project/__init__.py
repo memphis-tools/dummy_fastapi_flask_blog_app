@@ -220,6 +220,38 @@ def book(book_id):
     )
 
 
+@app.route("/front/user/<int:user_id>/books/")
+def user_books(user_id):
+    """
+    Description: the user's book Flask route.
+    """
+    if not current_user.is_authenticated:
+        flash("Acces page interdit aux utilisateurs non connectés.", "error")
+        return render_template("index.html", is_authenticated=current_user.is_authenticated)
+    session = session_commands.get_a_database_session("postgresql")
+    user = session.get(User, user_id)
+    if not user:
+        flash(f"Utilisateur id {user_id} inexistant.", "error")
+        session.close()
+        return render_template("index.html", is_authenticated=current_user.is_authenticated)
+    books_query = session.query(Book).filter(Book.user_id.in_([user_id,]))
+    books = books_query.all()
+    session.close()
+    if current_user.id == user_id:
+        return render_template(
+            "user_books.html",
+            books=books,
+            user_name=user.username,
+            is_authenticated=current_user.is_authenticated,
+        )
+    else:
+        return render_template(
+            "user_any_books.html",
+            books=books,
+            user_name=user.username,
+            is_authenticated=current_user.is_authenticated,
+        )
+
 def check_book_fields(book):
     """
     Description: vérifier que l'utilisateur renseigne le livre correctement.

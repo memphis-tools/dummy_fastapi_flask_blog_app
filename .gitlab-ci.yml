@@ -32,7 +32,6 @@ unit_tests:
   stage: test
   only:
     - development
-    - master
   image: python:3.11.6
   variables:
     SCOPE: "local_test"
@@ -55,7 +54,6 @@ unit_tests:
 build_init_certbot_images:
   stage: build_init_certbot
   only:
-    - development
     - master
   image: docker:24.0.9
   services:
@@ -73,7 +71,6 @@ build_init_certbot_images:
 build_docker_images:
   stage: build
   only:
-    - development
     - master
   image: docker:24.0.9
   services:
