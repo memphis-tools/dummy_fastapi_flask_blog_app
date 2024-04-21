@@ -5,5 +5,6 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx/conf/nginx.conf /etc/nginx/conf.d
 RUN mkdir /etc/ssl/dhparam/
 COPY nginx/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["nginx","-g","daemon off;"]
