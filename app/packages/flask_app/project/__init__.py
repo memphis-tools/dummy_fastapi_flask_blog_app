@@ -189,12 +189,13 @@ def book(book_id):
     book = session.get(Book, book_id)
     comments = session.query(Comment).filter_by(book_id=book.id).all()
 
-    logs_context = {
+    if os.getenv("SCOPE") == "production":
+        logs_context = {
         "current_user": f"{current_user.username}",
         "book_id": book_id,
         "book_title": book.title
-    }
-    LOGGER.info("[+] Flask - Consultation livre", extra=logs_context)
+        }
+        LOGGER.info("[+] Flask - Consultation livre", extra=logs_context)
 
     if request.method == "POST":
         if form.validate_on_submit():
@@ -203,8 +204,9 @@ def book(book_id):
             )
             total_book_comments = book.nb_comments + 1
             book.nb_comments = total_book_comments
-            logs_context = {"current_user": f"{current_user.username}", "book_title": book.title}
-            LOGGER.info("[+] Flask - Ajout commentaire.", extra=logs_context)
+            if os.getenv("SCOPE") == "production":
+                logs_context = {"current_user": f"{current_user.username}", "book_title": book.title}
+                LOGGER.info("[+] Flask - Ajout commentaire.", extra=logs_context)
             session.add(new_comment)
             session.commit()
         session.close()
@@ -359,8 +361,9 @@ def add_book():
             total_user_publications = user.nb_publications + 1
             user.nb_publications = total_user_publications
             session.commit()
-            logs_context = {"current_user": f"{current_user.username}", "book_title": new_book.title}
-            LOGGER.info("[+] Flask - Ajout livre", extra=logs_context)
+            if os.getenv("SCOPE") == "production":
+                logs_context = {"current_user": f"{current_user.username}", "book_title": new_book.title}
+                LOGGER.info("[+] Flask - Ajout livre", extra=logs_context)
             session.close()
             return redirect(url_for("books"))
         else:
@@ -389,16 +392,18 @@ def login():
         password = form.password.data
         user = session.query(User).filter_by(username=username).first()
         if not user or user.email != email:
-            logs_context = {"username": f"{username}", "email": f"{email}"}
-            LOGGER.info("[+] Flask - Echec connexion à application.", extra=logs_context)
+            if os.getenv("SCOPE") == "production":
+                logs_context = {"username": f"{username}", "email": f"{email}"}
+                LOGGER.info("[+] Flask - Echec connexion à application.", extra=logs_context)
             flash("Identifiants invalides", "error")
         else:
             if check_password_hash(user.hashed_password, password):
                 login_user(user)
                 first_books = session.query(Book).order_by("id").all()[:3]
                 flash(f"Vous nous avez manqué {user} 🫶")
-                logs_context = {"username": f"{username}"}
-                LOGGER.info("[+] Flask - Connexion à application.", extra=logs_context)
+                if os.getenv("SCOPE") == "production":
+                    logs_context = {"username": f"{username}"}
+                    LOGGER.info("[+] Flask - Connexion à application.", extra=logs_context)
                 session.close()
                 return render_template(
                     "index.html",
@@ -406,8 +411,11 @@ def login():
                     is_authenticated=current_user.is_authenticated,
                 )
             else:
-                logs_context = {"username": f"{username}", "email": f"{email}"}
-                LOGGER.info("[+] Flask - Echec connexion à application. Mot de passe invalide.", extra=logs_context)
+                if os.getenv("SCOPE") == "production":
+                    logs_context = {"username": f"{username}", "email": f"{email}"}
+                    LOGGER.info(
+                        "[+] Flask - Echec connexion à application. Mot de passe invalide.", extra=logs_context
+                    )
                 flash("Mot de passe invalide", "error")
         session.close()
     return render_template(
@@ -464,8 +472,9 @@ def register():
                 session.add(new_user)
                 session.commit()
                 flash(f"Bienvenue {username} vous pouvez vous connecter", "info")
-                logs_context = {"username": f"{username}", "email": f"{email}"}
-                LOGGER.info("[+] Flask - Création compte utilisateur.", extra=logs_context)
+                if os.getenv("SCOPE") == "production":
+                    logs_context = {"username": f"{username}", "email": f"{email}"}
+                    LOGGER.info("[+] Flask - Création compte utilisateur.", extra=logs_context)
                 session.close()
                 return redirect(url_for("login"))
             else:
@@ -609,8 +618,9 @@ def delete_book(book_id):
     book_to_delete = session.get(Book, book_id)
     user = session.get(User, book_to_delete.user_id)
     if current_user.id != book_to_delete.user_id and current_user.role != "admin":
-        logs_context = {"current_user": f"{current_user.username}", "book_title": book_to_delete.title}
-        LOGGER.info("[+] Flask - Suppression livre refusée", extra=logs_context)
+        if os.getenv("SCOPE") == "production":
+            logs_context = {"current_user": f"{current_user.username}", "book_title": book_to_delete.title}
+            LOGGER.info("[+] Flask - Suppression livre refusée", extra=logs_context)
         flash("Seul l'utilisateur ayant publié le livre peut le supprimer", "error")
         session.close()
         return abort(403)
@@ -620,8 +630,9 @@ def delete_book(book_id):
         os.remove(f"{app.instance_path}staticfiles/{book_picture_name}")
         total_user_publications = user.nb_publications - 1
         user.nb_publications = total_user_publications
-        logs_context = {"current_user": f"{current_user.username}", "book_title": book_to_delete.title}
-        LOGGER.info("[+] Flask - Suppression livre", extra=logs_context)
+        if os.getenv("SCOPE") == "production":
+            logs_context = {"current_user": f"{current_user.username}", "book_title": book_to_delete.title}
+            LOGGER.info("[+] Flask - Suppression livre", extra=logs_context)
         session.commit()
         session.close()
         return redirect(url_for("books"))
@@ -645,12 +656,13 @@ def delete_comment(comment_id):
     comment_to_delete = session.get(Comment, comment_id)
     book = session.get(Book, comment_to_delete.book_id)
     if current_user.id != comment_to_delete.author_id and current_user.role != "admin":
-        logs_context = {
-            "current_user": f"{current_user.username}",
-            "book_title": book.title,
-            "comment": comment_to_delete.text
-        }
-        LOGGER.info("[+] Flask - Suppression commentaire refusée", extra=logs_context)
+        if os.getenv("SCOPE") == "production":
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "book_title": book.title,
+                "comment": comment_to_delete.text
+            }
+            LOGGER.info("[+] Flask - Suppression commentaire refusée", extra=logs_context)
         flash("Seul l'auteur du commentaire peut le supprimer", "error")
         session.close()
         return abort(403)
@@ -684,14 +696,15 @@ def delete_user(user_id):
         flash("Le compte admin ne peut pas etre supprime", "error")
         return abort(403)
     if current_user.id != 1:
-        logs_context = {
-            "current_user": f"{current_user.username}",
-            "user_to_delete": user_to_delete.username
-        }
-        LOGGER.info(
-            "[+] Flask - Suppression utilisateur refusée, utilisateur non admin",
-            extra=logs_context
-        )
+        if os.getenv("SCOPE") == "production":
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "user_to_delete": user_to_delete.username
+            }
+            LOGGER.info(
+                "[+] Flask - Suppression utilisateur refusée, utilisateur non admin",
+                extra=logs_context
+            )
     if form.validate_on_submit():
         session.delete(user_to_delete)
         session.commit()

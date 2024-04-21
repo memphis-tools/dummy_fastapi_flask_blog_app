@@ -10,7 +10,7 @@
 ![Screenshot](https://img.shields.io/badge/digitalocean--black?logo=digitalocean&logoColor=yellow&color=blue)
 ![Screenshot](https://img.shields.io/badge/betterstack--blue)
 ![Screenshot](https://img.shields.io/badge/coveralls--blue?logo=coveralls&logoColor=yellow)
-[![Coverage Status](https://coveralls.io/repos/github/memphis-tools/dummy_fastapi_flask_blog_app/badge.svg?branch=HEAD)](https://coveralls.io/github/memphis-tools/dummy_fastapi_flask_blog_app?branch=HEAD)
+[![Coverage Status](https://coveralls.io/repos/gitlab/memphis-tools/dummy_fastapi_flask_blog_app/badge.svg?branch=master)](https://coveralls.io/gitlab/memphis-tools/dummy_fastapi_flask_blog_app?branch=master)
 
 # DUMMY APP FOR LEARNING PURPOSES
 **This is dummy blog application.**
@@ -495,6 +495,20 @@ To set the DigitalOcean Firewall through Terraform i used:
 https://www.digitalocean.com/community/tutorials/how-to-import-existing-digitalocean-assets-into-terraform
 
 https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall
+
+To set Nginx i used:
+
+https://www.ssllabs.com/ssltest/analyze.html
+
+https://nginx.org/en/docs/http/ngx_http_ssl_module.html
+
+https://nginx.org/en/docs/http/configuring_https_servers.html
+
+https://www.nginx.com/blog/http-strict-transport-security-hsts-and-nginx/
+
+https://www.nginx.com/resources/glossary/http2/
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
 
 For the logo and favicon.ico i used:
 

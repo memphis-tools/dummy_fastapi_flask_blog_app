@@ -15,7 +15,8 @@ variables:
   LOCAL_EMAIL_LOGS_FILE: "/var/log/gunicorn/flask.logs"
 
 stages:
-  - test
+  - test_development_branch
+  - test_master_branch
   - build_init_certbot
   - build
   - deploy_init_vault
@@ -28,10 +29,32 @@ before_script:
   - pip install -r app/requirements.txt
   - pip install -r app/packages/flask_app/requirements.txt
 
-unit_tests:
-  stage: test
+unit_tests_development_branch:
+  stage: test_development_branch
   only:
     - development
+  image: python:3.11.6
+  variables:
+    SCOPE: "local_test"
+    ADMIN_LOGIN: "admin"
+    ADMIN_PASSWORD: "dummy_password_for_test_to_run"
+    ADMIN_EMAIL: "admin@whatever.fr"
+    POSTGRES_HOST: "postgres"
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "$POSTGRES_PASSWORD"
+    TEST_USER_PWD: $TEST_USER_PWD"
+    SECRET_KEY: "dummy_secret_for_test_to_run"
+    DATABASE_URL: "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_TEST_DB_NAME"
+  script:
+    - echo "Running tests"
+    - coverage run -m pytest -vs app/
+    - coverage report
+  coverage: '/^TOTAL.*\s+(\d+\%)$/'
+
+unit_tests_master_branch:
+  stage: test_master_branch
+  only:
+    - master
   image: python:3.11.6
   variables:
     SCOPE: "local_test"
