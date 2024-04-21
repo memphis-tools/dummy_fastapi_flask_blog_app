@@ -496,6 +496,20 @@ https://www.digitalocean.com/community/tutorials/how-to-import-existing-digitalo
 
 https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall
 
+To set Nginx i used:
+
+https://www.ssllabs.com/ssltest/analyze.html
+
+https://nginx.org/en/docs/http/ngx_http_ssl_module.html
+
+https://nginx.org/en/docs/http/configuring_https_servers.html
+
+https://www.nginx.com/blog/http-strict-transport-security-hsts-and-nginx/
+
+https://www.nginx.com/resources/glossary/http2/
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+
 For the logo and favicon.ico i used:
 
 https://www.canva.com
