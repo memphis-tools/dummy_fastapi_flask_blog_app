@@ -10,7 +10,7 @@
 ![Screenshot](https://img.shields.io/badge/digitalocean--black?logo=digitalocean&logoColor=yellow&color=blue)
 ![Screenshot](https://img.shields.io/badge/betterstack--blue)
 ![Screenshot](https://img.shields.io/badge/coveralls--blue?logo=coveralls&logoColor=yellow)
-[![Coverage Status](https://coveralls.io/repos/github/memphis-tools/dummy_fastapi_flask_blog_app/badge.svg?branch=HEAD)](https://coveralls.io/github/memphis-tools/dummy_fastapi_flask_blog_app?branch=HEAD)
+[![Coverage Status](https://coveralls.io/repos/gitlab/memphis-tools/dummy_fastapi_flask_blog_app/badge.svg?branch=master)](https://coveralls.io/gitlab/memphis-tools/dummy_fastapi_flask_blog_app?branch=master)
 
 # DUMMY APP FOR LEARNING PURPOSES
 **This is dummy blog application.**
