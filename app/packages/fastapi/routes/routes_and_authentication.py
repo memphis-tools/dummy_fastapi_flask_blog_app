@@ -211,7 +211,7 @@ async def user_books(
     """
     user = session.get(models.User, user_id)
     if user:
-        books = database_crud_commands.view_all_user_instances(session, user_id, id)
+        books = database_crud_commands.view_all_user_books(session, user_id)
         return books
     else:
         raise HTTPException(
