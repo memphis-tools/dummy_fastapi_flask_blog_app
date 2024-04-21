@@ -923,3 +923,39 @@ def test_get_invalid_user_books(client, access_session):
     response = client.get("/front/user/5555/books/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
     assert b'Utilisateur id 5555 inexistant' in response.data
+
+
+def test_get_books_categories(client, access_session):
+    """
+    Description: check if we can get all the books categories.
+    """
+    headers = {
+        "Cookie": f"session={access_session}"
+    }
+    response = client.get("/front/books/categories/", headers=headers, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'DUMMY BLOG - LES LIVRES PAR CATEGORIES' in response.data
+
+
+def test_get_valid_category_books(client, access_session):
+    """
+    Description: check if we can get all the books from a valid category.
+    """
+    headers = {
+        "Cookie": f"session={access_session}"
+    }
+    response = client.get("/front/books/categories/1/", headers=headers, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'DUMMY BLOG - LES LIVRES DE LA CATEGORIE' in response.data
+
+
+def test_get_invalid_category_books(client, access_session):
+    """
+    Description: check if we can get all the books from a valid category.
+    """
+    headers = {
+        "Cookie": f"session={access_session}"
+    }
+    response = client.get("/front/books/categories/55555/", headers=headers, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Categorie id 55555 inexistante.' in response.data

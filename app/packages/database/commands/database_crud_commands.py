@@ -55,3 +55,22 @@ def view_all_user_instances(session, user_id, Book):
         else:
             instances_list.append(instance.get_json())
     return instances_list
+
+
+def view_all_categories_instances(session):
+    """view all categories instances """
+    categories_query = session.query(models.BookCategory).all()
+    categories_list = []
+    for category in categories_query:
+        total_category_books = session.query(models.Book).filter(
+            models.Book.category.in_([category.id,])
+            ).count()
+        categories_list.append({"id": category.id, "name": category.title, "total_books": total_category_books})
+    return categories_list
+
+
+def view_all_category_books(session, category_id):
+    """view all books from a category filter by category_id """
+    categories_query = session.query(models.Book).filter(models.Book.category.in_([category_id,]))
+    category_books = categories_query.all()
+    return category_books

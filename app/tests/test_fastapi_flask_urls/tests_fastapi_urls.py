@@ -128,3 +128,42 @@ async def test_view_comments_without_valid_token():
             "/api/v1/comments", headers={"Authorization": "Bearer somethingWeird"}
         )
     assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_books_categories(get_fastapi_token):
+    """
+    Description:
+    Check if we can reach the view_books_categories uri served by FastAPI with a valid authentication token.
+    """
+    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+        response = await ac.get(
+            "/api/v1/books/categories/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+        )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_get_category_books(get_fastapi_token):
+    """
+    Description:
+    Check if we can reach the view_category_books uri served by FastAPI with a valid authentication token.
+    """
+    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+        response = await ac.get(
+            "/api/v1/books/categories/1/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+        )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_get_invalid_category_books(get_fastapi_token):
+    """
+    Description:
+    Check if we can reach an invalid category books.
+    """
+    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+        response = await ac.get(
+            "/api/v1/books/categories/55555/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+        )
+    assert response.status_code == 404

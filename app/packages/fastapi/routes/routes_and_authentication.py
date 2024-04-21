@@ -154,6 +154,36 @@ async def view_books(
     return books
 
 
+@app.get("/api/v1/books/categories/")
+async def view_books_categories(
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+):
+    """
+    view_books_categories return a list of books categories.
+    A list element consists in a dict with 3 keys: id, name, total_books.
+    """
+    categories = database_crud_commands.view_all_categories_instances(session)
+    return categories
+
+
+@app.get("/api/v1/books/categories/{id}/")
+async def view_category_books(
+    id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+):
+    """
+    view_category_books return a list of books from a category.
+    """
+    category = database_crud_commands.get_instance(session, models.BookCategory, id)
+    if not category:
+        raise HTTPException(
+            status_code=status. HTTP_404_NOT_FOUND,
+            detail="Incorrect category id",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    categories = database_crud_commands.view_all_category_books(session, id)
+    return categories
+
+
 @app.get("/api/v1/books/{id}/")
 async def view_book(
     id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
