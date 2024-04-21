@@ -16,7 +16,7 @@
           <h4 class="d-flex flex-column">Sous-titre: {{ book.summary }}</h4>
           <img style="width:200px;height:auto;" src="{{ url_for('static', filename=book.book_picture_name) }}" align="middle" />
           <p class="post-publisher">
-              Publié par {{ book.user_id|format_user() }}
+              Publié par <a href="{{ url_for('user_books', user_id=book.user_id) }}">{{ book.user_id|format_user() }}</a>
               on {{ book.publication_date|format_datetime() }}
           </p>
           <p>{{ book.content }}</p>

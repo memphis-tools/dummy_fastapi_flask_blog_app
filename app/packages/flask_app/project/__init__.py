@@ -220,20 +220,64 @@ def book(book_id):
     )
 
 
+@app.route("/front/books/categories/")
+def categories():
+    """
+    Description: the books categories Flask route.
+    """
+    session = session_commands.get_a_database_session("postgresql")
+    categories_list = []
+    categories = session.query(BookCategory).order_by(BookCategory.id).all()
+    for category in categories:
+        category_id = category.id
+        category_books_query = session.query(Book).filter(Book.category.in_([category_id,]))
+        total_category_books = category_books_query.count()
+        categories_list.append({"id": category_id, "name": category, "total_books": total_category_books})
+    session.close()
+    return render_template(
+        "categories.html",
+        categories_list=categories_list,
+        is_authenticated=current_user.is_authenticated,
+    )
+
+
+@app.route("/front/books/categories/<int:category_id>/")
+def category_books(category_id):
+    """
+    Description: the books from a category Flask route.
+    """
+    session = session_commands.get_a_database_session("postgresql")
+    category = session.get(BookCategory, category_id)
+    if not category:
+        flash(f"Categorie id {category_id} inexistante.", "error")
+        session.close()
+        return redirect(url_for("index"))
+    category_books_query = session.query(Book).filter(Book.category.in_([category_id,]))
+    books = category_books_query.all()
+    session.close()
+    return render_template(
+        "category_books.html",
+        category=category,
+        books=books,
+        is_authenticated=current_user.is_authenticated,
+    )
+
+
 @app.route("/front/user/<int:user_id>/books/")
+@login_required
 def user_books(user_id):
     """
     Description: the user's book Flask route.
     """
     if not current_user.is_authenticated:
         flash("Acces page interdit aux utilisateurs non connectés.", "error")
-        return render_template("index.html", is_authenticated=current_user.is_authenticated)
+        return redirect(url_for("register"))
     session = session_commands.get_a_database_session("postgresql")
     user = session.get(User, user_id)
     if not user:
         flash(f"Utilisateur id {user_id} inexistant.", "error")
         session.close()
-        return render_template("index.html", is_authenticated=current_user.is_authenticated)
+        return redirect(url_for("index"))
     books_query = session.query(Book).filter(Book.user_id.in_([user_id,]))
     books = books_query.all()
     session.close()

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}CATEGORY BOOKS{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="section_intro"></div>
+    <h1>DUMMY BLOG - LES LIVRES PAR CATEGORIES</h1>
+    <div class="home-books-container">
+      {% for category in categories_list %}
+          <div class="post-preview">
+              <p class="post-title">
+                <a href="{{ url_for('category_books', category_id=category['id']) }}">{{ category["name"]|upper }}</a>
+                ({{ category["total_books"] }})
+              </p>
+          </div>
+          <hr />
+      {% endfor %}
+    </div>
+</div>
+{% endblock content %}

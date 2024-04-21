@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}USER BOOKS{% endblock title %}
+{% block title %}CATEGORY BOOKS{% endblock title %}
 
 {% block content %}
 <div class="container">
     <div class="section_intro"></div>
-    <h1>DUMMY BLOG - LIVRES DE {{ user_name|upper }}<h1>
+    <h1>DUMMY BLOG - LES LIVRES DE LA CATEGORIE {{ category|upper }}</h1>
     <div class="home-books-container">
       {% for book in books %}
           <div class="post-preview">
               <p class="post-title">{{ book.title }}</p>
               <p class="post-meta m-0">
-                  Publié par {{ book.user_id|format_user() }} le {{ book.publication_date|format_datetime() }}
+                  Publié par <a href="{{ url_for('user_books', user_id=book.user_id) }}">{{ book.user_id|format_user() }}</a> le {{ book.publication_date|format_datetime() }}
               </p>
               <p>
                 <a class="about-book" href="{{ url_for('book', book_id=book.id) }}">A propos du livre</a>

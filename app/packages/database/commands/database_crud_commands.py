@@ -44,14 +44,33 @@ def view_all_instances(session, instance):
     return instances_list
 
 
-def view_all_user_instances(session, user_id, Book):
-    """view all instances from an user_id """
-    instances_query = session.query(models.Book).filter(models.Book.user_id.in_([user_id,]))
-    instances = instances_query.all()
-    instances_list = []
-    for instance in instances:
+def view_all_user_books(session, user_id):
+    """view all books from an user_id """
+    user_books_query = session.query(models.Book).filter(models.Book.user_id.in_([user_id,]))
+    user_books = user_books_query.all()
+    user_books_list = []
+    for instance in user_books_list:
         if instance == models.User:
-            instances_list.append(instance.get_restricted_json())
+            user_books_list.append(instance.get_restricted_json())
         else:
-            instances_list.append(instance.get_json())
-    return instances_list
+            user_books_list.append(instance.get_json())
+    return user_books_list
+
+
+def view_all_categories_instances(session):
+    """view all categories instances """
+    categories_query = session.query(models.BookCategory).all()
+    categories_list = []
+    for category in categories_query:
+        total_category_books = session.query(models.Book).filter(
+            models.Book.category.in_([category.id,])
+            ).count()
+        categories_list.append({"id": category.id, "name": category.title, "total_books": total_category_books})
+    return categories_list
+
+
+def view_all_category_books(session, category_id):
+    """view all books from a category filter by category_id """
+    categories_query = session.query(models.Book).filter(models.Book.category.in_([category_id,]))
+    category_books = categories_query.all()
+    return category_books
