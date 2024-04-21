@@ -15,6 +15,7 @@ services:
       - web-root:/var/www/html
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
+      - /etc/ssl/dhparam/dhparam.pem:/etc/ssl/dhparam/dhparam.pem
       - static_volume:/home/dummy-operator/flask/staticfiles
       - media_volume:/home/dummy-operator/flask/mediafiles
 

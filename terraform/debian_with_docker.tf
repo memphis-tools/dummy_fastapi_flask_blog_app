@@ -23,7 +23,7 @@ resource "digitalocean_droplet" "dummy_ops_on_docker" {
         "sudo apt update -y",
         "sudo apt install tree ca-certificates curl gnupg snapd ufw net-tools dnsutils netcat-traditional lynis -y",
         "sudo apt install acct sysstat auditd chkrootkit fail2ban libpam-pwquality -y",
-        "sudo apt install python3-protobuf libcrack2 apt-show-versions debsums libpam-tmpdir apt-listbugs -y",
+        "sudo apt install python3-protobuf libcrack2 apt-show-versions debsums libpam-tmpdir apt-listbugs openssl -y",
         "sudo install -m 0755 -d /etc/apt/keyrings",
         # Add Docker's official GPG key:
         "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg",
@@ -42,6 +42,8 @@ resource "digitalocean_droplet" "dummy_ops_on_docker" {
         "sudo systemctl enable --now fail2ban",
         "sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local",
         "sudo echo 'install usb-storage /bin/true' > /etc/modprobe.d/fake_usb.conf",
+        "sudo mkdir /etc/ssl/dhparam/",
+        "sudo openssl dhparam -out /etc/ssl/dhparam/dhparam.pem 4096",
         # We create a dummy_user
         "useradd dummy_user",
         "mkdir -p /home/${var.dummy_username}/.ssh",
