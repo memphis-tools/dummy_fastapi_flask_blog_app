@@ -4,7 +4,4 @@ RUN apt-get update && apt-get install -y openssl
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx/conf/nginx.conf /etc/nginx/conf.d
 RUN mkdir /etc/ssl/dhparam/
-COPY nginx/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["nginx","-g","daemon off;"]
+RUN openssl dhparam -out /etc/ssl/dhparam/dhparam-2048.pem 2048
