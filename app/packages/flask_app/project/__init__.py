@@ -221,19 +221,20 @@ def book(book_id):
 
 
 @app.route("/front/user/<int:user_id>/books/")
+@login_required
 def user_books(user_id):
     """
     Description: the user's book Flask route.
     """
     if not current_user.is_authenticated:
         flash("Acces page interdit aux utilisateurs non connectés.", "error")
-        return render_template("index.html", is_authenticated=current_user.is_authenticated)
+        return redirect(url_for("register"))
     session = session_commands.get_a_database_session("postgresql")
     user = session.get(User, user_id)
     if not user:
         flash(f"Utilisateur id {user_id} inexistant.", "error")
         session.close()
-        return render_template("index.html", is_authenticated=current_user.is_authenticated)
+        return redirect(url_for("index"))
     books_query = session.query(Book).filter(Book.user_id.in_([user_id,]))
     books = books_query.all()
     session.close()
