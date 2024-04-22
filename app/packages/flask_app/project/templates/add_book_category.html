@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}ADD BOOK CATEGORY{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="section_intro"></div>
+    <h1>DUMMY BLOG - LIVRES - AJOUTER UNE CATEGORIE</h1>
+    <div class="d-flex flex-column justify-content-center align-items-center">
+        <div class="d-flex flex-column justify-content-center w-75">
+            <form class="form" method="post" enctype="multipart/form-data">
+                {{ form.csrf_token }}
+                <label for="title">{{ form.title.label }}</label>{{ form.title }}
+                <button type="submit" class="btn btn-primary" name="button">AJOUTER</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

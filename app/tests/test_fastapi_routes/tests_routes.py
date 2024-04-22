@@ -10,10 +10,12 @@ try:
     import app.packages.settings as settings
     from app.packages.fastapi.models import fastapi_models
     from app.packages.fastapi.routes import routes_and_authentication
+    from app.packages.flask_app.project.__init__ import check_book_fields, check_book_category_fields
 except ModuleNotFoundError:
     import packages.settings as settings
     from packages.fastapi.models import fastapi_models
     from packages.fastapi.routes import routes_and_authentication
+    from packages.flask_app.project.__init__ import check_book_fields, check_book_category_fields
 
 
 def test_get_existing_user():
@@ -814,3 +816,391 @@ def test_authenticate_unexisting_user():
     password = settings.TEST_USER_PWD
     response = routes_and_authentication.authenticate_user(username, password)
     assert response is False
+
+
+@pytest.mark.asyncio
+async def test_get_books_categories_with_authentication(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test get book category route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.get("/api/v1/books/categories/", headers=headers)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_book_category_with_authentication(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test get book category route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.get("/api/v1/books/categories/1/", headers=headers)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_unexisting_book_category_with_authentication(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test get unexisting book category route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.get("/api/v1/books/categories/55555/", headers=headers)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_post_book_category_with_authentication_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test add book category route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    json = {"title": "mathematique"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.post("/api/v1/books/categories/", headers=headers, json=json)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_post_book_category_with_authentication_with_invalid_datas(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test add book category route with invalid data and FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    json = {"category_name": "mathematique"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.post("/api/v1/books/categories/", headers=headers, json=json)
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_post_existing_book_category_with_authentication_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test add existing book category route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    json = {"title": "roman"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.post("/api/v1/books/categories/", headers=headers, json=json)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_delete_book_category_with_authentication_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test delete book category route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.delete("/api/v1/books/categories/5/delete/", headers=headers)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_delete_unexisting_book_category_with_authentication_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test delete unexisting book category route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.delete("/api/v1/books/categories/55555/delete/", headers=headers)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_update_book_category_with_authentication_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test update book category route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    json = {"title": "politiques"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.put("/api/v1/books/categories/1/update/", headers=headers, json=json)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_update_unexisting_book_category_with_authentication_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test update an unexisting book category route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    json = {"title": "politiques"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.put("/api/v1/books/categories/55555/update/", headers=headers, json=json)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_books_categories_with_authentication_as_admin(get_fastapi_client, get_fastapi_token_for_admin):
+    """
+    Description: test get book category route with FastAPI TestClient with admin token.
+    """
+    access_token = get_fastapi_token_for_admin
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.get("/api/v1/books/categories/", headers=headers)
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_get_book_category_with_authentication_as_admin(get_fastapi_client, get_fastapi_token_for_admin):
+    """
+    Description: test get book category route with FastAPI TestClient with admin token.
+    """
+    access_token = get_fastapi_token_for_admin
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.get("/api/v1/books/categories/1/", headers=headers)
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_get_unexisting_book_category_with_authentication_as_admin(get_fastapi_client, get_fastapi_token_for_admin):
+    """
+    Description: test get unexisting book category route with FastAPI TestClient with admin token.
+    """
+    access_token = get_fastapi_token_for_admin
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.get("/api/v1/books/categories/55555/", headers=headers)
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_post_book_category_with_authentication_as_admin_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token_for_admin
+):
+    """
+    Description: test add book category route with FastAPI TestClient with admin token.
+    """
+    access_token = get_fastapi_token_for_admin
+    json = {"title": "mathematique"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.post("/api/v1/books/categories/", headers=headers, json=json)
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_post_book_category_with_authentication_as_admin_with_invalid_datas(
+    get_fastapi_client,
+    get_fastapi_token_for_admin
+):
+    """
+    Description: test add book category route with invalid data and FastAPI TestClient with admin token.
+    """
+    access_token = get_fastapi_token_for_admin
+    json = {"category_name": "mathematique"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.post("/api/v1/books/categories/", headers=headers, json=json)
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_post_existing_book_category_with_authentication_as_admin_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token_for_admin
+):
+    """
+    Description: test add existing book category route with FastAPI TestClient with admin token.
+    """
+    access_token = get_fastapi_token_for_admin
+    json = {"title": "POLITIQUE"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.post("/api/v1/books/categories/", headers=headers, json=json)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_delete_book_category_with_authentication_as_admin_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token_for_admin
+):
+    """
+    Description: test delete book category route with FastAPI TestClient with admin token.
+    """
+    access_token = get_fastapi_token_for_admin
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.delete("/api/v1/books/categories/5/delete/", headers=headers)
+    assert response.status_code == 204
+
+
+@pytest.mark.asyncio
+async def test_delete_unexisting_book_category_with_authentication_as_admin_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token_for_admin
+):
+    """
+    Description: test delete unexisting book category route with FastAPI TestClient with admin token.
+    """
+    access_token = get_fastapi_token_for_admin
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.delete("/api/v1/books/categories/55555/delete/", headers=headers)
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_update_book_category_with_authentication_as_admin_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token_for_admin
+):
+    """
+    Description: test update book category route with FastAPI TestClient with admin token.
+    """
+    access_token = get_fastapi_token_for_admin
+    json = {"title": "politiques"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.put("/api/v1/books/categories/1/update/", headers=headers, json=json)
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_update_unexisting_book_category_with_authentication_as_admin_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token_for_admin
+):
+    """
+    Description: test update an unexisting book category route with FastAPI TestClient with admin token.
+    """
+    access_token = get_fastapi_token_for_admin
+    json = {"title": "politiques"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.put("/api/v1/books/categories/55555/update/", headers=headers, json=json)
+    assert response.status_code == 404
+
+
+def test_check_book_fields():
+    """
+    Description: test the check_book_fields function.
+    """
+    new_book = fastapi_models.NewBookModel(
+        title="This is a dummy title sir",
+        summary="This is a dummy summary sir",
+        content="This is a dummy content sir",
+        author="This is a dummy author sir",
+        category="1",
+        year_of_publication="1999",
+        book_picture_name="dummy_filename.png",
+        user_id=2,
+    )
+    response = check_book_fields(new_book)
+    assert response is True
+
+
+def test_check_book_fields_with_invalid_field():
+    """
+    Description: test the check_book_fields function.
+    """
+    new_book = fastapi_models.NewBookModel(
+        title="This is a dummy title sir",
+        author="This is a dummy author sir",
+        summary="This is a dummy summary sir",
+        content="string",
+        category="1",
+        year_of_publication="1999",
+        book_picture_name="dummy_filename.png",
+        user_id=2,
+    )
+    response = check_book_fields(new_book)
+    assert "Saisie invalide, mot clef string non utilisable." == response

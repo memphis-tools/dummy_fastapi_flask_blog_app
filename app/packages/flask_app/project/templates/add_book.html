@@ -15,9 +15,9 @@
                 <label for="summary">{{ form.summary.label }}</label>{{ form.summary }}
                 <label for="author">{{ form.author.label }}</label>{{ form.author }}
                 <div class="d-flex flex-column">
-                  {% for category in form.categories %}
-                  {{ category }}
-                  {% endfor %}
+                    {% for category in form.categories %}
+                        {{ category }}
+                    {% endfor %}
                 </div>
                 <label for="year_of_publication">{{ form.year_of_publication.label }}</label>
                 <div class="col-md-1">

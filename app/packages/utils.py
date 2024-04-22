@@ -129,6 +129,7 @@ def set_dummies_books():
             summary="Une brève histoire d'interractions entre humains au grand coeur",
             content="C bibendum pharetra purus.",
             author="Deplhine de Vighan",
+            category=3,
             book_picture_name="dummy_blank_book.png",
             user_id=4,
             nb_comments=2,
@@ -171,6 +172,7 @@ def set_dummies_books():
             une histoire qui interpelle et invite à réfléchir sur le monde qui nous entoure.
             """,
             author="Marc Levy",
+            category=6,
             book_picture_name="dummy_blank_book.png",
             user_id=3,
             nb_comments=2,
@@ -185,6 +187,7 @@ def set_dummies_books():
             grandes puissances comme agents secrets ou aventuriers.
             """,
             author="Taline Ter Minassian",
+            category=2,
             book_picture_name="dummy_blank_book.png",
             user_id=4,
         ),
@@ -199,6 +202,7 @@ def set_dummies_books():
             en 1981, et à observer la naissance de l’islam en France dans ses significations multiformes.
             """,
             author="Gilles Kepel",
+            category=1,
             book_picture_name="dummy_blank_book.png",
             user_id=2,
         ),

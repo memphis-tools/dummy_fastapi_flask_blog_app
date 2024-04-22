@@ -43,7 +43,28 @@ class RegisterForm(FlaskForm):
     email = EmailField("EMAIL", validators=[DataRequired(), Email()])
 
 
+class AddCategoryBookForm(FlaskForm):
+    """
+    Description: the add category book FlaskForm form.
+    """
+    title = StringField(
+        label="CATEGORIE", validators=[DataRequired(), Length(min=3, max=50)]
+    )
+
+
+class UpdateeBookCategoryForm(FlaskForm):
+    """
+    Description: the update category book FlaskForm form.
+    """
+    title = StringField(
+        label="CATEGORIE", validators=[DataRequired(), Length(min=3, max=50)]
+    )
+
+
 class BookCategory(Form):
+    """
+    Description: the field list for select a book category.
+    """
     categories_tupple_list = []
     for category in settings.BOOKS_CATEGORIES:
         categories_tupple_list.append((f'{category.lower()}', f'{category.upper()}'))
@@ -148,6 +169,13 @@ class ContactForm(FlaskForm):
     name = StringField("NOM", validators=[DataRequired()])
     email = EmailField("EMAIL", validators=[DataRequired()])
     message = TextAreaField("MESSAGE", validators=[DataRequired(), Length(min=3, max=1800)])
+
+
+class DeleteBookCategoryForm(FlaskForm):
+    """
+    Description: the delete book category FlaskForm form.
+    """
+    pass
 
 
 class DeleteBookForm(FlaskForm):

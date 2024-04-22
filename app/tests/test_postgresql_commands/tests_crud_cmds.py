@@ -110,3 +110,24 @@ def test_delete_comment_instance(get_session):
     instance = session.query(models.Comment).filter_by(text="Dummy comment sir").scalar()
     query = database_crud_commands.delete_instance(session, instance)
     assert query is True
+
+
+def test_get_view_all_user_books(get_session):
+    """ Description: test if we can get all books from a calid user """
+    session = get_session
+    books = session.query(models.Book).filter_by(user_id=2).all()
+    assert len(books) > 0
+
+
+def test_get_view_all_categories_instances(get_session):
+    """ Description: test if we can get all books categories """
+    session = get_session
+    categories = session.query(models.BookCategory).all()
+    assert len(categories) > 0
+
+
+def test_get_view_all_category_books(get_session):
+    """ Description: test if we can get all books from a category """
+    session = get_session
+    total_books = session.query(models.Book).filter(models.Book.category==3).count()
+    assert total_books >= 0

@@ -298,6 +298,27 @@ def user_books(user_id):
             is_authenticated=current_user.is_authenticated,
         )
 
+def check_book_category_fields(category):
+    """
+    Description: vérifier que l'utilisateur renseigne la catégorie correctement.
+    """
+    session = session_commands.get_a_database_session("postgresql")
+    if any([
+        str(category.title).lower() == "string",
+    ]):
+        session.close()
+        error = "Saisie invalide, mot clef string non utilisable."
+        return error
+    existing_category = session.query(BookCategory).filter(
+        BookCategory.title==str(category.title).lower()
+    ).first()
+    session.close()
+    if existing_category:
+        error = "Saisie invalide, categorie existe deja."
+        return error
+    return True
+
+
 def check_book_fields(book):
     """
     Description: vérifier que l'utilisateur renseigne le livre correctement.
@@ -341,14 +362,14 @@ def add_book():
         book_picture = form.photo.data
         filename = secure_filename(book_picture.filename)
         new_book = Book(
-        title=title,
-        summary=summary,
-        content=content,
-        author=author,
-        category=category_id,
-        year_of_publication=year_of_publication,
-        book_picture_name=filename,
-        user_id=current_user.get_id(),
+            title=title,
+            summary=summary,
+            content=content,
+            author=author,
+            category=category_id,
+            year_of_publication=year_of_publication,
+            book_picture_name=filename,
+            user_id=current_user.get_id(),
         )
         book_is_valid = check_book_fields(new_book)
         if book_is_valid is True:
@@ -604,6 +625,133 @@ def users():
         session.close()
         return render_template(
             "users.html", users=users, is_authenticated=current_user.is_authenticated
+        )
+
+
+@app.route("/front/categories/", methods=["GET"])
+@login_required
+@admin_only
+def manage_books_categories():
+    """
+    Description: a manage view to get books categories Flask route.
+    """
+    if current_user.role != "admin":
+        return abort(401)
+    else:
+        session = session_commands.get_a_database_session("postgresql")
+        categories = session.query(BookCategory).all()
+        session.close()
+        return render_template(
+            "books_categories.html",
+            categories=categories,
+            is_authenticated=current_user.is_authenticated
+        )
+
+
+@app.route("/front/book/categories/add/", methods=["GET", "POST"])
+@login_required
+@admin_only
+def add_book_category():
+    """
+    Description: an add book category Flask route.
+    """
+    form = forms.AddCategoryBookForm()
+    if current_user.role != "admin":
+        return abort(401)
+    else:
+        if form.validate_on_submit():
+            session = session_commands.get_a_database_session("postgresql")
+            title = form.title.data
+            new_category = BookCategory(
+                title=str(title).lower(),
+            )
+            category_is_valid = check_book_category_fields(new_category)
+            if category_is_valid is True:
+                session.add(new_category)
+                session.commit()
+            else:
+                flash(category_is_valid, "error")
+            session.close()
+            return redirect(url_for("manage_books_categories"))
+        return render_template(
+            "add_book_category.html",
+            form=form,
+            is_authenticated=current_user.is_authenticated
+        )
+
+
+@app.route("/front/book/categories/<int:category_id>/delete/", methods=["GET", "POST"])
+@login_required
+@admin_only
+def delete_book_category(category_id):
+    """
+    Description: delete a book category Flask route.
+    """
+    form = forms.DeleteBookCategoryForm()
+    session = session_commands.get_a_database_session("postgresql")
+    category_to_delete = session.get(BookCategory, category_id)
+    if not category_to_delete:
+        flash("Categorie livre non trouvee", "error")
+        session.close()
+        return abort(404)
+    if current_user.role != "admin":
+        session.close()
+        return abort(401)
+    else:
+        if form.validate_on_submit():
+            session.delete(category_to_delete)
+            session.commit()
+            session.close()
+            return redirect(url_for("manage_books_categories"))
+        return render_template(
+            "delete_book_category.html",
+            category_to_delete=category_to_delete,
+            form=form,
+            is_authenticated=current_user.is_authenticated
+        )
+
+
+@app.route("/front/book/categories/<int:category_id>/update/", methods=["GET", "POST"])
+@login_required
+@admin_only
+def update_book_category(category_id):
+    """
+    Description: update a book category Flask route.
+    """
+    session = session_commands.get_a_database_session("postgresql")
+    category_to_update = session.get(BookCategory, category_id)
+    if not category_to_update:
+        flash("Categorie livre non trouvee", "error")
+        session.close()
+        return abort(404)
+    edit_form = forms.UpdateeBookCategoryForm(title=category_to_update.title,)
+    if current_user.role != "admin":
+        session.close()
+        return abort(401)
+    else:
+        if edit_form.validate_on_submit():
+            title = edit_form.title.data
+            updated_category = BookCategory(
+                title=title,
+            )
+            session.query(BookCategory).where(BookCategory.id == category_id).update(
+                updated_category.get_json_for_update()
+            )
+            book_category_is_valid = check_book_category_fields(updated_category)
+            if book_category_is_valid is True:
+                session.commit()
+                session.close()
+                return redirect(url_for("manage_books_categories"))
+            else:
+                flash(book_category_is_valid, "error")
+                session.close()
+                return redirect(url_for("index"))
+            return redirect(url_for("manage_books_categories"))
+        return render_template(
+            "update_book_category.html",
+            category_to_update=category_to_update,
+            form=edit_form,
+            is_authenticated=current_user.is_authenticated
         )
 
 
