@@ -65,3 +65,10 @@ def test_reset_and_populate_database(get_session):
     Description: test the reset and populate database.
     """
     assert init_database.reset_and_populate_database(get_session) is True
+
+
+def test_update_default_postgres_password(get_session):
+    """
+    Description: test the update password for postgres default user .
+    """
+    assert init_database.update_default_postgres_password("postgresql", get_session) is True

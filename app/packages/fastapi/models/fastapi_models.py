@@ -15,6 +15,22 @@ class TokenData(BaseModel):
     username: str | None = None
 
 
+class BookCategoryModel(BaseModel):
+    """ FastAPI Book Category class """
+    id: int
+    title: str
+
+
+class NewBookCategoryModel(BaseModel):
+    """ FastAPI new Book Category class """
+    title: str
+
+
+class UpdateBookCategoryModel(BaseModel):
+    """ FastAPI update Book Category class """
+    title: str
+
+
 class BookModel(BaseModel):
     """ FastAPI Book class """
     id: int

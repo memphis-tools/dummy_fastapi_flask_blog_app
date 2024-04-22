@@ -72,6 +72,24 @@ class BookCategory(BASE):
         """
         return self.title
 
+    def get_json(self):
+        """
+        Description: get a category book instance as a json dict during general application execution.
+        """
+        return {
+            "id": self.id,
+            "title": self.title,
+        }
+
+    def get_json_for_update(self):
+        """
+        Description:
+        Get a category book instance as a json dict without id (when we list them from FastAPI)
+        """
+        return {
+            "title": self.title,
+        }
+
 
 class Book(BASE):
     """
@@ -84,7 +102,7 @@ class Book(BASE):
     summary = Column(Text, nullable=False)
     content = Column(String(2500), nullable=False)
     author = Column(String(150), nullable=False)
-    category =  Column(Integer, ForeignKey("book_categories_table.id"))
+    category =  Column(Integer, ForeignKey("book_categories_table.id"), nullable=True)
     year_of_publication = Column(Integer, nullable=True)
     book_picture_name = Column(String(250), nullable=False)
     publication_date = Column(

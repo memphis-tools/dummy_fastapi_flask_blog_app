@@ -32,6 +32,18 @@ h2 {
   font-size: 2rem;
 }
 
+table {
+  width: 100%;
+}
+
+tbody, td, tfoot, th, thead, tr {
+  padding-bottom: 2%;
+}
+
+tr {
+  padding-bottom: 5%;
+}
+
 form {
   display: flex;
   flex-direction: column;
@@ -209,11 +221,13 @@ legend {
   margin-bottom: 5%;
 }
 
-.user-preview {
+.user-preview,
+.category-preview {
   display: flex;
   flex-direction: row;
   flex-flow: nowrap;
   justify-content: space-around;
+  align-items: center;
 }
 
 footer {
