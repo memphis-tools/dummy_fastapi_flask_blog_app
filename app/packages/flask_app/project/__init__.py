@@ -690,7 +690,7 @@ def delete_book_category(category_id):
     form = forms.DeleteBookCategoryForm()
     session = session_commands.get_a_database_session("postgresql")
     category_to_delete = session.get(BookCategory, category_id)
-    if not category_to_delete:
+    if category_to_delete is None:
         flash("Categorie livre non trouvee", "error")
         session.close()
         return abort(404)
@@ -720,7 +720,7 @@ def update_book_category(category_id):
     """
     session = session_commands.get_a_database_session("postgresql")
     category_to_update = session.get(BookCategory, category_id)
-    if not category_to_update:
+    if category_to_update is None:
         flash("Categorie livre non trouvee", "error")
         session.close()
         return abort(404)
