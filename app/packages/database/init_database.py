@@ -162,6 +162,7 @@ def update_default_postgres_password(engine_name, session):
         statement = f"ALTER USER {os.getenv('POSTGRES_USER')} WITH PASSWORD {updated_password};"
         session.execute(text(statement))
     print(f'[+] Default {os.getenv("POSTGRES_USER")} password updated sir.')
+    return True
 
 
 def reset_and_populate_database(session):

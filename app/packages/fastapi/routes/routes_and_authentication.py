@@ -20,6 +20,9 @@ try:
         UpdateBookModel,
         NewCommentModel,
         UpdateCommentModel,
+        BookCategoryModel,
+        NewBookCategoryModel,
+        UpdateBookCategoryModel,
         Token,
         TokenData,
     )
@@ -37,6 +40,9 @@ except ModuleNotFoundError:
         UpdateBookModel,
         NewCommentModel,
         UpdateCommentModel,
+        BookCategoryModel,
+        NewBookCategoryModel,
+        UpdateBookCategoryModel,
         Token,
         TokenData,
     )
@@ -164,7 +170,14 @@ async def view_books_categories(
     """
     view_books_categories return a list of books categories.
     A list element consists in a dict with 3 keys: id, name, total_books.
+    Remember application admin account id is 1.
     """
+    if current_user.id != 1:
+        raise HTTPException(
+            status_code=status. HTTP_401_UNAUTHORIZED,
+            detail="Acces reserve au seul compte admin",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     categories = database_crud_commands.view_all_categories_instances(session)
     return categories
 
@@ -176,15 +189,105 @@ async def view_category_books(
     """
     view_category_books return a list of books from a category.
     """
+    if current_user.id != 1:
+        raise HTTPException(
+            status_code=status. HTTP_401_UNAUTHORIZED,
+            detail="Acces reserve au seul compte admin",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     category = database_crud_commands.get_instance(session, models.BookCategory, id)
     if not category:
         raise HTTPException(
-            status_code=status. HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Incorrect category id",
             headers={"WWW-Authenticate": "Bearer"},
         )
     categories = database_crud_commands.view_all_category_books(session, id)
     return categories
+
+
+@app.post("/api/v1/books/categories/")
+async def add_category_books(
+    book_category: NewBookCategoryModel,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+):
+    """
+    add_category_books a category if it has been created.
+    """
+    if current_user.id != 1:
+        raise HTTPException(
+            status_code=status. HTTP_401_UNAUTHORIZED,
+            detail="Acces reserve au seul compte admin",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    new_book_category = models.BookCategory(
+        title=book_category.title
+    )
+    check_book_category_fields(new_book_category)
+    session.add(new_book_category)
+    session.commit()
+    return new_book_category
+
+
+@app.put("/api/v1/books/categories/{id}/update/")
+async def update_book_category(
+    id: int,
+    book_category_updated: UpdateBookCategoryModel,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+):
+    """
+    update_book_category return a an updated book category.
+    """
+    if current_user.id != 1:
+        raise HTTPException(
+            status_code=status. HTTP_401_UNAUTHORIZED,
+            detail="Acces reserve au seul compte admin",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    category = database_crud_commands.get_instance(session, models.BookCategory, id)
+    if not category:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Incorrect category id",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if book_category_updated.title is not None:
+        check_book_category_fields(book_category_updated)
+        category.title = book_category_updated.title
+        session.query(models.BookCategory).where(models.BookCategory.id == id).update(
+                category.get_json_for_update()
+        )
+        session.commit()
+    return category
+
+
+@app.delete("/api/v1/books/categories/{id}/delete/")
+async def delete_book_category(
+    id: int,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+):
+    """
+    delete_book_category returns 204 if category deleted.
+    """
+    if current_user.id != 1:
+        raise HTTPException(
+            status_code=status. HTTP_401_UNAUTHORIZED,
+            detail="Acces reserve au seul compte admin",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    category = database_crud_commands.get_instance(session, models.BookCategory, id)
+    if not category:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Incorrect category id",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    session.delete(category)
+    session.commit()
+    raise HTTPException(
+        status_code= status.HTTP_204_NO_CONTENT,
+        detail= f"category with id {id} removed."
+    )
 
 
 @app.get("/api/v1/books/{id}/")
@@ -285,7 +388,7 @@ async def register(
 
 def check_book_fields(book):
     """
-    Description: vérifier que l'utilisateur renseigne le livre correctement.
+    Description: check if user set book correctly.
     """
     if any([
         str(book.title).lower() == "string",
@@ -303,6 +406,26 @@ def check_book_fields(book):
         raise HTTPException(
             status_code=401,
             detail="Saisie invalide, annee publication livre doit etre un entier."
+        )
+    return True
+
+
+def check_book_category_fields(category):
+    """
+    Description: check if user set book category correctly.
+    """
+    if str(category.title).lower() == "string":
+        raise HTTPException(
+            status_code=401,
+            detail="Saisie invalide, mot clef string non utilisable."
+        )
+    category = session.query(models.BookCategory).filter(
+        models.BookCategory.title==str(category.title).lower()
+    ).first()
+    if category:
+        raise HTTPException(
+            status_code=401,
+            detail="Saisie invalide, categorie existe deja."
         )
 
 

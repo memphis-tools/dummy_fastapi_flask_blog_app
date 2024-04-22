@@ -53,6 +53,20 @@ def get_fastapi_token():
 
 
 @pytest.fixture
+def get_fastapi_token_for_admin():
+    """
+    Description: fixture offers a FastAPI user's token.
+    """
+    username = "admin"
+    user = routes_and_authentication.get_user(username)
+    access_token_expires = timedelta(minutes=routes_and_authentication.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = routes_and_authentication.create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return access_token
+
+
+@pytest.fixture
 def get_test_token():
     """
     Description: we need a token created from the app (and his secret key).

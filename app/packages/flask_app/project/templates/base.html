@@ -41,6 +41,11 @@
                                         <li><a class="dropdown-item" href="{{ url_for('user_books', user_id=current_user.id) }}">VOIR VOS LIVRES</a></li>
                                         <li><a class="dropdown-item" href="{{ url_for('add_book') }}">AJOUTER UN LIVRE</a></li>
                                     {% endif %}
+                                    {% if current_user.role == "admin" %}
+                                      <li class="nav-item">
+                                          <a class="dropdown-item" href="{{ url_for('manage_books_categories') }}">GERER CATEGORIES</a>
+                                      </li>
+                                    {% endif %}
                                 {% endif %}
                             </ul>
                         </li>

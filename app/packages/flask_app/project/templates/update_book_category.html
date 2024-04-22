@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}UPDATE BOOK CATEGORY{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="section_intro"></div>
+    <h1>DUMMY BLOG - METTRE A JOUR CATEGORIE {{ category_to_update.title|upper }}</h1>
+    <div class="row justify-content-center">
+        <div class="d-flex flex-column justify-content-center w-75">
+            <form class="form" method="post" enctype="multipart/form-data">
+                {{ form.csrf_token }}
+                <label for="title">{{ form.title.label }}</label>{{ form.title }}
+                <button type="submit" class="btn btn-primary" name="button">METTRE A JOUR</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

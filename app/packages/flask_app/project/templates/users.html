@@ -6,14 +6,18 @@
 <div class="container">
   <div class="section_intro"></div>
   <h1>DUMMY BLOG - UTILISATEURS</h1>
-  <div class="d-flex flex-column justify-content-center w-50">
-    {% for user in users %}
+  <div class="d-flex flex-column justify-content-center align-items-center">
         <div class="user-preview">
-            <p class="post-title">{{ user.username|upper }}</p>
-            <a class="btn btn-primary" href="{{ url_for('delete_user', user_id=user.id) }}">SUPPRIMER UTILISATEUR</a>
+            <table>
+                {% for user in users %}
+                    <tr>
+                        <td><p class="post-title">{{ user.username|upper }}</p></td>
+                        <td><a class="btn btn-primary" href="{{ url_for('delete_user', user_id=user.id) }}">SUPPRIMER UTILISATEUR</a></td>
+                    </tr>
+                {% endfor %}
+            </table>
         </div>
         <hr />
-    {% endfor %}
   </div>
 </div>
 {% endblock content %}
