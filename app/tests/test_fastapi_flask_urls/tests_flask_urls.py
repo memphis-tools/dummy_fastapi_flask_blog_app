@@ -1065,7 +1065,7 @@ def test_delete_invalid_book_category_being_admin(client, access_session_as_admi
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
-        "http://localhost/front/book/categories/555555/delete/",
+        "/front/book/categories/555555/delete/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -1139,14 +1139,14 @@ def test_update_invalid_book_category_being_admin(client, access_session_as_admi
     Description: check if we can update an invalid book category being admin.
     """
     data = {
-        "title": "something",
+        "name": "something",
         "csrf_token": get_flask_csrf_token,
     }
     headers = {
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
-        "http://localhost/front/book/categories/55555/update/",
+        "/front/book/categories/55555/update/",
         headers=headers,
         data=data,
         follow_redirects=True
