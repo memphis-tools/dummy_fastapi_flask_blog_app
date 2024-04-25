@@ -172,38 +172,26 @@ async def view_books_categories(
     A list element consists in a dict with 3 keys: id, name, total_books.
     Remember application admin account id is 1.
     """
-    if current_user.id != 1:
-        raise HTTPException(
-            status_code=status. HTTP_401_UNAUTHORIZED,
-            detail="Acces reserve au seul compte admin",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
     categories = database_crud_commands.view_all_categories_instances(session)
     return categories
 
 
-@app.get("/api/v1/books/categories/{id}/")
+@app.get("/api/v1/books/categories/{category_id}/")
 async def view_category_books(
-    id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    category_id: int
 ):
     """
     view_category_books return a list of books from a category.
     """
-    if current_user.id != 1:
-        raise HTTPException(
-            status_code=status. HTTP_401_UNAUTHORIZED,
-            detail="Acces reserve au seul compte admin",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    category = database_crud_commands.get_instance(session, models.BookCategory, id)
+    category = database_crud_commands.get_instance(session, models.BookCategory, category_id)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Incorrect category id",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    categories = database_crud_commands.view_all_category_books(session, id)
-    return categories
+    category_books = database_crud_commands.view_all_category_books(session, category_id)
+    return category_books
 
 
 @app.post("/api/v1/books/categories/")
@@ -229,9 +217,9 @@ async def add_category_books(
     return new_book_category
 
 
-@app.put("/api/v1/books/categories/{id}/update/")
+@app.put("/api/v1/books/categories/{category_id}/update/")
 async def update_book_category(
-    id: int,
+    category_id: int,
     book_category_updated: UpdateBookCategoryModel,
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -244,7 +232,7 @@ async def update_book_category(
             detail="Acces reserve au seul compte admin",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    category = database_crud_commands.get_instance(session, models.BookCategory, id)
+    category = database_crud_commands.get_instance(session, models.BookCategory, category_id)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -254,16 +242,16 @@ async def update_book_category(
     if book_category_updated.title is not None:
         check_book_category_fields(book_category_updated)
         category.title = book_category_updated.title
-        session.query(models.BookCategory).where(models.BookCategory.id == id).update(
+        session.query(models.BookCategory).where(models.BookCategory.id == category_id).update(
                 category.get_json_for_update()
         )
         session.commit()
     return category
 
 
-@app.delete("/api/v1/books/categories/{id}/delete/")
+@app.delete("/api/v1/books/categories/{category_id}/delete/")
 async def delete_book_category(
-    id: int,
+    category_id: int,
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
@@ -275,7 +263,7 @@ async def delete_book_category(
             detail="Acces reserve au seul compte admin",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    category = database_crud_commands.get_instance(session, models.BookCategory, id)
+    category = database_crud_commands.get_instance(session, models.BookCategory, category_id)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -286,30 +274,30 @@ async def delete_book_category(
     session.commit()
     raise HTTPException(
         status_code= status.HTTP_204_NO_CONTENT,
-        detail= f"category with id {id} removed."
+        detail= f"category with id {category_id} removed."
     )
 
 
-@app.get("/api/v1/books/{id}/")
+@app.get("/api/v1/books/{book_id}/")
 async def view_book(
-    id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    book_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     view_books return a book.
     """
-    book = database_crud_commands.get_instance(session, models.Book, id)
+    book = database_crud_commands.get_instance(session, models.Book, book_id)
     if book is not None:
         if os.getenv("SCOPE") == "production":
             logs_context = {
                 "current_user": f"{current_user.username}",
-                "book_id": id,
+                "book_id": book_id,
                 "book_title": book.title
             }
             LOGGER.info("[+] FastAPI - Consultation livre", extra=logs_context)
         return book
     else:
         if os.getenv("SCOPE") == "production":
-            logs_context = {"current_user": f"{current_user.username}", "book_id": id}
+            logs_context = {"current_user": f"{current_user.username}", "book_id": book_id}
             LOGGER.info("[+] FastAPI - Consultation livre inconnu", extra=logs_context)
         return books
 
@@ -384,6 +372,51 @@ async def register(
         session.add(new_user)
         session.commit()
         return user
+
+
+@app.post("/api/v1/users/")
+async def add_user(
+    user: NewUserInDBModel,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+):
+    """
+    add user as an admin
+    """
+    user.username = str(user.username).lower()
+    user.email = str(user.email).lower()
+    existing_user = session.query(models.User).filter_by(username=str(user.username).lower()).first()
+    existing_email = session.query(models.User).filter_by(email=str(user.email).lower()).first()
+    hashed_password = generate_password_hash(
+        user.password, "pbkdf2:sha256", salt_length=8
+    )
+    if current_user.role == "admin":
+        if not existing_user and not existing_email:
+            new_user = models.User(
+                username=str(user.username).lower(),
+                email=str(user.email).lower(),
+                hashed_password=hashed_password,
+            )
+            session.add(new_user)
+            session.commit()
+            return {"200": f"user {str(user.username).lower()} added"}
+        raise HTTPException(
+            status_code=401,
+            detail="Utilisateur existe deja"
+        )
+    else:
+        if os.getenv("SCOPE") == "production":
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "user_to_add": user.username
+            }
+            LOGGER.info(
+                "[+] FastAPI - Ajout utilisateur refusee, vous n'etes pas admin",
+                extra=logs_context
+            )
+        raise HTTPException(
+            status_code=401,
+            detail="Seul l'admin peut ajouter un utilisateur"
+        )
 
 
 def check_book_fields(book):
@@ -465,14 +498,16 @@ async def post_book(
     return new_book
 
 
-@app.put("/api/v1/books/{id}/")
+@app.put("/api/v1/books/{book_id}/")
 async def update_book(
-    id: int, book_updated: UpdateBookModel, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    book_id: int,
+    book_updated: UpdateBookModel,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     update a book instance.
     """
-    book = database_crud_commands.get_instance(session, models.Book, id)
+    book = database_crud_commands.get_instance(session, models.Book, book_id)
     if book:
         if current_user.id == book.user_id or current_user.username == "admin":
             if book_updated.title is not None:
@@ -487,7 +522,7 @@ async def update_book(
                     category_id = session.query(models.BookCategory).filter(models.BookCategory.title==category).first().id
                 except Exception:
                     raise HTTPException(
-                        status_code=401,
+                        status_code=404,
                         detail="Saisie invalide, categorie livre non prevue."
                     )
                 book.category = category_id
@@ -496,7 +531,7 @@ async def update_book(
             if book_updated.book_picture_name is not None:
                 book.book_picture_name = book_updated.book_picture_name
             check_book_fields(book)
-            session.query(models.Book).where(models.Book.id == id).update(
+            session.query(models.Book).where(models.Book.id == book_id).update(
                 book.get_json_for_update()
             )
             session.commit()
@@ -518,7 +553,7 @@ async def update_book(
                 status_code=401,
                 detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour le livre"
             )
-    raise HTTPException(status_code=404, detail=f"book with id {id} does not exist")
+    raise HTTPException(status_code=404, detail=f"book with id {book_id} does not exist")
 
 
 @app.get("/api/v1/users")
@@ -532,25 +567,27 @@ async def view_users(
     return books
 
 
-@app.get("/api/v1/users/{id}/")
+@app.get("/api/v1/users/{user_id}/")
 async def view_user(
-    id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    user_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     view_user return an user.
     """
-    user = database_crud_commands.get_instance(session, models.User, id)
+    user = database_crud_commands.get_instance(session, models.User, user_id)
     return user
 
 
-@app.put("/api/v1/users/{id}/")
+@app.put("/api/v1/users/{user_id}/")
 async def update_user(
-    id: int, user_updated: UpdateUserModel, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    user_id: int,
+    user_updated: UpdateUserModel,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     update an user instance.
     """
-    user = database_crud_commands.get_instance(session, models.User, id)
+    user = database_crud_commands.get_instance(session, models.User, user_id)
     if user:
         if current_user.id == user.id or current_user.username == "admin":
             if user_updated.username is not None:
@@ -561,7 +598,7 @@ async def update_user(
                 user.role = user_updated.role
             if user_updated.disabled is not None:
                 user.disabled = user_updated.disabled
-            session.query(models.User).where(models.User.id == id).update(
+            session.query(models.User).where(models.User.id == user_id).update(
                 user.get_json_for_update()
             )
             session.commit()
@@ -571,24 +608,26 @@ async def update_user(
                 status_code=401,
                 detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur"
             )
-    raise HTTPException(status_code=404, detail=f"user with id {id} does not exist")
+    raise HTTPException(status_code=404, detail=f"user with id {user_id} does not exist")
 
 
-@app.put("/api/v1/users/{id}/password/")
+@app.put("/api/v1/users/{user_id}/password/")
 async def update_user_password(
-    id: int, user_updated: UpdateUserInDB, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    user_id: int,
+    user_updated: UpdateUserInDB,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     update password of an user instance.
     """
-    user = database_crud_commands.get_instance(session, models.User, id)
+    user = database_crud_commands.get_instance(session, models.User, user_id)
     if user:
         if current_user.id == user.id or current_user.username == "admin":
             if user_updated.password is not None:
                 user.hashed_password = generate_password_hash(
                     user_updated.password, "pbkdf2:sha256", salt_length=8
                 )
-            session.query(models.User).where(models.User.id == id).update(
+            session.query(models.User).where(models.User.id == user_id).update(
                 user.get_json_for_update()
             )
             session.commit()
@@ -598,7 +637,7 @@ async def update_user_password(
                 status_code=401,
                 detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur"
             )
-    raise HTTPException(status_code=404, detail=f"user with id {id} does not exist")
+    raise HTTPException(status_code=404, detail=f"user with id {user_id} does not exist")
 
 
 @app.get("/api/v1/comments")
@@ -612,14 +651,14 @@ async def view_comments(
     return books
 
 
-@app.get("/api/v1/comments/{id}/")
+@app.get("/api/v1/comments/{comment_id}/")
 async def view_comment(
-    id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    comment_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     view_comment return a comment.
     """
-    comment = database_crud_commands.get_instance(session, models.Comment, id)
+    comment = database_crud_commands.get_instance(session, models.Comment, comment_id)
     return comment
 
 
@@ -652,19 +691,21 @@ async def add_comment(
     raise HTTPException(status_code=404, detail=f"book with id {book_id} does not exist")
 
 
-@app.put("/api/v1/comments/{id}/")
+@app.put("/api/v1/comments/{comment_id}/")
 async def update_comment(
-    id: int, comment_updated: UpdateCommentModel, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    comment_id: int,
+    comment_updated: UpdateCommentModel,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     update a comment instance.
     """
-    comment = database_crud_commands.get_instance(session, models.Comment, id)
+    comment = database_crud_commands.get_instance(session, models.Comment, comment_id)
     if comment:
         if current_user.id == comment.author_id or current_user.username == "admin":
             if comment_updated.text is not None:
                 comment.text = comment_updated.text
-            session.query(models.Comment).where(models.Comment.id == id).update(
+            session.query(models.Comment).where(models.Comment.id == comment_id).update(
                 comment.get_json_for_update()
             )
             session.commit()
@@ -673,12 +714,13 @@ async def update_comment(
             status_code=401,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour un commentaire"
         )
-    raise HTTPException(status_code=404, detail=f"comment with id {id} does not exist")
+    raise HTTPException(status_code=404, detail=f"comment with id {comment_id} does not exist")
 
 
-@app.delete("/api/v1/books/{book_id}/comments/{id}/")
+@app.delete("/api/v1/books/{book_id}/comments/{comment_id}/")
 async def delete_comment(
-    id: int, book_id: int,
+    comment_id: int,
+    book_id: int,
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
@@ -690,7 +732,7 @@ async def delete_comment(
             status_code=404,
             detail="Livre n'existe pas."
         )
-    comment = database_crud_commands.get_instance(session, models.Comment, id)
+    comment = database_crud_commands.get_instance(session, models.Comment, comment_id)
     if comment.book_id != book_id:
         raise HTTPException(
             status_code=401,
@@ -702,7 +744,7 @@ async def delete_comment(
             session.commit()
             total_book_comments = updated_book.nb_comments + 1
             updated_book.nb_comments = total_book_comments
-            return {"204": f"comment with id {id} removed"}
+            return {"204": f"comment with id {comment_id} removed"}
         if os.getenv("SCOPE") == "production":
             logs_context = {
                 "current_user": f"{current_user.username}",
@@ -714,22 +756,22 @@ async def delete_comment(
             status_code=401,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent supprimer son commentaire"
         )
-    raise HTTPException(status_code=404, detail=f"comment with id {id} does not exist")
+    raise HTTPException(status_code=404, detail=f"comment with id {comment_id} does not exist")
 
 
-@app.delete("/api/v1/users/{id}/")
+@app.delete("/api/v1/users/{user_id}/")
 async def delete_user(
-    id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    user_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     delete_comment allows to delete an user base on id
     """
-    user = database_crud_commands.get_instance(session, models.User, id)
+    user = database_crud_commands.get_instance(session, models.User, user_id)
     if current_user.role == "admin":
         if user:
             session.delete(user)
             session.commit()
-            return {"204": f"user with id {id} removed"}
+            return {"204": f"user with id {user_id} removed"}
         raise HTTPException(
             status_code=404,
             detail="Utilisateur n'existe pas"
@@ -748,18 +790,18 @@ async def delete_user(
             status_code=401,
             detail="Seul l'admin peut supprimer un utilisateur"
         )
-    raise HTTPException(status_code=404, detail=f"user with id {id} does not exist")
+    raise HTTPException(status_code=404, detail=f"user with id {user_id} does not exist")
 
 
-@app.delete("/api/v1/books/{id}/")
+@app.delete("/api/v1/books/{book_id}/")
 async def delete_book(
-    id: int,
+    book_id: int,
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     delete_comment allows to delete a book base on id
     """
-    book = database_crud_commands.get_instance(session, models.Book, id)
+    book = database_crud_commands.get_instance(session, models.Book, book_id)
     if book:
         if current_user.id == book.user_id:
             if os.getenv("SCOPE") == "production":
@@ -774,7 +816,7 @@ async def delete_book(
             current_user.nb_publications = total_user_publications
             raise HTTPException(
                 status_code=204,
-                detail= f"book with id {id} removed."
+                detail= f"book with id {book_id} removed."
             )
         if os.getenv("SCOPE") == "production":
             logs_context = {"current_user": f"{current_user.username}", "book_title": book.title}
@@ -783,4 +825,4 @@ async def delete_book(
             status_code=401,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent supprimer son livre."
         )
-    raise HTTPException(status_code=404, detail=f"book with id {id} does not exist")
+    raise HTTPException(status_code=404, detail=f"book with id {book_id} does not exist")
