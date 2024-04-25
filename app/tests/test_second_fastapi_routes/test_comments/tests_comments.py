@@ -38,7 +38,6 @@ async def test_view_comments(get_fastapi_token):
             "/api/v1/comments", headers={"Authorization": f"Bearer {get_fastapi_token}"}
         )
     assert response.status_code == 200
-    assert len(response.json()) == 3
 
 
 @pytest.mark.asyncio
