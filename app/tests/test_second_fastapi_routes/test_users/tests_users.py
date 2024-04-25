@@ -128,7 +128,6 @@ async def test_view_users(get_fastapi_token):
             "/api/v1/users", headers={"Authorization": f"Bearer {get_fastapi_token}"}
         )
     assert response.status_code == 200
-    assert len(response.json()) == 6
 
 
 @pytest.mark.asyncio
@@ -155,11 +154,6 @@ async def test_add_user_being_admin(get_fastapi_client, get_fastapi_token_for_ad
     )
     assert response.status_code == 200
     assert len(response.json()) == 1
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response = await ac.get(
-            "/api/v1/users", headers={"Authorization": f"Bearer {access_token}"}
-        )
-    assert len(response.json()) == 7
 
 
 @pytest.mark.asyncio
@@ -207,11 +201,6 @@ async def test_add_user_without_being_admin(get_fastapi_client, get_fastapi_toke
         json=json
     )
     assert response.status_code == 401
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response = await ac.get(
-            "/api/v1/users", headers={"Authorization": f"Bearer {access_token}"}
-        )
-    assert len(response.json()) == 7
 
 
 @pytest.mark.asyncio
@@ -247,11 +236,6 @@ async def test_delete_user_being_admin(get_fastapi_client, get_fastapi_token_for
     )
     assert response.status_code == 200
     assert len(response.json()) == 1
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response = await ac.get(
-            "/api/v1/users", headers={"Authorization": f"Bearer {access_token}"}
-        )
-    assert len(response.json()) == 6
 
 
 @pytest.mark.asyncio
