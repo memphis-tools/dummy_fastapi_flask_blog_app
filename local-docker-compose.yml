@@ -39,6 +39,7 @@ services:
       - TEST_USER_PWD
       - SECRET_KEY
       - BETTERSTACK_SOURCE_TOKEN
+      - GRAFANA_URL_ENV_TEST
     networks:
       - app-network
     depends_on:
@@ -93,10 +94,28 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
+  grafana:
+    image: grafana/grafana:latest
+    # expose:
+    #   - 3000
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SERVER_ROOT_URL=http://localhost:3000/
+      - GF_SECURITY_ADMIN_PASSWORD=$POSTGRES_PASSWORD
+      - GF_LOG_LEVEL=DEBUG
+    networks:
+      - app-network
+    volumes:
+      - grafana_volume:/var/lib/grafana/
+    depends_on:
+      - db
+
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+  grafana_volume:
 
 networks:
   app-network:
