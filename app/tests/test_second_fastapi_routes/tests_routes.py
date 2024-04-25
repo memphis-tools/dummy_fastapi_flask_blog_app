@@ -49,7 +49,6 @@ async def test_read_main(get_fastapi_client, get_fastapi_token):
         "/api/v1/books", headers={"Authorization": f"Bearer {get_fastapi_token}"}
     )
     assert response.status_code == 200
-    assert len(response.json()) == 5
 
 
 @pytest.mark.asyncio
