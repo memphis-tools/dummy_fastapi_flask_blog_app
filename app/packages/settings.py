@@ -20,6 +20,3 @@ BOOKS_CATEGORIES = [
     "psychologie",
     "management",
 ]
-
-TEST_GRAFANA_STATS_PAGE = os.getenv("GRAFANA_URL_ENV_TEST")
-PRODUCTION_GRAFANA_STATS_PAGE = os.getenv("GRAFANA_URL_ENV_PROD")
