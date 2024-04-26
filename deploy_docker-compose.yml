@@ -38,7 +38,6 @@ services:
       - TEST_USER_PWD
       - SECRET_KEY
       - BETTERSTACK_SOURCE_TOKEN
-      - GRAFANA_URL_ENV_PROD
     networks:
       - app-network
     depends_on:
@@ -102,23 +101,6 @@ services:
     networks:
       - app-network
 
-  grafana:
-    image: grafana/grafana:latest
-    # expose:
-    #   - 3000
-    ports:
-      - 3000:3000
-    environment:
-      - GF_SERVER_ROOT_URL=https://dummy-ops.dev:3000/
-      - GF_SECURITY_ADMIN_PASSWORD=$ADMIN_PASSWORD
-      - GF_LOG_LEVEL=DEBUG
-    networks:
-      - app-network
-    volumes:
-      - grafana_volume:/var/lib/grafana/
-    depends_on:
-      - db
-
 volumes:
   postgres_data:
   static_volume:
@@ -126,7 +108,6 @@ volumes:
   certbot-etc:
   certbot-var:
   web-root:
-  grafana_volume:
 
 networks:
   app-network:

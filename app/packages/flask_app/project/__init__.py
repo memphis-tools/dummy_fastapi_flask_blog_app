@@ -120,22 +120,6 @@ def format_book_category(id):
     return category
 
 
-# Global HTML template variables.
-@app.context_processor
-def set_global_grafana_url_variable():
-    """
-    Description: the templated grafana link is within the base.html load by each templates.
-    We inject the grafana url for each rendering.
-    We set a conditional statement to avoid repetition.
-    """
-    if os.getenv("SCOPE") == "production":
-        grafana_url = settings.PRODUCTION_GRAFANA_STATS_PAGE
-    else:
-        grafana_url = settings.TEST_GRAFANA_STATS_PAGE
-    template_config = {'grafana_url': grafana_url}
-    return template_config
-
-
 @app.route("/front")
 @app.route("/front/home/")
 def index():
@@ -145,14 +129,9 @@ def index():
     session = session_commands.get_a_database_session("postgresql")
     first_books = session.query(Book).order_by("id").all()[:MAX_BOOKS_ON_INDEX_PAGE]
     session.close()
-    if os.getenv("SCOPE") == "production":
-        grafana_url=settings.PRODUCTION_GRAFANA_STATS_PAGE
-    else:
-        grafana_url=settings.TEST_GRAFANA_STATS_PAGE
     return render_template(
         "index.html",
         books=first_books,
-        grafana_url=settings.TEST_GRAFANA_STATS_PAGE,
         is_authenticated=current_user.is_authenticated
     )
 
