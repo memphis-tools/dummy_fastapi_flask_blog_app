@@ -109,8 +109,8 @@ services:
     ports:
       - 3000:3000
     environment:
-      - GF_SERVER_ROOT_URL=http://localhost:3000/
-      - GF_SECURITY_ADMIN_PASSWORD=$POSTGRES_PASSWORD
+      - GF_SERVER_ROOT_URL=https://dummy-ops.dev:3000/
+      - GF_SECURITY_ADMIN_PASSWORD=$ADMIN_PASSWORD
       - GF_LOG_LEVEL=DEBUG
     networks:
       - app-network
