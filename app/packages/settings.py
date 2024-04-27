@@ -20,3 +20,18 @@ BOOKS_CATEGORIES = [
     "psychologie",
     "management",
 ]
+
+PIE_COLORS = [
+    "orange",
+    "cyan",
+    "green",
+    "yellow",
+    "pink",
+    "brown",
+    "beige",
+    "grey",
+    "yellowgreen",
+    "gold",
+    "lightcoral",
+    "lightskyblue",
+]
