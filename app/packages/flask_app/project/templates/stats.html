@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}STATS{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="section_intro"></div>
+    <h1>DUMMY BLOG - LES STATS</h1>
+    <div class="d-flex justify-content-center">
+          <div class="stats">
+              <a class="" href="{{ url_for('categories_stats') }}" target="blank">LIVRES PAR CATEGORIES</a>
+              <a class="" href="{{ url_for('users_stats') }}" target="blank">LIVRES PAR UTILISATEURS</a>
+          </div>
+          <hr />
+    </div>
+</div>
+{% endblock content %}

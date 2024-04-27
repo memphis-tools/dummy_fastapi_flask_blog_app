@@ -7,11 +7,11 @@ from pathlib import Path
 from werkzeug.datastructures import FileStorage
 try:
     from app.packages.database.models.models import Book, User
-    from app.packages.flask_app.project.__init__ import check_book_fields
+    from app.packages.flask_app.project.__init__ import check_book_fields, get_pie_colors
     from app.packages import settings
 except ModuleNotFoundError:
     from packages.database.models.models import Book, User
-    from packages.flask_app.project.__init__ import check_book_fields
+    from packages.flask_app.project.__init__ import check_book_fields, get_pie_colors
     from packages import settings
 
 
@@ -55,7 +55,7 @@ def test_flask_post_add_book_with_authentication(
         "csrf_token": get_flask_csrf_token,
     }
 
-    url = "http://localhost/front/add_book/"
+    url = "http://localhost/front/books/add/"
     response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
     assert response.status_code == 200
 
@@ -80,7 +80,7 @@ def test_flask_post_add_book_without_authentication(client, get_flask_csrf_token
         "csrf_token": get_flask_csrf_token,
     }
 
-    url = "http://localhost/front/add_book/"
+    url = "http://localhost/front/books/add/"
     response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
     assert response.status_code == 200
     assert b"Vous devez d&#39;abord vous connecter" in response.data
@@ -97,7 +97,7 @@ def test_flask_post_add_book_without_authentication_with_invalid_datas(client):
         "content": "This is a dummy content sir",
     }
 
-    url = "http://localhost/front/add_book/"
+    url = "http://localhost/front/books/add/"
     response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
     assert response.status_code == 400
 
@@ -115,7 +115,7 @@ def test_flask_post_add_book_without_authentication_with_invalid_book_category(c
         "category": "supplication"
     }
 
-    url = "http://localhost/front/add_book/"
+    url = "http://localhost/front/books/add/"
     response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
     assert response.status_code == 400
 
@@ -147,6 +147,7 @@ def test_flask_update_book_being_authenticated(
 
     book_form = {
         "title": "This is a dummy title sir",
+        "category": "1",
         "csrf_token": get_flask_csrf_token,
     }
 
@@ -156,6 +157,58 @@ def test_flask_update_book_being_authenticated(
     }
     response = client.post(
         "http://localhost/front/book/1/update/",
+        headers=headers,
+        data=book_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+
+def test_flask_update_book_being_authenticated_without_being_publisher(
+    client, access_session, get_flask_csrf_token
+):
+    """
+    Description: check if we can update a book which user has not published.
+    """
+
+    book_form = {
+        "title": "This is a dummy title sir",
+        "category": "1",
+        "csrf_token": get_flask_csrf_token,
+    }
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cookie": f"session={access_session}",
+    }
+    response = client.post(
+        "http://localhost/front/book/2/update/",
+        headers=headers,
+        data=book_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 403
+
+
+def test_flask_update_book_being_authenticated_as_admin(
+    client, access_session_as_admin, get_flask_csrf_token
+):
+    """
+    Description: check if we can update a book being admin.
+    """
+
+    book_form = {
+        "title": "This is a dummy title sir",
+        "category": "1",
+        "csrf_token": get_flask_csrf_token,
+    }
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cookie": f"session={access_session_as_admin}",
+    }
+    response = client.post(
+        "http://localhost/front/book/2/update/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -251,7 +304,6 @@ def test_flask_post_delete_book_being_authenticated_being_the_publisher(
         follow_redirects=True,
     )
     assert response.status_code == 200
-
     get_session.refresh(user)
     assert user.nb_publications == current_user_total_publications - 1
 
@@ -276,7 +328,7 @@ def test_add_book_check_book_fields(
         "summary": "string",
         "content": "This is a dummy content sir",
         "year_of_publication": "2023",
-        "categories-0-intitule": "histoire",
+        "categories": "3",
         "author": "Dummy Boy",
         "photo": FileStorage(
             stream=(resources / "photo_pexels.com_by_inga_seliverstova.jpg").open("rb"),
@@ -286,7 +338,7 @@ def test_add_book_check_book_fields(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/add_book/",
+        "/front/books/add/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -311,3 +363,11 @@ def test_check_book_fields():
     )
     response = check_book_fields(new_book)
     assert "Saisie invalide, annee publication livre doit etre un entier." == response
+
+
+def test_get_pie_colors():
+    """
+    Description: check the get pie colors.
+    """
+    response = get_pie_colors()
+    assert type(response) is list

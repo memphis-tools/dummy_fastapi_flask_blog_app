@@ -511,6 +511,10 @@ https://www.nginx.com/resources/glossary/http2/
 
 https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
 
+For the matplotlib charts i used:
+
+https://matplotlib.org/stable/gallery/user_interfaces/web_application_server_sgskip.html
+
 For the logo and favicon.ico i used:
 
 https://www.canva.com

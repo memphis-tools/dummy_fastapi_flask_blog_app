@@ -5,11 +5,11 @@ Notice that by default we already add dummies data through the application utils
 
 try:
     from app.packages.database.models.models import BookCategory
-    from app.packages.flask_app.project.__init__ import check_book_category_fields
+    from app.packages.flask_app.project.__init__ import check_book_category_fields, format_book_category
     from app.packages import settings
 except ModuleNotFoundError:
     from packages.database.models.models import BookCategory
-    from packages.flask_app.project.__init__ import check_book_category_fields
+    from packages.flask_app.project.__init__ import check_book_category_fields, format_book_category
     from packages import settings
 
 
@@ -186,7 +186,7 @@ def test_update_valid_book_category_being_admin(client, access_session_as_admin,
     Description: check if we can update a valid book category being admin.
     """
     data = {
-        "title": "something",
+        "title": "politique",
         "csrf_token": get_flask_csrf_token,
     }
     headers = {
@@ -194,6 +194,54 @@ def test_update_valid_book_category_being_admin(client, access_session_as_admin,
     }
     response = client.post(
         "http://localhost/front/book/categories/3/update/",
+        headers=headers,
+        data=data,
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+
+
+def test_format_book_category():
+    """
+    Description: test the custom template filter format_book_category.
+    """
+    response = format_book_category(1)
+    assert response.title == "politique"
+
+
+def test_add_book_category_without_being_admin(client, access_session, get_flask_csrf_token):
+    """
+    Description: check if we can add an existing book category without being admin.
+    """
+    data = {
+        "title": "POLITIQUE",
+        "csrf_token": get_flask_csrf_token,
+    }
+    headers = {
+        "Cookie": f"session={access_session}"
+    }
+    response = client.post(
+        "http://localhost/front/book/categories/add/",
+        headers=headers,
+        data=data,
+        follow_redirects=True
+    )
+    assert response.status_code == 403
+
+
+def test_add_book_category_with_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+    """
+    Description: check if we can add an existing book category being admin.
+    """
+    data = {
+        "title": "CUISINE",
+        "csrf_token": get_flask_csrf_token,
+    }
+    headers = {
+        "Cookie": f"session={access_session_as_admin}"
+    }
+    response = client.post(
+        "http://localhost/front/book/categories/add/",
         headers=headers,
         data=data,
         follow_redirects=True

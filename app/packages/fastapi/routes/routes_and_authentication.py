@@ -299,7 +299,10 @@ async def view_book(
         if os.getenv("SCOPE") == "production":
             logs_context = {"current_user": f"{current_user.username}", "book_id": book_id}
             LOGGER.info("[+] FastAPI - Consultation livre inconnu", extra=logs_context)
-        return books
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="FastAPI - Consultation livre inconnu"
+        )
 
 
 @app.get("/api/v1/{user_id}/books/")
@@ -315,7 +318,7 @@ async def user_books(
         return books
     else:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Aucun utilisateur avec id {user_id} en base"
         )
 

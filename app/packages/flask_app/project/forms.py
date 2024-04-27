@@ -8,8 +8,12 @@ from wtforms.validators import DataRequired, Length, Email, NumberRange
 
 try:
     from app.packages import settings
+    from app.packages.database.commands import session_commands
+    from app.packages.database.models.models import BookCategory
 except ModuleNotFoundError:
     from packages import settings
+    from packages.database.commands import session_commands
+    from packages.database.models.models import BookCategory
 
 
 class LoginForm(FlaskForm):
@@ -61,23 +65,18 @@ class UpdateeBookCategoryForm(FlaskForm):
     )
 
 
-class BookCategory(Form):
-    """
-    Description: the field list for select a book category.
-    """
-    categories_tupple_list = []
-    for category in settings.BOOKS_CATEGORIES:
-        categories_tupple_list.append((f'{category.lower()}', f'{category.upper()}'))
-    intitule = SelectField("CATEGORIE", choices=categories_tupple_list)
-
-
 class BookForm(FlaskForm):
     """
     Description: the book FlaskForm form.
     """
     max_year = dt.date.today().year
+    def __init__(self, books_categories=None):
+        super().__init__()
+        if books_categories:
+            self.categories.choices = books_categories
+
     def validate_category(form, field):
-        if field.data not in settings.BOOKS_CATEGORIES:
+        if field.data not in books_categories:
             raise ValidationError("Catégorie livre non prévue")
 
     title = StringField(
@@ -89,7 +88,7 @@ class BookForm(FlaskForm):
     content = TextAreaField(
         label="DESCRIPTION", validators=[DataRequired(), Length(max=2500)]
     )
-    categories = FieldList(FormField(BookCategory), min_entries=1, max_entries=1)
+    categories = SelectField("CATEGORIES", choices="", validators=[DataRequired()])
     year_of_publication = IntegerField(
         label="ANNEE PUBLICATION",
         validators=[DataRequired(), NumberRange(min=1, max=max_year)],
@@ -126,7 +125,7 @@ class UpdateBookForm(FlaskForm):
     content = TextAreaField(
         label="DESCRIPTION", validators=[DataRequired(), Length(max=2500)]
     )
-    categories = FieldList(FormField(BookCategory), min_entries=1, max_entries=1)
+    categories = SelectField("CATEGORIES", choices="", validators=[DataRequired()])
     year_of_publication = IntegerField(
         label="ANNEE PUBLICATION",
         validators=[DataRequired(), NumberRange(min=1, max=max_year)],

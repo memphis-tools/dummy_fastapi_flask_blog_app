@@ -86,6 +86,26 @@ def test_flask_post_delete_comment_with_auth_without_being_author(
     assert response.status_code == 403
 
 
+def test_flask_post_delete_comment_with_auth_as_admin(
+    client, access_session_as_admin, get_flask_csrf_token
+):
+    """
+    Description: check if we can delete comment route with authentication being admin.
+    """
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cookie": f"session={access_session_as_admin}",
+    }
+    data = {"csrf_token": get_flask_csrf_token}
+    response = client.post(
+        "http://localhost/front/comment/1/delete/",
+        headers=headers,
+        data=data,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+
 def test_flask_post_update_comment_without_being_logged_in(
     client, get_flask_csrf_token
 ):
@@ -155,3 +175,27 @@ def test_flask_post_update_comment_when_user_is_not_the_author(
         follow_redirects=True,
     )
     assert response.status_code == 403
+
+
+def test_flask_post_update_comment_as_admin(
+    client, access_session_as_admin, get_flask_csrf_token
+):
+    """
+    Description: check if we can update a comment as an admin.
+    """
+    user_form = {
+        "comment": "this is an updated comment sir",
+        "csrf_token": get_flask_csrf_token,
+    }
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cookie": f"session={access_session_as_admin}",
+    }
+    response = client.post(
+        "/front/comment/6/update/",
+        headers=headers,
+        data=user_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200

@@ -75,3 +75,48 @@ def test_flask_books_route(client):
     response = client.get("http://localhost/front/books/")
     assert response.status_code == 200
     assert b'class="post-title">Au commencement' in response.data
+
+
+def test_flask_update_book_route(client):
+    """
+    Description: check if we can reach the update books route
+    """
+    response = client.get("http://localhost/front/book/1/update/", follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Vous devez d&#39;abord vous connecter' in response.data
+
+
+def test_flask_update_comment_route(client):
+    """
+    Description: check if we can reach the update books route
+    """
+    response = client.get("http://localhost/front/comment/1/update/", follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Vous devez d&#39;abord vous connecter' in response.data
+
+
+def test_flask_stats_route(client):
+    """
+    Description: check if we can reach the books categories route
+    """
+    response = client.get("http://localhost/front/stats/", follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Vous devez d&#39;abord vous connecter' in response.data
+
+
+def test_flask_categories_stats_route(client):
+    """
+    Description: check if we can reach the books categories route
+    """
+    response = client.get("http://localhost/front/books/categories/stats/", follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Vous devez d&#39;abord vous connecter' in response.data
+
+
+def test_flask_users_stats_route(client):
+    """
+    Description: check if we can reach the books categories route
+    """
+    response = client.get("http://localhost/front/books/users/stats/", follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Vous devez d&#39;abord vous connecter' in response.data
