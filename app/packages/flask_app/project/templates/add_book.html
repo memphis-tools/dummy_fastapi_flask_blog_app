@@ -14,11 +14,7 @@
                 <label for="title">{{ form.title.label }}</label>{{ form.title }}
                 <label for="summary">{{ form.summary.label }}</label>{{ form.summary }}
                 <label for="author">{{ form.author.label }}</label>{{ form.author }}
-                <div class="d-flex flex-column">
-                    {% for category in form.categories %}
-                        {{ category }}
-                    {% endfor %}
-                </div>
+                <label for="categories">{{ form.categories.label }}</label>{{ form.categories }}
                 <label for="year_of_publication">{{ form.year_of_publication.label }}</label>
                 <div class="col-md-1">
                     {{ form.year_of_publication(size=5) }}

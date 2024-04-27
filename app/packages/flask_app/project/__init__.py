@@ -3,8 +3,13 @@ The Flask app definition.Notice we do not use the app factory pattern
 """
 
 import os
+import base64
+from io import BytesIO
+import random
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 from functools import wraps
-from flask import Flask, url_for, render_template, flash, abort, redirect, request
+from flask import Flask, url_for, render_template, flash, abort, redirect, request, Response
 from flask_bootstrap import Bootstrap
 from flask_login import (
     LoginManager,
@@ -14,6 +19,7 @@ from flask_login import (
     current_user,
 )
 from flask_wtf import CSRFProtect
+from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
@@ -72,7 +78,6 @@ def admin_only(f):
     """
     Description: allow a decorator to limit uri's access for admin only.
     """
-
     @wraps(f)
     def decorated_function(*args, **kw):
         if current_user.id != 1:
@@ -120,20 +125,266 @@ def format_book_category(id):
     return category
 
 
-# Global HTML template variables.
-@app.context_processor
-def set_global_grafana_url_variable():
+def get_random_color(colors_list):
+    return random.randint(0, len(colors_list)-1)
+
+
+def get_pie_colors():
     """
-    Description: the templated grafana link is within the base.html load by each templates.
-    We inject the grafana url for each rendering.
-    We set a conditional statement to avoid repetition.
+    Description: return the chart's allowed colors.
     """
-    if os.getenv("SCOPE") == "production":
-        grafana_url = settings.PRODUCTION_GRAFANA_STATS_PAGE
-    else:
-        grafana_url = settings.TEST_GRAFANA_STATS_PAGE
-    template_config = {'grafana_url': grafana_url}
-    return template_config
+    colors = []
+    colors_list = settings.PIE_COLORS.copy()
+    for category in settings.BOOKS_CATEGORIES:
+        color_index = get_random_color(colors_list)
+        color = colors_list[color_index]
+        colors.append(color)
+        colors_list.remove(color)
+    return colors
+
+
+def create_books_categories_chart(total_books, categories_books_count_dict):
+    labels = tuple(categories_books_count_dict.keys())
+    sizes = []
+    for value in categories_books_count_dict.values():
+        sizes.append((value/total_books)*100)
+    colors = get_pie_colors()
+    fig, ax = plt.subplots(figsize=(9,6))
+    explode_list = []
+    [explode_list.append(0.1) for distance in range(0, len(labels))]
+    explode = tuple(explode_list)
+    ax.pie(sizes, explode=explode, colors=colors, labels=labels, autopct='%1.1f%%', shadow=True)
+    ax.set_aspect('equal')
+    fig.legend(labels)
+    return fig
+
+
+@app.route("/front/books/categories/stats/")
+@login_required
+def categories_stats():
+    total_books = 0
+    categories_books_count_dict = {}
+    session = session_commands.get_a_database_session("postgresql")
+    books_categories_list = session.query(BookCategory).all()
+    for category in books_categories_list:
+        category_id = session.query(BookCategory).filter_by(title=f"{category}").first().id
+        books_count = session.query(func.count(Book.category)).filter(Book.category==category_id).all()[0]
+        if bool(books_count[0] > 0):
+            categories_books_count_dict[f"{category}"] = books_count[0]
+        total_books += books_count[0]
+    session.close()
+    fig = create_books_categories_chart(total_books, categories_books_count_dict)
+    buf = BytesIO()
+    fig.savefig(buf, format="png")
+    data = base64.b64encode(buf.getbuffer()).decode("ascii")
+    return f"""
+        <!DOCTYPE html>
+        <html lang='en'>
+            <head>
+                <meta charset='utf-8' />
+                <meta name='viewport' content='width=device-width, initial-scale=1, user-scaler=false' />
+                <meta name='description' content='A blog Python's app.' />
+                <meta name='author' content='dummy-ops' />
+                <title>STATS</title>
+                <link rel='icon' type='image/x-icon' href='/static/favicon.ico' />
+                <!-- Google fonts-->
+                <link rel='preconnect' href='https://fonts.googleapis.com'>
+                <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+                <link href='https://fonts.googleapis.com/css2?family=Truculenta:opsz,wght@12..72,100..900&display=swap' rel='stylesheet'>
+                <!--  Boostrap css -->
+                <link rel='stylesheet' href='/static/bootstrap.min.css'>
+                <!-- Custom css -->
+                <link rel='stylesheet' href='/static/styles.css'>
+            </head>
+            <body>
+            <header>
+            	<!-- Navigation-->
+            <nav class='navbar navbar-expand-lg navbar-dark fixed-top bg-dark'>
+              <div class='container-fluid navbar-container'>
+                <a class='dummy_logo navbar-brand' href='/front/home/'>DUMMY-OPS</a>
+                <button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarCollapse' aria-controls='navbarCollapse' aria-expanded='false' aria-label='Toggle navigation'>
+                    <span class='navbar-toggler-icon'></span>
+                </button>
+                <div class='collapse navbar-collapse' id='navbarCollapse'></div>
+              </div>
+            </nav>
+            </header>
+                <section>
+                <div class='container'>
+                    <div class='section_intro'></div>
+                    <h1>DUMMY BLOG - LES CATEGORIES</h1>
+                    <div class='home-books-container'>
+                          <div class='post'>
+                              <p class='stat-title'></p>
+                              <img src='data:image/png;base64,{data}'/>
+                          </div>
+                          <hr />
+                    </div>
+                </div>
+                </section>
+            <!-- Footer-->
+              <footer class='border-top'>
+                  <div class='footer-container'>
+                      <div class='d-flex flex-column justify-content-center'>
+                        <div class='social-networks'>
+                            <ul>
+                                <li>
+                                  <a class='d-flex' href='https://gitlab.com/memphis-tools/dummy_fastapi_flask_blog_app' target='_blank'>
+                                      <span class='fa-stack fa-lg'>
+                                          <i class='fas fa-circle fa-stack-2x'></i>
+                                          <i class='fab fa-gitlab fa-stack-1x fa-inverse'></i>
+                                      </span>
+                                </li>
+                                <li>
+                                  </a>
+                                    <a class='d-flex' href='https://github.com/memphis-tools/dummy_fastapi_flask_blog_app' target='_blank'>
+                                        <span class='fa-stack fa-lg'>
+                                            <i class='fas fa-circle fa-stack-2x'></i>
+                                            <i class='fab fa-github fa-stack-1x fa-inverse'></i>
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class='text-center' id='footer_date'></div>
+                        <div class='provider-logo'>
+                          <a href='https://www.digitalocean.com/?refcode=4f541e02cfe5&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge'><img src='https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%202.svg' alt='DigitalOcean Referral Badge' /></a>
+                        </div>
+                      </div>
+                  </div>
+              </footer>
+              <script src='/static/scripts.js'></script>
+              <script src='/static/all.js'></script>
+              <script src='/static/bootstrap.bundle.min.js'></script>
+            </body>
+        </html>
+    """
+
+
+def create_users_chart(total_books, users_books_count_dict):
+    labels = tuple(users_books_count_dict.keys())
+    sizes = []
+    for value in users_books_count_dict.values():
+        sizes.append((value/total_books)*100)
+    colors = get_pie_colors()
+    fig, ax = plt.subplots(figsize=(9,6))
+    explode_list = []
+    [explode_list.append(0.1) for distance in range(0, len(labels))]
+    explode = tuple(explode_list)
+    ax.pie(sizes, explode=explode, colors=colors, labels=labels, autopct='%1.1f%%', shadow=True)
+    ax.set_aspect('equal')
+    fig.legend(labels)
+    return fig
+
+
+@app.route("/front/books/users/stats/")
+@login_required
+def users_stats():
+    total_books = 0
+    users_books_count_dict = {}
+    session = session_commands.get_a_database_session("postgresql")
+    users_list = session.query(User).all()
+    for user in users_list:
+        books_count = session.query(func.count(Book.category)).filter(Book.user_id==user.id).all()[0]
+        if bool(books_count[0] > 0):
+            users_books_count_dict[f"{user}"] = books_count[0]
+        total_books += books_count[0]
+    session.close()
+    fig = create_users_chart(total_books, users_books_count_dict)
+    buf = BytesIO()
+    fig.savefig(buf, format="png")
+    data = base64.b64encode(buf.getbuffer()).decode("ascii")
+    return f"""
+        <!DOCTYPE html>
+        <html lang='en'>
+            <head>
+                <meta charset='utf-8' />
+                <meta name='viewport' content='width=device-width, initial-scale=1, user-scaler=false' />
+                <meta name='description' content='A blog Python's app.' />
+                <meta name='author' content='dummy-ops' />
+                <title>STATS</title>
+                <link rel='icon' type='image/x-icon' href='/static/favicon.ico' />
+                <!-- Google fonts-->
+                <link rel='preconnect' href='https://fonts.googleapis.com'>
+                <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+                <link href='https://fonts.googleapis.com/css2?family=Truculenta:opsz,wght@12..72,100..900&display=swap' rel='stylesheet'>
+                <!--  Boostrap css -->
+                <link rel='stylesheet' href='/static/bootstrap.min.css'>
+                <!-- Custom css -->
+                <link rel='stylesheet' href='/static/styles.css'>
+            </head>
+            <body>
+            <header>
+            	<!-- Navigation-->
+            <nav class='navbar navbar-expand-lg navbar-dark fixed-top bg-dark'>
+              <div class='container-fluid navbar-container'>
+                <a class='dummy_logo navbar-brand' href='/front/home/'>DUMMY-OPS</a>
+                <button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarCollapse' aria-controls='navbarCollapse' aria-expanded='false' aria-label='Toggle navigation'>
+                    <span class='navbar-toggler-icon'></span>
+                </button>
+                <div class='collapse navbar-collapse' id='navbarCollapse'></div>
+              </div>
+            </nav>
+            </header>
+                <section>
+                <div class='container'>
+                    <div class='section_intro'></div>
+                    <h1>DUMMY BLOG - LES UTILISATEURS</h1>
+                    <div class='home-books-container'>
+                          <div class='post'>
+                              <p class='stat-title'></p>
+                              <img src='data:image/png;base64,{data}'/>
+                          </div>
+                          <hr />
+                    </div>
+                </div>
+                </section>
+            <!-- Footer-->
+              <footer class='border-top'>
+                  <div class='footer-container'>
+                      <div class='d-flex flex-column justify-content-center'>
+                        <div class='social-networks'>
+                            <ul>
+                                <li>
+                                  <a class='d-flex' href='https://gitlab.com/memphis-tools/dummy_fastapi_flask_blog_app' target='_blank'>
+                                      <span class='fa-stack fa-lg'>
+                                          <i class='fas fa-circle fa-stack-2x'></i>
+                                          <i class='fab fa-gitlab fa-stack-1x fa-inverse'></i>
+                                      </span>
+                                </li>
+                                <li>
+                                  </a>
+                                    <a class='d-flex' href='https://github.com/memphis-tools/dummy_fastapi_flask_blog_app' target='_blank'>
+                                        <span class='fa-stack fa-lg'>
+                                            <i class='fas fa-circle fa-stack-2x'></i>
+                                            <i class='fab fa-github fa-stack-1x fa-inverse'></i>
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class='text-center' id='footer_date'></div>
+                        <div class='provider-logo'>
+                          <a href='https://www.digitalocean.com/?refcode=4f541e02cfe5&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge'><img src='https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%202.svg' alt='DigitalOcean Referral Badge' /></a>
+                        </div>
+                      </div>
+                  </div>
+              </footer>
+              <script src='/static/scripts.js'></script>
+              <script src='/static/all.js'></script>
+              <script src='/static/bootstrap.bundle.min.js'></script>
+            </body>
+        </html>
+    """
+
+
+@app.route("/front/stats/")
+@login_required
+def stats():
+    return render_template(
+        "stats.html",
+        is_authenticated=current_user.is_authenticated
+    )
 
 
 @app.route("/front")
@@ -145,14 +396,9 @@ def index():
     session = session_commands.get_a_database_session("postgresql")
     first_books = session.query(Book).order_by("id").all()[:MAX_BOOKS_ON_INDEX_PAGE]
     session.close()
-    if os.getenv("SCOPE") == "production":
-        grafana_url=settings.PRODUCTION_GRAFANA_STATS_PAGE
-    else:
-        grafana_url=settings.TEST_GRAFANA_STATS_PAGE
     return render_template(
         "index.html",
         books=first_books,
-        grafana_url=settings.TEST_GRAFANA_STATS_PAGE,
         is_authenticated=current_user.is_authenticated
     )
 
@@ -360,22 +606,26 @@ def check_book_fields(book):
     return True
 
 
-@app.route("/front/add_book/", methods=["GET", "POST"])
+@app.route("/front/books/add/", methods=["GET", "POST"])
 @login_required
 def add_book():
     """
     Description: the add book Flask route.
     """
     session = session_commands.get_a_database_session("postgresql")
-    form = forms.BookForm()
+    books_categories_query = session.query(BookCategory).all()
+    books_categories = [(i.id, i.title) for i in books_categories_query]
+    form = forms.BookForm(books_categories=books_categories)
     if form.validate_on_submit():
         title = form.title.data
         summary = form.summary.data
         content = form.content.data
         author = form.author.data
-        category = form.categories.data[0]["intitule"]
+        category_id_from_form = int(form.categories.data[0])
         try:
-            category_id = session.query(BookCategory).filter(BookCategory.title==category).first().id
+            category_id = session.query(BookCategory).filter(
+                BookCategory.id==category_id_from_form
+            ).first().id
         except Exception:
             flash("Saisie invalide, categorie livre non prevue.", "error")
             return render_template(
@@ -398,6 +648,8 @@ def add_book():
         if book_is_valid is True:
             if os.getenv("SCOPE") == "production":
                 book_picture.save(os.path.join(app.instance_path, "staticfiles", filename))
+            else:
+                new_book.book_picture_name = "dummy_blank_book.png"
             session.add(new_book)
             session.commit()
             session.refresh(new_book)
@@ -565,6 +817,9 @@ def update_book(book_id):
     """
     session = session_commands.get_a_database_session("postgresql")
     book = session.get(Book, book_id)
+    if current_user.id != book.user_id and current_user.role != "admin":
+        session.close()
+        return abort(403)
     category = session.query(BookCategory).filter(BookCategory.id==book.category).first()
     if book:
         book_picture_filename = book.book_picture_name
@@ -581,7 +836,16 @@ def update_book(book_id):
             summary = edit_form.summary.data
             content = edit_form.content.data
             author = edit_form.author.data
-            category = edit_form.categories.data[0]["intitule"]
+            category_id_from_form = int(edit_form.categories.data[0])
+            try:
+                category_id = session.query(BookCategory).filter(
+                    BookCategory.id==category_id_from_form
+                ).first().id
+            except Exception:
+                flash("Saisie invalide, categorie livre non prevue.", "error")
+                return render_template(
+                    "add_book.html", form=edit_form, is_authenticated=current_user.is_authenticated
+                    )
             category_id = session.query(BookCategory).filter(BookCategory.title==category).first().id
             year_of_publication = edit_form.year_of_publication.data
             book_picture = edit_form.photo.data
@@ -602,11 +866,15 @@ def update_book(book_id):
                 user_id=book.user_id,
             )
             if book_picture_filename != filename:
-                book_picture.save(os.path.join(app.instance_path, "staticfiles", filename))
-                try:
-                    os.remove(f"{app.instance_path}staticfiles/{book_picture_filename}")
-                except FileNotFoundError:
-                    pass
+                if os.getenv("SCOPE") == "production":
+                    book_picture.save(os.path.join(app.instance_path, "staticfiles", filename))
+                    try:
+                        os.remove(f"{app.instance_path}staticfiles/{book_picture_filename}")
+                    except FileNotFoundError:
+                        pass
+                else:
+                    updated_book.book_picture_name = "dummy_blank_book.png"
+
             session.query(Book).where(Book.id == book_id).update(
                 updated_book.get_json_for_update()
             )
@@ -680,7 +948,7 @@ def add_book_category():
     """
     form = forms.AddCategoryBookForm()
     if current_user.role != "admin":
-        return abort(401)
+        return abort(403)
     else:
         if form.validate_on_submit():
             session = session_commands.get_a_database_session("postgresql")
@@ -876,6 +1144,8 @@ def delete_user(user_id):
                 "[+] Flask - Suppression utilisateur refusée, utilisateur non admin",
                 extra=logs_context
             )
+        flash("Suppression utilisateur refusée, utilisateur non admi", "error")
+        return abort(403)
     if form.validate_on_submit():
         session.delete(user_to_delete)
         session.commit()

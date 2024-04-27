@@ -48,6 +48,16 @@ async def test_view_book_without_authentication(get_fastapi_client, get_fastapi_
 
 
 @pytest.mark.asyncio
+async def test_view_unexisting_book_being_authenticated(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test view_book id 55555 route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    response = get_fastapi_client.get("/api/v1/books/55555/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_update_book_with_authentication_without_valid_datas(get_fastapi_client, get_fastapi_token):
     """
     Description: test update_book id 3 route with FastAPI TestClient with token.

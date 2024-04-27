@@ -3,6 +3,13 @@ All the tests functions for the users urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
+try:
+    from app.packages.database.models.models import User
+    from app.packages.flask_app.project.__init__ import format_user
+except ModuleNotFoundError:
+    from packages.database.models.models import User
+    from packages.flask_app.project.__init__ import format_user
+
 def test_flask_get_users_without_authentication(client):
     """
     Description: check if we can reach a users page without authentication
@@ -101,7 +108,7 @@ def test_flask_post_delete_user_without_authentication(client):
     assert response.status_code == 400
 
 
-def test_flask_post_delete_user_with_authentication(
+def test_flask_post_delete_user_with_authentication_as_admin(
     client, access_session_as_admin, get_flask_csrf_token
 ):
     """
@@ -119,6 +126,26 @@ def test_flask_post_delete_user_with_authentication(
         follow_redirects=True,
     )
     assert response.status_code == 200
+
+
+def test_flask_post_delete_user_with_authentication_without_being_admin(
+    client, access_session, get_flask_csrf_token
+):
+    """
+    Description: check if we delete user route without being authenticated as admin
+    """
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cookie": f"session={access_session}",
+    }
+    data = {"csrf_token": get_flask_csrf_token}
+    response = client.post(
+        "http://localhost/front/user/4/delete/",
+        headers=headers,
+        data=data,
+        follow_redirects=True,
+    )
+    assert response.status_code == 403
 
 
 def test_flask_post_delete_user_admin_with_authentication(
@@ -139,3 +166,25 @@ def test_flask_post_delete_user_admin_with_authentication(
         follow_redirects=True,
     )
     assert response.status_code == 403
+
+
+def test_get_users_without_being_admin(client, access_session):
+    """
+    Description: check if we can get users uri without being admin.
+    """
+    headers = {
+        "Cookie": f"session={access_session}"
+    }
+    response = client.get("/front/users/", headers=headers, follow_redirects=True)
+    assert response.status_code == 403
+
+
+def test_get_users_being_admin(client, access_session_as_admin):
+    """
+    Description: check if we can get users uri without being admin.
+    """
+    headers = {
+        "Cookie": f"session={access_session_as_admin}"
+    }
+    response = client.get("/front/users/", headers=headers, follow_redirects=True)
+    assert response.status_code == 200

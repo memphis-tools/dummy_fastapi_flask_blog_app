@@ -163,7 +163,6 @@ Lynis (for the virtual machine, droplet, hardening)
         LOGGING_DEVEL="DEBUG"
         COVERALLS_REPO_TOKEN="yourCoverallsToken"
         BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
-        GRAFANA_URL_ENV_TEST="http://localhost:3000/public-dashboards/yourOne"
 
 
   - For a local docker execution, you will have 5 services:
@@ -195,7 +194,7 @@ Lynis (for the virtual machine, droplet, hardening)
         export LOGGING_DEVEL="DEBUG"
         export COVERALLS_REPO_TOKEN="yourCoverallsToken"
         export BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
-        export GRAFANA_URL_ENV_TEST="http://localhost:3000/public-dashboards/yourOne"
+
 
 ### HOW RUN IT LOCALLY AS A SINGLE APPLICATION
 ----------------------------------------------
@@ -410,7 +409,6 @@ If you need to debug from the virtual machine, at the project root folder:
         export LOGGING_DEVEL="DEBUG"
         export COVERALLS_REPO_TOKEN="yourCoverallsToken"
         export BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
-        export GRAFANA_URL_ENV_PROD="https://yourOne:3000/public-dashboards/yourOne"
 
 
   - run the docker-compose like this (you have to build if you have not download images):
@@ -512,6 +510,10 @@ https://www.nginx.com/blog/http-strict-transport-security-hsts-and-nginx/
 https://www.nginx.com/resources/glossary/http2/
 
 https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+
+For the matplotlib charts i used:
+
+https://matplotlib.org/stable/gallery/user_interfaces/web_application_server_sgskip.html
 
 For the logo and favicon.ico i used:
 

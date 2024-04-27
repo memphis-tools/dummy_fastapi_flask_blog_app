@@ -21,5 +21,17 @@ BOOKS_CATEGORIES = [
     "management",
 ]
 
-TEST_GRAFANA_STATS_PAGE = os.getenv("GRAFANA_URL_ENV_TEST")
-PRODUCTION_GRAFANA_STATS_PAGE = os.getenv("GRAFANA_URL_ENV_PROD")
+PIE_COLORS = [
+    "orange",
+    "cyan",
+    "green",
+    "yellow",
+    "pink",
+    "brown",
+    "beige",
+    "grey",
+    "yellowgreen",
+    "gold",
+    "lightcoral",
+    "lightskyblue",
+]
