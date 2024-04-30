@@ -94,32 +94,34 @@ def set_dummies_users():
 
 def set_dummies_books():
     """
-    Description: set_dummies_books creates dummies books
+    Description: set_dummies_books creates dummy books
     """
     dummy_books_list: List[models.Book] = [
         models.Book(
-            title="L'origine des espèces",
-            summary="""
-            L'Origine des espèces (On the Origin of Species) est un ouvrage scientifique de Charles Darwin,
-            publié le 24 novembre 1859 pour sa première édition anglaise sous le titre L'origine des espèces
-            au moyen de la sélection naturelle ou la préservation des races favorisées dans la lutte pour la survie.
-            """,
+            title="Neque porro quisquam est qui dolorem",
+            summary="Etiam dapibus ut erat id tincidunt. In nec lobortis lectus. Nunc sed consectetur enime.",
             content="""
-            Cet ouvrage est considéré comme le texte fondateur de la théorie de l'évolution. Dans ce livre,
-            Darwin présente la théorie scientifique de l'évolution des espèces vivantes à partir d'autres espèces
-            généralement éteintes, au moyen de la sélection naturelle. Darwin avance un ensemble de preuves montrant
-            que les espèces n'ont pas été créées indépendamment et ne sont pas immuables.
+            Vestibulum sed porta elit. Sed a posuere urna, eget maximus diam.
+            Fusce eu placerat enim, in volutpat erat.
+            Vivamus vitae erat vel ex porta pulvinar.
+            Curabitur vulputate velit in ligula suscipit, eget ultricies lorem condimentum.
+            In pulvinar aliquet elit, eu facilisis nibh egestas ut.
+            Suspendisse et purus leo. Nam sed imperdiet risus.
+            Vestibulum quis lectus erat.
+            Aenean viverra maximus velit, euismod imperdiet velit euismod et.
             """,
-            author="Charles Darwin",
+            author="John Doe",
+            year_of_publication="999",
             book_picture_name="dummy_blank_book.png",
             user_id=2,
             nb_comments=1,
         ),
         models.Book(
-            title="Guerre en Ukraine, choc géopolitique",
-            summary="Dde brèves histoires autour de chocs géopolitiques",
-            content="ras lectus nisi, aliquet vel nulla eget.",
-            author="Pascal Bonniface",
+            title="Aenean viverra maximus velit",
+            summary="Maecenas tempus, erat posuere vehicula fringilla",
+            content="Ras lectus nisi, aliquet vel nulla eget. Vestibulum quis lectus erat.Etiam ultrices semper.",
+            author="Cathy Doe",
+            year_of_publication="999",
             book_picture_name="dummy_blank_book.png",
             user_id=3,
             nb_comments=1,
@@ -129,6 +131,7 @@ def set_dummies_books():
             summary="Une brève histoire d'interractions entre humains au grand coeur",
             content="C bibendum pharetra purus.",
             author="Deplhine de Vighan",
+            year_of_publication="999",
             category=3,
             book_picture_name="dummy_blank_book.png",
             user_id=4,
@@ -139,6 +142,7 @@ def set_dummies_books():
             summary="De brèves histoires autour de l'histoire du monde, une guerre incessante",
             content="Donec vitae enim diam. Vivamus dignissim risus.",
             author="Alain Bauer",
+            year_of_publication="999",
             book_picture_name="dummy_blank_book.png",
             user_id=3,
         ),
@@ -154,6 +158,7 @@ def set_dummies_books():
             services de renseignements durant la guerre froide.
             """,
             author="Chloé Aeberhardt",
+            year_of_publication="999",
             book_picture_name="dummy_blank_book.png",
             user_id=2,
             nb_comments=1,
@@ -172,6 +177,7 @@ def set_dummies_books():
             une histoire qui interpelle et invite à réfléchir sur le monde qui nous entoure.
             """,
             author="Marc Levy",
+            year_of_publication="999",
             category=6,
             book_picture_name="dummy_blank_book.png",
             user_id=3,
@@ -187,6 +193,7 @@ def set_dummies_books():
             grandes puissances comme agents secrets ou aventuriers.
             """,
             author="Taline Ter Minassian",
+            year_of_publication="999",
             category=2,
             book_picture_name="dummy_blank_book.png",
             user_id=4,
@@ -202,6 +209,7 @@ def set_dummies_books():
             en 1981, et à observer la naissance de l’islam en France dans ses significations multiformes.
             """,
             author="Gilles Kepel",
+            year_of_publication="999",
             category=1,
             book_picture_name="dummy_blank_book.png",
             user_id=2,

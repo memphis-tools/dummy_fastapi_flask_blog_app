@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}ADD USER{% endblock title %}
+
+{% block content %}
+<div class="container">
+  <div class="section_intro"></div>
+  <h1>DUMMY BLOG - AJOUTER UTILISATEUR</h1>
+  <div class="d-flex flex-column justify-content-center align-items-center">
+    <div class="d-flex flex-column justify-content-center w-50">
+      <form class="form" action="" method="post">
+        {{ form.csrf_token }}
+        <label for="login">{{ form.login.label }}</label>{{ form.login }}
+        <label for="password">{{ form.password.label }}</label>{{ form.password }}
+        <label for="password_check">{{ form.password_check.label }}</label>{{ form.password_check }}
+        <label for="email">{{ form.email.label }}</label>{{ form.email }}
+        <button type="submit" class="btn btn-primary" name="button">S'INSCRIRE</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}

@@ -144,6 +144,9 @@ def get_pie_colors():
 
 
 def create_books_categories_chart(total_books, categories_books_count_dict):
+    """
+    Description: build a matplotlib pie based on books categories.
+    """
     labels = tuple(categories_books_count_dict.keys())
     sizes = []
     for value in categories_books_count_dict.values():
@@ -213,7 +216,7 @@ def categories_stats():
                 <div class='container'>
                     <div class='section_intro'></div>
                     <h1>DUMMY BLOG - LES CATEGORIES</h1>
-                    <div class='home-books-container'>
+                    <div class='home-stats-container'>
                           <div class='post'>
                               <p class='stat-title'></p>
                               <img src='data:image/png;base64,{data}'/>
@@ -262,6 +265,9 @@ def categories_stats():
 
 
 def create_users_chart(total_books, users_books_count_dict):
+    """
+    Description: build a matplotlib pie based on users publications.
+    """
     labels = tuple(users_books_count_dict.keys())
     sizes = []
     for value in users_books_count_dict.values():
@@ -330,7 +336,7 @@ def users_stats():
                 <div class='container'>
                     <div class='section_intro'></div>
                     <h1>DUMMY BLOG - LES UTILISATEURS</h1>
-                    <div class='home-books-container'>
+                    <div class='home-stats-container'>
                           <div class='post'>
                               <p class='stat-title'></p>
                               <img src='data:image/png;base64,{data}'/>
@@ -781,6 +787,51 @@ def register():
     )
 
 
+@app.route("/front/users/add/", methods=["GET", "POST"])
+@login_required
+@admin_only
+def add_user():
+    """
+    Description: the add user Flask route.
+    """
+    if current_user.role != "admin":
+        session.close()
+        return abort(403)
+    session = session_commands.get_a_database_session("postgresql")
+    form = forms.CreateUserForm()
+    if form.validate_on_submit():
+        username = str(form.login.data).lower()
+        hashed_password = generate_password_hash(
+            form.password.data, "pbkdf2:sha256", salt_length=8
+        )
+        email = str(form.email.data).lower()
+        user = session.query(User).filter_by(username=username).first()
+        user_email = session.query(User).filter_by(email=email).first()
+        if user_email:
+            flash("Email existe deja en base", "error")
+        elif form.password.data != form.password_check.data:
+            flash("Mots de passe ne correspondent pas", "error")
+        else:
+            if not user:
+                new_user = User(
+                    username=username, hashed_password=hashed_password, email=email
+                )
+                session.add(new_user)
+                session.commit()
+                flash(f"Creation utilisateur {username} faite.", "info")
+                if os.getenv("SCOPE") == "production":
+                    logs_context = {"username": f"{username}", "email": f"{email}"}
+                    LOGGER.info("[+] Flask - Création compte utilisateur par admin.", extra=logs_context)
+                session.close()
+                return redirect(url_for("login"))
+            else:
+                flash("Nom utilisateur existe deja, veuillez le modifier", "error")
+    session.close()
+    return render_template(
+        "add_user.html", form=form, is_authenticated=current_user.is_authenticated
+    )
+
+
 @app.route("/front/comment/<int:comment_id>/update/", methods=["GET", "POST"])
 @login_required
 def update_comment(comment_id):
@@ -823,32 +874,50 @@ def update_book(book_id):
     category = session.query(BookCategory).filter(BookCategory.id==book.category).first()
     if book:
         book_picture_filename = book.book_picture_name
+        books_categories_query = session.query(BookCategory).all()
+        books_categories = [(i.id, i.title) for i in books_categories_query]
         edit_form = forms.UpdateBookForm(
-            title=book.title,
-            summary=book.summary,
-            content=book.content,
-            category=book.category,
-            year_of_publication=book.year_of_publication,
-            author=book.author,
+            books_categories=books_categories,
+            book=book,
         )
         if edit_form.validate_on_submit():
-            title = edit_form.title.data
-            summary = edit_form.summary.data
-            content = edit_form.content.data
-            author = edit_form.author.data
-            category_id_from_form = int(edit_form.categories.data[0])
+            form = request.form.to_dict()
+            form_file = request.files.to_dict
+            if "title" in form:
+                title = form["title"]
+            else:
+                title = book.title
+            if "summary" in form:
+                summary = form["summary"]
+            else:
+                summary = book.summary
+            if "content" in form:
+                content = form["content"]
+            else:
+                content = book.content
+            if "author" in form:
+                author = form["author"]
+            else:
+                author = book.author
+            if "year_of_publication" in form:
+                year_of_publication = int(form["year_of_publication"])
+            else:
+                year_of_publication = book.year_of_publication
+            if "categories" in form:
+                category_id_from_form = int(form["categories"])
+                try:
+                    category_id = session.query(BookCategory).filter(
+                        BookCategory.id==category_id_from_form
+                    ).first().id
+                except Exception:
+                    flash("Saisie invalide, categorie livre non prevue.", "error")
+                    return render_template(
+                        "update_book.html", form=edit_form, is_authenticated=current_user.is_authenticated
+                        )
             try:
-                category_id = session.query(BookCategory).filter(
-                    BookCategory.id==category_id_from_form
-                ).first().id
-            except Exception:
-                flash("Saisie invalide, categorie livre non prevue.", "error")
-                return render_template(
-                    "add_book.html", form=edit_form, is_authenticated=current_user.is_authenticated
-                    )
-            category_id = session.query(BookCategory).filter(BookCategory.title==category).first().id
-            year_of_publication = edit_form.year_of_publication.data
-            book_picture = edit_form.photo.data
+                book_picture =  form_file["photo"]
+            except:
+                book_picture = None
             if book_picture is not None:
                 filename = secure_filename(book_picture.filename)
             else:
@@ -889,15 +958,16 @@ def update_book(book_id):
                 return render_template(
                 "update_book.html", form=edit_form, is_authenticated=current_user.is_authenticated
                 )
+        return render_template(
+            "update_book.html",
+            form=edit_form,
+            is_authenticated=current_user.is_authenticated,
+        )
     else:
         flash("Livre non trouvé", "error")
         return redirect(url_for("books"))
     session.close()
-    return render_template(
-        "update_book.html",
-        form=edit_form,
-        is_authenticated=current_user.is_authenticated,
-    )
+
 
 
 @app.route("/front/users/", methods=["GET"])
@@ -1015,7 +1085,7 @@ def update_book_category(category_id):
         flash("Categorie livre non trouvee", "error")
         session.close()
         return abort(404)
-    edit_form = forms.UpdateeBookCategoryForm(title=category_to_update.title,)
+    edit_form = forms.UpdateBookCategoryForm(title=category_to_update.title,)
     if current_user.role != "admin":
         session.close()
         return abort(401)
