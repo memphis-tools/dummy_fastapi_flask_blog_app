@@ -789,6 +789,7 @@ def register():
 
 @app.route("/front/users/add/", methods=["GET", "POST"])
 @login_required
+@admin_only
 def add_user():
     """
     Description: the add user Flask route.
@@ -977,7 +978,7 @@ def users():
     Description: the users app Flask route.
     """
     if current_user.role != "admin":
-        return abort(403)
+        return abort(401)
     else:
         session = session_commands.get_a_database_session("postgresql")
         # remember that user with id 1 is the application admin (wr remove it from dataset)
@@ -1010,6 +1011,7 @@ def manage_books_categories():
 
 @app.route("/front/book/categories/add/", methods=["GET", "POST"])
 @login_required
+@admin_only
 def add_book_category():
     """
     Description: an add book category Flask route.
@@ -1041,6 +1043,7 @@ def add_book_category():
 
 @app.route("/front/book/categories/<int:category_id>/delete/", methods=["GET", "POST"])
 @login_required
+@admin_only
 def delete_book_category(category_id):
     """
     Description: delete a book category Flask route.
@@ -1071,6 +1074,7 @@ def delete_book_category(category_id):
 
 @app.route("/front/book/categories/<int:category_id>/update/", methods=["GET", "POST"])
 @login_required
+@admin_only
 def update_book_category(category_id):
     """
     Description: update a book category Flask route.
