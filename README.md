@@ -15,6 +15,8 @@
 # DUMMY APP FOR LEARNING PURPOSES
 **This is dummy blog application.**
 
+The project is mirored from <a href="https://gitlab.com/memphis-tools/dummy_fastapi_flask_blog_app">GITHUB DUMMY FASTAPI FLASK BLOG APP</a>
+
 Application is simultaneously served as a Flask and a FastAPI front-end. Postgresql the database and Nginx as reverse proxy.
 
 Certbot and Nginx handle the HTTPS. A Vault adds sensitive datas into "the envrc" of the application.

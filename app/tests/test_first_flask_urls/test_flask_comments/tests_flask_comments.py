@@ -153,6 +153,30 @@ def test_flask_post_update_comment_when_user_is_the_author(
     assert b"Commentaire mis a jour" in response.data
 
 
+def test_flask_post_update_comment_authenticated_without_comment_id(
+    client, access_session, get_flask_csrf_token
+):
+    """
+    Description: check if we can update a comment without specifying an id.
+    """
+    user_form = {
+        "comment": "this is an updated comment sir",
+        "csrf_token": get_flask_csrf_token,
+    }
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cookie": f"session={access_session}",
+    }
+    response = client.post(
+        "/front/comment/update/",
+        headers=headers,
+        data=user_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 404
+
+
 def test_flask_post_update_comment_when_user_is_not_the_author(
     client, access_session, get_flask_csrf_token
 ):
