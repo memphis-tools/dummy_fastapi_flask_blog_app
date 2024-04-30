@@ -789,15 +789,14 @@ def register():
 
 @app.route("/front/users/add/", methods=["GET", "POST"])
 @login_required
-@admin_only
 def add_user():
     """
     Description: the add user Flask route.
     """
+    session = session_commands.get_a_database_session("postgresql")
     if current_user.role != "admin":
         session.close()
         return abort(403)
-    session = session_commands.get_a_database_session("postgresql")
     form = forms.CreateUserForm()
     if form.validate_on_submit():
         username = str(form.login.data).lower()
@@ -978,7 +977,7 @@ def users():
     Description: the users app Flask route.
     """
     if current_user.role != "admin":
-        return abort(401)
+        return abort(403)
     else:
         session = session_commands.get_a_database_session("postgresql")
         # remember that user with id 1 is the application admin (wr remove it from dataset)
@@ -1011,7 +1010,6 @@ def manage_books_categories():
 
 @app.route("/front/book/categories/add/", methods=["GET", "POST"])
 @login_required
-@admin_only
 def add_book_category():
     """
     Description: an add book category Flask route.
@@ -1043,7 +1041,6 @@ def add_book_category():
 
 @app.route("/front/book/categories/<int:category_id>/delete/", methods=["GET", "POST"])
 @login_required
-@admin_only
 def delete_book_category(category_id):
     """
     Description: delete a book category Flask route.
@@ -1057,7 +1054,7 @@ def delete_book_category(category_id):
         return abort(404)
     if current_user.role != "admin":
         session.close()
-        return abort(401)
+        return abort(403)
     else:
         if form.validate_on_submit():
             session.delete(category_to_delete)
@@ -1074,7 +1071,6 @@ def delete_book_category(category_id):
 
 @app.route("/front/book/categories/<int:category_id>/update/", methods=["GET", "POST"])
 @login_required
-@admin_only
 def update_book_category(category_id):
     """
     Description: update a book category Flask route.
@@ -1088,7 +1084,7 @@ def update_book_category(category_id):
     edit_form = forms.UpdateBookCategoryForm(title=category_to_update.title,)
     if current_user.role != "admin":
         session.close()
-        return abort(401)
+        return abort(403)
     else:
         if edit_form.validate_on_submit():
             title = edit_form.title.data
