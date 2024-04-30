@@ -210,7 +210,7 @@ def test_add_user_without_being_admin(client, access_session, get_flask_csrf_tok
     assert response.status_code == 403
 
 
-def test_add_invalid_email_user_being_admin(client, access_session, get_flask_csrf_token):
+def test_add_invalid_email_user_without_being_admin(client, access_session, get_flask_csrf_token):
     """
     Description: check if we can create a valid user being admin.
     """
