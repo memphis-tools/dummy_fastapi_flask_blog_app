@@ -133,6 +133,7 @@ deploy_init:
         docker network prune --force ;
         docker image ls -q | xargs docker image rm ;
         docker-compose -f deploy_vault_docker-compose.yml up -d --build ;
+        sleep 5;
         echo '[+] vault built, we start it, create the secrets and unseal it' &&
         docker exec vault bash vault/scripts/build_it_up.sh &&
         echo '[+] the dummy vault is ready sir' "
