@@ -16,7 +16,7 @@ except ModuleNotFoundError:
     from packages import settings
 
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 1
+ACCESS_TOKEN_EXPIRE_MINUTES = 5
 
 
 @pytest.fixture
