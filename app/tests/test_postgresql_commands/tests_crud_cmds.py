@@ -16,6 +16,13 @@ except ModuleNotFoundError:
     from packages.database.models import models
 
 
+def test_commit_update(get_session):
+    """ Description: test commit_update"""
+    session = get_session
+    query = database_crud_commands.commit_update(session)
+    assert query is True
+
+
 def test_add_user_instance(get_session):
     """ Description: test if we can add an user instance"""
     session = get_session
@@ -47,11 +54,53 @@ def test_delete_user_instance(get_session):
     assert query is True
 
 
+def test_get_instance(get_session):
+    """ Description: test get_instance"""
+    session = get_session
+    instance = models.User
+    id = 2
+    instance = database_crud_commands.get_instance(session, instance, id)
+    assert isinstance(instance, models.User)
+    assert instance.username == "donald"
+
+
+def test_view_all_user_instances(get_session):
+    """ Description: test get all user instances"""
+    session = get_session
+    instance = models.User
+    instances = database_crud_commands.view_all_instances(session, instance)
+    assert type(instances) == list
+
+
+def test_view_all_book_instances(get_session):
+    """ Description: test get all book instances"""
+    session = get_session
+    instance = models.Book
+    instances = database_crud_commands.view_all_instances(session, instance)
+    assert type(instances) == list
+
+
+def test_view_all_book_category__instances(get_session):
+    """ Description: test get all book categories instances"""
+    session = get_session
+    instance = models.BookCategory
+    instances = database_crud_commands.view_all_instances(session, instance)
+    assert type(instances) == list
+
+
+def test_view_all_book_comment_instances(get_session):
+    """ Description: test get all book comments instances"""
+    session = get_session
+    instance = models.Comment
+    instances = database_crud_commands.view_all_instances(session, instance)
+    assert type(instances) == list
+
+
 def test_add_book_instance(get_session):
     """ Description: test if we can add a book instance"""
     session = get_session
     instance = models.Book(
-        title="This is a dummy title sir",
+        title="This is a dummy test title sir",
         summary="This is a dummy summary sir",
         content="This is a dummy content sir",
         author="Dummy Sapiens",
@@ -65,16 +114,16 @@ def test_add_book_instance(get_session):
 def test_get_book_instance(get_session):
     """ Description: test if we can get a book instance"""
     session = get_session
-    instance = session.query(models.Book).filter_by(title="This is a dummy title sir").scalar()
+    instance = session.query(models.Book).filter_by(title="This is a dummy test title sir").scalar()
     assert isinstance(instance, models.Book)
     # notice that the __str__ method from book instance returns the title
-    assert str(instance) == "This is a dummy title sir"
+    assert str(instance) == "This is a dummy test title sir"
 
 
 def test_delete_book_instance(get_session):
     """ Description: test if we can delete a book instance"""
     session = get_session
-    instance = session.query(models.Book).filter_by(title="This is a dummy title sir").scalar()
+    instance = session.query(models.Book).filter_by(title="This is a dummy test title sir").scalar()
     query = database_crud_commands.delete_instance(session, instance)
     assert query is True
 

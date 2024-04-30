@@ -87,7 +87,6 @@ input {
 }
 
 /* spécifications pour le sous-menu 'a propos' */
-/* reprise de: https://www.codeply.com/go/ji5ijk6yJ4/bootstrap-4-dropdown-submenu-on-hover */
 .navbar-nav li:hover > ul.dropdown-menu {
     display: block;
 }
@@ -100,7 +99,6 @@ input {
     margin-top:-6px;
 }
 
-/* rotate caret on hover */
 .dropdown-menu > li > a:hover:after {
     text-decoration: underline;
     transform: rotate(-90deg);
@@ -221,7 +219,11 @@ legend {
   margin-bottom: 5%;
 }
 
-.user-preview,
+.user-add {
+  margin-bottom: 3%;
+}
+
+.users-preview,
 .category-preview {
   display: flex;
   flex-direction: row;
