@@ -7,7 +7,7 @@
 <div class="container">
     <div class="section_intro"></div>
     <h1>DUMMY BLOG - LIVRES - SUPPRIMER CATEGORIE {{ category_to_delete.title|upper }}</h1>
-    <div class="d-flex flex-column justify-content-center w-75">
+    <div class="d-flex flex-column justify-content-center m-5">
         <form class="form" method="post">
             {{ form.csrf_token }}
             <button type="submit" class="btn btn-primary" name="button">SUPPRIMER CATEGORIE</button>
