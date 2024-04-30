@@ -47,6 +47,23 @@ class RegisterForm(FlaskForm):
     email = EmailField("EMAIL", validators=[DataRequired(), Email()])
 
 
+class CreateUserForm(FlaskForm):
+    """
+    Description: the create user FlaskForm form.
+    """
+
+    login = StringField(
+        "NOM UTILISATEUR", validators=[DataRequired(), Length(min=3, max=125)]
+    )
+    password = PasswordField(
+        "MOT DE PASSE", validators=[DataRequired(), Length(min=3, max=125)]
+    )
+    password_check = PasswordField(
+        "CONFIRMER MOT DE PASSE", validators=[DataRequired(), Length(min=3, max=125)]
+    )
+    email = EmailField("EMAIL", validators=[DataRequired(), Email()])
+
+
 class AddCategoryBookForm(FlaskForm):
     """
     Description: the add category book FlaskForm form.
@@ -56,7 +73,7 @@ class AddCategoryBookForm(FlaskForm):
     )
 
 
-class UpdateeBookCategoryForm(FlaskForm):
+class UpdateBookCategoryForm(FlaskForm):
     """
     Description: the update category book FlaskForm form.
     """
@@ -112,20 +129,43 @@ class UpdateBookForm(FlaskForm):
     Description: the update book FlaskForm form.
     """
     max_year = dt.date.today().year
+    def __init__(
+        self,
+        books_categories=None,
+        book=None
+    ):
+        super().__init__()
+        if books_categories:
+            self.categories.choices = books_categories
+        if book:
+            self.title.data = book.title
+            self.summary.data = book.summary
+            self.content.data = book.content
+            self.author.data = book.author
+            if book.year_of_publication is not None:
+                self.year_of_publication.data = book.year_of_publication
+            else:
+                self.year_of_publication.data = ""
+
     def validate_category(form, field):
-        if field.data not in settings.BOOKS_CATEGORIES:
+        if field.data not in books_categories:
             raise ValidationError("Catégorie livre non prévue")
 
     title = StringField(
         label="TITRE", validators=[DataRequired(), Length(min=3, max=80)]
     )
     summary = StringField(
-        label="SOUS-TITRE", validators=[DataRequired(), Length(min=3, max=350)]
+        label="SOUS-TITRE", validators=[DataRequired(), Length(min=3, max=160)]
     )
     content = TextAreaField(
         label="DESCRIPTION", validators=[DataRequired(), Length(max=2500)]
     )
-    categories = SelectField("CATEGORIES", choices="", validators=[DataRequired()])
+    categories = SelectField(
+        "CATEGORIES",
+        choices="",
+        coerce=int,
+        validators=[DataRequired()]
+    )
     year_of_publication = IntegerField(
         label="ANNEE PUBLICATION",
         validators=[DataRequired(), NumberRange(min=1, max=max_year)],

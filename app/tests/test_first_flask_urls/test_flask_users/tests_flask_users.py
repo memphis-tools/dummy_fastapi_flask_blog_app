@@ -6,9 +6,11 @@ Notice that by default we already add dummies data through the application utils
 try:
     from app.packages.database.models.models import User
     from app.packages.flask_app.project.__init__ import format_user
+    from app.packages import settings
 except ModuleNotFoundError:
     from packages.database.models.models import User
     from packages.flask_app.project.__init__ import format_user
+    from packages import settings
 
 def test_flask_get_users_without_authentication(client):
     """
@@ -188,3 +190,96 @@ def test_get_users_being_admin(client, access_session_as_admin):
     }
     response = client.get("/front/users/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
+
+
+def test_add_user_without_being_admin(client, access_session, get_flask_csrf_token):
+    """
+    Description: check if we can create an user without being admin.
+    """
+    headers = {
+        "Cookie": f"session={access_session}"
+    }
+    data = {
+        "login": "dupond",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "email": "dupond@localhost.fr",
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
+    assert response.status_code == 403
+
+
+def test_add_invalid_email_user_being_admin(client, access_session, get_flask_csrf_token):
+    """
+    Description: check if we can create a valid user being admin.
+    """
+    headers = {
+        "Cookie": f"session={access_session}"
+    }
+    data = {
+        "login": "dupond",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "email": "dupond@localhost.fr",
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
+    assert response.status_code == 403
+
+
+def test_add_invalid_password_user_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+    """
+    Description: check if we can create an invalid user due to password, being admin.
+    """
+    headers = {
+        "Cookie": f"session={access_session_as_admin}"
+    }
+    data = {
+        "login": "dupond",
+        "password": f"{settings.TEST_USER_PWD}xxx",
+        "password_check": settings.TEST_USER_PWD,
+        "email": "dupond@localhost.fr",
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Mots de passe ne correspondent pas" in response.data
+
+
+def test_add_invalid_email_user_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+    """
+    Description: check if we can create an invalid user due to email, being admin.
+    """
+    headers = {
+        "Cookie": f"session={access_session_as_admin}"
+    }
+    data = {
+        "login": "dupond",
+        "password": f"{settings.TEST_USER_PWD}",
+        "password_check": settings.TEST_USER_PWD,
+        "email": "donald@localhost.fr",
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Email existe deja en base" in response.data
+
+
+def test_add_invalid_username_user_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+    """
+    Description: check if we can create an invalid user due to username, being admin.
+    """
+    headers = {
+        "Cookie": f"session={access_session_as_admin}"
+    }
+    data = {
+        "login": "donald",
+        "password": f"{settings.TEST_USER_PWD}",
+        "password_check": settings.TEST_USER_PWD,
+        "email": "dupond@localhost.fr",
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Nom utilisateur existe deja, veuillez le modifier" in response.data

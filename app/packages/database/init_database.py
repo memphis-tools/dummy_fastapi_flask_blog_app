@@ -58,7 +58,7 @@ def get_a_database_session(engine_name):
         db_name = os.getenv("POSTGRES_PRODUCTION_DB_NAME")
     else:
         db_name = os.getenv("POSTGRES_TEST_DB_NAME")
-
+    session = None
     if engine_name == "postgresql":
         username = os.getenv("POSTGRES_USER")
         password = os.getenv("POSTGRES_PASSWORD")

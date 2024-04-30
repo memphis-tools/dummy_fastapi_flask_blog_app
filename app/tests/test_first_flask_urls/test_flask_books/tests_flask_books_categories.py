@@ -229,9 +229,9 @@ def test_add_book_category_without_being_admin(client, access_session, get_flask
     assert response.status_code == 403
 
 
-def test_add_book_category_with_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+def test_add_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
     """
-    Description: check if we can add an existing book category being admin.
+    Description: check if we can add a book category being admin.
     """
     data = {
         "title": "CUISINE",

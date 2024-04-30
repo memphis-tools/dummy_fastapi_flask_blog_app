@@ -50,10 +50,7 @@ def view_all_user_books(session, user_id):
     user_books = user_books_query.all()
     user_books_list = []
     for instance in user_books_list:
-        if instance == models.User:
-            user_books_list.append(instance.get_restricted_json())
-        else:
-            user_books_list.append(instance.get_json())
+        user_books_list.append(instance.get_restricted_json())
     return user_books_list
 
 

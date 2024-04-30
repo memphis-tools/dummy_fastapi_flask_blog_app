@@ -3,6 +3,7 @@ All the tests functions for the books urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
+import pytest
 from pathlib import Path
 from werkzeug.datastructures import FileStorage
 try:
@@ -147,7 +148,7 @@ def test_flask_update_book_being_authenticated(
 
     book_form = {
         "title": "This is a dummy title sir",
-        "category": "1",
+        "categories": "1",
         "csrf_token": get_flask_csrf_token,
     }
 
@@ -162,6 +163,32 @@ def test_flask_update_book_being_authenticated(
         follow_redirects=True,
     )
     assert response.status_code == 200
+
+
+def test_flask_update_book_being_authenticated_without_book_id(
+    client, access_session, get_flask_csrf_token
+):
+    """
+    Description: check if we can update a book without specifying a book id.
+    """
+
+    book_form = {
+        "title": "This is a dummy title sir",
+        "category": "1",
+        "csrf_token": get_flask_csrf_token,
+    }
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cookie": f"session={access_session}",
+    }
+    response = client.post(
+        "http://localhost/front/book/update/",
+        headers=headers,
+        data=book_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 404
 
 
 def test_flask_update_book_being_authenticated_without_being_publisher(
@@ -199,7 +226,7 @@ def test_flask_update_book_being_authenticated_as_admin(
 
     book_form = {
         "title": "This is a dummy title sir",
-        "category": "1",
+        "categories": "1",
         "csrf_token": get_flask_csrf_token,
     }
 

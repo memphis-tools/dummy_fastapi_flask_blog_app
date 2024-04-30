@@ -15,14 +15,16 @@
                 <label for="summary">{{ form.summary.label }}</label>{{ form.summary }}
                 <label for="author">{{ form.author.label }}</label>{{ form.author }}
                 <div class="d-flex flex-column">
-                    {% for category in form.categories %}
-                        <p>{{ category }}</p>
-                    {% endfor %}
+                    <label for="categories">{{ form.categories.label }}</label>{{ form.categories }}
                 </div>
                 <label for="year_of_publication">{{ form.year_of_publication.label }}</label>
-                <div class="col-md-1">
-                    {{ form.year_of_publication(size=5) }}
-                </div>
+                {% if form.year_of_publication is not none %}
+                  <div class="col-md-1">
+                      {{ form.year_of_publication(size=5) }}
+                  </div>
+                {% else %}
+                <div class="col-md-1"></div>
+                {% endif %}
                 <label for="content">{{ form.content.label }}</label>{{ form.content }}
                 <label for="photo">{{ form.photo.label }}</label>{{ form.photo }}
                 <button type="submit" class="btn btn-primary" name="button">METTRE A JOUR</button>
