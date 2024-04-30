@@ -244,7 +244,7 @@ def test_add_invalid_password_user_being_admin(client, access_session_as_admin, 
     }
     response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
-    # assert b"Mots de passe ne correspondent pas" in response.data
+    assert b"Mots de passe ne correspondent pas" in response.data
 
 
 def test_add_invalid_email_user_being_admin(client, access_session_as_admin, get_flask_csrf_token):
@@ -263,7 +263,7 @@ def test_add_invalid_email_user_being_admin(client, access_session_as_admin, get
     }
     response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
-    # assert b"Email existe deja en base" in response.data
+    assert b"Email existe deja en base" in response.data
 
 
 def test_add_invalid_username_user_being_admin(client, access_session_as_admin, get_flask_csrf_token):
@@ -282,4 +282,4 @@ def test_add_invalid_username_user_being_admin(client, access_session_as_admin, 
     }
     response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
-    # assert b"Nom utilisateur existe deja, veuillez le modifier" in response.data
+    assert b"Nom utilisateur existe deja, veuillez le modifier" in response.data
