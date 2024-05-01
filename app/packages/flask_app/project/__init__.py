@@ -829,6 +829,12 @@ def update_comment(comment_id):
         session.close()
         return abort(403)
     if edit_form.validate_on_submit():
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "old_comment": comment.text,
+            "new_comment": edit_form.comment_text.data,
+        }
+        log_events.log_event("[+] Flask - Mise à jour commentaire.", logs_context)
         comment.text = edit_form.comment_text.data
         session.commit()
         flash("Commentaire mis a jour", "info")
@@ -933,6 +939,11 @@ def update_book(book_id):
             if book_is_valid is True:
                 session.commit()
                 session.close()
+                logs_context = {
+                    "current_user": f"{current_user.username}",
+                    "book_title": updated_book.title,
+                }
+                log_events.log_event("[+] Flask - Mise à jour livre.", logs_context)
                 return redirect(url_for("book", book_id=book_id))
             else:
                 flash(book_is_valid, "error")
@@ -1001,6 +1012,11 @@ def add_book_category():
         )
         category_is_valid = check_book_category_fields(new_category)
         if category_is_valid is True:
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "new_category": new_category.title,
+            }
+            log_events.log_event("[+] Flask - Ajout catégorie livre.", logs_context)
             session.add(new_category)
             session.commit()
         else:
@@ -1030,6 +1046,11 @@ def delete_book_category(category_id):
         return abort(404)
 
     if form.validate_on_submit():
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "category_to_delete": category_to_delete.title,
+        }
+        log_events.log_event("[+] Flask - Suppression catégorie livre.", logs_context)
         session.delete(category_to_delete)
         session.commit()
         session.close()
@@ -1067,6 +1088,12 @@ def update_book_category(category_id):
         )
         book_category_is_valid = check_book_category_fields(updated_category)
         if book_category_is_valid is True:
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "updated_category_old": category_to_update.title,
+                "updated_category_new": updated_category.title,
+            }
+            log_events.log_event("[+] Flask - Mise à jour catégorie livre.", logs_context)
             session.commit()
             session.close()
             return redirect(url_for("manage_books_categories"))
@@ -1140,6 +1167,12 @@ def delete_comment(comment_id):
         session.close()
         return abort(403)
     if form.validate_on_submit():
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "book_title": book.title,
+            "comment": comment_to_delete.text
+        }
+        log_events.log_event("[+] Flask - Suppression commentaire.", logs_context)
         session.delete(comment_to_delete)
         total_book_comments = book.nb_comments - 1
         book.nb_comments = total_book_comments
@@ -1170,6 +1203,11 @@ def delete_user(user_id):
         flash("Le compte admin ne peut pas etre supprime", "error")
         return abort(403)
     if form.validate_on_submit():
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "user_to_delete": user_to_delete.username,
+        }
+        log_events.log_event("[+] Flask - Suppression utilisateur.", logs_context)
         session.delete(user_to_delete)
         session.commit()
         session.close()
