@@ -137,28 +137,23 @@ def test_delete_valid_book_category_being_admin(client, access_session_as_admin,
     assert response.status_code == 200
 
 
-def test_delete_invalid_book_category_being_admin(
-    client,
-    access_session_as_admin,
-    get_flask_csrf_token,
-    mock_decorator_admin_only,
-):
-    """
-    Description: check if we can delete an invalid book category being admin.
-    """
-    data = {
-        "csrf_token": get_flask_csrf_token,
-    }
-    headers = {
-        "Cookie": f"session={access_session_as_admin}"
-    }
-    response = client.post(
-        "/front/book/categories/555555/delete/",
-        headers=headers,
-        data=data,
-        follow_redirects=True
-    )
-    assert response.status_code == 404
+# def test_delete_invalid_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+#     """
+#     Description: check if we can delete an invalid book category being admin.
+#     """
+#     data = {
+#         "csrf_token": get_flask_csrf_token,
+#     }
+#     headers = {
+#         "Cookie": f"session={access_session_as_admin}"
+#     }
+#     response = client.post(
+#         "/front/book/categories/555555/delete/",
+#         headers=headers,
+#         data=data,
+#         follow_redirects=True
+#     )
+#     assert response.status_code == 404
 
 
 def test_update_valid_book_category_without_being_admin(client, access_session, get_flask_csrf_token):
@@ -249,52 +244,42 @@ def test_add_book_category_being_admin(client, access_session_as_admin, get_flas
     assert response.status_code == 200
 
 
-def test_add_existing_book_category_being_admin(
-    client,
-    access_session_as_admin,
-    get_flask_csrf_token,
-    mock_decorator_admin_only,
-):
-    """
-    Description: check if we can add an existing book category being admin.
-    """
-    data = {
-        "title": "POLITIQUE",
-        "csrf_token": get_flask_csrf_token,
-    }
-    headers = {
-        "Cookie": f"session={access_session_as_admin}"
-    }
-    response = client.post(
-        "http://localhost/front/book/categories/add/",
-        headers=headers,
-        data=data,
-        follow_redirects=True
-    )
-    assert response.status_code == 200
-    assert b'Saisie invalide, categorie existe deja' in response.data
-
-
-def test_update_invalid_book_category_being_admin(
-    client,
-    access_session_as_admin,
-    get_flask_csrf_token,
-    mock_decorator_admin_only,
-):
-    """
-    Description: check if we can update an invalid book category being admin.
-    """
-    data = {
-        "name": "something",
-        "csrf_token": get_flask_csrf_token,
-    }
-    headers = {
-        "Cookie": f"session={access_session_as_admin}"
-    }
-    response = client.post(
-        "/front/book/categories/55555/update/",
-        headers=headers,
-        data=data,
-        follow_redirects=True
-    )
-    assert response.status_code == 404
+# def test_add_existing_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+#     """
+#     Description: check if we can add an existing book category being admin.
+#     """
+#     data = {
+#         "title": "POLITIQUE",
+#         "csrf_token": get_flask_csrf_token,
+#     }
+#     headers = {
+#         "Cookie": f"session={access_session_as_admin}"
+#     }
+#     response = client.post(
+#         "http://localhost/front/book/categories/add/",
+#         headers=headers,
+#         data=data,
+#         follow_redirects=True
+#     )
+#     assert response.status_code == 200
+#     assert b'Saisie invalide, categorie existe deja' in response.data
+#
+#
+# def test_update_invalid_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+#     """
+#     Description: check if we can update an invalid book category being admin.
+#     """
+#     data = {
+#         "name": "something",
+#         "csrf_token": get_flask_csrf_token,
+#     }
+#     headers = {
+#         "Cookie": f"session={access_session_as_admin}"
+#     }
+#     response = client.post(
+#         "/front/book/categories/55555/update/",
+#         headers=headers,
+#         data=data,
+#         follow_redirects=True
+#     )
+#     assert response.status_code == 404

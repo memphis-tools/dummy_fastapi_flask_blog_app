@@ -211,7 +211,6 @@ def test_add_user_being_admin(
     client,
     access_session_as_admin,
     get_flask_csrf_token,
-    mock_decorator_admin_only,
 ):
     """
     Description: check if we can create an user without being admin.
