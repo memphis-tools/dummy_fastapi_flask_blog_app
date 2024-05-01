@@ -20,3 +20,5 @@ terraform.tfstate.backup
 .terraform.lock.hcl
 variables.tf
 terraform/variables.tf
+cov_html
+htmlcov

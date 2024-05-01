@@ -6,14 +6,10 @@ Notice that by default we already add dummies data through the application utils
 import os
 from pathlib import Path
 from werkzeug.datastructures import FileStorage
-try:
-    from app.packages.database.models.models import Book, User, BookCategory
-    from app.packages.flask_app.project.__init__ import check_book_fields, check_book_category_fields
-    from app.packages import settings
-except ModuleNotFoundError:
-    from packages.database.models.models import Book, User, BookCategory
-    from packages.flask_app.project.__init__ import check_book_fields, check_book_category_fields
-    from packages import settings
+
+from app.packages.database.models.models import Book, User, BookCategory
+from app.packages.flask_app.project.__init__ import check_book_fields, check_book_category_fields
+from app.packages import settings
 
 
 def test_flask_weird_route(client):

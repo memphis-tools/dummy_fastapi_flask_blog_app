@@ -12,4 +12,5 @@ omit = app/tests/conftest.py, \
   app/packages/settings.py, \
   app/packages/utils.py, \
   app/packages/logtail_handler.py, \
-  app/__init__.py
+  app/__init__.py, \
+  

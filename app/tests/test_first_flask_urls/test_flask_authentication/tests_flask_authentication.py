@@ -3,12 +3,8 @@ All the tests functions for the authentication urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-try:
-    from app.packages.database.models.models import Book, User
-    from app.packages import settings
-except ModuleNotFoundError:
-    from packages.database.models.models import Book, User
-    from packages import settings
+from app.packages.database.models.models import Book, User
+from app.packages import settings
 
 
 def test_flask_login_route(client):

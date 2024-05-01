@@ -4,12 +4,9 @@ Notice that we create a dummy test database in order to make the tests. So there
 """
 
 import os
-try:
-    from app.packages.database.models.models import BookCategory, User
-    from app.packages.database import init_database
-except ModuleNotFoundError:
-    from packages.database.models.models import BookCategory, User
-    from packages.database import init_database
+
+from app.packages.database.models.models import BookCategory, User
+from app.packages.database import init_database
 
 
 def test_create_books_categories_if_not_exist(get_session):
@@ -42,7 +39,7 @@ def test_get_a_database_session():
     """
     Description: test get a database session.
     """
-    session = init_database.get_a_database_session("postgresql")
+    session = init_database.get_a_database_session()
     assert session.__class__.__name__ == "Session"
 
 
@@ -56,7 +53,7 @@ def test_get_engine():
     host = os.getenv("POSTGRES_HOST")
     port = os.getenv("POSTGRES_PORT")
     database_name = db_name
-    engine = init_database.get_engine("postgresql", username, password, host, port, database_name)
+    engine = init_database.get_engine(username, password, host, port, database_name)
     assert engine.name == "postgresql"
 
 
@@ -71,4 +68,4 @@ def test_update_default_postgres_password(get_session):
     """
     Description: test the update password for postgres default user .
     """
-    assert init_database.update_default_postgres_password("postgresql", get_session) is True
+    assert init_database.update_default_postgres_password(get_session) is True

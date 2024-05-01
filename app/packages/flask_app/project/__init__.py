@@ -24,14 +24,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 
-try:
-    from app.packages import logtail_handler, settings
-    from app.packages.database.commands import session_commands
-    from app.packages.database.models.models import Book, Comment, User, BookCategory
-except ModuleNotFoundError:
-    from packages import logtail_handler, settings
-    from packages.database.commands import session_commands
-    from packages.database.models.models import Book, Comment, User, BookCategory
+from app.packages import logtail_handler, settings
+from app.packages.database.commands import session_commands
+from app.packages.database.models.models import Book, Comment, User, BookCategory
+
 
 from . import forms
 
@@ -59,7 +55,7 @@ def load_user(user_id):
     """
     Description: a default user_loader which enable the flask_login usage.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     loaded = session.get(User, user_id)
     session.close()
     return loaded
@@ -105,7 +101,7 @@ def format_user(id):
     """
     Description: a custom filter for username to be used in templates
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     user = session.get(User, id)
     session.close()
     if current_user.is_authenticated:
@@ -119,7 +115,7 @@ def format_book_category(id):
     """
     Description: a custom filter for book category to be used in templates
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     category = session.get(BookCategory, id)
     session.close()
     return category
@@ -167,7 +163,7 @@ def create_books_categories_chart(total_books, categories_books_count_dict):
 def categories_stats():
     total_books = 0
     categories_books_count_dict = {}
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     books_categories_list = session.query(BookCategory).all()
     for category in books_categories_list:
         category_id = session.query(BookCategory).filter_by(title=f"{category}").first().id
@@ -288,7 +284,7 @@ def create_users_chart(total_books, users_books_count_dict):
 def users_stats():
     total_books = 0
     users_books_count_dict = {}
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     users_list = session.query(User).all()
     for user in users_list:
         books_count = session.query(func.count(Book.category)).filter(Book.user_id==user.id).all()[0]
@@ -399,7 +395,7 @@ def index():
     """
     Description: the index /home, Flask route
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     first_books = session.query(Book).order_by("id").all()[:MAX_BOOKS_ON_INDEX_PAGE]
     session.close()
     return render_template(
@@ -444,7 +440,7 @@ def books():
     """
     Description: the books Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     books = session.query(Book).order_by(Book.id).all()
     session.close()
     return render_template(
@@ -458,7 +454,7 @@ def book(book_id):
     """
     Description: the book Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     delete_book_form = forms.DeleteBookForm()
     form = forms.CommentForm()
     book = session.get(Book, book_id)
@@ -502,7 +498,7 @@ def categories():
     """
     Description: the books categories Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     categories_list = []
     categories = session.query(BookCategory).order_by(BookCategory.id).all()
     for category in categories:
@@ -523,7 +519,7 @@ def category_books(category_id):
     """
     Description: the books from a category Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     category = session.get(BookCategory, category_id)
     if not category:
         flash(f"Categorie id {category_id} inexistante.", "error")
@@ -549,7 +545,7 @@ def user_books(user_id):
     if not current_user.is_authenticated:
         flash("Acces page interdit aux utilisateurs non connectés.", "error")
         return redirect(url_for("register"))
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     user = session.get(User, user_id)
     if not user:
         flash(f"Utilisateur id {user_id} inexistant.", "error")
@@ -577,7 +573,7 @@ def check_book_category_fields(category):
     """
     Description: vérifier que l'utilisateur renseigne la catégorie correctement.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     if any([
         str(category.title).lower() == "string",
     ]):
@@ -618,7 +614,7 @@ def add_book():
     """
     Description: the add book Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     books_categories_query = session.query(BookCategory).all()
     books_categories = [(i.id, i.title) for i in books_categories_query]
     form = forms.BookForm(books_categories=books_categories)
@@ -688,7 +684,7 @@ def login():
     """
     form = forms.LoginForm()
     if form.validate_on_submit():
-        session = session_commands.get_a_database_session("postgresql")
+        session = session_commands.get_a_database_session()
         email = str(form.email.data).lower()
         username = str(form.login.data).lower()
         password = form.password.data
@@ -740,7 +736,7 @@ def register():
     """
     Description: the register Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     form = forms.RegisterForm()
     if form.validate_on_submit():
         if any([
@@ -794,10 +790,7 @@ def add_user():
     """
     Description: the add user Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
-    if current_user.role != "admin":
-        session.close()
-        return abort(403)
+    session = session_commands.get_a_database_session()
     form = forms.CreateUserForm()
     if form.validate_on_submit():
         username = str(form.login.data).lower()
@@ -838,7 +831,7 @@ def update_comment(comment_id):
     """
     Description: the update comment Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     comment = session.get(Comment, comment_id)
     edit_form = forms.UpdateCommentForm(
         comment_text=comment.text,
@@ -866,13 +859,13 @@ def update_book(book_id):
     """
     Description: the update book Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     book = session.get(Book, book_id)
-    if current_user.id != book.user_id and current_user.role != "admin":
-        session.close()
-        return abort(403)
-    category = session.query(BookCategory).filter(BookCategory.id==book.category).first()
     if book:
+        category = session.query(BookCategory).filter(BookCategory.id==book.category).first()
+        if current_user.id != book.user_id and current_user.role != "admin":
+            session.close()
+            return abort(403)
         book_picture_filename = book.book_picture_name
         books_categories_query = session.query(BookCategory).all()
         books_categories = [(i.id, i.title) for i in books_categories_query]
@@ -977,16 +970,13 @@ def users():
     """
     Description: the users app Flask route.
     """
-    if current_user.role != "admin":
-        return abort(401)
-    else:
-        session = session_commands.get_a_database_session("postgresql")
-        # remember that user with id 1 is the application admin (wr remove it from dataset)
-        users = session.query(User).all()[1:]
-        session.close()
-        return render_template(
-            "users.html", users=users, is_authenticated=current_user.is_authenticated
-        )
+    session = session_commands.get_a_database_session()
+    # remember that user with id 1 is the application admin (wr remove it from dataset)
+    users = session.query(User).all()[1:]
+    session.close()
+    return render_template(
+        "users.html", users=users, is_authenticated=current_user.is_authenticated
+    )
 
 
 @app.route("/front/categories/", methods=["GET"])
@@ -996,17 +986,14 @@ def manage_books_categories():
     """
     Description: a manage view to get books categories Flask route.
     """
-    if current_user.role != "admin":
-        return abort(401)
-    else:
-        session = session_commands.get_a_database_session("postgresql")
-        categories = session.query(BookCategory).all()
-        session.close()
-        return render_template(
-            "books_categories.html",
-            categories=categories,
-            is_authenticated=current_user.is_authenticated
-        )
+    session = session_commands.get_a_database_session()
+    categories = session.query(BookCategory).all()
+    session.close()
+    return render_template(
+        "books_categories.html",
+        categories=categories,
+        is_authenticated=current_user.is_authenticated
+    )
 
 
 @app.route("/front/book/categories/add/", methods=["GET", "POST"])
@@ -1017,28 +1004,25 @@ def add_book_category():
     Description: an add book category Flask route.
     """
     form = forms.AddCategoryBookForm()
-    if current_user.role != "admin":
-        return abort(403)
-    else:
-        if form.validate_on_submit():
-            session = session_commands.get_a_database_session("postgresql")
-            title = form.title.data
-            new_category = BookCategory(
-                title=str(title).lower(),
-            )
-            category_is_valid = check_book_category_fields(new_category)
-            if category_is_valid is True:
-                session.add(new_category)
-                session.commit()
-            else:
-                flash(category_is_valid, "error")
-            session.close()
-            return redirect(url_for("manage_books_categories"))
-        return render_template(
-            "add_book_category.html",
-            form=form,
-            is_authenticated=current_user.is_authenticated
+    if form.validate_on_submit():
+        session = session_commands.get_a_database_session()
+        title = form.title.data
+        new_category = BookCategory(
+            title=str(title).lower(),
         )
+        category_is_valid = check_book_category_fields(new_category)
+        if category_is_valid is True:
+            session.add(new_category)
+            session.commit()
+        else:
+            flash(category_is_valid, "error")
+        session.close()
+        return redirect(url_for("manage_books_categories"))
+    return render_template(
+        "add_book_category.html",
+        form=form,
+        is_authenticated=current_user.is_authenticated
+    )
 
 
 @app.route("/front/book/categories/<int:category_id>/delete/", methods=["GET", "POST"])
@@ -1049,27 +1033,24 @@ def delete_book_category(category_id):
     Description: delete a book category Flask route.
     """
     form = forms.DeleteBookCategoryForm()
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     category_to_delete = session.get(BookCategory, category_id)
     if category_to_delete is None:
         flash("Categorie livre non trouvee", "error")
         session.close()
         return abort(404)
-    if current_user.role != "admin":
+
+    if form.validate_on_submit():
+        session.delete(category_to_delete)
+        session.commit()
         session.close()
-        return abort(403)
-    else:
-        if form.validate_on_submit():
-            session.delete(category_to_delete)
-            session.commit()
-            session.close()
-            return redirect(url_for("manage_books_categories"))
-        return render_template(
-            "delete_book_category.html",
-            category_to_delete=category_to_delete,
-            form=form,
-            is_authenticated=current_user.is_authenticated
-        )
+        return redirect(url_for("manage_books_categories"))
+    return render_template(
+        "delete_book_category.html",
+        category_to_delete=category_to_delete,
+        form=form,
+        is_authenticated=current_user.is_authenticated
+    )
 
 
 @app.route("/front/book/categories/<int:category_id>/update/", methods=["GET", "POST"])
@@ -1079,41 +1060,38 @@ def update_book_category(category_id):
     """
     Description: update a book category Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     category_to_update = session.get(BookCategory, category_id)
     if category_to_update is None:
         flash("Categorie livre non trouvee", "error")
         session.close()
         return abort(404)
     edit_form = forms.UpdateBookCategoryForm(title=category_to_update.title,)
-    if current_user.role != "admin":
-        session.close()
-        return abort(403)
-    else:
-        if edit_form.validate_on_submit():
-            title = edit_form.title.data
-            updated_category = BookCategory(
-                title=title,
-            )
-            session.query(BookCategory).where(BookCategory.id == category_id).update(
-                updated_category.get_json_for_update()
-            )
-            book_category_is_valid = check_book_category_fields(updated_category)
-            if book_category_is_valid is True:
-                session.commit()
-                session.close()
-                return redirect(url_for("manage_books_categories"))
-            else:
-                flash(book_category_is_valid, "error")
-                session.close()
-                return redirect(url_for("index"))
-            return redirect(url_for("manage_books_categories"))
-        return render_template(
-            "update_book_category.html",
-            category_to_update=category_to_update,
-            form=edit_form,
-            is_authenticated=current_user.is_authenticated
+
+    if edit_form.validate_on_submit():
+        title = edit_form.title.data
+        updated_category = BookCategory(
+            title=title,
         )
+        session.query(BookCategory).where(BookCategory.id == category_id).update(
+            updated_category.get_json_for_update()
+        )
+        book_category_is_valid = check_book_category_fields(updated_category)
+        if book_category_is_valid is True:
+            session.commit()
+            session.close()
+            return redirect(url_for("manage_books_categories"))
+        else:
+            flash(book_category_is_valid, "error")
+            session.close()
+            return redirect(url_for("index"))
+        return redirect(url_for("manage_books_categories"))
+    return render_template(
+        "update_book_category.html",
+        category_to_update=category_to_update,
+        form=edit_form,
+        is_authenticated=current_user.is_authenticated
+    )
 
 
 @app.route("/front/book//<int:book_id>/delete/", methods=["GET", "POST"])
@@ -1122,7 +1100,7 @@ def delete_book(book_id):
     """
     Description: the delete book Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     form = forms.DeleteBookForm()
     book_to_delete = session.get(Book, book_id)
     user = session.get(User, book_to_delete.user_id)
@@ -1160,7 +1138,7 @@ def delete_comment(comment_id):
     """
     Description: the delete comment Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     form = forms.DeleteCommentForm()
     comment_to_delete = session.get(Comment, comment_id)
     book = session.get(Book, comment_to_delete.book_id)
@@ -1197,7 +1175,7 @@ def delete_user(user_id):
     """
     Description: the delete user Flask route.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     form = forms.DeleteUserForm()
     user_to_delete = session.get(User, user_id)
     if user_id == 1:

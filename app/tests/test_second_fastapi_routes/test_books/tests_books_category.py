@@ -5,13 +5,11 @@ Notice that by default we already add dummies data through the application utils
 
 import pytest
 from httpx import AsyncClient
-try:
-    import app.packages.settings as settings
-    from app.packages.fastapi.routes import routes_and_authentication
-except ModuleNotFoundError:
-    import packages.settings as settings
-    from packages.fastapi.routes import routes_and_authentication
 
+import app.packages.settings as settings
+from app.packages.database.models.models import BookCategory
+from app.packages.fastapi.routes import routes_and_authentication
+from app.packages.flask_app.project.__init__ import check_book_category_fields
 
 app = routes_and_authentication.app
 
@@ -27,6 +25,18 @@ async def test_get_category_books(get_fastapi_token):
             "/api/v1/books/categories/1/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
         )
     assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_check_book_category_fields(get_fastapi_client):
+    """
+    Description: test check_book_category_fields when adding a new book category
+    """
+    book = BookCategory(
+        title="string",
+    )
+    response = check_book_category_fields(book)
+    assert "Saisie invalide, mot clef string non utilisable" in response
 
 
 @pytest.mark.asyncio
@@ -50,7 +60,7 @@ async def test_get_invalid_category_books(get_fastapi_token):
     """
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.get(
-            "/api/v1/books/categories/55555/",
+            "/api/v1/books/categories/55555555/",
             headers={"Authorization": f"Bearer {get_fastapi_token}"}
         )
     assert response.status_code == 404
@@ -78,7 +88,7 @@ async def test_get_invalid_category_books_as_admin(get_fastapi_token_for_admin):
     """
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.get(
-            "/api/v1/books/categories/55555/",
+            "/api/v1/books/categories/55555555/",
             headers={"Authorization": f"Bearer {get_fastapi_token_for_admin}"}
         )
     assert response.status_code == 404
@@ -152,7 +162,7 @@ async def test_get_unexisting_books_category_with_authentication(get_fastapi_cli
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.get("/api/v1/books/categories/55555/", headers=headers)
+    response = get_fastapi_client.get("/api/v1/books/categories/55555555/", headers=headers)
     assert response.status_code == 404
 
 
@@ -262,7 +272,7 @@ async def test_delete_unexisting_book_category_with_authentication_with_valid_da
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.delete("/api/v1/books/categories/55555/delete/", headers=headers)
+    response = get_fastapi_client.delete("/api/v1/books/categories/55555555/delete/", headers=headers)
     assert response.status_code == 401
 
 
@@ -300,7 +310,7 @@ async def test_update_unexisting_book_category_with_authentication_with_valid_da
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/books/categories/55555/update/", headers=headers, json=json)
+    response = get_fastapi_client.put("/api/v1/books/categories/55555555/update/", headers=headers, json=json)
     assert response.status_code == 401
 
 
@@ -345,7 +355,7 @@ async def test_get_unexisting_book_category_with_authentication_as_admin(get_fas
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.get("/api/v1/books/categories/55555/", headers=headers)
+    response = get_fastapi_client.get("/api/v1/books/categories/55555555/", headers=headers)
     assert response.status_code == 404
 
 
@@ -438,7 +448,7 @@ async def test_delete_unexisting_book_category_with_authentication_as_admin_with
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.delete("/api/v1/books/categories/55555/delete/", headers=headers)
+    response = get_fastapi_client.delete("/api/v1/books/categories/55555555/delete/", headers=headers)
     assert response.status_code == 404
 
 
@@ -476,7 +486,7 @@ async def test_update_unexisting_book_category_with_authentication_as_admin_with
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/books/categories/55555/update/", headers=headers, json=json)
+    response = get_fastapi_client.put("/api/v1/books/categories/55555555/update/", headers=headers, json=json)
     assert response.status_code == 404
 
 

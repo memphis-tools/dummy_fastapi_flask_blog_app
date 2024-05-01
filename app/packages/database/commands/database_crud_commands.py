@@ -2,10 +2,7 @@
 CRUD commands for any SGBD, executed through the sqlalchemy.
 """
 
-try:
-    from app.packages.database.models import models
-except ModuleNotFoundError:
-    from packages.database.models import models
+from app.packages.database.models import models
 
 
 def commit_update(session):

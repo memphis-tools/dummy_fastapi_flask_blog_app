@@ -6,14 +6,10 @@ Notice that by default we already add dummies data through the application utils
 import pytest
 from pathlib import Path
 from werkzeug.datastructures import FileStorage
-try:
-    from app.packages.database.models.models import Book, User
-    from app.packages.flask_app.project.__init__ import check_book_fields, get_pie_colors
-    from app.packages import settings
-except ModuleNotFoundError:
-    from packages.database.models.models import Book, User
-    from packages.flask_app.project.__init__ import check_book_fields, get_pie_colors
-    from packages import settings
+
+from app.packages.database.models.models import Book, User
+from app.packages.flask_app.project.__init__ import check_book_fields, get_pie_colors
+from app.packages import settings
 
 
 def test_flask_get_a_book_without_authentication(client):
@@ -241,6 +237,32 @@ def test_flask_update_book_being_authenticated_as_admin(
         follow_redirects=True,
     )
     assert response.status_code == 200
+
+
+# def test_flask_update_unexisting_book_being_authenticated_as_admin(
+#     client, access_session_as_admin, get_flask_csrf_token
+# ):
+#     """
+#     Description: check if we can update an unexisting book being admin.
+#     """
+#
+#     book_form = {
+#         "title": "This is a dummy title sir",
+#         "categories": "1",
+#         "csrf_token": get_flask_csrf_token,
+#     }
+#
+#     headers = {
+#         "Content-Type": "application/x-www-form-urlencoded",
+#         "Cookie": f"session={access_session_as_admin}",
+#     }
+#     response = client.post(
+#         "http://localhost/front/book/55555555/update/",
+#         headers=headers,
+#         data=book_form,
+#         follow_redirects=True,
+#     )
+#     assert b"Livre non trouv" in response.data
 
 
 def test_flask_update_book_without_authentication(client, get_flask_csrf_token):

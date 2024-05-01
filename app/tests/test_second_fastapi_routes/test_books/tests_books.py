@@ -6,16 +6,12 @@ Notice that by default we already add dummies data through the application utils
 import os
 import pytest
 from datetime import timedelta
-try:
-    import app.packages.settings as settings
-    from app.packages.fastapi.models import fastapi_models
-    from app.packages.fastapi.routes import routes_and_authentication
-    from app.packages.flask_app.project.__init__ import check_book_fields, check_book_category_fields
-except ModuleNotFoundError:
-    import packages.settings as settings
-    from packages.fastapi.models import fastapi_models
-    from packages.fastapi.routes import routes_and_authentication
-    from packages.flask_app.project.__init__ import check_book_fields, check_book_category_fields
+from fastapi import HTTPException, status
+import app.packages.settings as settings
+from app.packages.database.models.models import Book
+from app.packages.fastapi.models import fastapi_models
+from app.packages.fastapi.routes import routes_and_authentication
+from app.packages.flask_app.project.__init__ import check_book_fields
 
 
 @pytest.mark.asyncio
@@ -95,6 +91,28 @@ async def test_update_book_with_authentication_with_forbidden_user(get_fastapi_c
 
 
 @pytest.mark.asyncio
+async def test_update_unexisting_book_with_authentication(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test update_book id 55555 route with FastAPI TestClient with token.
+    The book does not exists.
+    """
+    access_token = get_fastapi_token
+    json = {"summary": "such a book"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    access_token = get_fastapi_token
+    response = get_fastapi_client.put(
+        "/api/v1/books/55555/",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json=json
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_update_book_with_authentication_with_valid_datas(get_fastapi_client, get_fastapi_token):
     """
     Description: test update_book id 1 route with FastAPI TestClient with token.
@@ -138,6 +156,25 @@ async def test_post_book_with_authentication_with_valid_datas(get_fastapi_client
 
     response = get_fastapi_client.post("/api/v1/books/", headers=headers, json=json)
     assert response.status_code == 200
+
+
+
+@pytest.mark.asyncio
+async def test_check_book_fields(get_fastapi_client):
+    """
+    Description: test check_book_fields when adding a new book
+    """
+    book = Book(
+        title="Perdus dans les Andes",
+        author="Carl Barks",
+        summary="Donald a trouvé un emploi au musée : il doit dépoussiérer la collection de pierres.",
+        content="what a great story sir",
+        book_picture_name="dummy_photo_name.jpg",
+        year_of_publication="bebopalula",
+        category="art"
+    )
+    response = check_book_fields(book)
+    assert "Saisie invalide, annee publication livre doit etre un entier" in response
 
 
 @pytest.mark.asyncio

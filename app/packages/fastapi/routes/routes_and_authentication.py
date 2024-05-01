@@ -6,46 +6,26 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
-try:
-    from app.packages import logtail_handler, settings
-    from app.packages.database.commands import database_crud_commands, session_commands
-    from app.packages.database.models import models
-    from app.packages.fastapi.models.fastapi_models import (
-        UserModel,
-        UserInDB,
-        UpdateUserModel,
-        UpdateUserInDB,
-        NewUserInDBModel,
-        NewBookModel,
-        UpdateBookModel,
-        NewCommentModel,
-        UpdateCommentModel,
-        BookCategoryModel,
-        NewBookCategoryModel,
-        UpdateBookCategoryModel,
-        Token,
-        TokenData,
-    )
-except ModuleNotFoundError:
-    from packages import logtail_handler, settings
-    from packages.database.commands import database_crud_commands, session_commands
-    from packages.database.models import models
-    from packages.fastapi.models.fastapi_models import (
-        UserModel,
-        UserInDB,
-        UpdateUserModel,
-        UpdateUserInDB,
-        NewUserInDBModel,
-        NewBookModel,
-        UpdateBookModel,
-        NewCommentModel,
-        UpdateCommentModel,
-        BookCategoryModel,
-        NewBookCategoryModel,
-        UpdateBookCategoryModel,
-        Token,
-        TokenData,
-    )
+
+from app.packages import logtail_handler, settings
+from app.packages.database.commands import database_crud_commands, session_commands
+from app.packages.database.models import models
+from app.packages.fastapi.models.fastapi_models import (
+    UserModel,
+    UserInDB,
+    UpdateUserModel,
+    UpdateUserInDB,
+    NewUserInDBModel,
+    NewBookModel,
+    UpdateBookModel,
+    NewCommentModel,
+    UpdateCommentModel,
+    BookCategoryModel,
+    NewBookCategoryModel,
+    UpdateBookCategoryModel,
+    Token,
+    TokenData,
+)
 
 
 # tokenUrl leads to the URI "/token"
@@ -56,7 +36,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 app: FastAPI = FastAPI()
 LOGGER = logtail_handler.logger
 # session used by the FastAPI application
-session = session_commands.init_and_get_a_database_session("postgresql")
+session = session_commands.init_and_get_a_database_session()
 
 
 def get_user(username: str):
@@ -736,12 +716,12 @@ async def delete_comment(
             detail="Livre n'existe pas."
         )
     comment = database_crud_commands.get_instance(session, models.Comment, comment_id)
-    if comment.book_id != book_id:
-        raise HTTPException(
-            status_code=401,
-            detail="Commentaire non rattaché au livre."
-        )
     if comment:
+        if comment.book_id != book_id:
+            raise HTTPException(
+                status_code=401,
+                detail="Commentaire non rattaché au livre."
+            )
         if current_user.id == comment.author_id:
             session.delete(comment)
             session.commit()

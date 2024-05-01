@@ -3,14 +3,9 @@ All the tests functions for the books categories urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-try:
-    from app.packages.database.models.models import BookCategory
-    from app.packages.flask_app.project.__init__ import check_book_category_fields, format_book_category
-    from app.packages import settings
-except ModuleNotFoundError:
-    from packages.database.models.models import BookCategory
-    from packages.flask_app.project.__init__ import check_book_category_fields, format_book_category
-    from packages import settings
+from app.packages.database.models.models import BookCategory
+from app.packages.flask_app.project.__init__ import check_book_category_fields, format_book_category
+from app.packages import settings
 
 
 def test_check_book_category_fields_with_valid_datas():

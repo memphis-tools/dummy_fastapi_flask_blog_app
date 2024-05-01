@@ -4,16 +4,11 @@ Notice that by default we already add dummies data through the application utils
 """
 
 from sqlalchemy import and_
-try:
-    from app.packages import settings
-    from app.packages import utils
-    from app.packages.database.commands import database_crud_commands
-    from app.packages.database.models import models
-except ModuleNotFoundError:
-    from packages import settings
-    from packages import utils
-    from packages.database.commands import database_crud_commands
-    from packages.database.models import models
+
+from app.packages import settings
+from app.packages import utils
+from app.packages.database.commands import database_crud_commands
+from app.packages.database.models import models
 
 
 def test_commit_update(get_session):
