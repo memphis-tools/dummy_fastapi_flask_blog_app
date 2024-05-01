@@ -51,6 +51,21 @@ unit_tests_development_branch:
     - coverage report
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
 
+run tests:
+  stage: test_development_branch
+  only:
+    - development
+  image: python:3
+  script:
+    - pip install pytest pytest-cov
+    - pytest --cov --cov-report term --cov-report xml:coverage.xml
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+
 unit_tests_master_branch:
   stage: test_master_branch
   only:
