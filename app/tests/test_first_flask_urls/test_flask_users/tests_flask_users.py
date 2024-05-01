@@ -3,14 +3,11 @@ All the tests functions for the users urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-try:
-    from app.packages.database.models.models import User
-    from app.packages.flask_app.project.__init__ import format_user
-    from app.packages import settings
-except ModuleNotFoundError:
-    from packages.database.models.models import User
-    from packages.flask_app.project.__init__ import format_user
-    from packages import settings
+
+from app.packages.database.models.models import User
+from app.packages.flask_app.project.__init__ import format_user
+from app.packages import settings
+
 
 def test_flask_get_users_without_authentication(client):
     """
@@ -56,14 +53,14 @@ def test_get_any_valid_user_books(client, access_session):
 def test_get_invalid_user_books(client, access_session):
     """
     Description: check if we can get all published books by an invalid user.
-    Try with dummy user id 5555.
+    Try with dummy user id 55555555.
     """
     headers = {
         "Cookie": f"session={access_session}"
     }
-    response = client.get("/front/user/5555/books/", headers=headers, follow_redirects=True)
+    response = client.get("/front/user/55555555/books/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
-    assert b'Utilisateur id 5555 inexistant' in response.data
+    assert b'Utilisateur id 55555555 inexistant' in response.data
 
 
 def test_flask_get_delete_user(client):

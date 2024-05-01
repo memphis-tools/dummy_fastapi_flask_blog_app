@@ -24,7 +24,7 @@ def get_session():
     """
     Description: fixture offers a postgresql engine's session.
     """
-    session = session_commands.get_a_database_session("postgresql")
+    session = session_commands.get_a_database_session()
     return session
 
 

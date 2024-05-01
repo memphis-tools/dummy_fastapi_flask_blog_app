@@ -6,10 +6,7 @@ Through the app/packages/flask_app/project/__init__.py file.
 
 from flask.cli import FlaskGroup
 
-try:
-    from app.packages.flask_app.project import app
-except ModuleNotFoundError:
-    from packages.flask_app.project import app
+from app.packages.flask_app.project import app
 
 cli = FlaskGroup(app)
 

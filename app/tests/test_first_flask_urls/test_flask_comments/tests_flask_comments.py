@@ -3,12 +3,9 @@ All the tests functions for the comments urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-try:
-    from app.packages.database.models.models import Book
-    from app.packages import settings
-except ModuleNotFoundError:
-    from packages.database.models.models import Book
-    from packages import settings
+
+from app.packages.database.models.models import Book
+from app.packages import settings
 
 
 def test_flask_get_delete_comment(client):

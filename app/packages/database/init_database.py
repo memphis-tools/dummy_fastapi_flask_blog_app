@@ -6,16 +6,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 from sqlalchemy_utils import create_database, database_exists
 
-try:
-    from app.packages import utils, settings
-    from app.packages.database.models import models
-except ModuleNotFoundError:
-    from packages import utils, settings
-    from packages.database.models import models
+from app.packages import utils, settings
+from app.packages.database.models import models
 
 
 def get_engine(
-    engine_name,
     username,
     password,
     host,
@@ -26,15 +21,13 @@ def get_engine(
     Description: return a postgresql engine.
 
     Parameters:
-    engine_name -- str, the sgbd name (by default should be postgresql)
     username -- str, name of super user on postgresql
     password -- str, password of super user on postgresql
     host -- str, host of postgresql
     port -- str, port of postgresql
     db_name -- str, name of database to work with on postgresql
     """
-    if engine_name == "postgresql":
-        url = f"postgresql+psycopg://{username}:{password}@{host}:{port}/{db_name}"
+    url = f"postgresql+psycopg://{username}:{password}@{host}:{port}/{db_name}"
     if not database_exists(url):
         print(f"[+] No existing database, we create one based on the {os.getenv('SCOPE')} scope sir.")
         create_database(url)
@@ -47,36 +40,30 @@ def get_engine(
     return engine
 
 
-def get_a_database_session(engine_name):
+def get_a_database_session():
     """
     Description: return a postgresql engine's session.
-
-    Parameters:
-    engine_name -- str, the sgbd name (by default should be postgresql)
     """
     if os.getenv("SCOPE") == "production":
         db_name = os.getenv("POSTGRES_PRODUCTION_DB_NAME")
     else:
         db_name = os.getenv("POSTGRES_TEST_DB_NAME")
     session = None
-    if engine_name == "postgresql":
-        username = os.getenv("POSTGRES_USER")
-        password = os.getenv("POSTGRES_PASSWORD")
-        host = os.getenv("POSTGRES_HOST")
-        port = os.getenv("POSTGRES_PORT")
-        url = f"postgresql+psycopg://{username}:{password}@{host}:{port}/{db_name}"
-        engine = create_engine(url)
-        session_maker = sessionmaker(bind=engine)
-        session = session_maker()
+
+    username = os.getenv("POSTGRES_USER")
+    password = os.getenv("POSTGRES_PASSWORD")
+    host = os.getenv("POSTGRES_HOST")
+    port = os.getenv("POSTGRES_PORT")
+    url = f"postgresql+psycopg://{username}:{password}@{host}:{port}/{db_name}"
+    engine = create_engine(url)
+    session_maker = sessionmaker(bind=engine)
+    session = session_maker()
     return session
 
 
-def init_database(engine_name):
+def init_database():
     """
     Description: we get a session from a database.
-
-    Parameters:
-    engine_name -- str, the sgbd name (by default should be postgresql)
     """
     if os.getenv("SCOPE") == "production":
         db_name = os.getenv("POSTGRES_PRODUCTION_DB_NAME")
@@ -87,7 +74,7 @@ def init_database(engine_name):
     host = os.getenv("POSTGRES_HOST")
     port = os.getenv("POSTGRES_PORT")
     database_name = db_name
-    engine = get_engine(engine_name, username, password, host, port, database_name)
+    engine = get_engine(username, password, host, port, database_name)
 
     session_maker = sessionmaker(bind=engine)
     session = session_maker()
@@ -100,7 +87,7 @@ def init_database(engine_name):
     else:
         create_application_admin_user_if_not_exist(session)
         create_books_categories_if_not_exist(session)
-        update_default_postgres_password(engine_name, session)
+        update_default_postgres_password(session)
     print("[+] The database application is ready sir.")
 
     return session
@@ -149,18 +136,16 @@ def create_application_admin_user_if_not_exist(session):
         )
 
 
-def update_default_postgres_password(engine_name, session):
+def update_default_postgres_password(session):
     """
     Description: we update the postgres user password.
 
     Parameters:
-    engine_name -- str, the sgbd name (by default it is postgresql)
     session -- engine's session to query postgresql database
     """
     updated_password = "'" + os.getenv("POSTGRES_PASSWORD") + "'"
-    if engine_name == "postgresql":
-        statement = f"ALTER USER {os.getenv('POSTGRES_USER')} WITH PASSWORD {updated_password};"
-        session.execute(text(statement))
+    statement = f"ALTER USER {os.getenv('POSTGRES_USER')} WITH PASSWORD {updated_password};"
+    session.execute(text(statement))
     print(f'[+] Default {os.getenv("POSTGRES_USER")} password updated sir.')
     return True
 

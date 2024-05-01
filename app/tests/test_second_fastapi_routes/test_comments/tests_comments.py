@@ -6,10 +6,8 @@ Notice that by default we already add dummies data through the application utils
 import os
 import pytest
 from httpx import AsyncClient
-try:
-    from app.packages.fastapi.routes import routes_and_authentication
-except ModuleNotFoundError:
-    from packages.fastapi.routes import routes_and_authentication
+
+from app.packages.fastapi.routes import routes_and_authentication
 
 
 app = routes_and_authentication.app
@@ -85,6 +83,30 @@ async def test_update_comment_with_authentication_without_valid_datas(get_fastap
         data=json
     )
     assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_update_comment_with_authentication_with_unexisting_book(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test update_comment for book id 55555555 route with FastAPI TestClient with token.
+    Book does not exist.
+    """
+    json = {
+        "comment_id": "55555555",
+        "text": "such a comment",
+    }
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.put(
+        "/api/v1/comments/55555555/",
+        headers=headers,
+        json=json
+    )
+    assert response.status_code == 404
 
 
 @pytest.mark.asyncio
@@ -233,7 +255,7 @@ async def test_delete_comment_with_authentication_with_forbidden_user(get_fastap
 @pytest.mark.asyncio
 async def test_delete_comment_with_authentication(get_fastapi_client, get_fastapi_token):
     """
-    Description: test delete_comments id 6 route with FastAPI TestClient with token.
+    Description: test delete_comments id 7 route with FastAPI TestClient with token.
     Notice we try to delete a comment that authenticated user has published
     """
     access_token = get_fastapi_token
@@ -251,7 +273,7 @@ async def test_delete_comment_with_authentication(get_fastapi_client, get_fastap
 @pytest.mark.asyncio
 async def test_delete_comment_without_authentication(get_fastapi_client, get_fastapi_token):
     """
-    Description: test delete_comments id 6 without being authenticated
+    Description: test delete_comments id 7 without being authenticated
     """
     headers = {
         "Authorization": f"Bearer dummyToken",
@@ -262,3 +284,54 @@ async def test_delete_comment_without_authentication(get_fastapi_client, get_fas
         headers=headers
     )
     assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_delete_comment_with_authentication_with_unexisting_book(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test delete_comments with unexisting book route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json"
+    }
+    response = get_fastapi_client.delete(
+        "/api/v1/books/55555555/comments/7/",
+        headers={"Authorization": f"Bearer {access_token}"}
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_delete_comment_with_authentication_with_unbind_book(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test delete_comments whereas comment not relative to book route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json"
+    }
+    response = get_fastapi_client.delete(
+        "/api/v1/books/2/comments/5/",
+        headers={"Authorization": f"Bearer {access_token}"}
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_delete_comment_with_authentication_with_unexisting_comment(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test delete_comments with unexisting comment route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json"
+    }
+    response = get_fastapi_client.delete(
+        "/api/v1/books/1/comments/55555555/",
+        headers={"Authorization": f"Bearer {access_token}"}
+    )
+    assert response.status_code == 404
