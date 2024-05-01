@@ -42,8 +42,8 @@ async def test_register_with_valid_datas(get_fastapi_client, get_fastapi_token):
     json = {
         "username": "tintin",
         "email": "tintin@localhost.fr",
-        "password": os.getenv("TEST_USER_PWD"),
-        "password_check": os.getenv("TEST_USER_PWD"),
+        "password": f"{os.getenv('TEST_USER_PWD')}X",
+        "password_check": f"{os.getenv('TEST_USER_PWD')}X",
     }
     headers = {
         "Authorization": f"Bearer {access_token}",
