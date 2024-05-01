@@ -34,11 +34,10 @@ def test_create_access_token():
 
 
 @pytest.mark.asyncio
-async def test_register_with_valid_datas(get_fastapi_client, get_fastapi_token):
+async def test_register_with_valid_datas(get_fastapi_client):
     """
     Description: test register new user through FastAPI.
     """
-    access_token = get_fastapi_token
     json = {
         "username": "tintin",
         "email": "tintin@localhost.fr",
@@ -46,7 +45,6 @@ async def test_register_with_valid_datas(get_fastapi_client, get_fastapi_token):
         "password_check": f"{os.getenv('TEST_USER_PWD')}X",
     }
     headers = {
-        "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
