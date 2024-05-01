@@ -54,7 +54,6 @@ unit_tests_development_branch:
   artifacts:
     paths:
       - htmlcov/
-        
 
 unit_tests_master_branch:
   stage: test_master_branch

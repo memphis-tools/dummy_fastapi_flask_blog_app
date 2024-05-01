@@ -791,9 +791,6 @@ def add_user():
     Description: the add user Flask route.
     """
     session = session_commands.get_a_database_session()
-    if current_user.role != "admin":
-        session.close()
-        return abort(403)
     form = forms.CreateUserForm()
     if form.validate_on_submit():
         username = str(form.login.data).lower()
@@ -864,11 +861,11 @@ def update_book(book_id):
     """
     session = session_commands.get_a_database_session()
     book = session.get(Book, book_id)
-    if current_user.id != book.user_id and current_user.role != "admin":
-        session.close()
-        return abort(403)
-    category = session.query(BookCategory).filter(BookCategory.id==book.category).first()
     if book:
+        category = session.query(BookCategory).filter(BookCategory.id==book.category).first()
+        if current_user.id != book.user_id and current_user.role != "admin":
+            session.close()
+            return abort(403)
         book_picture_filename = book.book_picture_name
         books_categories_query = session.query(BookCategory).all()
         books_categories = [(i.id, i.title) for i in books_categories_query]
@@ -973,16 +970,13 @@ def users():
     """
     Description: the users app Flask route.
     """
-    if current_user.role != "admin":
-        return abort(401)
-    else:
-        session = session_commands.get_a_database_session()
-        # remember that user with id 1 is the application admin (wr remove it from dataset)
-        users = session.query(User).all()[1:]
-        session.close()
-        return render_template(
-            "users.html", users=users, is_authenticated=current_user.is_authenticated
-        )
+    session = session_commands.get_a_database_session()
+    # remember that user with id 1 is the application admin (wr remove it from dataset)
+    users = session.query(User).all()[1:]
+    session.close()
+    return render_template(
+        "users.html", users=users, is_authenticated=current_user.is_authenticated
+    )
 
 
 @app.route("/front/categories/", methods=["GET"])
@@ -992,17 +986,14 @@ def manage_books_categories():
     """
     Description: a manage view to get books categories Flask route.
     """
-    if current_user.role != "admin":
-        return abort(401)
-    else:
-        session = session_commands.get_a_database_session()
-        categories = session.query(BookCategory).all()
-        session.close()
-        return render_template(
-            "books_categories.html",
-            categories=categories,
-            is_authenticated=current_user.is_authenticated
-        )
+    session = session_commands.get_a_database_session()
+    categories = session.query(BookCategory).all()
+    session.close()
+    return render_template(
+        "books_categories.html",
+        categories=categories,
+        is_authenticated=current_user.is_authenticated
+    )
 
 
 @app.route("/front/book/categories/add/", methods=["GET", "POST"])
@@ -1013,28 +1004,25 @@ def add_book_category():
     Description: an add book category Flask route.
     """
     form = forms.AddCategoryBookForm()
-    if current_user.role != "admin":
-        return abort(403)
-    else:
-        if form.validate_on_submit():
-            session = session_commands.get_a_database_session()
-            title = form.title.data
-            new_category = BookCategory(
-                title=str(title).lower(),
-            )
-            category_is_valid = check_book_category_fields(new_category)
-            if category_is_valid is True:
-                session.add(new_category)
-                session.commit()
-            else:
-                flash(category_is_valid, "error")
-            session.close()
-            return redirect(url_for("manage_books_categories"))
-        return render_template(
-            "add_book_category.html",
-            form=form,
-            is_authenticated=current_user.is_authenticated
+    if form.validate_on_submit():
+        session = session_commands.get_a_database_session()
+        title = form.title.data
+        new_category = BookCategory(
+            title=str(title).lower(),
         )
+        category_is_valid = check_book_category_fields(new_category)
+        if category_is_valid is True:
+            session.add(new_category)
+            session.commit()
+        else:
+            flash(category_is_valid, "error")
+        session.close()
+        return redirect(url_for("manage_books_categories"))
+    return render_template(
+        "add_book_category.html",
+        form=form,
+        is_authenticated=current_user.is_authenticated
+    )
 
 
 @app.route("/front/book/categories/<int:category_id>/delete/", methods=["GET", "POST"])
@@ -1051,21 +1039,18 @@ def delete_book_category(category_id):
         flash("Categorie livre non trouvee", "error")
         session.close()
         return abort(404)
-    if current_user.role != "admin":
+
+    if form.validate_on_submit():
+        session.delete(category_to_delete)
+        session.commit()
         session.close()
-        return abort(403)
-    else:
-        if form.validate_on_submit():
-            session.delete(category_to_delete)
-            session.commit()
-            session.close()
-            return redirect(url_for("manage_books_categories"))
-        return render_template(
-            "delete_book_category.html",
-            category_to_delete=category_to_delete,
-            form=form,
-            is_authenticated=current_user.is_authenticated
-        )
+        return redirect(url_for("manage_books_categories"))
+    return render_template(
+        "delete_book_category.html",
+        category_to_delete=category_to_delete,
+        form=form,
+        is_authenticated=current_user.is_authenticated
+    )
 
 
 @app.route("/front/book/categories/<int:category_id>/update/", methods=["GET", "POST"])
@@ -1082,34 +1067,31 @@ def update_book_category(category_id):
         session.close()
         return abort(404)
     edit_form = forms.UpdateBookCategoryForm(title=category_to_update.title,)
-    if current_user.role != "admin":
-        session.close()
-        return abort(403)
-    else:
-        if edit_form.validate_on_submit():
-            title = edit_form.title.data
-            updated_category = BookCategory(
-                title=title,
-            )
-            session.query(BookCategory).where(BookCategory.id == category_id).update(
-                updated_category.get_json_for_update()
-            )
-            book_category_is_valid = check_book_category_fields(updated_category)
-            if book_category_is_valid is True:
-                session.commit()
-                session.close()
-                return redirect(url_for("manage_books_categories"))
-            else:
-                flash(book_category_is_valid, "error")
-                session.close()
-                return redirect(url_for("index"))
-            return redirect(url_for("manage_books_categories"))
-        return render_template(
-            "update_book_category.html",
-            category_to_update=category_to_update,
-            form=edit_form,
-            is_authenticated=current_user.is_authenticated
+
+    if edit_form.validate_on_submit():
+        title = edit_form.title.data
+        updated_category = BookCategory(
+            title=title,
         )
+        session.query(BookCategory).where(BookCategory.id == category_id).update(
+            updated_category.get_json_for_update()
+        )
+        book_category_is_valid = check_book_category_fields(updated_category)
+        if book_category_is_valid is True:
+            session.commit()
+            session.close()
+            return redirect(url_for("manage_books_categories"))
+        else:
+            flash(book_category_is_valid, "error")
+            session.close()
+            return redirect(url_for("index"))
+        return redirect(url_for("manage_books_categories"))
+    return render_template(
+        "update_book_category.html",
+        category_to_update=category_to_update,
+        form=edit_form,
+        is_authenticated=current_user.is_authenticated
+    )
 
 
 @app.route("/front/book//<int:book_id>/delete/", methods=["GET", "POST"])
