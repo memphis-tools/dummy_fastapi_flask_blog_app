@@ -185,6 +185,7 @@ deploy:
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT &&
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT &&
         docker pull certbot/certbot:latest &&
+        docker-compose -f deploy_vault_docker-compose.yml down &&
         docker-compose -f deploy_init-certbot-docker-compose.yml up -d  --build &&
         docker-compose -f deploy_init-certbot-docker-compose.yml down &&
         docker-compose --env-file ./envrc -f deploy_docker-compose.yml up -d "
