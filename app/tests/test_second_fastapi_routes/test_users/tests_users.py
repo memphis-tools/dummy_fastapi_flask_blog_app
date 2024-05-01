@@ -8,15 +8,10 @@ import pytest
 from httpx import AsyncClient
 from datetime import timedelta
 from werkzeug.security import generate_password_hash
-try:
-    import app.packages.settings as settings
-    from app.packages.fastapi.models import fastapi_models
-    from app.packages.fastapi.routes import routes_and_authentication
-except ModuleNotFoundError:
-    import packages.settings as settings
-    from packages.fastapi.models import fastapi_models
-    from packages.fastapi.routes import routes_and_authentication
 
+import app.packages.settings as settings
+from app.packages.fastapi.models import fastapi_models
+from app.packages.fastapi.routes import routes_and_authentication
 
 app = routes_and_authentication.app
 
@@ -241,7 +236,7 @@ async def test_delete_user_being_admin(get_fastapi_client, get_fastapi_token_for
 @pytest.mark.asyncio
 async def test_delete_unexisting_user_being_admin(get_fastapi_client, get_fastapi_token_for_admin):
     """
-    Description: test delete unexisting user id 55555 being admin.
+    Description: test delete unexisting user id 55555555 being admin.
     """
     access_token = get_fastapi_token_for_admin
     headers = {
@@ -249,7 +244,7 @@ async def test_delete_unexisting_user_being_admin(get_fastapi_client, get_fastap
         "accept": "application/json"
     }
     response = get_fastapi_client.delete(
-        "/api/v1/users/55555/",
+        "/api/v1/users/55555555/",
         headers={"Authorization": f"Bearer {access_token}"}
     )
     assert response.status_code == 404
@@ -331,6 +326,23 @@ async def test_update_user_with_authentication_with_valid_datas(get_fastapi_clie
     }
     response = get_fastapi_client.put("/api/v1/users/2/", headers=headers, json=json)
     assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_update_uneixsting_user_with_authentication_with_valid_datas(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test update_user id 55555555 route with FastAPI TestClient with token.
+    User does not exist.
+    """
+    access_token = get_fastapi_token
+    json = {"email": "donald.duck@localhost.fr"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.put("/api/v1/users/55555555/", headers=headers, json=json)
+    assert response.status_code == 404
 
 
 @pytest.mark.asyncio

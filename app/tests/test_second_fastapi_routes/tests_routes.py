@@ -5,14 +5,10 @@ Notice that by default we already add dummies data through the application utils
 
 import pytest
 from httpx import AsyncClient
-try:
-    from app.packages.fastapi.models import fastapi_models
-    from app.packages.fastapi.routes import routes_and_authentication
-    from app.packages.flask_app.project.__init__ import check_book_fields
-except ModuleNotFoundError:
-    from packages.fastapi.models import fastapi_models
-    from packages.fastapi.routes import routes_and_authentication
-    from packages.flask_app.project.__init__ import check_book_fields
+
+from app.packages.fastapi.models import fastapi_models
+from app.packages.fastapi.routes import routes_and_authentication
+from app.packages.flask_app.project.__init__ import check_book_fields
 
 
 app = routes_and_authentication.app

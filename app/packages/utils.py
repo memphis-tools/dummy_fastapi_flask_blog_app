@@ -3,12 +3,8 @@
 from werkzeug.security import generate_password_hash
 from typing import List
 
-try:
-    from app.packages import settings
-    from app.packages.database.models import models
-except ModuleNotFoundError:
-    from packages import settings
-    from packages.database.models import models
+from app.packages import settings
+from app.packages.database.models import models
 
 
 def call_dummy_setup(session):

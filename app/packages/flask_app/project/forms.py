@@ -6,14 +6,9 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import StringField, PasswordField, TextAreaField, EmailField, IntegerField, FieldList, Form, FormField, SelectField
 from wtforms.validators import DataRequired, Length, Email, NumberRange
 
-try:
-    from app.packages import settings
-    from app.packages.database.commands import session_commands
-    from app.packages.database.models.models import BookCategory
-except ModuleNotFoundError:
-    from packages import settings
-    from packages.database.commands import session_commands
-    from packages.database.models.models import BookCategory
+from app.packages import settings
+from app.packages.database.commands import session_commands
+from app.packages.database.models.models import BookCategory
 
 
 class LoginForm(FlaskForm):

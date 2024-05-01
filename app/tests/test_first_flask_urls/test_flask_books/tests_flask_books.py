@@ -6,14 +6,10 @@ Notice that by default we already add dummies data through the application utils
 import pytest
 from pathlib import Path
 from werkzeug.datastructures import FileStorage
-try:
-    from app.packages.database.models.models import Book, User
-    from app.packages.flask_app.project.__init__ import check_book_fields, get_pie_colors
-    from app.packages import settings
-except ModuleNotFoundError:
-    from packages.database.models.models import Book, User
-    from packages.flask_app.project.__init__ import check_book_fields, get_pie_colors
-    from packages import settings
+
+from app.packages.database.models.models import Book, User
+from app.packages.flask_app.project.__init__ import check_book_fields, get_pie_colors
+from app.packages import settings
 
 
 def test_flask_get_a_book_without_authentication(client):

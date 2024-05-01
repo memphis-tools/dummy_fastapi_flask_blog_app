@@ -6,14 +6,10 @@ Notice that by default we already add dummies data through the application utils
 import os
 import pytest
 from datetime import timedelta
-try:
-    import app.packages.settings as settings
-    from app.packages.fastapi.models import fastapi_models
-    from app.packages.fastapi.routes import routes_and_authentication
-except ModuleNotFoundError:
-    import packages.settings as settings
-    from packages.fastapi.models import fastapi_models
-    from packages.fastapi.routes import routes_and_authentication
+
+import app.packages.settings as settings
+from app.packages.fastapi.models import fastapi_models
+from app.packages.fastapi.routes import routes_and_authentication
 
 
 def test_register_uri(get_fastapi_client):
@@ -122,6 +118,31 @@ async def test_register_with_invalid_username_data(
         "username": "string",
         "email": "tintin@localhost.fr",
         "password": os.getenv("TEST_USER_PWD"),
+        "password_check": os.getenv("TEST_USER_PWD"),
+    }
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+
+    response = get_fastapi_client.post("/api/v1/register/", headers=headers, json=json)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_register_with_invalid_password_data(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test register new user through FastAPI with unmatching passwords.
+    """
+    access_token = get_fastapi_token
+    json = {
+        "username": "string",
+        "email": "tintin@localhost.fr",
+        "password": f"{os.getenv('TEST_USER_PWD')}xxx",
         "password_check": os.getenv("TEST_USER_PWD"),
     }
     headers = {

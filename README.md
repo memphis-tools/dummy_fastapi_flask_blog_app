@@ -276,6 +276,10 @@ You do not need to create a python virtualenv.
 
       python -m coverage report
 
+  To create a friendly html report in a cov_html folder:
+
+      python -m coverage run -m pytest --cov-report html:cov_html --cov=.
+
   80 is a minimum relevent score.
 
   To run test during the gilab-ci execution, see .gitlab-ci.yml file.
