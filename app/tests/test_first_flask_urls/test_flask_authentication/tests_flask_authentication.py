@@ -68,8 +68,8 @@ def test_post_flask_register_route(client, get_flask_csrf_token):
     user_form = {
         "login": "fafa",
         "email": "fafa@localhost.fr",
-        "password": settings.TEST_USER_PWD,
-        "password_check": settings.TEST_USER_PWD,
+        "password": f"{settings.TEST_USER_PWD}X",
+        "password_check": f"{settings.TEST_USER_PWD}X",
         "csrf_token": get_flask_csrf_token,
     }
 
