@@ -330,11 +330,11 @@ async def register(
             detail="Saisie invalide, mot clef string non utilisable."
         )
     valid_password = handle_passwords.check_password(user.password)
-    # if not valid_password:
-    #     raise HTTPException(
-    #         status_code=401,
-    #         detail="Mot de passe trop simple, essayez de nouveau."
-    #     )
+    if not valid_password:
+        raise HTTPException(
+            status_code=401,
+            detail="Mot de passe trop simple, essayez de nouveau."
+        )
     hashed_password = generate_password_hash(
         user.password, "pbkdf2:sha256", salt_length=8
     )
