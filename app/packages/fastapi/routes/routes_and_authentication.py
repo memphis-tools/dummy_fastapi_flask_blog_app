@@ -6,8 +6,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
-
-from app.packages import log_events, settings
+from app.packages import handle_passwords, log_events, settings
 from app.packages.database.commands import database_crud_commands, session_commands
 from app.packages.database.models import models
 from app.packages.fastapi.models.fastapi_models import (
@@ -330,6 +329,12 @@ async def register(
             status_code=401,
             detail="Saisie invalide, mot clef string non utilisable."
         )
+    valid_password = handle_passwords.check_password(user.password)
+    if not valid_password:
+        raise HTTPException(
+            status_code=401,
+            detail="Mot de passe trop simple, essayez de nouveau."
+        )
     hashed_password = generate_password_hash(
         user.password, "pbkdf2:sha256", salt_length=8
     )
@@ -381,7 +386,13 @@ async def add_user(
     hashed_password = generate_password_hash(
         user.password, "pbkdf2:sha256", salt_length=8
     )
+    valid_password = handle_passwords.check_password(user.password)
     if current_user.role == "admin":
+        if not valid_password:
+            raise HTTPException(
+                status_code=401,
+                detail="Mot de passe trop simple, essayez de nouveau."
+            )
         if not existing_user and not existing_email:
             new_user = models.User(
                 username=str(user.username).lower(),

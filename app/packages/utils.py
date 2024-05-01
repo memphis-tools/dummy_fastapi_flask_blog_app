@@ -1,4 +1,4 @@
-""" some usefull functions mainly used to record dummies datas """
+""" some usefull functions used to set dummy datas """
 
 from werkzeug.security import generate_password_hash
 from typing import List
