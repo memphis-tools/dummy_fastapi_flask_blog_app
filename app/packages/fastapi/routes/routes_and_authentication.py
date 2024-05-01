@@ -329,7 +329,7 @@ async def register(
             status_code=401,
             detail="Saisie invalide, mot clef string non utilisable."
         )
-    valid_password = handle_passwords.check_password(user.password)
+    valid_password = handle_passwords.check_password(str(user.password))
     if not valid_password:
         raise HTTPException(
             status_code=401,
