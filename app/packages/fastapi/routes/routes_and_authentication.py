@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
 
-from app.packages import logtail_handler, settings
+from app.packages import log_events, settings
 from app.packages.database.commands import database_crud_commands, session_commands
 from app.packages.database.models import models
 from app.packages.fastapi.models.fastapi_models import (
@@ -34,7 +34,6 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 app: FastAPI = FastAPI()
-LOGGER = logtail_handler.logger
 # session used by the FastAPI application
 session = session_commands.init_and_get_a_database_session()
 
@@ -115,11 +114,8 @@ async def login_for_access_token(
     """ return a jwt access token to authenticated user """
     user = authenticate_user(str(form_data.username).lower(), form_data.password)
     if not user:
-        if os.getenv("SCOPE") == "production":
-            logs_context = {"user": f"{str(form_data.username).lower()}"}
-            LOGGER.info(
-                "[+] FastAPI - Utilisateur inconnu cherche à obtenir un token", extra=logs_context
-            )
+        logs_context = {"username": f"{str(form_data.username).lower()}"}
+        log_events.log_event("[+] FastAPI - Utilisateur inconnu cherche à obtenir un token.", logs_context)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
@@ -267,21 +263,19 @@ async def view_book(
     """
     book = database_crud_commands.get_instance(session, models.Book, book_id)
     if book is not None:
-        if os.getenv("SCOPE") == "production":
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "book_id": book_id,
-                "book_title": book.title
-            }
-            LOGGER.info("[+] FastAPI - Consultation livre", extra=logs_context)
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "book_id": book_id,
+            "book_title": book.title
+        }
+        log_events.log_event("[+] FastAPI - Consultation livre.", logs_context)
         return book
     else:
-        if os.getenv("SCOPE") == "production":
-            logs_context = {"current_user": f"{current_user.username}", "book_id": book_id}
-            LOGGER.info("[+] FastAPI - Consultation livre inconnu", extra=logs_context)
+        logs_context = {"current_user": f"{current_user.username}", "book_id": book_id}
+        log_events.log_event("[+] FastAPI - Consultation livre inconnu.", logs_context)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="FastAPI - Consultation livre inconnu"
+            detail="FastAPI - Consultation livre inconnu."
         )
 
 
@@ -346,12 +340,11 @@ async def register(
             email=str(user.email).lower(),
             hashed_password=hashed_password,
         )
-        if os.getenv("SCOPE") == "production":
-            logs_context = {
-                "username": f"{str(user.username).lower()}",
-                "email": f"{str(user.email).lower()}"
-            }
-            LOGGER.info("[+] Flask - Création compte utilisateur.", extra=logs_context)
+        logs_context = {
+            "username": f"{str(user.username).lower()}",
+            "email": f"{str(user.email).lower()}"
+        }
+        log_events.log_event("[+] FastAPI - Création compte utilisateur.", logs_context)
         session.add(new_user)
         session.commit()
         return user
@@ -387,15 +380,11 @@ async def add_user(
             detail="Utilisateur existe deja"
         )
     else:
-        if os.getenv("SCOPE") == "production":
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "user_to_add": user.username
-            }
-            LOGGER.info(
-                "[+] FastAPI - Ajout utilisateur refusee, vous n'etes pas admin",
-                extra=logs_context
-            )
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "user_to_add": user.username
+        }
+        log_events.log_event("[+] FastAPI - Ajout utilisateur refusee, vous n'etes pas admin.", logs_context)
         raise HTTPException(
             status_code=401,
             detail="Seul l'admin peut ajouter un utilisateur"
@@ -473,9 +462,8 @@ async def post_book(
     )
     total_user_publications = current_user.nb_publications + 1
     current_user.nb_publications = total_user_publications
-    if os.getenv("SCOPE") == "production":
-        logs_context = {"current_user": f"{current_user.username}", "book_title": new_book.title}
-        LOGGER.info("[+] FastAPI - Ajout livre", extra=logs_context)
+    logs_context = {"current_user": f"{current_user.username}", "book_title": new_book.title}
+    log_events.log_event("[+] FastAPI - Ajout livre.", logs_context)
     session.add(new_book)
     session.commit()
     return new_book
@@ -518,20 +506,18 @@ async def update_book(
                 book.get_json_for_update()
             )
             session.commit()
-            if os.getenv("SCOPE") == "production":
-                logs_context = {
-                    "current_user": f"{current_user.username}",
-                    "book_title": book.title
-                }
-                LOGGER.info("[+] FastAPI - Mise à jour livre", extra=logs_context)
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "book_title": book.title
+            }
+            log_events.log_event("[+] FastAPI - Mise à jour livre.", logs_context)
             return book
         else:
-            if os.getenv("SCOPE") == "production":
-                logs_context = {
-                    "current_user": f"{current_user.username}",
-                    "book_title": book.title
-                }
-                LOGGER.info("[+] FastAPI - Mise à jour livre refusée", extra=logs_context)
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "book_title": book.title
+            }
+            log_events.log_event("[+] FastAPI - Mise à jour livre refusée.", logs_context)
             raise HTTPException(
                 status_code=401,
                 detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour le livre"
@@ -663,12 +649,11 @@ async def add_comment(
         session.commit()
         total_book_comments = updated_book.nb_comments + 1
         updated_book.nb_comments = total_book_comments
-        if os.getenv("SCOPE") == "production":
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "book_title": updated_book.title
-            }
-            LOGGER.info("[+] FastAPI - Ajout commentaire", extra=logs_context)
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "book_title": updated_book.title
+        }
+        log_events.log_event("[+] FastAPI - Ajout commentaire.", logs_context)
         return new_comment
 
     raise HTTPException(status_code=404, detail=f"book with id {book_id} does not exist")
@@ -728,13 +713,12 @@ async def delete_comment(
             total_book_comments = updated_book.nb_comments + 1
             updated_book.nb_comments = total_book_comments
             return {"204": f"comment with id {comment_id} removed"}
-        if os.getenv("SCOPE") == "production":
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "book_title": updated_book.title,
-                "comment": comment.text
-            }
-            LOGGER.info("[+] Flask - Suppression commentaire refusée", extra=logs_context)
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "book_title": updated_book.title,
+            "comment": comment.text
+        }
+        log_events.log_event("[+] FastAPI - Suppression commentaire refusée.", logs_context)
         raise HTTPException(
             status_code=401,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent supprimer son commentaire"
@@ -760,15 +744,11 @@ async def delete_user(
             detail="Utilisateur n'existe pas"
         )
     else:
-        if os.getenv("SCOPE") == "production":
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "user_to_delete": user.username
-            }
-            LOGGER.info(
-                "[+] FastAPI - Suppression utilisateur refusée, utilisateur non admin",
-                extra=logs_context
-            )
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "user_to_delete": user.username
+        }
+        log_events.log_event("[+] FastAPI - Suppression utilisateur refusée, utilisateur non admin.", logs_context)
         raise HTTPException(
             status_code=401,
             detail="Seul l'admin peut supprimer un utilisateur"
@@ -787,12 +767,11 @@ async def delete_book(
     book = database_crud_commands.get_instance(session, models.Book, book_id)
     if book:
         if current_user.id == book.user_id:
-            if os.getenv("SCOPE") == "production":
-                logs_context = {
-                    "current_user": f"{current_user.username}",
-                    "book_title": book.title
-                }
-                LOGGER.info("[+] FastAPI - Suppression livre", extra=logs_context)
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "book_title": book.title
+            }
+            log_events.log_event("[+] FastAPI - Suppression livre.", logs_context)
             session.delete(book)
             session.commit()
             total_user_publications = current_user.nb_publications - 1
@@ -801,9 +780,8 @@ async def delete_book(
                 status_code=204,
                 detail= f"book with id {book_id} removed."
             )
-        if os.getenv("SCOPE") == "production":
-            logs_context = {"current_user": f"{current_user.username}", "book_title": book.title}
-            LOGGER.info("[+] FastAPI - Suppression livre refusée", extra=logs_context)
+        logs_context = {"current_user": f"{current_user.username}", "book_title": book.title}
+        log_events.log_event("[+] FastAPI - Suppression livre refusée.", logs_context)
         raise HTTPException(
             status_code=401,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent supprimer son livre."

@@ -4,16 +4,11 @@ from datetime import timedelta
 import pytest
 from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
-try:
-    from app.packages.fastapi.routes import routes_and_authentication
-    from app.packages.database.commands import session_commands
-    from app.packages.flask_app import project
-    from app.packages import settings
-except ModuleNotFoundError:
-    from packages.fastapi.routes import routes_and_authentication
-    from packages.flask_app import project
-    from packages.database.commands import session_commands
-    from packages import settings
+
+from app.packages.fastapi.routes import routes_and_authentication
+from app.packages.database.commands import session_commands
+from app.packages.flask_app import project
+from app.packages import settings
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 2
