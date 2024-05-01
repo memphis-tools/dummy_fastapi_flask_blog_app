@@ -23,12 +23,9 @@ from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
-
-from app.packages import log_events, settings
+from app.packages import handle_passwords, log_events, settings
 from app.packages.database.commands import session_commands
 from app.packages.database.models.models import Book, Comment, User, BookCategory
-
-
 from . import forms
 
 
@@ -730,13 +727,8 @@ def register():
     session = session_commands.get_a_database_session()
     form = forms.RegisterForm()
     if form.validate_on_submit():
-        if any([
-            str(form.login.data).lower() == "string",
-            str(form.email.data).lower() == "string",
-            str(form.password.data).lower() == "string",
-            str(form.password_check.data).lower() == "string"
-        ]):
-            flash("Saisie invalide, mot clef string non utilisable.", "error")
+        if not handle_passwords.check_password(form.password.data):
+            flash("Mot de passe trop simple, essayez de nouveau.", "error")
             session.close()
             return render_template(
                 "register.html", form=form, is_authenticated=current_user.is_authenticated
@@ -783,6 +775,12 @@ def add_user():
     session = session_commands.get_a_database_session()
     form = forms.CreateUserForm()
     if form.validate_on_submit():
+        if not handle_passwords.check_password(form.password.data):
+            flash("Mot de passe trop simple, essayez de nouveau.", "error")
+            session.close()
+            return render_template(
+                "register.html", form=form, is_authenticated=current_user.is_authenticated
+            )
         username = str(form.login.data).lower()
         hashed_password = generate_password_hash(
             form.password.data, "pbkdf2:sha256", salt_length=8

@@ -146,3 +146,13 @@ def mock_function_delete_book(mocker):
     mocker.patch("app.packages.flask_app.project.__init__.delete_book", return_value=True)
     mocker.patch("os.remove")
     return
+
+
+@pytest.fixture
+def mock_decorator_admin_only(mocker):
+    """
+    Description: we mock the adminonly decorator.
+    Mock is necessary when tests run through the ci chain.
+    """
+    mocker.patch("app.packages.flask_app.project.__init__.admin_only", return_value=True)
+    return

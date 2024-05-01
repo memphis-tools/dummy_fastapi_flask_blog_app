@@ -156,6 +156,31 @@ async def test_register_with_invalid_password_data(
 
 
 @pytest.mark.asyncio
+async def test_register_with_not_enough_complex_password_data(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test register new user through FastAPI with password not enough complex.
+    """
+    access_token = get_fastapi_token
+    json = {
+        "username": "string",
+        "email": "tintin@localhost.fr",
+        "password": settings.TEST_USER_PWD[:5],
+        "password_check": settings.TEST_USER_PWD[:5],
+    }
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+
+    response = get_fastapi_client.post("/api/v1/register/", headers=headers, json=json)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_register_with_invalid_datas(
     get_fastapi_client,
     get_fastapi_token
