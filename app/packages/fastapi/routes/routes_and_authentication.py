@@ -188,6 +188,11 @@ async def add_category_books(
         title=book_category.title
     )
     check_book_category_fields(new_book_category)
+    logs_context = {
+        "current_user": f"{current_user.username}",
+        "new_book_category": new_book_category.title,
+    }
+    log_events.log_event("[+] FastAPI - Ajout catégorie livre.", logs_context)
     session.add(new_book_category)
     session.commit()
     return new_book_category
@@ -217,6 +222,12 @@ async def update_book_category(
         )
     if book_category_updated.title is not None:
         check_book_category_fields(book_category_updated)
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "updated_category_old": category.title,
+            "updated_category_new": book_category_updated.title,
+        }
+        log_events.log_event("[+] FastAPI - Mise à jour catégorie livre.", logs_context)
         category.title = book_category_updated.title
         session.query(models.BookCategory).where(models.BookCategory.id == category_id).update(
                 category.get_json_for_update()
@@ -246,6 +257,11 @@ async def delete_book_category(
             detail="Incorrect category id",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    logs_context = {
+        "current_user": f"{current_user.username}",
+        "category_to_delete": category.title,
+    }
+    log_events.log_event("[+] FastAPI - Suppression catégorie livre.", logs_context)
     session.delete(category)
     session.commit()
     raise HTTPException(
@@ -671,6 +687,12 @@ async def update_comment(
     comment = database_crud_commands.get_instance(session, models.Comment, comment_id)
     if comment:
         if current_user.id == comment.author_id or current_user.username == "admin":
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "old_comment": comment.text,
+                "new_comment": comment_updated.text,
+            }
+            log_events.log_event("[+] FastAPI - Mise à jour commentaire.", logs_context)
             if comment_updated.text is not None:
                 comment.text = comment_updated.text
             session.query(models.Comment).where(models.Comment.id == comment_id).update(
@@ -708,6 +730,12 @@ async def delete_comment(
                 detail="Commentaire non rattaché au livre."
             )
         if current_user.id == comment.author_id:
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "book_title": updated_book.title,
+                "comment": comment.text
+            }
+            log_events.log_event("[+] FastAPI - Suppression commentaire.", logs_context)
             session.delete(comment)
             session.commit()
             total_book_comments = updated_book.nb_comments + 1
@@ -736,6 +764,11 @@ async def delete_user(
     user = database_crud_commands.get_instance(session, models.User, user_id)
     if current_user.role == "admin":
         if user:
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "user_to_delete": user.username
+            }
+            log_events.log_event("[+] FastAPI - Suppression utilisateur.", logs_context)
             session.delete(user)
             session.commit()
             return {"204": f"user with id {user_id} removed"}
