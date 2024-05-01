@@ -53,6 +53,7 @@ unit_tests_development_branch:
   artifacts:
     reports:
       coverage_report:
+        coverage_format: cobertura
         path: cov_html
 
 
