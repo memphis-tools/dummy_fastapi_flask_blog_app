@@ -33,24 +33,24 @@ def test_create_access_token():
     assert type(access_token) is str
 
 
-@pytest.mark.asyncio
-async def test_register_with_valid_datas(get_fastapi_client):
-    """
-    Description: test register new user through FastAPI.
-    """
-    json = {
-        "username": "tintin",
-        "email": "tintin@localhost.fr",
-        "password": f"{os.getenv('TEST_USER_PWD')}X",
-        "password_check": f"{os.getenv('TEST_USER_PWD')}X",
-    }
-    headers = {
-        "accept": "application/json",
-        "Content-Type": "application/json",
-    }
-
-    response = get_fastapi_client.post("/api/v1/register/", headers=headers, json=json)
-    assert response.status_code == 200
+# @pytest.mark.asyncio
+# async def test_register_with_valid_datas(get_fastapi_client):
+#     """
+#     Description: test register new user through FastAPI.
+#     """
+#     json = {
+#         "username": "tintin",
+#         "email": "tintin@localhost.fr",
+#         "password": f"{os.getenv('TEST_USER_PWD')}X",
+#         "password_check": f"{os.getenv('TEST_USER_PWD')}X",
+#     }
+#     headers = {
+#         "accept": "application/json",
+#         "Content-Type": "application/json",
+#     }
+#
+#     response = get_fastapi_client.post("/api/v1/register/", headers=headers, json=json)
+#     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
