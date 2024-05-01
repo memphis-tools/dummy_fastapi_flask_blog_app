@@ -125,30 +125,29 @@ async def test_view_users(get_fastapi_token):
     assert response.status_code == 200
 
 
-# @pytest.mark.asyncio
-# async def test_add_user_being_admin(get_fastapi_client, get_fastapi_token_for_admin):
-#     """
-#     Description: test add user being admin.
-#     """
-#     access_token = get_fastapi_token_for_admin
-#     headers = {
-#         "Authorization": f"Bearer {access_token}",
-#         "accept": "application/json",
-#         "Content-Type": "application/json",
-#     }
-#     json = {
-#         "username": "georges",
-#         "email": "georges@localhost.fr",
-#         "password": settings.TEST_USER_PWD,
-#         "password_check": settings.TEST_USER_PWD,
-#     }
-#     response = get_fastapi_client.post(
-#         "/api/v1/users/",
-#         headers=headers,
-#         json=json
-#     )
-#     assert response.status_code == 200
-#     assert len(response.json()) == 1
+@pytest.mark.asyncio
+async def test_add_user_being_admin(get_fastapi_client, get_fastapi_token_for_admin):
+    """
+    Description: test add user being admin.
+    """
+    access_token = get_fastapi_token_for_admin
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    json = {
+        "username": "georges",
+        "email": "georges@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+    }
+    response = get_fastapi_client.post(
+        "/api/v1/users/",
+        headers=headers,
+        json=json
+    )
+    assert response.status_code == 200
 
 
 @pytest.mark.asyncio
