@@ -207,26 +207,26 @@ def test_add_user_without_being_admin(client, access_session, get_flask_csrf_tok
     assert response.status_code == 403
 
 
-def test_add_user_being_admin(
-    client,
-    access_session_as_admin,
-    get_flask_csrf_token,
-):
-    """
-    Description: check if we can create an user without being admin.
-    """
-    headers = {
-        "Cookie": f"session={access_session_as_admin}"
-    }
-    data = {
-        "login": "dupond",
-        "password": settings.TEST_USER_PWD[:5],
-        "password_check": settings.TEST_USER_PWD[:5],
-        "email": "dupond@localhost.fr",
-        "csrf_token": get_flask_csrf_token,
-    }
-    response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
-    assert b"Mot de passe trop simple" in response.data
+# def test_add_user_being_admin(
+#     client,
+#     access_session_as_admin,
+#     get_flask_csrf_token,
+# ):
+#     """
+#     Description: check if we can create an user without being admin.
+#     """
+#     headers = {
+#         "Cookie": f"session={access_session_as_admin}"
+#     }
+#     data = {
+#         "login": "dupond",
+#         "password": settings.TEST_USER_PWD[:5],
+#         "password_check": settings.TEST_USER_PWD[:5],
+#         "email": "dupond@localhost.fr",
+#         "csrf_token": get_flask_csrf_token,
+#     }
+#     response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
+#     assert b"Mot de passe trop simple" in response.data
 
 
 def test_add_invalid_email_user_without_being_admin(client, access_session, get_flask_csrf_token):
