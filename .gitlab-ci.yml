@@ -49,13 +49,12 @@ unit_tests_development_branch:
     - echo "Running tests"
     - coverage run -m pytest --cov-report html:cov_html --cov=.
     - coverage report
+    - coverage html
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
   artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: cov_html
-
+    paths:
+      - htmlcov/
+        
 
 unit_tests_master_branch:
   stage: test_master_branch
