@@ -47,7 +47,7 @@ unit_tests_development_branch:
     DATABASE_URL: "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_TEST_DB_NAME"
   script:
     - echo "Running tests"
-    - coverage run -m pytest -vs app/
+    - coverage run -m pytest
     - coverage report
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
 
