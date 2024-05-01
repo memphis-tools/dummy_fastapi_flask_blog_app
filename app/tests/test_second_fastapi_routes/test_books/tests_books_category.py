@@ -516,14 +516,20 @@ async def test_delete_category_books_as_admin(get_fastapi_token_for_admin):
     assert response.status_code == 204
 
 
-# @pytest.mark.asyncio
-# async def test_get_books_categories_as_admin(get_fastapi_token_for_admin):
-#     """
-#     Description:
-#     Check if we can reach the view_books_categories uri served by FastAPI with admin token.
-#     """
-#     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-#         response = await ac.get(
-#             "/api/v1/books/categories/", headers={"Authorization": f"Bearer {get_fastapi_token_for_admin}"}
-#         )
-#     assert response.status_code == 200
+@pytest.mark.asyncio
+async def test_get_books_categories_as_admin(
+    get_fastapi_client,
+    get_fastapi_token_for_admin
+):
+    """
+    Description:
+    Check if we can reach the view_books_categories uri served by FastAPI with admin token.
+    """
+    access_token = get_fastapi_token_for_admin
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.get("/api/v1/books/categories/", headers=headers)
+    assert response.status_code == 200
