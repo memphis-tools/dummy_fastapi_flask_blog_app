@@ -11,7 +11,7 @@
           <a class="btn btn-primary" href="{{ url_for('add_user') }}">AJOUTER UTILISATEUR</a>
           <hr>
       </div>
-      <div class="users-preview">
+      <div class="users-preview d-flex flex-column">
           <table>
               {% for user in users %}
                   <tr>
