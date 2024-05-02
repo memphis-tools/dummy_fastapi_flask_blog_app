@@ -22,3 +22,4 @@ variables.tf
 terraform/variables.tf
 cov_html
 htmlcov
+test_api.py
