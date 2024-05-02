@@ -19,7 +19,7 @@ async def test_view_comments_with_authentication(get_fastapi_client, get_fastapi
     Description: test view_comments route with FastAPI TestClient with token.
     """
     access_token = get_fastapi_token
-    response = get_fastapi_client.get("/api/v1/comments", headers={"Authorization": f"Bearer {access_token}"})
+    response = get_fastapi_client.get("/api/v1/comments/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
 
 
@@ -33,7 +33,7 @@ async def test_view_comments(get_fastapi_token):
     """
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.get(
-            "/api/v1/comments", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+            "/api/v1/comments/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
         )
     assert response.status_code == 200
 
@@ -46,7 +46,7 @@ async def test_view_comments_without_valid_token():
     """
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.get(
-            "/api/v1/comments", headers={"Authorization": "Bearer somethingWeird"}
+            "/api/v1/comments/", headers={"Authorization": "Bearer somethingWeird"}
         )
     assert response.status_code == 401
 

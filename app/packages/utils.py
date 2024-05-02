@@ -56,7 +56,7 @@ def set_dummies_users():
             email="donald@localhost.fr",
             hashed_password=set_a_hash_password(settings.TEST_USER_PWD),
             disabled=False,
-            nb_publications=2,
+            nb_publications=3,
             nb_comments=1,
         ),
         models.User(
