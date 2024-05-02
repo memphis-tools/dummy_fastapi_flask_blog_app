@@ -32,7 +32,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-app: FastAPI = FastAPI()
+app: FastAPI = FastAPI(
+    title="DUMMY-OPS API",
+    swagger_ui_parameters={"defaultModelsExpandDepth": -1}
+)
 # session used by the FastAPI application
 session = session_commands.init_and_get_a_database_session()
 
@@ -106,7 +109,7 @@ async def get_current_active_user(
     return current_user
 
 
-@app.post("/token")
+@app.post("/token/")
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> Token:
@@ -127,7 +130,7 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")
 
 
-@app.get("/api/v1/books")
+@app.get("/api/v1/books/")
 async def view_books(
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -197,7 +200,7 @@ async def add_category_books(
     return new_book_category
 
 
-@app.put("/api/v1/books/categories/{category_id}/update/")
+@app.put("/api/v1/books/categories/{category_id}/")
 async def update_book_category(
     category_id: int,
     book_category_updated: UpdateBookCategoryModel,
@@ -235,7 +238,7 @@ async def update_book_category(
     return category
 
 
-@app.delete("/api/v1/books/categories/{category_id}/delete/")
+@app.delete("/api/v1/books/categories/{category_id}/")
 async def delete_book_category(
     category_id: int,
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
@@ -294,7 +297,7 @@ async def view_book(
         )
 
 
-@app.get("/api/v1/{user_id}/books/")
+@app.get("/api/v1/users/{user_id}/books/")
 async def user_books(
     user_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -552,7 +555,7 @@ async def update_book(
     raise HTTPException(status_code=404, detail=f"book with id {book_id} does not exist")
 
 
-@app.get("/api/v1/users")
+@app.get("/api/v1/users/")
 async def view_users(
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -636,7 +639,7 @@ async def update_user_password(
     raise HTTPException(status_code=404, detail=f"user with id {user_id} does not exist")
 
 
-@app.get("/api/v1/comments")
+@app.get("/api/v1/comments/")
 async def view_comments(
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):

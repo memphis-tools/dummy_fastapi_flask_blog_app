@@ -9,7 +9,7 @@
   <div class="d-flex flex-column justify-content-center">
     <a class="btn btn-primary" href="{{ url_for('add_book_category') }}">AJOUTER CATEGORIE</a>
     <hr />
-        <div class="category-preview">
+        <div class="category-preview d-flex flex-column">
           <table>
               {% for category in categories %}
                   <tr>

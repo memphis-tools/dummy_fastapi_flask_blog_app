@@ -46,8 +46,8 @@ def view_all_user_books(session, user_id):
     user_books_query = session.query(models.Book).filter(models.Book.user_id.in_([user_id,]))
     user_books = user_books_query.all()
     user_books_list = []
-    for instance in user_books_list:
-        user_books_list.append(instance.get_restricted_json())
+    for instance in user_books:
+        user_books_list.append(instance.get_json())
     return user_books_list
 
 

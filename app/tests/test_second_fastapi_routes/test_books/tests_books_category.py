@@ -254,7 +254,7 @@ async def test_delete_book_category_with_authentication_with_valid_datas(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.delete("/api/v1/books/categories/5/delete/", headers=headers)
+    response = get_fastapi_client.delete("/api/v1/books/categories/5/", headers=headers)
     assert response.status_code == 401
 
 
@@ -272,7 +272,7 @@ async def test_delete_unexisting_book_category_with_authentication_with_valid_da
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.delete("/api/v1/books/categories/55555555/delete/", headers=headers)
+    response = get_fastapi_client.delete("/api/v1/books/categories/55555555/", headers=headers)
     assert response.status_code == 401
 
 
@@ -291,7 +291,7 @@ async def test_update_book_category_with_authentication_with_valid_datas(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/books/categories/1/update/", headers=headers, json=json)
+    response = get_fastapi_client.put("/api/v1/books/categories/1/", headers=headers, json=json)
     assert response.status_code == 401
 
 
@@ -310,7 +310,7 @@ async def test_update_unexisting_book_category_with_authentication_with_valid_da
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/books/categories/55555555/update/", headers=headers, json=json)
+    response = get_fastapi_client.put("/api/v1/books/categories/55555555/", headers=headers, json=json)
     assert response.status_code == 401
 
 
@@ -430,7 +430,7 @@ async def test_delete_book_category_with_authentication_as_admin_with_valid_data
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.delete("/api/v1/books/categories/5/delete/", headers=headers)
+    response = get_fastapi_client.delete("/api/v1/books/categories/5/", headers=headers)
     assert response.status_code == 204
 
 
@@ -448,7 +448,7 @@ async def test_delete_unexisting_book_category_with_authentication_as_admin_with
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.delete("/api/v1/books/categories/55555555/delete/", headers=headers)
+    response = get_fastapi_client.delete("/api/v1/books/categories/55555555/", headers=headers)
     assert response.status_code == 404
 
 
@@ -467,7 +467,7 @@ async def test_update_book_category_with_authentication_as_admin_with_valid_data
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/books/categories/1/update/", headers=headers, json=json)
+    response = get_fastapi_client.put("/api/v1/books/categories/1/", headers=headers, json=json)
     assert response.status_code == 200
 
 
@@ -486,7 +486,7 @@ async def test_update_unexisting_book_category_with_authentication_as_admin_with
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/books/categories/55555555/update/", headers=headers, json=json)
+    response = get_fastapi_client.put("/api/v1/books/categories/55555555/", headers=headers, json=json)
     assert response.status_code == 404
 
 
@@ -498,7 +498,7 @@ async def test_delete_category_books(get_fastapi_token):
     """
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.delete(
-            "/api/v1/books/categories/6/delete/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+            "/api/v1/books/categories/6/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
         )
     assert response.status_code == 401
 
@@ -511,7 +511,7 @@ async def test_delete_category_books_as_admin(get_fastapi_token_for_admin):
     """
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.delete(
-            "/api/v1/books/categories/7/delete/", headers={"Authorization": f"Bearer {get_fastapi_token_for_admin}"}
+            "/api/v1/books/categories/7/", headers={"Authorization": f"Bearer {get_fastapi_token_for_admin}"}
         )
     assert response.status_code == 204
 

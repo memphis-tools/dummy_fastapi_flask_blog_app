@@ -42,7 +42,7 @@ async def test_read_main(get_fastapi_client, get_fastapi_token):
     Notice that the dummies datas (users, books, comments) are in the test database.
     """
     response = get_fastapi_client.get(
-        "/api/v1/books", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+        "/api/v1/books/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
     )
     assert response.status_code == 200
 
@@ -55,7 +55,7 @@ async def test_read_main_without_valid_token():
     """
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.get(
-            "/api/v1/books", headers={"Authorization": "Bearer somethingWeird"}
+            "/api/v1/books/", headers={"Authorization": "Bearer somethingWeird"}
         )
     assert response.status_code == 401
 
