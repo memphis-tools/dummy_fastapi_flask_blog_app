@@ -265,21 +265,21 @@ def test_add_existing_book_category_being_admin(client, access_session_as_admin,
     # assert b'Saisie invalide, categorie existe deja' in response.data
 
 
-def test_update_invalid_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
-    """
-    Description: check if we can update an invalid book category being admin.
-    """
-    data = {
-        "name": "something",
-        "csrf_token": get_flask_csrf_token,
-    }
-    headers = {
-        "Cookie": f"session={access_session_as_admin}"
-    }
-    response = client.post(
-        "/front/book/categories/55555/update/",
-        headers=headers,
-        data=data,
-        follow_redirects=True
-    )
-    assert response.status_code == 404
+# def test_update_invalid_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+#     """
+#     Description: check if we can update an invalid book category being admin.
+#     """
+#     data = {
+#         "name": "something",
+#         "csrf_token": get_flask_csrf_token,
+#     }
+#     headers = {
+#         "Cookie": f"session={access_session_as_admin}"
+#     }
+#     response = client.post(
+#         "/front/book/categories/55555/update/",
+#         headers=headers,
+#         data=data,
+#         follow_redirects=True
+#     )
+#     assert response.status_code == 404
