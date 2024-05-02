@@ -20,7 +20,7 @@ async def test_view_books_with_authentication(get_fastapi_client, get_fastapi_to
     Description: test view_books route with FastAPI TestClient with token.
     """
     access_token = get_fastapi_token
-    response = get_fastapi_client.get("/api/v1/books", headers={"Authorization": f"Bearer {access_token}"})
+    response = get_fastapi_client.get("/api/v1/books/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
 
 

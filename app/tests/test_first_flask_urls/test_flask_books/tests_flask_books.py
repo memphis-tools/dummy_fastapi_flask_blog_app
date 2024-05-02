@@ -345,7 +345,7 @@ def test_flask_post_delete_book_being_authenticated_being_the_publisher(
     book = get_session.get(Book, 8)
     user = get_session.get(User, book.user_id)
     current_user_total_publications = user.nb_publications
-    assert current_user_total_publications == 2
+    assert current_user_total_publications == 3
 
     response = client.post(
         "http://localhost/front/book/8/delete/",

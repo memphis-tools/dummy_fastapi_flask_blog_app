@@ -106,7 +106,7 @@ async def test_view_users_with_authentication(get_fastapi_client, get_fastapi_to
     Description: test view_users route with FastAPI TestClient with token.
     """
     access_token = get_fastapi_token
-    response = get_fastapi_client.get("/api/v1/users", headers={"Authorization": f"Bearer {access_token}"})
+    response = get_fastapi_client.get("/api/v1/users/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
 
 
@@ -120,7 +120,7 @@ async def test_view_users(get_fastapi_token):
     """
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.get(
-            "/api/v1/users", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+            "/api/v1/users/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
         )
     assert response.status_code == 200
 
@@ -257,7 +257,7 @@ async def test_view_users_without_valid_token():
     """
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.get(
-            "/api/v1/users", headers={"Authorization": "Bearer somethingWeird"}
+            "/api/v1/users/", headers={"Authorization": "Bearer somethingWeird"}
         )
     assert response.status_code == 401
 
@@ -365,7 +365,7 @@ async def test_get_user_books(get_fastapi_token):
     user_id = 2
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.get(
-            f"/api/v1/{user_id}/books/",
+            f"/api/v1/users/{user_id}/books/",
             headers={"Authorization": f"Bearer {get_fastapi_token}"}
         )
     assert response.status_code == 200
@@ -380,7 +380,7 @@ async def test_get_invalid_user_books(get_fastapi_token):
     user_id = 2555
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.get(
-            f"/api/v1/{user_id}/books/",
+            f"/api/v1/users/{user_id}/books/",
             headers={"Authorization": f"Bearer {get_fastapi_token}"}
         )
     assert response.status_code == 404
