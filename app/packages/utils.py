@@ -84,6 +84,13 @@ def set_dummies_users():
             role="user",
             disabled=True,
         ),
+        models.User(
+            username="visiteur",
+            email="visiteur@localhost.fr",
+            hashed_password=set_a_hash_password(settings.TEST_USER_PWD),
+            role="user",
+            disabled=True,
+        ),
     ]
     return dummy_users_list
 

@@ -39,6 +39,8 @@ If the dummy example application is up you will find it at:
 
   Flask Front: https://dummy-ops.dev/front
 
+A **visitor account** is created for anybody: visiteur / @pplepie94
+
 
 **About Vault and sensitive datas**
 
