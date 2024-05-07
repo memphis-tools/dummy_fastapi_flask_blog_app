@@ -6,10 +6,12 @@ Notice that by default we already add dummies data through the application utils
 import pytest
 from pathlib import Path
 from werkzeug.datastructures import FileStorage
+from bs4 import BeautifulSoup
 
 from app.packages.database.models.models import Book, User
 from app.packages.flask_app.project.__init__ import check_book_fields, get_pie_colors
 from app.packages import settings
+import app
 
 
 def test_flask_get_a_book_without_authentication(client):
@@ -421,3 +423,15 @@ def test_get_pie_colors():
     """
     response = get_pie_colors()
     assert type(response) is list
+
+
+def test_flask_index_route_with_three_random_books(client, access_session):
+    """
+    Description: check if we get 3 books while more than 3 exist in database.
+    By default 3 books are expected.
+    """
+    response = client.get("http://localhost/front/home/")
+    soup = BeautifulSoup(response.data, "html.parser")
+    total_books = len(soup.find_all("div", {"class": "post-preview"}))
+    assert response.status_code == 200
+    assert total_books == 3

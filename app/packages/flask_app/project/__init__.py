@@ -117,6 +117,21 @@ def format_book_category(id):
     return category
 
 
+def get_random_books_ids(session, ids_list, max_ids_to_get):
+    """
+    Description: return a list of random ids
+
+    Parameters:
+    session -- a postgresql'session
+    ids_list -- a list of postgresql book's ids
+    max_ids_to_get -- integer, specify how many ids we need
+    """
+    random_ids = set()
+    while len(random_ids) < max_ids_to_get:
+        random_ids.add(random.choice(ids_list))
+    return random_ids
+
+
 def get_random_color(colors_list):
     return random.randint(0, len(colors_list)-1)
 
@@ -389,10 +404,15 @@ def stats():
 @app.route("/front/home/")
 def index():
     """
-    Description: the index /home, Flask route
+    Description: the index /home, Flask route.
     """
     session = session_commands.get_a_database_session()
-    first_books = session.query(Book).order_by("id").all()[:MAX_BOOKS_ON_INDEX_PAGE]
+    ids_list = [id[0] for id in session.query(Book.id).all()]
+    if len(ids_list) >= MAX_BOOKS_ON_INDEX_PAGE:
+        random_ids = get_random_books_ids(session, ids_list, MAX_BOOKS_ON_INDEX_PAGE)
+    else:
+        random_ids = get_random_books_ids(session, ids_list, len(ids_list))
+    first_books = session.query(Book).filter(Book.id.in_(random_ids)).all()
     session.close()
     return render_template(
         "index.html",
