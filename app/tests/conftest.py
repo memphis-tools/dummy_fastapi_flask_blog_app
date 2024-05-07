@@ -9,6 +9,7 @@ from app.packages.fastapi.routes import routes_and_authentication
 from app.packages.database.commands import session_commands
 from app.packages.flask_app import project
 from app.packages import settings
+import app
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 2
