@@ -9,7 +9,16 @@ import random
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from functools import wraps
-from flask import Flask, url_for, render_template, flash, abort, redirect, request, Response
+from flask import (
+    Flask,
+    url_for,
+    render_template,
+    flash,
+    abort,
+    redirect,
+    request,
+    Response,
+)
 from flask_bootstrap import Bootstrap
 from flask_login import (
     LoginManager,
@@ -70,6 +79,7 @@ def admin_only(f):
     """
     Description: allow a decorator to limit uri's access for admin only.
     """
+
     @wraps(f)
     def decorated_function(*args, **kw):
         if current_user.id != 1:
@@ -133,7 +143,7 @@ def get_random_books_ids(session, ids_list, max_ids_to_get):
 
 
 def get_random_color(colors_list):
-    return random.randint(0, len(colors_list)-1)
+    return random.randint(0, len(colors_list) - 1)
 
 
 def get_pie_colors():
@@ -157,14 +167,21 @@ def create_books_categories_chart(total_books, categories_books_count_dict):
     labels = tuple(categories_books_count_dict.keys())
     sizes = []
     for value in categories_books_count_dict.values():
-        sizes.append((value/total_books)*100)
+        sizes.append((value / total_books) * 100)
     colors = get_pie_colors()
-    fig, ax = plt.subplots(figsize=(9,6))
+    fig, ax = plt.subplots(figsize=(9, 6))
     explode_list = []
     [explode_list.append(0.1) for distance in range(0, len(labels))]
     explode = tuple(explode_list)
-    ax.pie(sizes, explode=explode, colors=colors, labels=labels, autopct='%1.1f%%', shadow=True)
-    ax.set_aspect('equal')
+    ax.pie(
+        sizes,
+        explode=explode,
+        colors=colors,
+        labels=labels,
+        autopct="%1.1f%%",
+        shadow=True,
+    )
+    ax.set_aspect("equal")
     fig.legend(labels)
     return fig
 
@@ -177,8 +194,14 @@ def categories_stats():
     session = session_commands.get_a_database_session()
     books_categories_list = session.query(BookCategory).all()
     for category in books_categories_list:
-        category_id = session.query(BookCategory).filter_by(title=f"{category}").first().id
-        books_count = session.query(func.count(Book.category)).filter(Book.category==category_id).all()[0]
+        category_id = (
+            session.query(BookCategory).filter_by(title=f"{category}").first().id
+        )
+        books_count = (
+            session.query(func.count(Book.category))
+            .filter(Book.category == category_id)
+            .all()[0]
+        )
         if bool(books_count[0] > 0):
             categories_books_count_dict[f"{category}"] = books_count[0]
         total_books += books_count[0]
@@ -278,14 +301,21 @@ def create_users_chart(total_books, users_books_count_dict):
     labels = tuple(users_books_count_dict.keys())
     sizes = []
     for value in users_books_count_dict.values():
-        sizes.append((value/total_books)*100)
+        sizes.append((value / total_books) * 100)
     colors = get_pie_colors()
-    fig, ax = plt.subplots(figsize=(9,6))
+    fig, ax = plt.subplots(figsize=(9, 6))
     explode_list = []
     [explode_list.append(0.1) for distance in range(0, len(labels))]
     explode = tuple(explode_list)
-    ax.pie(sizes, explode=explode, colors=colors, labels=labels, autopct='%1.1f%%', shadow=True)
-    ax.set_aspect('equal')
+    ax.pie(
+        sizes,
+        explode=explode,
+        colors=colors,
+        labels=labels,
+        autopct="%1.1f%%",
+        shadow=True,
+    )
+    ax.set_aspect("equal")
     fig.legend(labels)
     return fig
 
@@ -298,7 +328,11 @@ def users_stats():
     session = session_commands.get_a_database_session()
     users_list = session.query(User).all()
     for user in users_list:
-        books_count = session.query(func.count(Book.category)).filter(Book.user_id==user.id).all()[0]
+        books_count = (
+            session.query(func.count(Book.category))
+            .filter(Book.user_id == user.id)
+            .all()[0]
+        )
         if bool(books_count[0] > 0):
             users_books_count_dict[f"{user}"] = books_count[0]
         total_books += books_count[0]
@@ -394,10 +428,7 @@ def users_stats():
 @app.route("/front/stats/")
 @login_required
 def stats():
-    return render_template(
-        "stats.html",
-        is_authenticated=current_user.is_authenticated
-    )
+    return render_template("stats.html", is_authenticated=current_user.is_authenticated)
 
 
 @app.route("/front")
@@ -415,9 +446,7 @@ def index():
     first_books = session.query(Book).filter(Book.id.in_(random_ids)).all()
     session.close()
     return render_template(
-        "index.html",
-        books=first_books,
-        is_authenticated=current_user.is_authenticated
+        "index.html", books=first_books, is_authenticated=current_user.is_authenticated
     )
 
 
@@ -477,9 +506,9 @@ def book(book_id):
     comments = session.query(Comment).filter_by(book_id=book.id).all()
 
     logs_context = {
-    "current_user": f"{current_user.username}",
-    "book_id": book_id,
-    "book_title": book.title
+        "current_user": f"{current_user.username}",
+        "book_id": book_id,
+        "book_title": book.title,
     }
     log_events.log_event("[+] Flask - Consultation livre.", logs_context)
 
@@ -490,7 +519,10 @@ def book(book_id):
             )
             total_book_comments = book.nb_comments + 1
             book.nb_comments = total_book_comments
-            logs_context = {"current_user": f"{current_user.username}", "book_title": book.title}
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "book_title": book.title,
+            }
             log_events.log_event("[+] Flask - Ajout commentaire.", logs_context)
             session.add(new_comment)
             session.commit()
@@ -517,9 +549,17 @@ def categories():
     categories = session.query(BookCategory).order_by(BookCategory.id).all()
     for category in categories:
         category_id = category.id
-        category_books_query = session.query(Book).filter(Book.category.in_([category_id,]))
+        category_books_query = session.query(Book).filter(
+            Book.category.in_(
+                [
+                    category_id,
+                ]
+            )
+        )
         total_category_books = category_books_query.count()
-        categories_list.append({"id": category_id, "name": category, "total_books": total_category_books})
+        categories_list.append(
+            {"id": category_id, "name": category, "total_books": total_category_books}
+        )
     session.close()
     return render_template(
         "categories.html",
@@ -539,7 +579,13 @@ def category_books(category_id):
         flash(f"Categorie id {category_id} inexistante.", "error")
         session.close()
         return redirect(url_for("index"))
-    category_books_query = session.query(Book).filter(Book.category.in_([category_id,]))
+    category_books_query = session.query(Book).filter(
+        Book.category.in_(
+            [
+                category_id,
+            ]
+        )
+    )
     books = category_books_query.all()
     session.close()
     return render_template(
@@ -565,7 +611,13 @@ def user_books(user_id):
         flash(f"Utilisateur id {user_id} inexistant.", "error")
         session.close()
         return redirect(url_for("index"))
-    books_query = session.query(Book).filter(Book.user_id.in_([user_id,]))
+    books_query = session.query(Book).filter(
+        Book.user_id.in_(
+            [
+                user_id,
+            ]
+        )
+    )
     books = books_query.all()
     session.close()
     if current_user.id == user_id:
@@ -583,20 +635,25 @@ def user_books(user_id):
             is_authenticated=current_user.is_authenticated,
         )
 
+
 def check_book_category_fields(category):
     """
     Description: vérifier que l'utilisateur renseigne la catégorie correctement.
     """
     session = session_commands.get_a_database_session()
-    if any([
-        str(category.title).lower() == "string",
-    ]):
+    if any(
+        [
+            str(category.title).lower() == "string",
+        ]
+    ):
         session.close()
         error = "Saisie invalide, mot clef string non utilisable."
         return error
-    existing_category = session.query(BookCategory).filter(
-        BookCategory.title==str(category.title).lower()
-    ).first()
+    existing_category = (
+        session.query(BookCategory)
+        .filter(BookCategory.title == str(category.title).lower())
+        .first()
+    )
     session.close()
     if existing_category:
         error = "Saisie invalide, categorie existe deja."
@@ -608,12 +665,14 @@ def check_book_fields(book):
     """
     Description: vérifier que l'utilisateur renseigne le livre correctement.
     """
-    if any([
-        str(book.title).lower() == "string",
-        str(book.author).lower() == "string",
-        str(book.summary).lower() == "string",
-        str(book.content).lower() == "string",
-    ]):
+    if any(
+        [
+            str(book.title).lower() == "string",
+            str(book.author).lower() == "string",
+            str(book.summary).lower() == "string",
+            str(book.content).lower() == "string",
+        ]
+    ):
         error = "Saisie invalide, mot clef string non utilisable."
         return error
     if type(book.year_of_publication) is not int:
@@ -639,14 +698,19 @@ def add_book():
         author = form.author.data
         category_id_from_form = int(form.categories.data[0])
         try:
-            category_id = session.query(BookCategory).filter(
-                BookCategory.id==category_id_from_form
-            ).first().id
+            category_id = (
+                session.query(BookCategory)
+                .filter(BookCategory.id == category_id_from_form)
+                .first()
+                .id
+            )
         except Exception:
             flash("Saisie invalide, categorie livre non prevue.", "error")
             return render_template(
-                "add_book.html", form=form, is_authenticated=current_user.is_authenticated
-                )
+                "add_book.html",
+                form=form,
+                is_authenticated=current_user.is_authenticated,
+            )
         year_of_publication = form.year_of_publication.data
         book_picture = form.photo.data
         filename = secure_filename(book_picture.filename)
@@ -663,7 +727,9 @@ def add_book():
         book_is_valid = check_book_fields(new_book)
         if book_is_valid is True:
             if os.getenv("SCOPE") == "production":
-                book_picture.save(os.path.join(app.instance_path, "staticfiles", filename))
+                book_picture.save(
+                    os.path.join(app.instance_path, "staticfiles", filename)
+                )
             else:
                 new_book.book_picture_name = "dummy_blank_book.png"
             session.add(new_book)
@@ -673,7 +739,10 @@ def add_book():
             total_user_publications = user.nb_publications + 1
             user.nb_publications = total_user_publications
             session.commit()
-            logs_context = {"current_user": f"{current_user.username}", "book_title": new_book.title}
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "book_title": new_book.title,
+            }
             log_events.log_event("[+] Flask - Ajout livre.", logs_context)
             session.close()
             return redirect(url_for("books"))
@@ -681,7 +750,9 @@ def add_book():
             flash(book_is_valid, "error")
             session.close()
             return render_template(
-            "add_book.html", form=form, is_authenticated=current_user.is_authenticated
+                "add_book.html",
+                form=form,
+                is_authenticated=current_user.is_authenticated,
             )
     session.close()
     return render_template(
@@ -704,7 +775,9 @@ def login():
         user = session.query(User).filter_by(username=username).first()
         if not user or user.email != email:
             logs_context = {"username": f"{username}", "email": f"{email}"}
-            log_events.log_event("[+] Flask - Echec connexion à application.", logs_context)
+            log_events.log_event(
+                "[+] Flask - Echec connexion à application.", logs_context
+            )
             flash("Identifiants invalides", "error")
         else:
             if check_password_hash(user.hashed_password, password):
@@ -712,7 +785,9 @@ def login():
                 first_books = session.query(Book).order_by("id").all()[:3]
                 flash(f"Vous nous avez manqué {user} 🫶")
                 logs_context = {"username": f"{username}"}
-                log_events.log_event("[+] Flask - Connexion à application.", logs_context)
+                log_events.log_event(
+                    "[+] Flask - Connexion à application.", logs_context
+                )
                 session.close()
                 return render_template(
                     "index.html",
@@ -721,11 +796,60 @@ def login():
                 )
             else:
                 logs_context = {"username": f"{username}", "email": f"{email}"}
-                log_events.log_event("[+] Flask - Echec connexion à application. Mot de passe invalide.", logs_context)
+                log_events.log_event(
+                    "[+] Flask - Echec connexion à application. Mot de passe invalide.",
+                    logs_context,
+                )
                 flash("Mot de passe invalide", "error")
         session.close()
     return render_template(
         "login.html", form=form, is_authenticated=current_user.is_authenticated
+    )
+
+
+@app.route("/front/users/password/", methods=["GET", "POST"])
+@login_required
+def update_password():
+    """
+    Description: the update user password Flask route.
+    """
+    form = forms.UpdateUserPasswordForm()
+    if form.validate_on_submit():
+        current_password = form.current_password.data
+        new_password = form.new_password.data
+        new_password_check = form.new_password_check.data
+        if not check_password_hash(current_user.hashed_password, current_password):
+            flash("Mot de passe actuel ne correspond pas.")
+        elif not handle_passwords.check_password_input(
+            current_password, new_password, new_password_check
+        ):
+            flash("Champs attendus non saisis.")
+        elif not handle_passwords.check_password(new_password):
+            flash("Mot de passe trop simple, essayez de nouveau.")
+        elif new_password != new_password_check:
+            flash("Mots de passes ne correspondent pas.")
+        else:
+            session = session_commands.get_a_database_session()
+            hashed_password = generate_password_hash(
+                new_password, "pbkdf2:sha256", salt_length=8
+            )
+            updated_user = User(
+                username=current_user.username,
+                hashed_password=hashed_password,
+                email=current_user.email,
+                role=current_user.role,
+            )
+            session.query(User).where(User.id == current_user.id).update(
+                updated_user.get_json_for_update()
+            )
+            session.commit()
+            flash(f"Mot de passe mis a jour {current_user} 💪")
+            session.close()
+            return redirect(url_for("index"))
+    return render_template(
+        "update_password.html",
+        form=form,
+        is_authenticated=current_user.is_authenticated,
     )
 
 
@@ -751,7 +875,9 @@ def register():
             flash("Mot de passe trop simple, essayez de nouveau.", "error")
             session.close()
             return render_template(
-                "register.html", form=form, is_authenticated=current_user.is_authenticated
+                "register.html",
+                form=form,
+                is_authenticated=current_user.is_authenticated,
             )
         username = str(form.login.data).lower()
         hashed_password = generate_password_hash(
@@ -774,7 +900,9 @@ def register():
                 session.commit()
                 flash(f"Bienvenue {username} vous pouvez vous connecter", "info")
                 logs_context = {"username": f"{username}", "email": f"{email}"}
-                log_events.log_event("[+] Flask - Création compte utilisateur.", logs_context)
+                log_events.log_event(
+                    "[+] Flask - Création compte utilisateur.", logs_context
+                )
                 session.close()
                 return redirect(url_for("login"))
             else:
@@ -799,7 +927,9 @@ def add_user():
             flash("Mot de passe trop simple, essayez de nouveau.", "error")
             session.close()
             return render_template(
-                "register.html", form=form, is_authenticated=current_user.is_authenticated
+                "register.html",
+                form=form,
+                is_authenticated=current_user.is_authenticated,
             )
         username = str(form.login.data).lower()
         hashed_password = generate_password_hash(
@@ -821,7 +951,9 @@ def add_user():
                 session.commit()
                 flash(f"Creation utilisateur {username} faite.", "info")
                 logs_context = {"username": f"{username}", "email": f"{email}"}
-                log_events.log_event("[+] Flask - Création compte utilisateur par admin.", logs_context)
+                log_events.log_event(
+                    "[+] Flask - Création compte utilisateur par admin.", logs_context
+                )
                 session.close()
                 return redirect(url_for("login"))
             else:
@@ -875,7 +1007,9 @@ def update_book(book_id):
     session = session_commands.get_a_database_session()
     book = session.get(Book, book_id)
     if book:
-        category = session.query(BookCategory).filter(BookCategory.id==book.category).first()
+        category = (
+            session.query(BookCategory).filter(BookCategory.id == book.category).first()
+        )
         if current_user.id != book.user_id and current_user.role != "admin":
             session.close()
             return abort(403)
@@ -912,16 +1046,21 @@ def update_book(book_id):
             if "categories" in form:
                 category_id_from_form = int(form["categories"])
                 try:
-                    category_id = session.query(BookCategory).filter(
-                        BookCategory.id==category_id_from_form
-                    ).first().id
+                    category_id = (
+                        session.query(BookCategory)
+                        .filter(BookCategory.id == category_id_from_form)
+                        .first()
+                        .id
+                    )
                 except Exception:
                     flash("Saisie invalide, categorie livre non prevue.", "error")
                     return render_template(
-                        "update_book.html", form=edit_form, is_authenticated=current_user.is_authenticated
-                        )
+                        "update_book.html",
+                        form=edit_form,
+                        is_authenticated=current_user.is_authenticated,
+                    )
             try:
-                book_picture =  form_file["photo"]
+                book_picture = form_file["photo"]
             except:
                 book_picture = None
             if book_picture is not None:
@@ -942,9 +1081,13 @@ def update_book(book_id):
             )
             if book_picture_filename != filename:
                 if os.getenv("SCOPE") == "production":
-                    book_picture.save(os.path.join(app.instance_path, "staticfiles", filename))
+                    book_picture.save(
+                        os.path.join(app.instance_path, "staticfiles", filename)
+                    )
                     try:
-                        os.remove(f"{app.instance_path}staticfiles/{book_picture_filename}")
+                        os.remove(
+                            f"{app.instance_path}staticfiles/{book_picture_filename}"
+                        )
                     except FileNotFoundError:
                         pass
                 else:
@@ -967,7 +1110,9 @@ def update_book(book_id):
                 flash(book_is_valid, "error")
                 session.close()
                 return render_template(
-                "update_book.html", form=edit_form, is_authenticated=current_user.is_authenticated
+                    "update_book.html",
+                    form=edit_form,
+                    is_authenticated=current_user.is_authenticated,
                 )
         return render_template(
             "update_book.html",
@@ -978,7 +1123,6 @@ def update_book(book_id):
         flash("Livre non trouvé", "error")
         return redirect(url_for("books"))
     session.close()
-
 
 
 @app.route("/front/users/", methods=["GET"])
@@ -1010,7 +1154,7 @@ def manage_books_categories():
     return render_template(
         "books_categories.html",
         categories=categories,
-        is_authenticated=current_user.is_authenticated
+        is_authenticated=current_user.is_authenticated,
     )
 
 
@@ -1044,7 +1188,7 @@ def add_book_category():
     return render_template(
         "add_book_category.html",
         form=form,
-        is_authenticated=current_user.is_authenticated
+        is_authenticated=current_user.is_authenticated,
     )
 
 
@@ -1077,7 +1221,7 @@ def delete_book_category(category_id):
         "delete_book_category.html",
         category_to_delete=category_to_delete,
         form=form,
-        is_authenticated=current_user.is_authenticated
+        is_authenticated=current_user.is_authenticated,
     )
 
 
@@ -1094,7 +1238,9 @@ def update_book_category(category_id):
         flash("Categorie livre non trouvee", "error")
         session.close()
         return abort(404)
-    edit_form = forms.UpdateBookCategoryForm(title=category_to_update.title,)
+    edit_form = forms.UpdateBookCategoryForm(
+        title=category_to_update.title,
+    )
 
     if edit_form.validate_on_submit():
         title = edit_form.title.data
@@ -1111,7 +1257,9 @@ def update_book_category(category_id):
                 "updated_category_old": category_to_update.title,
                 "updated_category_new": updated_category.title,
             }
-            log_events.log_event("[+] Flask - Mise à jour catégorie livre.", logs_context)
+            log_events.log_event(
+                "[+] Flask - Mise à jour catégorie livre.", logs_context
+            )
             session.commit()
             session.close()
             return redirect(url_for("manage_books_categories"))
@@ -1124,7 +1272,7 @@ def update_book_category(category_id):
         "update_book_category.html",
         category_to_update=category_to_update,
         form=edit_form,
-        is_authenticated=current_user.is_authenticated
+        is_authenticated=current_user.is_authenticated,
     )
 
 
@@ -1139,7 +1287,10 @@ def delete_book(book_id):
     book_to_delete = session.get(Book, book_id)
     user = session.get(User, book_to_delete.user_id)
     if current_user.id != book_to_delete.user_id and current_user.role != "admin":
-        logs_context = {"current_user": f"{current_user.username}", "book_title": book_to_delete.title}
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "book_title": book_to_delete.title,
+        }
         log_events.log_event("[+] Flask - Suppression livre refusée.", logs_context)
         flash("Seul l'utilisateur ayant publié le livre peut le supprimer", "error")
         session.close()
@@ -1150,7 +1301,10 @@ def delete_book(book_id):
         os.remove(f"{app.instance_path}staticfiles/{book_picture_name}")
         total_user_publications = user.nb_publications - 1
         user.nb_publications = total_user_publications
-        logs_context = {"current_user": f"{current_user.username}", "book_title": book_to_delete.title}
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "book_title": book_to_delete.title,
+        }
         log_events.log_event("[+] Flask - Suppression livre.", logs_context)
         session.commit()
         session.close()
@@ -1178,9 +1332,11 @@ def delete_comment(comment_id):
         logs_context = {
             "current_user": f"{current_user.username}",
             "book_title": book.title,
-            "comment": comment_to_delete.text
+            "comment": comment_to_delete.text,
         }
-        log_events.log_event("[+] Flask - Suppression commentaire refusée.", logs_context)
+        log_events.log_event(
+            "[+] Flask - Suppression commentaire refusée.", logs_context
+        )
         flash("Seul l'auteur du commentaire peut le supprimer", "error")
         session.close()
         return abort(403)
@@ -1188,7 +1344,7 @@ def delete_comment(comment_id):
         logs_context = {
             "current_user": f"{current_user.username}",
             "book_title": book.title,
-            "comment": comment_to_delete.text
+            "comment": comment_to_delete.text,
         }
         log_events.log_event("[+] Flask - Suppression commentaire.", logs_context)
         session.delete(comment_to_delete)
@@ -1244,9 +1400,7 @@ def ops():
     """
     Description: the ops Flask route.
     """
-    return render_template(
-        "ops.html", is_authenticated=current_user.is_authenticated
-    )
+    return render_template("ops.html", is_authenticated=current_user.is_authenticated)
 
 
 @app.route("/front/moocs/")
@@ -1254,6 +1408,4 @@ def moocs():
     """
     Description: the moocs Flask route.
     """
-    return render_template(
-        "moocs.html", is_authenticated=current_user.is_authenticated
-    )
+    return render_template("moocs.html", is_authenticated=current_user.is_authenticated)

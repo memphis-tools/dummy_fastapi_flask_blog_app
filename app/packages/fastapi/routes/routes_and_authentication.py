@@ -13,7 +13,7 @@ from app.packages.fastapi.models.fastapi_models import (
     UserModel,
     UserInDB,
     UpdateUserModel,
-    UpdateUserInDB,
+    UpdateUserPasswordInDB,
     NewUserInDBModel,
     NewBookModel,
     UpdateBookModel,
@@ -613,7 +613,7 @@ async def update_user(
 @app.put("/api/v1/users/{user_id}/password/")
 async def update_user_password(
     user_id: int,
-    user_updated: UpdateUserInDB,
+    user_updated: UpdateUserPasswordInDB,
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
@@ -622,15 +622,36 @@ async def update_user_password(
     user = database_crud_commands.get_instance(session, models.User, user_id)
     if user:
         if current_user.id == user.id or current_user.username == "admin":
-            if user_updated.password is not None:
+            if user_updated.new_password != "" and user_updated.new_password_check != "" and user_updated.current_password != "":
+                if not authenticate_user(current_user.username, user_updated.current_password):
+                    raise HTTPException(
+                        status_code=401,
+                        detail="Mot de passe actuel incorrect."
+                    )
+                if user_updated.new_password != user_updated.new_password_check:
+                    raise HTTPException(
+                        status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                        detail="Mots de passe ne correspondent pas.",
+                    )
+                valid_password = handle_passwords.check_password(str(user_updated.new_password))
+                if not valid_password:
+                    raise HTTPException(
+                        status_code=401,
+                        detail="Mot de passe trop simple, essayez de nouveau."
+                    )
                 user.hashed_password = generate_password_hash(
-                    user_updated.password, "pbkdf2:sha256", salt_length=8
+                    user_updated.new_password, "pbkdf2:sha256", salt_length=8
                 )
-            session.query(models.User).where(models.User.id == user_id).update(
-                user.get_json_for_update()
-            )
-            session.commit()
-            return user_updated
+                session.query(models.User).where(models.User.id == user_id).update(
+                    user.get_json_for_update()
+                )
+                session.commit()
+                return user
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Mots de passe non renseignés",
+                )
         else:
             raise HTTPException(
                 status_code=401,
