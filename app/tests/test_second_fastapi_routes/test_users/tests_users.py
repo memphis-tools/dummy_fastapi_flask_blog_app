@@ -384,3 +384,243 @@ async def test_get_invalid_user_books(get_fastapi_token):
             headers={"Authorization": f"Bearer {get_fastapi_token}"}
         )
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_update_user_password_being_admin(get_fastapi_client, get_fastapi_token_for_admin):
+    """
+    Description: test update user password being admin.
+    """
+    access_token = get_fastapi_token_for_admin
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    json = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": f"{settings.TEST_USER_PWD}123",
+        "new_password_check": f"{settings.TEST_USER_PWD}123",
+    }
+    response = get_fastapi_client.put(
+        "/api/v1/users/2/password/",
+        headers=headers,
+        json=json
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_update_user_password_with_wrong_method(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test update user password with post method.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    json = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": f"{settings.TEST_USER_PWD}123",
+        "new_password_check": f"{settings.TEST_USER_PWD}123",
+    }
+    response = get_fastapi_client.post(
+        "/api/v1/users/2/password/",
+        headers=headers,
+        json=json
+    )
+    assert response.status_code == 405
+
+
+@pytest.mark.asyncio
+async def test_update_user_password_being_legitimate_user(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test update user password being the legitimate user.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    json = {
+        "current_password": f"{settings.TEST_USER_PWD}123",
+        "new_password": f"{settings.TEST_USER_PWD}456",
+        "new_password_check": f"{settings.TEST_USER_PWD}456",
+    }
+    response = get_fastapi_client.put(
+        "/api/v1/users/2/password/",
+        headers=headers,
+        json=json
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_update_unexisting_user_password(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test update password for an unexisting user.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    json = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": f"{settings.TEST_USER_PWD}123",
+        "new_password_check": f"{settings.TEST_USER_PWD}123",
+    }
+    response = get_fastapi_client.put(
+        "/api/v1/users/55555555/password/",
+        headers=headers,
+        json=json
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_update_user_mismatched_password_being_legitimate_user(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test update user mismatched password being the legitimate user.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    json = {
+        "current_password": f"{settings.TEST_USER_PWD}456",
+        "new_password": f"{settings.TEST_USER_PWD}123",
+        "new_password_check": f"{settings.TEST_USER_PWD}987",
+    }
+    response = get_fastapi_client.put(
+        "/api/v1/users/2/password/",
+        headers=headers,
+        json=json
+    )
+    assert response.status_code == 406
+
+
+@pytest.mark.asyncio
+async def test_update_user_password_without_being_legitimate_user(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test update user password without being the legitimate user.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    json = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": f"{settings.TEST_USER_PWD}123",
+        "new_password_check": f"{settings.TEST_USER_PWD}123",
+    }
+    response = get_fastapi_client.put(
+        "/api/v1/users/1/password/",
+        headers=headers,
+        json=json
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_update_user_password_with_blank_being_legitimate_user(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test update user password with a blank string being the legitimate user.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    json = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": "",
+        "new_password_check": f"{settings.TEST_USER_PWD}123",
+    }
+    response = get_fastapi_client.put(
+        "/api/v1/users/2/password/",
+        headers=headers,
+        json=json
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_update_user_password_check_with_blank_being_legitimate_user(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test update user password with a blank string being the legitimate user.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    json = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": f"{settings.TEST_USER_PWD}123",
+        "new_password_check": "",
+    }
+    response = get_fastapi_client.put(
+        "/api/v1/users/2/password/",
+        headers=headers,
+        json=json
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_update_user_password_with_uncomplex_being_legitimate_user(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test update user password through FastAPI with password not enough complex.
+    """
+    access_token = get_fastapi_token
+    json = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": settings.TEST_USER_PWD[:5],
+        "new_password_check": settings.TEST_USER_PWD[:5],
+    }
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+
+    response = get_fastapi_client.put("/api/v1/users/2/password/", headers=headers, json=json)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_update_user_password_with_wrong_current_password_being_legitimate_user(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test update user password through FastAPI with wrong current password.
+    """
+    access_token = get_fastapi_token
+    json = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": settings.TEST_USER_PWD,
+        "new_password_check": settings.TEST_USER_PWD,
+    }
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+
+    response = get_fastapi_client.put("/api/v1/users/2/password/", headers=headers, json=json)
+    assert response.status_code == 401

@@ -86,7 +86,7 @@ input {
   -webkit-overflow-scrolling: touch;
 }
 
-/* spécifications pour le sous-menu 'a propos' */
+/* spécifications pour les sous-menu */
 .navbar-nav li:hover > ul.dropdown-menu {
     display: block;
 }
@@ -108,6 +108,13 @@ input {
   color: white;
 }
 /*  */
+
+
+.disabled_link {
+  cursor: not-allowed;
+  opacity: 0.5;
+  text-decoration: none;
+}
 
 .flash_messages li {
   list-style: none;

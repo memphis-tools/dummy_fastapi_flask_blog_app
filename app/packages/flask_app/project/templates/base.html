@@ -64,7 +64,16 @@
                           {% if current_user.role == "admin" %}
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('users') }}">UTILISATEURS</a></li>
                           {% endif %}
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">SE DECONNECTER</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  UTILISATEUR
+                                </a>
+                                <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownMenuLink">
+                                  <li><a class="dropdown-item disabled_link" href="#">PROFILE</a></li>
+                                  <li><a class="dropdown-item" href="{{ url_for('update_password') }}">UPDATE PASSWORD</a></li>
+                                  <li><a class="dropdown-item" href="{{ url_for('logout') }}">SE DECONNECTER</a></li>
+                                </ul>
+                            </li>
                         {% else %}
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">SE CONNECTER</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">S'INSCRIRE</a></li>

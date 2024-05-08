@@ -5,34 +5,40 @@ from typing import Optional
 
 
 class Token(BaseModel):
-    """ FastAPI token class """
+    """FastAPI token class"""
+
     access_token: str
     token_type: str
 
 
 class TokenData(BaseModel):
-    """ FastAPI token data class """
+    """FastAPI token data class"""
+
     username: str | None = None
 
 
 class BookCategoryModel(BaseModel):
-    """ FastAPI Book Category class """
+    """FastAPI Book Category class"""
+
     id: int
     title: str
 
 
 class NewBookCategoryModel(BaseModel):
-    """ FastAPI new Book Category class """
+    """FastAPI new Book Category class"""
+
     title: str
 
 
 class UpdateBookCategoryModel(BaseModel):
-    """ FastAPI update Book Category class """
+    """FastAPI update Book Category class"""
+
     title: str
 
 
 class BookModel(BaseModel):
-    """ FastAPI Book class """
+    """FastAPI Book class"""
+
     id: int
     title: str
     author: str
@@ -48,7 +54,8 @@ class BookModel(BaseModel):
 
 
 class NewBookModel(BaseModel):
-    """ FastAPI new Book class """
+    """FastAPI new Book class"""
+
     title: str
     author: str
     summary: str
@@ -59,7 +66,8 @@ class NewBookModel(BaseModel):
 
 
 class UpdateBookModel(BaseModel):
-    """ FastAPI update Book class """
+    """FastAPI update Book class"""
+
     title: Optional[str] | None = None
     author: Optional[str] | None = None
     summary: Optional[str] | None = None
@@ -70,13 +78,15 @@ class UpdateBookModel(BaseModel):
 
 
 class Role(str, Enum):
-    """ FastAPI Role class """
+    """FastAPI Role class"""
+
     admin = "admin"
     user = "user"
 
 
 class UserModel(BaseModel):
-    """ FastAPI User class """
+    """FastAPI User class"""
+
     id: int
     username: str
     email: str | None = None
@@ -87,12 +97,14 @@ class UserModel(BaseModel):
 
 
 class UserInDB(UserModel):
-    """ FastAPI User password class """
+    """FastAPI User password class"""
+
     hashed_password: str
 
 
 class NewUserInDBModel(BaseModel):
-    """ FastAPI new User class """
+    """FastAPI new User class"""
+
     username: str
     email: str
     password: str
@@ -100,20 +112,31 @@ class NewUserInDBModel(BaseModel):
 
 
 class UpdateUserModel(BaseModel):
-    """ FastAPI update User class """
+    """FastAPI update User class"""
+
     username: str | None = None
     email: str | None = None
     role: Role | None = None
     disabled: bool | None = False
 
 
-class UpdateUserInDB(BaseModel):
-    """ FastAPI update User password class """
-    password: str
+class UpdateUserPasswordInDB(BaseModel):
+    """FastAPI update User password class"""
+
+    current_password: str
+    new_password: str
+    new_password_check: str
+
+
+class UpdateUserEmailInDB(BaseModel):
+    """FastAPI update User email class"""
+
+    email: str
 
 
 class CommentModel(BaseModel):
-    """ FastAPI Comment class """
+    """FastAPI Comment class"""
+
     id: int
     text: str
     publication_date: dt.datetime
@@ -122,10 +145,12 @@ class CommentModel(BaseModel):
 
 
 class NewCommentModel(BaseModel):
-    """ FastAPI new Comment class """
+    """FastAPI new Comment class"""
+
     text: str
 
 
 class UpdateCommentModel(BaseModel):
-    """ FastAPI update Comment class """
+    """FastAPI update Comment class"""
+
     text: str
