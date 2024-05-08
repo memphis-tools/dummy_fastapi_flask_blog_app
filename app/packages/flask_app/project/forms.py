@@ -3,7 +3,17 @@
 import datetime as dt
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from wtforms import StringField, PasswordField, TextAreaField, EmailField, IntegerField, FieldList, Form, FormField, SelectField
+from wtforms import (
+    StringField,
+    PasswordField,
+    TextAreaField,
+    EmailField,
+    IntegerField,
+    FieldList,
+    Form,
+    FormField,
+    SelectField,
+)
 from wtforms.validators import DataRequired, Length, Email, NumberRange
 
 from app.packages import settings
@@ -59,10 +69,28 @@ class CreateUserForm(FlaskForm):
     email = EmailField("EMAIL", validators=[DataRequired(), Email()])
 
 
+class UpdateUserPasswordForm(FlaskForm):
+    """
+    Description: the update user password FlaskForm form.
+    """
+
+    current_password = PasswordField(
+        "MOT DE PASSE ACTUEL", validators=[DataRequired(), Length(min=3, max=125)]
+    )
+    new_password = PasswordField(
+        "NOUVEAU MOT DE PASSE", validators=[DataRequired(), Length(min=3, max=125)]
+    )
+    new_password_check = PasswordField(
+        "CONFIRMER NOUVEAU MOT DE PASSE",
+        validators=[DataRequired(), Length(min=3, max=125)],
+    )
+
+
 class AddCategoryBookForm(FlaskForm):
     """
     Description: the add category book FlaskForm form.
     """
+
     title = StringField(
         label="CATEGORIE", validators=[DataRequired(), Length(min=3, max=50)]
     )
@@ -72,6 +100,7 @@ class UpdateBookCategoryForm(FlaskForm):
     """
     Description: the update category book FlaskForm form.
     """
+
     title = StringField(
         label="CATEGORIE", validators=[DataRequired(), Length(min=3, max=50)]
     )
@@ -81,7 +110,9 @@ class BookForm(FlaskForm):
     """
     Description: the book FlaskForm form.
     """
+
     max_year = dt.date.today().year
+
     def __init__(self, books_categories=None):
         super().__init__()
         if books_categories:
@@ -123,12 +154,10 @@ class UpdateBookForm(FlaskForm):
     """
     Description: the update book FlaskForm form.
     """
+
     max_year = dt.date.today().year
-    def __init__(
-        self,
-        books_categories=None,
-        book=None
-    ):
+
+    def __init__(self, books_categories=None, book=None):
         super().__init__()
         if books_categories:
             self.categories.choices = books_categories
@@ -156,10 +185,7 @@ class UpdateBookForm(FlaskForm):
         label="DESCRIPTION", validators=[DataRequired(), Length(max=2500)]
     )
     categories = SelectField(
-        "CATEGORIES",
-        choices="",
-        coerce=int,
-        validators=[DataRequired()]
+        "CATEGORIES", choices="", coerce=int, validators=[DataRequired()]
     )
     year_of_publication = IntegerField(
         label="ANNEE PUBLICATION",
@@ -182,6 +208,7 @@ class CommentForm(FlaskForm):
     """
     Description: the comment FlaskForm form.
     """
+
     comment_text = TextAreaField(
         "COMMENTAIRE", validators=[DataRequired(), Length(min=3, max=500)]
     )
@@ -191,6 +218,7 @@ class UpdateCommentForm(FlaskForm):
     """
     Description: the update comment FlaskForm form.
     """
+
     comment_text = TextAreaField(
         "COMMENTAIRE", validators=[DataRequired(), Length(min=3, max=500)]
     )
@@ -200,15 +228,19 @@ class ContactForm(FlaskForm):
     """
     Description: the contact FlaskForm form.
     """
+
     name = StringField("NOM", validators=[DataRequired()])
     email = EmailField("EMAIL", validators=[DataRequired()])
-    message = TextAreaField("MESSAGE", validators=[DataRequired(), Length(min=3, max=1800)])
+    message = TextAreaField(
+        "MESSAGE", validators=[DataRequired(), Length(min=3, max=1800)]
+    )
 
 
 class DeleteBookCategoryForm(FlaskForm):
     """
     Description: the delete book category FlaskForm form.
     """
+
     pass
 
 
@@ -216,6 +248,7 @@ class DeleteBookForm(FlaskForm):
     """
     Description: the delete book FlaskForm form.
     """
+
     pass
 
 
@@ -223,6 +256,7 @@ class DeleteCommentForm(FlaskForm):
     """
     Description: the delete comment FlaskForm form.
     """
+
     pass
 
 
@@ -230,4 +264,5 @@ class DeleteUserForm(FlaskForm):
     """
     Description: the delete user FlaskForm form.
     """
+
     pass

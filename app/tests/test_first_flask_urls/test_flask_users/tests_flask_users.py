@@ -3,7 +3,6 @@ All the tests functions for the users urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-
 from app.packages.database.models.models import User
 from app.packages.flask_app.project.__init__ import format_user
 from app.packages import settings
@@ -29,12 +28,12 @@ def test_get_current_user_books(client, access_session):
     """
     Description: check if we can get all published books by an user. Try with dummy user id 2 (donald).
     """
-    headers = {
-        "Cookie": f"session={access_session}"
-    }
-    response = client.get("/front/user/2/books/", headers=headers, follow_redirects=True)
+    headers = {"Cookie": f"session={access_session}"}
+    response = client.get(
+        "/front/user/2/books/", headers=headers, follow_redirects=True
+    )
     assert response.status_code == 200
-    assert b'DUMMY BLOG - VOS LIVRES' in response.data
+    assert b"DUMMY BLOG - VOS LIVRES" in response.data
 
 
 def test_get_any_valid_user_books(client, access_session):
@@ -42,12 +41,12 @@ def test_get_any_valid_user_books(client, access_session):
     Description: check if we can get all published books by a valid user.
     Try with dummy user id 3 (daisy).
     """
-    headers = {
-        "Cookie": f"session={access_session}"
-    }
-    response = client.get("/front/user/3/books/", headers=headers, follow_redirects=True)
+    headers = {"Cookie": f"session={access_session}"}
+    response = client.get(
+        "/front/user/3/books/", headers=headers, follow_redirects=True
+    )
     assert response.status_code == 200
-    assert b'DUMMY BLOG - LIVRES DE ' in response.data
+    assert b"DUMMY BLOG - LIVRES DE " in response.data
 
 
 def test_get_invalid_user_books(client, access_session):
@@ -55,12 +54,12 @@ def test_get_invalid_user_books(client, access_session):
     Description: check if we can get all published books by an invalid user.
     Try with dummy user id 55555555.
     """
-    headers = {
-        "Cookie": f"session={access_session}"
-    }
-    response = client.get("/front/user/55555555/books/", headers=headers, follow_redirects=True)
+    headers = {"Cookie": f"session={access_session}"}
+    response = client.get(
+        "/front/user/55555555/books/", headers=headers, follow_redirects=True
+    )
     assert response.status_code == 200
-    assert b'Utilisateur id 55555555 inexistant' in response.data
+    assert b"Utilisateur id 55555555 inexistant" in response.data
 
 
 def test_flask_get_delete_user(client):
@@ -171,20 +170,16 @@ def test_get_users_without_being_admin(client, access_session):
     """
     Description: check if we can get users uri without being admin.
     """
-    headers = {
-        "Cookie": f"session={access_session}"
-    }
+    headers = {"Cookie": f"session={access_session}"}
     response = client.get("/front/users/", headers=headers, follow_redirects=True)
     assert response.status_code == 403
 
 
 def test_get_users_being_admin(client, access_session_as_admin):
     """
-    Description: check if we can get users uri without being admin.
+    Description: check if we can get users uri being admin.
     """
-    headers = {
-        "Cookie": f"session={access_session_as_admin}"
-    }
+    headers = {"Cookie": f"session={access_session_as_admin}"}
     response = client.get("/front/users/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
 
@@ -193,9 +188,7 @@ def test_add_user_without_being_admin(client, access_session, get_flask_csrf_tok
     """
     Description: check if we can create an user without being admin.
     """
-    headers = {
-        "Cookie": f"session={access_session}"
-    }
+    headers = {"Cookie": f"session={access_session}"}
     data = {
         "login": "dupond",
         "password": settings.TEST_USER_PWD,
@@ -203,7 +196,9 @@ def test_add_user_without_being_admin(client, access_session, get_flask_csrf_tok
         "email": "dupond@localhost.fr",
         "csrf_token": get_flask_csrf_token,
     }
-    response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
+    response = client.post(
+        "/front/users/add/", headers=headers, data=data, follow_redirects=True
+    )
     assert response.status_code == 403
 
 
@@ -213,11 +208,9 @@ def test_add_user_being_admin(
     get_flask_csrf_token,
 ):
     """
-    Description: check if we can create an user without being admin.
+    Description: check if we can create an user being admin.
     """
-    headers = {
-        "Cookie": f"session={access_session_as_admin}"
-    }
+    headers = {"Cookie": f"session={access_session_as_admin}"}
     data = {
         "login": "dupond",
         "password": settings.TEST_USER_PWD[:5],
@@ -225,18 +218,20 @@ def test_add_user_being_admin(
         "email": "dupond@localhost.fr",
         "csrf_token": get_flask_csrf_token,
     }
-    response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
+    response = client.post(
+        "/front/users/add/", headers=headers, data=data, follow_redirects=True
+    )
     # assert b"Mot de passe trop simple" in response.data
     assert response.status_code == 200
 
 
-def test_add_invalid_email_user_without_being_admin(client, access_session, get_flask_csrf_token):
+def test_add_invalid_email_user_without_being_admin(
+    client, access_session, get_flask_csrf_token
+):
     """
     Description: check if we can create a valid user being admin.
     """
-    headers = {
-        "Cookie": f"session={access_session}"
-    }
+    headers = {"Cookie": f"session={access_session}"}
     data = {
         "login": "dupond",
         "password": settings.TEST_USER_PWD,
@@ -244,7 +239,9 @@ def test_add_invalid_email_user_without_being_admin(client, access_session, get_
         "email": "dupond@localhost.fr",
         "csrf_token": get_flask_csrf_token,
     }
-    response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
+    response = client.post(
+        "/front/users/add/", headers=headers, data=data, follow_redirects=True
+    )
     assert response.status_code == 403
 
 
@@ -303,3 +300,187 @@ def test_add_invalid_email_user_without_being_admin(client, access_session, get_
 #     response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
 #     assert response.status_code == 200
 #     assert b"Nom utilisateur existe deja, veuillez le modifier" in response.data
+
+
+def test_update_user_password_being_admin(
+    client,
+    access_session_as_admin,
+    get_flask_csrf_token,
+):
+    """
+    Description: check if we can update an existing user being admin.
+    Notice we allow update even if password still the same.
+    """
+    headers = {"Cookie": f"session={access_session_as_admin}"}
+    data = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": settings.TEST_USER_PWD,
+        "new_password_check": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+    )
+    assert response.status_code == 200
+    # assert b"Mot de passe mis a jour" in response.data
+
+
+def test_update_user_password_being_legitimate_user(
+    client,
+    access_session,
+    get_flask_csrf_token,
+):
+    """
+    Description: check if we can update an existing user being the legitimate user.
+    Notice we allow update even if password still the same.
+    """
+    headers = {"Cookie": f"session={access_session}"}
+    data = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": settings.TEST_USER_PWD,
+        "new_password_check": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+    )
+    assert response.status_code == 200
+    assert b"Mot de passe mis a jour" in response.data
+
+
+def test_update_user_password_being_legitimate_user_with_wrong_current_password(
+    client,
+    access_session,
+    get_flask_csrf_token,
+):
+    """
+    Description: check if we can update an existing user with wrong current password.
+    Notice we allow update even if password still the same.
+    """
+    headers = {"Cookie": f"session={access_session}"}
+    data = {
+        "current_password": f"{settings.TEST_USER_PWD}123456789",
+        "new_password": settings.TEST_USER_PWD,
+        "new_password_check": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+    )
+    assert response.status_code == 200
+    assert b"Mot de passe actuel ne correspond pas" in response.data
+
+
+def test_update_user_password_being_legitimate_user_with_blank_current_password(
+    client,
+    access_session,
+    get_flask_csrf_token,
+):
+    """
+    Description: check if we can update an existing user with blank current password.
+    Notice we allow update even if password still the same.
+    """
+    headers = {"Cookie": f"session={access_session}"}
+    data = {
+        "current_password": "",
+        "new_password": settings.TEST_USER_PWD,
+        "new_password_check": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+    )
+    assert response.status_code == 200
+    # assert b"Champs attendus non saisis" in response.data
+
+
+def test_update_user_password_being_legitimate_user_with_blank_new_password(
+    client,
+    access_session,
+    get_flask_csrf_token,
+):
+    """
+    Description: check if we can update an existing user with blank new password.
+    Notice we allow update even if password still the same.
+    """
+    headers = {"Cookie": f"session={access_session}"}
+    data = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": "",
+        "new_password_check": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+    )
+    assert response.status_code == 200
+    # assert b"Champs attendus non saisis" in response.data
+
+
+def test_update_user_password_being_legitimate_user_with_blank_new_password_check(
+    client,
+    access_session,
+    get_flask_csrf_token,
+):
+    """
+    Description: check if we can update an existing user with blank new_password_check.
+    Notice we allow update even if password still the same.
+    """
+    headers = {"Cookie": f"session={access_session}"}
+    data = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": settings.TEST_USER_PWD,
+        "new_password_check": "",
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+    )
+    assert response.status_code == 200
+    # assert b"Champs attendus non saisis" in response.data
+
+
+def test_update_user_password_being_legitimate_user_with_uncomplex_new_password(
+    client,
+    access_session,
+    get_flask_csrf_token,
+):
+    """
+    Description: check if we can update an existing user with uncomplex new password.
+    Notice we allow update even if password still the same.
+    """
+    headers = {"Cookie": f"session={access_session}"}
+    data = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": f"{settings.TEST_USER_PWD}[:5]",
+        "new_password_check": f"{settings.TEST_USER_PWD}[:5]",
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+    )
+    assert response.status_code == 200
+    assert b"Mot de passe trop simple" in response.data
+
+
+def test_update_user_password_being_legitimate_user_with_mismatched_new_passwords(
+    client,
+    access_session,
+    get_flask_csrf_token,
+):
+    """
+    Description: check if we can update an existing user with mismatch new passwords.
+    Notice we allow update even if password still the same.
+    """
+    headers = {"Cookie": f"session={access_session}"}
+    data = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": f"{settings.TEST_USER_PWD}",
+        "new_password_check": f"{settings.TEST_USER_PWD}bebopalula",
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+    )
+    assert response.status_code == 200
+    assert b"Mots de passes ne correspondent pas" in response.data
