@@ -60,6 +60,7 @@
                         </li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">CONTACT</a></li>
                         {% endif %}
+                        <li class="nav-item"><a class="nav-link" href="https://forms.gle/bNJqv3PGSHuaSvTq5" target="_blank">SUGGESTIONS</a></li>
                         {% if is_authenticated %}
                           {% if current_user.role == "admin" %}
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('users') }}">UTILISATEURS</a></li>
@@ -78,7 +79,6 @@
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">SE CONNECTER</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">S'INSCRIRE</a></li>
                         {% endif %}
-                        <li class="nav-item"><a class="nav-link" href="https://forms.gle/bNJqv3PGSHuaSvTq5" target="_blank">SUGGESTIONS</a></li>
                     </ul>
                 </div>
               </div>

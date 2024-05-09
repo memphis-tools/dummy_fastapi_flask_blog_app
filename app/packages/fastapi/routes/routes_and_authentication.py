@@ -684,7 +684,7 @@ async def update_user_password(
                 return user
             else:
                 raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
+                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
                     detail="Mots de passe non renseignés",
                 )
         else:
