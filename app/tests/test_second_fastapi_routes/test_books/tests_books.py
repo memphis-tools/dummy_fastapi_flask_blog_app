@@ -3,14 +3,8 @@ All the tests functions for the books model from FastAPI's uri /urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-import os
 import pytest
-from datetime import timedelta
-from fastapi import HTTPException, status
-import app.packages.settings as settings
 from app.packages.database.models.models import Book
-from app.packages.fastapi.models import fastapi_models
-from app.packages.fastapi.routes import routes_and_authentication
 from app.packages.flask_app.project.__init__ import check_book_fields
 
 
@@ -158,7 +152,6 @@ async def test_post_book_with_authentication_with_valid_datas(get_fastapi_client
     assert response.status_code == 200
 
 
-
 @pytest.mark.asyncio
 async def test_check_book_fields(get_fastapi_client):
     """
@@ -192,7 +185,7 @@ async def test_post_book_without_authentication(get_fastapi_client):
         "category": "art"
     }
     headers = {
-        "Authorization": f"Bearer dummyToken",
+        "Authorization": "Bearer dummyToken",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
@@ -348,7 +341,7 @@ async def test_delete_book_without_authentication(get_fastapi_client,):
     Description: test delete_book id 1 route without being authenticated
     """
     headers = {
-        "Authorization": f"Bearer dummyToken",
+        "Authorization": "Bearer dummyToken",
         "accept": "application/json"
     }
     response = get_fastapi_client.delete("/api/v1/books/1/", headers=headers)

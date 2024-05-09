@@ -3,8 +3,7 @@ All the tests functions for the users urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-from app.packages.database.models.models import User
-from app.packages.flask_app.project.__init__ import format_user
+
 from app.packages import settings
 
 

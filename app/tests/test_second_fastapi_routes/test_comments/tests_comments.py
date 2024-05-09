@@ -3,7 +3,6 @@ All the tests functions for the comment model from FastAPI's uri /urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-import os
 import pytest
 from httpx import AsyncClient
 
@@ -155,7 +154,7 @@ async def test_update_comment_without_authentication(get_fastapi_client):
     """
     json = {"text": "such a comment"}
     headers = {
-        "Authorization": f"Bearer dummyToken",
+        "Authorization": "Bearer dummyToken",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
@@ -208,7 +207,7 @@ async def test_post_comment_without_being_authenticated(get_fastapi_client, get_
     access_token = get_fastapi_token
     json = {"text": "such a great book sir"}
     headers = {
-        "Authorization": f"Bearer DummyToken",
+        "Authorization": "Bearer DummyToken",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
@@ -276,7 +275,7 @@ async def test_delete_comment_without_authentication(get_fastapi_client, get_fas
     Description: test delete_comments id 7 without being authenticated
     """
     headers = {
-        "Authorization": f"Bearer dummyToken",
+        "Authorization": "Bearer dummyToken",
         "accept": "application/json"
     }
     response = get_fastapi_client.delete(

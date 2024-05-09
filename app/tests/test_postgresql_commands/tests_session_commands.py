@@ -2,7 +2,6 @@
 All the tests functions dedicatd to test session_commands methods.
 """
 
-import pytest
 from app.packages.database.commands import session_commands
 
 

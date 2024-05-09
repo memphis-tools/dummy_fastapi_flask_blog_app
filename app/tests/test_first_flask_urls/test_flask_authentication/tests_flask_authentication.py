@@ -3,7 +3,7 @@ All the tests functions for the authentication urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-from app.packages.database.models.models import Book, User
+
 from app.packages import settings
 
 
