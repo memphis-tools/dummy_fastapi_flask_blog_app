@@ -64,7 +64,7 @@ def test_view_all_user_instances(get_session):
     session = get_session
     instance = models.User
     instances = database_crud_commands.view_all_instances(session, instance)
-    assert type(instances) == list
+    assert isinstance(instances, list)
 
 
 def test_view_all_book_instances(get_session):
@@ -72,7 +72,7 @@ def test_view_all_book_instances(get_session):
     session = get_session
     instance = models.Book
     instances = database_crud_commands.view_all_instances(session, instance)
-    assert type(instances) == list
+    assert isinstance(instances, list)
 
 
 def test_view_all_book_category__instances(get_session):
@@ -80,7 +80,7 @@ def test_view_all_book_category__instances(get_session):
     session = get_session
     instance = models.BookCategory
     instances = database_crud_commands.view_all_instances(session, instance)
-    assert type(instances) == list
+    assert isinstance(instances, list)
 
 
 def test_view_all_book_comment_instances(get_session):
@@ -88,7 +88,7 @@ def test_view_all_book_comment_instances(get_session):
     session = get_session
     instance = models.Comment
     instances = database_crud_commands.view_all_instances(session, instance)
-    assert type(instances) == list
+    assert isinstance(instances, list)
 
 
 def test_add_book_instance(get_session):
@@ -173,5 +173,5 @@ def test_get_view_all_categories_instances(get_session):
 def test_get_view_all_category_books(get_session):
     """ Description: test if we can get all books from a category """
     session = get_session
-    total_books = session.query(models.Book).filter(models.Book.category==3).count()
+    total_books = session.query(models.Book).filter(models.Book.category == 3).count()
     assert total_books >= 0

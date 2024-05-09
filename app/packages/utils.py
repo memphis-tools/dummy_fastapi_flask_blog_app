@@ -1,7 +1,8 @@
 """ some usefull functions used to set dummy datas """
 
-from werkzeug.security import generate_password_hash
+
 from typing import List
+from werkzeug.security import generate_password_hash
 
 from app.packages import settings
 from app.packages.database.models import models

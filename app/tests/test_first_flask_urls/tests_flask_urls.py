@@ -3,14 +3,6 @@ All the tests functions for the flask urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-import os
-from pathlib import Path
-from werkzeug.datastructures import FileStorage
-
-from app.packages.database.models.models import Book, User, BookCategory
-from app.packages.flask_app.project.__init__ import check_book_fields, check_book_category_fields
-from app.packages import settings
-
 
 def test_flask_weird_route(client):
     """

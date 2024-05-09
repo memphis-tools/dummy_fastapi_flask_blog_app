@@ -1,13 +1,13 @@
 """ all the sqlalchemy models """
 
+
+import datetime
+from enum import Enum
+from flask_login import UserMixin
+
 from sqlalchemy import Column, String, DateTime, Integer, ForeignKey, Text, Boolean
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy_utils import EmailType
-
-# from sqlalchemy_imageattach.entity import Image, image_attachment
-from flask_login import UserMixin
-from enum import Enum
-import datetime
 
 
 BASE = declarative_base()
@@ -102,7 +102,7 @@ class Book(BASE):
     summary = Column(Text, nullable=False)
     content = Column(String(2500), nullable=False)
     author = Column(String(150), nullable=False)
-    category =  Column(Integer, ForeignKey("book_categories_table.id"), nullable=True)
+    category = Column(Integer, ForeignKey("book_categories_table.id"), nullable=True)
     year_of_publication = Column(Integer, nullable=True)
     book_picture_name = Column(String(250), nullable=False)
     publication_date = Column(

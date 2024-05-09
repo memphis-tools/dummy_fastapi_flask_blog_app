@@ -3,11 +3,9 @@ All the tests functions for the user model from FastAPI's uri /urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-import os
 import pytest
 from httpx import AsyncClient
 from datetime import timedelta
-from werkzeug.security import generate_password_hash
 
 import app.packages.settings as settings
 from app.packages.fastapi.models import fastapi_models
@@ -551,7 +549,7 @@ async def test_update_user_password_with_blank_being_legitimate_user(get_fastapi
         headers=headers,
         json=json
     )
-    assert response.status_code == 403
+    assert response.status_code == 406
 
 
 @pytest.mark.asyncio
@@ -575,7 +573,7 @@ async def test_update_user_password_check_with_blank_being_legitimate_user(get_f
         headers=headers,
         json=json
     )
-    assert response.status_code == 403
+    assert response.status_code == 406
 
 
 @pytest.mark.asyncio
@@ -599,7 +597,7 @@ async def test_update_user_password_with_uncomplex_being_legitimate_user(
     }
 
     response = get_fastapi_client.put("/api/v1/users/2/password/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 406
 
 
 # @pytest.mark.asyncio

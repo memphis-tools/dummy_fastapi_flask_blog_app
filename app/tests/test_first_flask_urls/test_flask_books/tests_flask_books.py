@@ -3,15 +3,13 @@ All the tests functions for the books urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-import pytest
+
 from pathlib import Path
 from werkzeug.datastructures import FileStorage
 from bs4 import BeautifulSoup
 
 from app.packages.database.models.models import Book, User
 from app.packages.flask_app.project.__init__ import check_book_fields, get_pie_colors
-from app.packages import settings
-import app
 
 
 def test_flask_get_a_book_without_authentication(client):
@@ -37,7 +35,7 @@ def test_flask_post_add_book_with_authentication(
     Description: check if we can add a book being authenticated and without following redirect.
     """
     # get the resources folder in the tests folder
-    #rb flag means "Open in binary mode (read/write using byte data)" - https://realpython.com/read-write-files-python/
+    # rb flag means "Open in binary mode (read/write using byte data)" - https://realpython.com/read-write-files-python/
     resources = Path(__file__).parent
     headers = {
         "Content-Type": "multipart/form-data",
@@ -369,7 +367,7 @@ def test_add_book_check_book_fields(
     Description: check if we can add a book with 'string' keyword as content.
     """
     # get the resources folder in the tests folder
-    #rb flag means "Open in binary mode (read/write using byte data)" - https://realpython.com/read-write-files-python/
+    # rb flag means "Open in binary mode (read/write using byte data)" - https://realpython.com/read-write-files-python/
     resources = Path(__file__).parent
     headers = {
         "Content-Type": "multipart/form-data",

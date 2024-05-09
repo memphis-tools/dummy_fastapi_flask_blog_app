@@ -1,14 +1,12 @@
-"""
-The Flask app definition.Notice we do not use the app factory pattern
-"""
+""" The Flask app definition.Notice we do not use the app factory pattern """
+
 
 import os
 import base64
 from io import BytesIO
 import random
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
 from functools import wraps
+import matplotlib.pyplot as plt
 from flask import (
     Flask,
     url_for,
@@ -17,7 +15,6 @@ from flask import (
     abort,
     redirect,
     request,
-    Response,
 )
 from flask_bootstrap import Bootstrap
 from flask_login import (
@@ -127,7 +124,7 @@ def format_book_category(id):
     return category
 
 
-def get_random_books_ids(session, ids_list, max_ids_to_get):
+def get_random_books_ids(ids_list, max_ids_to_get):
     """
     Description: return a list of random ids
 
@@ -143,6 +140,12 @@ def get_random_books_ids(session, ids_list, max_ids_to_get):
 
 
 def get_random_color(colors_list):
+    """
+    Description: returns a random element from a list.
+
+    Parameters:
+    colors_list -- list, pie chart colors list
+    """
     return random.randint(0, len(colors_list) - 1)
 
 
@@ -189,6 +192,9 @@ def create_books_categories_chart(total_books, categories_books_count_dict):
 @app.route("/front/books/categories/stats/")
 @login_required
 def categories_stats():
+    """
+    Description: returns a book's categories pie chart.
+    """
     total_books = 0
     categories_books_count_dict = {}
     session = session_commands.get_a_database_session()
@@ -223,7 +229,8 @@ def categories_stats():
                 <!-- Google fonts-->
                 <link rel='preconnect' href='https://fonts.googleapis.com'>
                 <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
-                <link href='https://fonts.googleapis.com/css2?family=Truculenta:opsz,wght@12..72,100..900&display=swap' rel='stylesheet'>
+                <link href='https://fonts.googleapis.com/css2?family=Truculenta:opsz,wght@12..72,100..900&display=swap'
+                 rel='stylesheet'>
                 <!--  Boostrap css -->
                 <link rel='stylesheet' href='/static/bootstrap.min.css'>
                 <!-- Custom css -->
@@ -231,11 +238,12 @@ def categories_stats():
             </head>
             <body>
             <header>
-            	<!-- Navigation-->
+            <!-- Navigation-->
             <nav class='navbar navbar-expand-lg navbar-dark fixed-top bg-dark'>
               <div class='container-fluid navbar-container'>
                 <a class='dummy_logo navbar-brand' href='/front/home/'>DUMMY-OPS</a>
-                <button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarCollapse' aria-controls='navbarCollapse' aria-expanded='false' aria-label='Toggle navigation'>
+                <button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarCollapse'
+                aria-controls='navbarCollapse' aria-expanded='false' aria-label='Toggle navigation'>
                     <span class='navbar-toggler-icon'></span>
                 </button>
                 <div class='collapse navbar-collapse' id='navbarCollapse'></div>
@@ -261,27 +269,32 @@ def categories_stats():
                       <div class='d-flex flex-column justify-content-center'>
                         <div class='social-networks'>
                             <ul>
-                                <li>
-                                  <a class='d-flex' href='https://gitlab.com/memphis-tools/dummy_fastapi_flask_blog_app' target='_blank'>
-                                      <span class='fa-stack fa-lg'>
-                                          <i class='fas fa-circle fa-stack-2x'></i>
-                                          <i class='fab fa-gitlab fa-stack-1x fa-inverse'></i>
-                                      </span>
-                                </li>
-                                <li>
-                                  </a>
-                                    <a class='d-flex' href='https://github.com/memphis-tools/dummy_fastapi_flask_blog_app' target='_blank'>
-                                        <span class='fa-stack fa-lg'>
-                                            <i class='fas fa-circle fa-stack-2x'></i>
-                                            <i class='fab fa-github fa-stack-1x fa-inverse'></i>
-                                        </span>
-                                    </a>
-                                </li>
+                             <li>
+                               <a class='d-flex' href='https://gitlab.com/memphis-tools/dummy_fastapi_flask_blog_app'
+                               target='_blank'>
+                                   <span class='fa-stack fa-lg'>
+                                       <i class='fas fa-circle fa-stack-2x'></i>
+                                       <i class='fab fa-gitlab fa-stack-1x fa-inverse'></i>
+                                   </span>
+                             </li>
+                             <li>
+                               </a>
+                                 <a class='d-flex' href='https://github.com/memphis-tools/dummy_fastapi_flask_blog_app'
+                                 target='_blank'>
+                                     <span class='fa-stack fa-lg'>
+                                         <i class='fas fa-circle fa-stack-2x'></i>
+                                         <i class='fab fa-github fa-stack-1x fa-inverse'></i>
+                                     </span>
+                                 </a>
+                             </li>
                             </ul>
                         </div>
                         <div class='text-center' id='footer_date'></div>
                         <div class='provider-logo'>
-                          <a href='https://www.digitalocean.com/?refcode=4f541e02cfe5&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge'><img src='https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%202.svg' alt='DigitalOcean Referral Badge' /></a>
+                          <a href='https://www.digitalocean.com/?refcode=4f541e02cfe5&utm_campaign=Referral_Invite
+                          &utm_medium=Referral_Program&utm_source=badge'>
+                          <img src='https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%202.svg'
+                          alt='DigitalOcean Referral Badge' /></a>
                         </div>
                       </div>
                   </div>
@@ -323,6 +336,9 @@ def create_users_chart(total_books, users_books_count_dict):
 @app.route("/front/books/users/stats/")
 @login_required
 def users_stats():
+    """
+    Description: returns an user's publications pie chart.
+    """
     total_books = 0
     users_books_count_dict = {}
     session = session_commands.get_a_database_session()
@@ -354,7 +370,8 @@ def users_stats():
                 <!-- Google fonts-->
                 <link rel='preconnect' href='https://fonts.googleapis.com'>
                 <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
-                <link href='https://fonts.googleapis.com/css2?family=Truculenta:opsz,wght@12..72,100..900&display=swap' rel='stylesheet'>
+                <link href='https://fonts.googleapis.com/css2?family=Truculenta:opsz,wght@12..72,100..900&display=swap'
+                rel='stylesheet'>
                 <!--  Boostrap css -->
                 <link rel='stylesheet' href='/static/bootstrap.min.css'>
                 <!-- Custom css -->
@@ -362,11 +379,12 @@ def users_stats():
             </head>
             <body>
             <header>
-            	<!-- Navigation-->
+            <!-- Navigation-->
             <nav class='navbar navbar-expand-lg navbar-dark fixed-top bg-dark'>
               <div class='container-fluid navbar-container'>
                 <a class='dummy_logo navbar-brand' href='/front/home/'>DUMMY-OPS</a>
-                <button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarCollapse' aria-controls='navbarCollapse' aria-expanded='false' aria-label='Toggle navigation'>
+                <button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarCollapse'
+                aria-controls='navbarCollapse' aria-expanded='false' aria-label='Toggle navigation'>
                     <span class='navbar-toggler-icon'></span>
                 </button>
                 <div class='collapse navbar-collapse' id='navbarCollapse'></div>
@@ -393,7 +411,8 @@ def users_stats():
                         <div class='social-networks'>
                             <ul>
                                 <li>
-                                  <a class='d-flex' href='https://gitlab.com/memphis-tools/dummy_fastapi_flask_blog_app' target='_blank'>
+                                  <a class='d-flex' href='https://gitlab.com/memphis-tools/dummy_fastapi_flask_blog_app'
+                                  target='_blank'>
                                       <span class='fa-stack fa-lg'>
                                           <i class='fas fa-circle fa-stack-2x'></i>
                                           <i class='fab fa-gitlab fa-stack-1x fa-inverse'></i>
@@ -401,7 +420,8 @@ def users_stats():
                                 </li>
                                 <li>
                                   </a>
-                                    <a class='d-flex' href='https://github.com/memphis-tools/dummy_fastapi_flask_blog_app' target='_blank'>
+                                    <a class='d-flex' href='https://github.com/memphis-tools/dummy_fastapi_flask_blog_app'
+                                    target='_blank'>
                                         <span class='fa-stack fa-lg'>
                                             <i class='fas fa-circle fa-stack-2x'></i>
                                             <i class='fab fa-github fa-stack-1x fa-inverse'></i>
@@ -412,7 +432,10 @@ def users_stats():
                         </div>
                         <div class='text-center' id='footer_date'></div>
                         <div class='provider-logo'>
-                          <a href='https://www.digitalocean.com/?refcode=4f541e02cfe5&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge'><img src='https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%202.svg' alt='DigitalOcean Referral Badge' /></a>
+                          <a href='https://www.digitalocean.com/?refcode=4f541e02cfe5&utm_campaign=Referral_Invite
+                          &utm_medium=Referral_Program&utm_source=badge'>
+                          <img src='https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%202.svg'
+                          alt='DigitalOcean Referral Badge' /></a>
                         </div>
                       </div>
                   </div>
@@ -428,6 +451,9 @@ def users_stats():
 @app.route("/front/stats/")
 @login_required
 def stats():
+    """
+    Description: the stats Flask route.
+    """
     return render_template("stats.html", is_authenticated=current_user.is_authenticated)
 
 
@@ -440,9 +466,9 @@ def index():
     session = session_commands.get_a_database_session()
     ids_list = [id[0] for id in session.query(Book.id).all()]
     if len(ids_list) >= MAX_BOOKS_ON_INDEX_PAGE:
-        random_ids = get_random_books_ids(session, ids_list, MAX_BOOKS_ON_INDEX_PAGE)
+        random_ids = get_random_books_ids(ids_list, MAX_BOOKS_ON_INDEX_PAGE)
     else:
-        random_ids = get_random_books_ids(session, ids_list, len(ids_list))
+        random_ids = get_random_books_ids(ids_list, len(ids_list))
     first_books = session.query(Book).filter(Book.id.in_(random_ids)).all()
     session.close()
     return render_template(
@@ -675,7 +701,7 @@ def check_book_fields(book):
     ):
         error = "Saisie invalide, mot clef string non utilisable."
         return error
-    if type(book.year_of_publication) is not int:
+    if not isinstance(book.year_of_publication, int):
         error = "Saisie invalide, annee publication livre doit etre un entier."
         return error
     return True
@@ -1007,9 +1033,6 @@ def update_book(book_id):
     session = session_commands.get_a_database_session()
     book = session.get(Book, book_id)
     if book:
-        category = (
-            session.query(BookCategory).filter(BookCategory.id == book.category).first()
-        )
         if current_user.id != book.user_id and current_user.role != "admin":
             session.close()
             return abort(403)
@@ -1061,7 +1084,7 @@ def update_book(book_id):
                     )
             try:
                 book_picture = form_file["photo"]
-            except:
+            except Exception:
                 book_picture = None
             if book_picture is not None:
                 filename = secure_filename(book_picture.filename)
