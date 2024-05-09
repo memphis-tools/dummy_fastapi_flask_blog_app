@@ -58,7 +58,7 @@ def view_all_categories_instances(session):
     for category in categories_query:
         total_category_books = session.query(models.Book).filter(
             models.Book.category.in_([category.id,])
-            ).count()
+        ).count()
         categories_list.append({"id": category.id, "name": category.title, "total_books": total_category_books})
     return categories_list
 

@@ -9,7 +9,6 @@ from app.packages.fastapi.routes import routes_and_authentication
 from app.packages.database.commands import session_commands
 from app.packages.flask_app import project
 from app.packages import settings
-import app
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 2
@@ -29,8 +28,7 @@ def get_fastapi_client(get_session):
     """
     Description: fixture offers a Flask TestClient
     """
-    app = routes_and_authentication.app
-    with TestClient(app) as client:
+    with TestClient(routes_and_authentication.app) as client:
         yield client
 
 
@@ -80,11 +78,11 @@ def flask_app():
     """
     Description: get the project Flask app in order for tests to run.
     """
-    app = project.app
-    app.config.update(
+    flask_app = project.app
+    flask_app.config.update(
         {"TESTING": True, "WTF_CSRF_ENABLED": True, "LOGIN_DISABLED": False, "DEBUG": True}
     )
-    yield app
+    yield flask_app
 
 
 @pytest.fixture

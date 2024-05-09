@@ -6,7 +6,6 @@ Notice that by default we already add dummies data through the application utils
 import pytest
 from httpx import AsyncClient
 
-import app.packages.settings as settings
 from app.packages.database.models.models import BookCategory
 from app.packages.fastapi.routes import routes_and_authentication
 from app.packages.flask_app.project.__init__ import check_book_category_fields
@@ -194,7 +193,7 @@ async def test_post_book_category_without_authentication_with_valid_datas(
     """
     json = {"title": "mathematique"}
     headers = {
-        "Authorization": f"Bearer dummyToken",
+        "Authorization": "Bearer dummyToken",
         "accept": "application/json",
         "Content-Type": "application/json",
     }

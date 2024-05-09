@@ -9,16 +9,9 @@ from wtforms import (
     TextAreaField,
     EmailField,
     IntegerField,
-    FieldList,
-    Form,
-    FormField,
     SelectField,
 )
 from wtforms.validators import DataRequired, Length, Email, NumberRange
-
-from app.packages import settings
-from app.packages.database.commands import session_commands
-from app.packages.database.models.models import BookCategory
 
 
 class LoginForm(FlaskForm):
@@ -118,10 +111,6 @@ class BookForm(FlaskForm):
         if books_categories:
             self.categories.choices = books_categories
 
-    def validate_category(form, field):
-        if field.data not in books_categories:
-            raise ValidationError("Catégorie livre non prévue")
-
     title = StringField(
         label="TITRE", validators=[DataRequired(), Length(min=3, max=80)]
     )
@@ -170,10 +159,6 @@ class UpdateBookForm(FlaskForm):
                 self.year_of_publication.data = book.year_of_publication
             else:
                 self.year_of_publication.data = ""
-
-    def validate_category(form, field):
-        if field.data not in books_categories:
-            raise ValidationError("Catégorie livre non prévue")
 
     title = StringField(
         label="TITRE", validators=[DataRequired(), Length(min=3, max=80)]
@@ -241,15 +226,11 @@ class DeleteBookCategoryForm(FlaskForm):
     Description: the delete book category FlaskForm form.
     """
 
-    pass
-
 
 class DeleteBookForm(FlaskForm):
     """
     Description: the delete book FlaskForm form.
     """
-
-    pass
 
 
 class DeleteCommentForm(FlaskForm):
@@ -257,12 +238,8 @@ class DeleteCommentForm(FlaskForm):
     Description: the delete comment FlaskForm form.
     """
 
-    pass
-
 
 class DeleteUserForm(FlaskForm):
     """
     Description: the delete user FlaskForm form.
     """
-
-    pass

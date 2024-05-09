@@ -101,7 +101,7 @@ def create_books_categories_if_not_exist(session):
     if len(categories) == 0:
         for category in settings.BOOKS_CATEGORIES:
             book_category = models.BookCategory(
-                title = category
+                title=category
             )
             session.add(book_category)
             session.commit()

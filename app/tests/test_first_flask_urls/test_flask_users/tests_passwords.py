@@ -3,7 +3,8 @@ All the tests functions to checkt users passwords against the policy.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-from app.packages import handle_passwords, settings
+
+from app.packages import handle_passwords
 
 
 def test_check_password():

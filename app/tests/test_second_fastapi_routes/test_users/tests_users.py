@@ -3,11 +3,9 @@ All the tests functions for the user model from FastAPI's uri /urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-import os
 import pytest
 from httpx import AsyncClient
 from datetime import timedelta
-from werkzeug.security import generate_password_hash
 
 import app.packages.settings as settings
 from app.packages.fastapi.models import fastapi_models

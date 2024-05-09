@@ -2,6 +2,7 @@
 
 from app.packages.database import init_database
 
+
 def init_and_get_a_database_session():
     """
     Description:

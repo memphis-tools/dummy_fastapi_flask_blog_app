@@ -5,7 +5,6 @@ Notice that by default we already add dummies data through the application utils
 
 
 from app.packages.database.models.models import Book
-from app.packages import settings
 
 
 def test_flask_get_delete_comment(client):

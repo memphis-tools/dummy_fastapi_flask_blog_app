@@ -1,30 +1,32 @@
 """ check password againt a policy """
 
-from flask import (
-    Flask,
-    url_for,
-    render_template,
-    flash,
-    abort,
-    redirect,
-    request,
-    Response,
-)
 from app.packages import settings
 
 
-def check_digit(plain_password):
+def check_digit(plain_text_password):
+    """
+    Description: count digits in a password.
+
+    Parameters:
+    plain_text_password -- str, a plain text password
+    """
     digit_count = 0
-    for char in plain_password:
+    for char in plain_text_password:
         if char.isdigit():
             digit_count += 1
     return digit_count
 
 
-def check_special_chars(plain_password):
+def check_special_chars(plain_text_password):
+    """
+    Description: count special chars in a password.
+
+    Parameters:
+    plain_text_password -- str, a plain text password
+    """
     special_chars_count = 0
     forbidden_chars_count = 0
-    for char in plain_password:
+    for char in plain_text_password:
         if char in settings.ALLOWED_SPECIALCHARS_IN_PASSWORD:
             special_chars_count += 1
         if char in settings.FORBIDDEN_SPECIALCHARS_IN_PASSWORD:
