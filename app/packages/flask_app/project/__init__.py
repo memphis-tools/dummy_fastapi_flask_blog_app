@@ -255,7 +255,7 @@ def categories_stats():
                     <div class='section_intro'></div>
                     <h1>DUMMY BLOG - LES CATEGORIES</h1>
                     <div class='home-stats-container'>
-                          <div class='post'>
+                          <div class='stat-post'>
                               <p class='stat-title'></p>
                               <img src='data:image/png;base64,{data}'/>
                           </div>
@@ -396,7 +396,7 @@ def users_stats():
                     <div class='section_intro'></div>
                     <h1>DUMMY BLOG - LES UTILISATEURS</h1>
                     <div class='home-stats-container'>
-                          <div class='post'>
+                          <div class='stat-post'>
                               <p class='stat-title'></p>
                               <img src='data:image/png;base64,{data}'/>
                           </div>
