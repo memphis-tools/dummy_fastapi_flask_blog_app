@@ -155,9 +155,9 @@ Lynis (for the virtual machine, droplet, hardening)
         POSTGRES_PORT="5432"
         POSTGRES_HOST="0.0.0.0"
         ADMIN_LOGIN="admin"
-        ADMIN_PASSWORD="applepie94"
+        ADMIN_PASSWORD="@pplepie94"
         ADMIN_EMAIL="admin@localhost.fr"
-        TEST_USER_PWD="aDummyPassword"
+        TEST_USER_PWD="@DummyPassword94"
         SECRET_KEY="YourSUperSecretKey123oclock"
         FLASK_APP=project/__init__.py
         FLASK_DEBUG=1
@@ -186,9 +186,9 @@ Lynis (for the virtual machine, droplet, hardening)
         export POSTGRES_PORT="5432"
         export POSTGRES_HOST="db"
         export ADMIN_LOGIN="admin"
-        export ADMIN_PASSWORD="yourAdminDesiredPassword"
+        export ADMIN_PASSWORD="@pplepie94"
         export ADMIN_EMAIL="admin@localhost.fr"
-        export TEST_USER_PWD="aDummyPassword"
+        export TEST_USER_PWD="@DummyPassword94"
         export SECRET_KEY="YourSUperSecretKey123oclock"
         export FLASK_APP=project/__init__.py
         export FLASK_DEBUG=1
