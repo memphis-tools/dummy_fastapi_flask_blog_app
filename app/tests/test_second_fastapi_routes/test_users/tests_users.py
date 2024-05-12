@@ -226,8 +226,7 @@ async def test_delete_user_being_admin(get_fastapi_client, get_fastapi_token_for
         "/api/v1/users/5/",
         headers={"Authorization": f"Bearer {access_token}"}
     )
-    assert response.status_code == 200
-    assert len(response.json()) == 1
+    assert response.status_code == 204
 
 
 @pytest.mark.asyncio
