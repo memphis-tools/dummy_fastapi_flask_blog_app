@@ -334,12 +334,14 @@ async def register(user: NewUserInDBModel):
         ]
     ):
         raise HTTPException(
-            status_code=401, detail="Saisie invalide, mot clef string non utilisable."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Saisie invalide, mot clef string non utilisable.",
         )
     valid_password = handle_passwords.check_password(str(user.password))
     if not valid_password:
         raise HTTPException(
-            status_code=401, detail="Mot de passe trop simple, essayez de nouveau."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Mot de passe trop simple, essayez de nouveau.",
         )
     hashed_password = generate_password_hash(
         user.password, "pbkdf2:sha256", salt_length=8
@@ -351,16 +353,20 @@ async def register(user: NewUserInDBModel):
     )
     if user_in_db:
         raise HTTPException(
-            status_code=401, detail="Nom utilisateur existe deja, veuillez le modifier"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Nom utilisateur existe deja, veuillez le modifier",
         )
     user_email = (
         session.query(models.User).filter_by(email=str(user.email).lower()).first()
     )
     if user_email:
-        raise HTTPException(status_code=401, detail="Email existe deja en base")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Email existe deja en base"
+        )
     if user.password != user.password_check:
         raise HTTPException(
-            status_code=401, detail="Mots de passe ne correspondent pas"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Mots de passe ne correspondent pas",
         )
     else:
         new_user = models.User(
@@ -403,7 +409,8 @@ async def add_user(
     if current_user.role == "admin":
         if not valid_password:
             raise HTTPException(
-                status_code=401, detail="Mot de passe trop simple, essayez de nouveau."
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Mot de passe trop simple, essayez de nouveau.",
             )
         if not existing_user and not existing_email:
             new_user = models.User(
@@ -414,7 +421,9 @@ async def add_user(
             session.add(new_user)
             session.commit()
             return {"200": f"user {str(user.username).lower()} added"}
-        raise HTTPException(status_code=401, detail="Utilisateur existe deja")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Utilisateur existe deja"
+        )
     else:
         logs_context = {
             "current_user": f"{current_user.username}",
@@ -425,7 +434,8 @@ async def add_user(
             logs_context,
         )
         raise HTTPException(
-            status_code=401, detail="Seul l'admin peut ajouter un utilisateur"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Seul l'admin peut ajouter un utilisateur",
         )
 
 
@@ -444,11 +454,12 @@ def check_book_fields(book):
         ]
     ):
         raise HTTPException(
-            status_code=401, detail="Saisie invalide, mot clef string non utilisable."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Saisie invalide, mot clef string non utilisable.",
         )
     if type(book.year_of_publication) is not int:
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Saisie invalide, annee publication livre doit etre un entier.",
         )
     return True
@@ -460,7 +471,8 @@ def check_book_category_fields(category):
     """
     if str(category.title).lower() == "string":
         raise HTTPException(
-            status_code=401, detail="Saisie invalide, mot clef string non utilisable."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Saisie invalide, mot clef string non utilisable.",
         )
     category = (
         session.query(models.BookCategory)
@@ -469,7 +481,8 @@ def check_book_category_fields(category):
     )
     if category:
         raise HTTPException(
-            status_code=401, detail="Saisie invalide, categorie existe deja."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Saisie invalide, categorie existe deja.",
         )
 
 
@@ -492,7 +505,8 @@ async def post_book(
         )
     except Exception:
         raise HTTPException(
-            status_code=404, detail="Saisie invalide, categorie livre non connue."
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Saisie invalide, categorie livre non connue.",
         )
     new_book = models.Book(
         title=book.title,
@@ -545,7 +559,7 @@ async def update_book(
                     )
                 except Exception:
                     raise HTTPException(
-                        status_code=404,
+                        status_code=status.HTTP_404_NOT_FOUND,
                         detail="Saisie invalide, categorie livre non prevue.",
                     )
                 book.category = category_id
@@ -573,11 +587,12 @@ async def update_book(
                 "[+] FastAPI - Mise à jour livre refusée.", logs_context
             )
             raise HTTPException(
-                status_code=401,
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour le livre",
             )
     raise HTTPException(
-        status_code=404, detail=f"book with id {book_id} does not exist"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"book with id {book_id} does not exist",
     )
 
 
@@ -630,11 +645,12 @@ async def update_user(
             return user
         else:
             raise HTTPException(
-                status_code=401,
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur",
             )
     raise HTTPException(
-        status_code=404, detail=f"user with id {user_id} does not exist"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"user with id {user_id} does not exist",
     )
 
 
@@ -653,13 +669,14 @@ async def update_user_password(
             if not handle_passwords.check_password_input(
                 user_updated.current_password,
                 user_updated.new_password,
-                user_updated.new_password_check
+                user_updated.new_password_check,
             ):
                 if not authenticate_user(
                     current_user.username, user_updated.current_password
                 ):
                     raise HTTPException(
-                        status_code=401, detail="Mot de passe actuel incorrect."
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Mot de passe actuel incorrect.",
                     )
                 if user_updated.new_password != user_updated.new_password_check:
                     raise HTTPException(
@@ -671,7 +688,7 @@ async def update_user_password(
                 )
                 if not valid_password:
                     raise HTTPException(
-                        status_code=401,
+                        status_code=status.HTTP_401_UNAUTHORIZED,
                         detail="Mot de passe trop simple, essayez de nouveau.",
                     )
                 user.hashed_password = generate_password_hash(
@@ -689,11 +706,12 @@ async def update_user_password(
                 )
         else:
             raise HTTPException(
-                status_code=401,
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur",
             )
     raise HTTPException(
-        status_code=404, detail=f"user with id {user_id} does not exist"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"user with id {user_id} does not exist",
     )
 
 
@@ -746,7 +764,8 @@ async def add_comment(
         return new_comment
 
     raise HTTPException(
-        status_code=404, detail=f"book with id {book_id} does not exist"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"book with id {book_id} does not exist",
     )
 
 
@@ -776,11 +795,12 @@ async def update_comment(
             session.commit()
             return comment
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour un commentaire",
         )
     raise HTTPException(
-        status_code=404, detail=f"comment with id {comment_id} does not exist"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"comment with id {comment_id} does not exist",
     )
 
 
@@ -795,12 +815,15 @@ async def delete_comment(
     """
     updated_book = database_crud_commands.get_instance(session, models.Book, book_id)
     if updated_book is None:
-        raise HTTPException(status_code=404, detail="Livre n'existe pas.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Livre n'existe pas."
+        )
     comment = database_crud_commands.get_instance(session, models.Comment, comment_id)
     if comment:
         if comment.book_id != book_id:
             raise HTTPException(
-                status_code=401, detail="Commentaire non rattaché au livre."
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Commentaire non rattaché au livre.",
             )
         if current_user.id == comment.author_id:
             logs_context = {
@@ -813,7 +836,10 @@ async def delete_comment(
             session.commit()
             total_book_comments = updated_book.nb_comments + 1
             updated_book.nb_comments = total_book_comments
-            return {"204": f"comment with id {comment_id} removed"}
+            raise HTTPException(
+                status_code=status.HTTP_204_NO_CONTENT,
+                detail=f"comment with id {comment_id} removed",
+            )
         logs_context = {
             "current_user": f"{current_user.username}",
             "book_title": updated_book.title,
@@ -823,11 +849,12 @@ async def delete_comment(
             "[+] FastAPI - Suppression commentaire refusée.", logs_context
         )
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent supprimer son commentaire",
         )
     raise HTTPException(
-        status_code=404, detail=f"comment with id {comment_id} does not exist"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"comment with id {comment_id} does not exist",
     )
 
 
@@ -848,8 +875,13 @@ async def delete_user(
             log_events.log_event("[+] FastAPI - Suppression utilisateur.", logs_context)
             session.delete(user)
             session.commit()
-            return {"204": f"user with id {user_id} removed"}
-        raise HTTPException(status_code=404, detail="Utilisateur n'existe pas")
+            raise HTTPException(
+                status_code=status.HTTP_204_NO_CONTENT,
+                detail=f"user with id {user_id} removed",
+            )
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur n'existe pas"
+        )
     else:
         logs_context = {
             "current_user": f"{current_user.username}",
@@ -860,10 +892,12 @@ async def delete_user(
             logs_context,
         )
         raise HTTPException(
-            status_code=401, detail="Seul l'admin peut supprimer un utilisateur"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Seul l'admin peut supprimer un utilisateur",
         )
     raise HTTPException(
-        status_code=404, detail=f"user with id {user_id} does not exist"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"user with id {user_id} does not exist",
     )
 
 
@@ -887,7 +921,8 @@ async def delete_book(
             total_user_publications = current_user.nb_publications - 1
             current_user.nb_publications = total_user_publications
             raise HTTPException(
-                status_code=204, detail=f"book with id {book_id} removed."
+                status_code=status.HTTP_204_NO_CONTENT,
+                detail=f"book with id {book_id} removed.",
             )
         logs_context = {
             "current_user": f"{current_user.username}",
@@ -895,9 +930,10 @@ async def delete_book(
         }
         log_events.log_event("[+] FastAPI - Suppression livre refusée.", logs_context)
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent supprimer son livre.",
         )
     raise HTTPException(
-        status_code=404, detail=f"book with id {book_id} does not exist"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"book with id {book_id} does not exist",
     )

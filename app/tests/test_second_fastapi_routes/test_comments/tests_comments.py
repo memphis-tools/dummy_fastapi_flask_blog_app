@@ -266,7 +266,7 @@ async def test_delete_comment_with_authentication(get_fastapi_client, get_fastap
         "/api/v1/books/6/comments/7/",
         headers={"Authorization": f"Bearer {access_token}"}
     )
-    assert response.status_code == 200
+    assert response.status_code == 204
 
 
 @pytest.mark.asyncio
