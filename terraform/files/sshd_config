@@ -3,8 +3,7 @@ Port 22
 HostKey /etc/ssh/ssh_host_ecdsa_key
 SyslogFacility AUTH
 LogLevel VERBOSE
-# we should not allow root direct access
-PermitRootLogin yes
+PermitRootLogin no
 MaxAuthTries 3
 MaxSessions 2
 PubkeyAuthentication yes
