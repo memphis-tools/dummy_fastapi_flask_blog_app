@@ -156,22 +156,23 @@ async def view_books_categories(
 
 
 @app.get("/api/v1/books/categories/{category_id}/")
-async def view_category_books(category_id: int):
+async def view_category_books(
+    category_id: int,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+):
     """
     view_category_books return a list of books from a category.
     """
-    category = database_crud_commands.get_instance(
-        session, models.BookCategory, category_id
+    category_books = database_crud_commands.view_all_category_books(
+        session, category_id
     )
-    if not category:
+    if len(category_books) == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Incorrect category id",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    category_books = database_crud_commands.view_all_category_books(
-        session, category_id
-    )
+
     return category_books
 
 
