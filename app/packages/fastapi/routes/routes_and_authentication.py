@@ -156,7 +156,10 @@ async def view_books_categories(
 
 
 @app.get("/api/v1/books/categories/{category_id}/")
-async def view_category_books(category_id: int):
+async def view_category_books(
+    category_id: int,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)],
+):
     """
     view_category_books return a list of books from a category.
     """
