@@ -48,7 +48,7 @@ async def test_get_category_books_without_authentication():
         response = await ac.get(
             "/api/v1/books/categories/1/",
         )
-    assert response.status_code == 200
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio
@@ -147,7 +147,7 @@ async def test_get_books_category_without_authentication(get_fastapi_client):
         "Content-Type": "application/json",
     }
     response = get_fastapi_client.get("/api/v1/books/categories/1/", headers=headers)
-    assert response.status_code == 200
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio
