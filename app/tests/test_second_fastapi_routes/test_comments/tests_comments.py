@@ -18,7 +18,7 @@ async def test_view_comments_with_authentication(get_fastapi_client, get_fastapi
     Description: test view_comments route with FastAPI TestClient with token.
     """
     access_token = get_fastapi_token
-    response = get_fastapi_client.get("/api/v1/comments/", headers={"Authorization": f"Bearer {access_token}"})
+    response = get_fastapi_client.get("/api/v1/books/comments/all/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
 
 
@@ -32,7 +32,7 @@ async def test_view_comments(get_fastapi_token):
     """
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.get(
-            "/api/v1/comments/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+            "/api/v1/books/comments/all/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
         )
     assert response.status_code == 200
 
@@ -45,7 +45,7 @@ async def test_view_comments_without_valid_token():
     """
     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
         response = await ac.get(
-            "/api/v1/comments/", headers={"Authorization": "Bearer somethingWeird"}
+            "/api/v1/books/comments/all/", headers={"Authorization": "Bearer somethingWeird"}
         )
     assert response.status_code == 401
 
@@ -56,7 +56,7 @@ async def test_view_comment_with_authentication(get_fastapi_client, get_fastapi_
     Description: test view_comments id 1 route with FastAPI TestClient with token.
     """
     access_token = get_fastapi_token
-    response = get_fastapi_client.get("/api/v1/comments/1/", headers={"Authorization": f"Bearer {access_token}"})
+    response = get_fastapi_client.get("/api/v1/books/comments/1/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
 
 
@@ -65,8 +65,47 @@ async def test_view_comment_without_authentication(get_fastapi_client):
     """
     Description: test view_comment id 1 route with FastAPI TestClient without token.
     """
-    response = get_fastapi_client.get("/api/v1/comments/1/", headers={"Authorization": "Bearer bebopalula"})
+    response = get_fastapi_client.get("/api/v1/books/comments/1/", headers={"Authorization": "Bearer bebopalula"})
     assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_view_book_comments_without_authentication(get_fastapi_client):
+    """
+    Description: test view comments from a book, without being authenticated.
+    """
+    response = get_fastapi_client.get("/api/v1/books/1/comments/", headers={"Authorization": "Bearer bebopalula"})
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_view_book_comments_with_being_authenticated(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test view comments from a book, being authenticated.
+    """
+    access_token = get_fastapi_token
+    response = get_fastapi_client.get("/api/v1/books/2/comments/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_view_book_comments_being_authenticated_as_admin(get_fastapi_client, get_fastapi_token_for_admin):
+    """
+    Description: test view comments from a book, being authenticated.
+    """
+    access_token = get_fastapi_token_for_admin
+    response = get_fastapi_client.get("/api/v1/books/2/comments/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_view_book_comments_being_authenticated_with_unexisting_book(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test view comments from an unexistingbook, being authenticated.
+    """
+    access_token = get_fastapi_token
+    response = get_fastapi_client.get("/api/v1/books/55555/comments/", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 404
 
 
 @pytest.mark.asyncio
@@ -77,7 +116,7 @@ async def test_update_comment_with_authentication_without_valid_datas(get_fastap
     json = {"text": "such a comment"}
     access_token = get_fastapi_token
     response = get_fastapi_client.put(
-        "/api/v1/comments/3/",
+        "/api/v1/books/comments/3/",
         headers={"Authorization": f"Bearer {access_token}"},
         data=json
     )
@@ -101,7 +140,7 @@ async def test_update_comment_with_authentication_with_unexisting_book(get_fasta
         "Content-Type": "application/json",
     }
     response = get_fastapi_client.put(
-        "/api/v1/comments/55555555/",
+        "/api/v1/books/comments/55555555/",
         headers=headers,
         json=json
     )
@@ -123,7 +162,7 @@ async def test_update_comment_with_authentication_with_forbidden_user(get_fastap
     }
     access_token = get_fastapi_token
     response = get_fastapi_client.put(
-        "/api/v1/comments/6/",
+        "/api/v1/books/comments/6/",
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
     )
@@ -143,7 +182,7 @@ async def test_update_comment_with_authentication_with_valid_datas(get_fastapi_c
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/comments/5/", headers=headers, json=json)
+    response = get_fastapi_client.put("/api/v1/books/comments/5/", headers=headers, json=json)
     assert response.status_code == 200
 
 
@@ -158,7 +197,7 @@ async def test_update_comment_without_authentication(get_fastapi_client):
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/comments/5/", headers=headers, json=json)
+    response = get_fastapi_client.put("/api/v1/books/comments/5/", headers=headers, json=json)
     assert response.status_code == 401
 
 
@@ -178,7 +217,7 @@ async def test_update_comment_with_auth_with_valid_datas_for_unexisting_comment(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/comments/55555/", headers=headers, json=json)
+    response = get_fastapi_client.put("/api/v1/books/comments/55555/", headers=headers, json=json)
     assert response.status_code == 404
 
 
@@ -195,7 +234,7 @@ async def test_post_comment_with_authentication_with_valid_datas(get_fastapi_cli
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.post("/api/v1/comments/?book_id=2", headers=headers, json=json)
+    response = get_fastapi_client.post("/api/v1/books/comments/?book_id=2", headers=headers, json=json)
     assert response.status_code == 200
 
 
@@ -211,7 +250,7 @@ async def test_post_comment_without_being_authenticated(get_fastapi_client, get_
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.post("/api/v1/comments/?book_id=2", headers=headers, json=json)
+    response = get_fastapi_client.post("/api/v1/books/comments/?book_id=2", headers=headers, json=json)
     assert response.status_code == 401
 
 
@@ -228,7 +267,7 @@ async def test_post_comment_with_authentication_without_valid_datas(get_fastapi_
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.post("/api/v1/comments/", headers=headers, json=json)
+    response = get_fastapi_client.post("/api/v1/books/comments/", headers=headers, json=json)
     assert response.status_code == 422
 
 
@@ -331,6 +370,73 @@ async def test_delete_comment_with_authentication_with_unexisting_comment(get_fa
     }
     response = get_fastapi_client.delete(
         "/api/v1/books/1/comments/55555555/",
-        headers={"Authorization": f"Bearer {access_token}"}
+        headers=headers
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_view_user_comments_without_authentication():
+    """
+    Description:
+    Check if we can reach the user's comments uri served by FastAPI without being authenticated.
+    """
+    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+        response = await ac.get(
+            "/api/v1/users/2/comments/", headers={"Authorization": "Bearer bebopalula"}
+        )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_view_user_comments_being_authenticated(get_fastapi_client, get_fastapi_token):
+    """
+    Description:
+    Check if we can reach the user's comments uri served by FastAPI being authenticated.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json"
+    }
+    response = get_fastapi_client.get(
+        "/api/v1/users/2/comments/",
+        headers=headers
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_view_user_comments_being_authenticated_as_admin(get_fastapi_client, get_fastapi_token_for_admin):
+    """
+    Description:
+    Check if we can reach the user's comments uri served by FastAPI being authenticated as admin.
+    """
+    access_token = get_fastapi_token_for_admin
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json"
+    }
+    response = get_fastapi_client.get(
+        "/api/v1/users/2/comments/",
+        headers=headers
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_view_unexisting_user_comments_being_authenticated(get_fastapi_client, get_fastapi_token):
+    """
+    Description:
+    Check if we can reach an unexisting user's comments uri served by FastAPI being authenticated.
+    """
+    access_token = get_fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json"
+    }
+    response = get_fastapi_client.get(
+        "/api/v1/users/55555/comments/",
+        headers=headers
     )
     assert response.status_code == 404

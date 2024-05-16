@@ -51,6 +51,16 @@ def view_all_user_books(session, user_id):
     return user_books_list
 
 
+def view_all_user_comments(session, user_id):
+    """view all books from an user_id """
+    user_comments_query = session.query(models.Comment).filter(models.Comment.author_id.in_([user_id,]))
+    user_comments = user_comments_query.all()
+    user_comments_list = []
+    for instance in user_comments:
+        user_comments_list.append(instance.get_json())
+    return user_comments_list
+
+
 def view_all_categories_instances(session):
     """view all categories instances """
     categories_query = session.query(models.BookCategory).all()
