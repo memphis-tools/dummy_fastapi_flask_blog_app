@@ -27,7 +27,7 @@ async def test_views_without_authentication(get_fastapi_client):
     """
     Description: test view routes from FastAPI TestClient without token.
     """
-    uris = ["users", "books", "comments"]
+    uris = ["users", "books", "books/comments"]
     for uri in uris:
         response = get_fastapi_client.get(f"/api/v1/{uri}")
         assert response.status_code == 401
