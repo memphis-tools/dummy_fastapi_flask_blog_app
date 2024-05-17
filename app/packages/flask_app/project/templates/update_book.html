@@ -23,8 +23,12 @@
                       {{ form.year_of_publication(size=5) }}
                   </div>
                 {% else %}
-                <div class="col-md-1"></div>
+                  <div class="col-md-1"></div>
                 {% endif %}
+                <div class="counters">
+                    <p>Commentaires: {{ book.book_comments | length }}</p>
+                    <p>Favoris: {{ book.starred | length }}</p>
+                </div>
                 <label for="content">{{ form.content.label }}</label>{{ form.content }}
                 <label for="photo">{{ form.photo.label }}</label>{{ form.photo }}
                 <button type="submit" class="btn btn-primary" name="button">METTRE A JOUR</button>

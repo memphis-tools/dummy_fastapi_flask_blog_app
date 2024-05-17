@@ -19,6 +19,17 @@
               Publié par <a href="{{ url_for('user_books', user_id=book.user_id) }}">{{ book.user_id|format_user() }}</a>
               on {{ book.publication_date|format_datetime() }}
           </p>
+          <div class="counters">
+              <p>Commentaires: {{ book.book_comments | length }}</p>
+              <div class="starred_div d-flex flex-column">
+                <p>Favoris: {{ book.starred | length }}</p>
+                {% if book.id in user_starred_books_id_list|map(attribute=0) %}
+                    <a class="btn btn-primary w-25" href="{{ url_for('delete_starred_book', book_id=book.id, user_id=current_user.id )}}">RETIRER DES FAVORIS</a>
+                {% else %}
+                    <a class="btn btn-primary w-25" href="{{ url_for('add_starred_book', book_id=book.id, user_id=current_user.id )}}">AJOUTER AUX FAVORIS</a>
+                {% endif %}
+              </div>
+          </div>
           <p>{{ book.content }}</p>
           {% if current_user.id == book.user_id or current_user.role == 'admin' %}
             <div class="buttons_container">

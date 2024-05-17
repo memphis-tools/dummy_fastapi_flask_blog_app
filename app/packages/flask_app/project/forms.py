@@ -221,25 +221,13 @@ class ContactForm(FlaskForm):
     )
 
 
-class DeleteBookCategoryForm(FlaskForm):
+class AddInstanceForm(FlaskForm):
     """
-    Description: the delete book category FlaskForm form.
-    """
-
-
-class DeleteBookForm(FlaskForm):
-    """
-    Description: the delete book FlaskForm form.
+    Description: an add instance FlaskForm form.
     """
 
 
-class DeleteCommentForm(FlaskForm):
+class DeleteInstanceForm(FlaskForm):
     """
-    Description: the delete comment FlaskForm form.
-    """
-
-
-class DeleteUserForm(FlaskForm):
-    """
-    Description: the delete user FlaskForm form.
+    Description: a delete instance FlaskForm form.
     """

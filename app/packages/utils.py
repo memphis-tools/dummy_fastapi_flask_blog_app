@@ -36,6 +36,14 @@ def call_dummy_setup(session):
         except Exception:
             print("[+] Comment already exists sir, nothing to do.")
 
+    dummy_starred_list = set_dummies_starred()
+    for starred in dummy_starred_list:
+        try:
+            session.add(starred)
+            session.commit()
+        except Exception:
+            print("[+] Starred already exists sir, nothing to do.")
+
 
 def set_a_hash_password(password):
     """
@@ -57,8 +65,6 @@ def set_dummies_users():
             email="donald@localhost.fr",
             hashed_password=set_a_hash_password(settings.TEST_USER_PWD),
             disabled=False,
-            nb_publications=3,
-            nb_comments=1,
         ),
         models.User(
             username="daisy",
@@ -66,8 +72,6 @@ def set_dummies_users():
             hashed_password=set_a_hash_password(settings.TEST_USER_PWD),
             role="user",
             disabled=False,
-            nb_publications=3,
-            nb_comments=1,
         ),
         models.User(
             username="loulou",
@@ -75,8 +79,6 @@ def set_dummies_users():
             hashed_password=set_a_hash_password(settings.TEST_USER_PWD),
             role="user",
             disabled=False,
-            nb_publications=2,
-            nb_comments=1,
         ),
         models.User(
             username="louloute",
@@ -117,8 +119,8 @@ def set_dummies_books():
             author="John Doe",
             year_of_publication="999",
             book_picture_name="dummy_blank_book.png",
+            category=1,
             user_id=2,
-            nb_comments=1,
         ),
         models.Book(
             title="Aenean viverra maximus velit",
@@ -127,8 +129,8 @@ def set_dummies_books():
             author="Cathy Doe",
             year_of_publication="999",
             book_picture_name="dummy_blank_book.png",
+            category=1,
             user_id=3,
-            nb_comments=1,
         ),
         models.Book(
             title="Les gratitudes",
@@ -136,10 +138,9 @@ def set_dummies_books():
             content="C bibendum pharetra purus.",
             author="Deplhine de Vighan",
             year_of_publication="999",
-            category=3,
             book_picture_name="dummy_blank_book.png",
+            category=3,
             user_id=4,
-            nb_comments=2,
         ),
         models.Book(
             title="Au commencement était la guerre",
@@ -148,6 +149,7 @@ def set_dummies_books():
             author="Alain Bauer",
             year_of_publication="999",
             book_picture_name="dummy_blank_book.png",
+            category=1,
             user_id=3,
         ),
         models.Book(
@@ -164,8 +166,8 @@ def set_dummies_books():
             author="Chloé Aeberhardt",
             year_of_publication="999",
             book_picture_name="dummy_blank_book.png",
+            category=1,
             user_id=2,
-            nb_comments=1,
         ),
         models.Book(
             title="Noa",
@@ -182,10 +184,9 @@ def set_dummies_books():
             """,
             author="Marc Levy",
             year_of_publication="999",
-            category=6,
             book_picture_name="dummy_blank_book.png",
+            category=6,
             user_id=3,
-            nb_comments=2,
         ),
         models.Book(
             title="Sur l'échiquier du grand jeu",
@@ -198,8 +199,8 @@ def set_dummies_books():
             """,
             author="Taline Ter Minassian",
             year_of_publication="999",
-            category=2,
             book_picture_name="dummy_blank_book.png",
+            category=2,
             user_id=4,
         ),
         models.Book(
@@ -264,3 +265,28 @@ def set_dummies_comments():
         ),
     ]
     return dummy_comments_list
+
+
+def set_dummies_starred():
+    """
+    Description: set_dummies_starred creates dummies books starred
+    """
+    dummy_starred_list: List[models.Starred] = [
+        models.Starred(
+            user_id=2,
+            book_id=1,
+        ),
+        models.Starred(
+            user_id=2,
+            book_id=2,
+        ),
+        models.Starred(
+            user_id=2,
+            book_id=3,
+        ),
+        models.Starred(
+            user_id=3,
+            book_id=1,
+        ),
+    ]
+    return dummy_starred_list
