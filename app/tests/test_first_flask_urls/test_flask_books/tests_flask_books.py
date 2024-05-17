@@ -7,6 +7,7 @@ Notice that by default we already add dummies data through the application utils
 from pathlib import Path
 from werkzeug.datastructures import FileStorage
 from bs4 import BeautifulSoup
+from sqlalchemy.orm import joinedload
 
 from app.packages.database.models.models import Book, User
 from app.packages.flask_app.project.__init__ import check_book_fields, get_pie_colors
@@ -343,8 +344,12 @@ def test_flask_post_delete_book_being_authenticated_being_the_publisher(
     }
     data = {"csrf_token": get_flask_csrf_token}
     book = get_session.get(Book, 8)
-    user = get_session.get(User, book.user_id)
-    current_user_total_publications = user.nb_publications
+    user = get_session.query(User).filter(
+        User.id==book.user_id
+    ).options(
+        joinedload(User.books)
+    ).one()
+    current_user_total_publications = len(user.books)
     assert current_user_total_publications == 3
 
     response = client.post(
@@ -355,7 +360,7 @@ def test_flask_post_delete_book_being_authenticated_being_the_publisher(
     )
     assert response.status_code == 200
     get_session.refresh(user)
-    assert user.nb_publications == current_user_total_publications - 1
+    assert len(user.books) == current_user_total_publications - 1
 
 
 def test_add_book_check_book_fields(

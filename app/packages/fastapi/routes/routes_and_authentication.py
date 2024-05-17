@@ -519,8 +519,6 @@ async def post_book(
         book_picture_name=book.book_picture_name,
         user_id=current_user.id,
     )
-    total_user_publications = current_user.nb_publications + 1
-    current_user.nb_publications = total_user_publications
     logs_context = {
         "current_user": f"{current_user.username}",
         "book_title": new_book.title,
@@ -773,8 +771,6 @@ async def add_comment(
     if updated_book:
         session.add(new_comment)
         session.commit()
-        total_book_comments = updated_book.nb_comments + 1
-        updated_book.nb_comments = total_book_comments
         logs_context = {
             "current_user": f"{current_user.username}",
             "book_title": updated_book.title,
@@ -870,8 +866,6 @@ async def delete_comment(
             log_events.log_event("[+] FastAPI - Suppression commentaire.", logs_context)
             session.delete(comment)
             session.commit()
-            total_book_comments = updated_book.nb_comments + 1
-            updated_book.nb_comments = total_book_comments
             raise HTTPException(
                 status_code=status.HTTP_204_NO_CONTENT,
                 detail=f"comment with id {comment_id} removed",
@@ -954,8 +948,6 @@ async def delete_book(
             log_events.log_event("[+] FastAPI - Suppression livre.", logs_context)
             session.delete(book)
             session.commit()
-            total_user_publications = current_user.nb_publications - 1
-            current_user.nb_publications = total_user_publications
             raise HTTPException(
                 status_code=status.HTTP_204_NO_CONTENT,
                 detail=f"book with id {book_id} removed.",

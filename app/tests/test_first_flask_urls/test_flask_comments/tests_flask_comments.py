@@ -3,7 +3,7 @@ All the tests functions for the comments urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-
+from sqlalchemy.orm import joinedload
 from app.packages.database.models.models import Book
 
 
@@ -48,8 +48,12 @@ def test_flask_post_delete_comment_with_authentication(
         "Cookie": f"session={access_session}",
     }
     data = {"csrf_token": get_flask_csrf_token}
-    book = get_session.get(Book, 2)
-    current_total_comments = book.nb_comments
+    book = get_session.query(Book).filter(
+        Book.id==2
+    ).options(
+        joinedload(Book.book_comments)
+    ).one()
+    current_total_comments = len(book.book_comments)
     assert current_total_comments == 1
     response = client.post(
         "http://localhost/front/comment/2/delete/",
@@ -59,7 +63,7 @@ def test_flask_post_delete_comment_with_authentication(
     )
     assert response.status_code == 200
     get_session.refresh(book)
-    assert book.nb_comments == current_total_comments - 1
+    assert len(book.book_comments) == current_total_comments - 1
 
 
 def test_flask_post_delete_comment_with_auth_without_being_author(
