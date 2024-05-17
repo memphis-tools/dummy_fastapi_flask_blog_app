@@ -6,6 +6,7 @@ import base64
 from io import BytesIO
 import random
 from functools import wraps
+import matplotlib.pyplot as plt
 from flask import (
     Flask,
     url_for,
@@ -637,20 +638,20 @@ def delete_starred_book(user_id, book_id):
         flash(f"Utilisateur inexistant", "error")
         session.close()
         return redirect(url_for("index"))
+    starred_book_to_delete = session.query(Starred).filter(
+        Starred.book_id==book_id
+    ).filter(
+        Starred.user_id==user_id
+    ).first()
+    if not starred_book_to_delete:
+        flash(f"Favori inexistant", "error")
+        session.close()
+        return redirect(url_for("index"))
     if not user_id == current_user.id:
         flash(f"Vous ne pouvez supprimer que vos favoris", "error")
         session.close()
         return redirect(url_for("index"))
     if form.validate_on_submit():
-        starred_book_to_delete = session.query(Starred).filter(
-            Starred.book_id==book_id
-        ).filter(
-            Starred.user_id==user_id
-        ).first()
-        if not starred_book_to_delete:
-            flash(f"Favori inexistant", "error")
-            session.close()
-            return redirect(url_for("index"))
         logs_context = {
             "current_user": f"{current_user.username}",
             "starred_book_deleted": starred_book_to_delete,
@@ -698,7 +699,9 @@ def add_starred_book(user_id, book_id):
         return redirect(url_for("index"))
 
     if form.validate_on_submit():
-        book = session.query(Book).filter(Book.id==book_id).first()
+        book = session.query(Book).filter(
+            Book.id==book_id
+        ).first()
         if not book:
             flash(f"Livre inexistant", "error")
             session.close()
@@ -725,7 +728,7 @@ def add_starred_book(user_id, book_id):
     return render_template(
         "add_starred_book.html",
         form=form,
-        book_to_add=book,
+        book_to_add=starred_book_to_add,
         is_authenticated=current_user.is_authenticated,
     )
 
