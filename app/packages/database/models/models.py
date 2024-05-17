@@ -13,6 +13,25 @@ from sqlalchemy_utils import EmailType
 BASE = declarative_base()
 
 
+class Starred(BASE):
+    """
+    Description: a starred model related to books of the dummy blog.
+    """
+
+    __tablename__ = "starred_table"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users_table.id"), primary_key=True)
+    book_id = Column(Integer, ForeignKey("books_table.id"), primary_key=True)
+    users = relationship("User", back_populates="starred")
+    books = relationship("Book", back_populates="starred")
+
+    def __str__(self, *args, **kwargs):
+        """
+        Description: rewrite the __str__ function for the model object.
+        """
+        return self.id
+
+
 class Comment(BASE):
     """
     Description: a comment model related to books of the dummy blog.
@@ -113,8 +132,7 @@ class Book(BASE):
     book_comments = relationship(
         "Comment", back_populates="comment_book", cascade="all, delete-orphan"
     )
-    nb_comments = Column(Integer, default=0)
-    nb_starred = Column(Integer, default=0)
+    starred = relationship("Starred", back_populates="books", cascade="delete, delete-orphan")
 
     def __str__(self, *args, **kwargs):
         """
@@ -136,8 +154,6 @@ class Book(BASE):
             "year_of_publication": self.year_of_publication,
             "publication_date": self.publication_date,
             "user_id": self.user_id,
-            "nb_comments": self.nb_comments,
-            "nb_starred": self.nb_starred,
         }
 
     def get_json_for_update(self):
@@ -184,9 +200,8 @@ class User(BASE, UserMixin):
     comments = relationship(
         "Comment", back_populates="comment_author", cascade="delete, delete-orphan"
     )
+    starred = relationship("Starred", back_populates="users", cascade="delete, delete-orphan")
     disabled = Column(Boolean, default=True)
-    nb_publications = Column(Integer, default=0)
-    nb_comments = Column(Integer, default=0)
 
     def __str__(self, *args, **kwargs):
         """
@@ -204,8 +219,6 @@ class User(BASE, UserMixin):
             "hashed_password": self.hashed_password,
             "email": self.email,
             "role": self.role,
-            "nb_publications": self.nb_publications,
-            "nb_comments": self.nb_comments,
         }
 
     def get_restricted_json(self):
@@ -218,8 +231,6 @@ class User(BASE, UserMixin):
             "username": self.username,
             "email": self.email,
             "role": self.role,
-            "nb_publications": self.nb_publications,
-            "nb_comments": self.nb_comments,
         }
 
     def get_json_for_update(self):

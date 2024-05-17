@@ -49,8 +49,6 @@ class BookModel(BaseModel):
     publication_date: dt.datetime
     book_picture_name: str
     user_id: int
-    nb_comments: int
-    nb_starred: int
 
 
 class NewBookModel(BaseModel):
@@ -92,8 +90,6 @@ class UserModel(BaseModel):
     email: str | None = None
     role: Role
     disabled: bool | None = False
-    nb_publications: int
-    nb_comments: int
 
 
 class UserInDB(UserModel):

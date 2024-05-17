@@ -38,6 +38,7 @@
                                 <li><a class="dropdown-item" href="{{ url_for('categories') }}">VOIR LES CATEGORIES</a></li>
                                 {% if is_authenticated %}
                                     {% if current_user.role != "admin" %}
+                                        <li><a class="dropdown-item" href="{{ url_for('user_starred', user_id=current_user.id) }}">VOIR VOS FAVORIS</a></li>
                                         <li><a class="dropdown-item" href="{{ url_for('user_books', user_id=current_user.id) }}">VOIR VOS LIVRES</a></li>
                                         <li><a class="dropdown-item" href="{{ url_for('add_book') }}">AJOUTER UN LIVRE</a></li>
                                     {% endif %}

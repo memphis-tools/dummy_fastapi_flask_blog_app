@@ -6,7 +6,6 @@ import base64
 from io import BytesIO
 import random
 from functools import wraps
-import matplotlib.pyplot as plt
 from flask import (
     Flask,
     url_for,
@@ -25,15 +24,15 @@ from flask_login import (
     current_user,
 )
 from flask_wtf import CSRFProtect
-from sqlalchemy import func
+from sqlalchemy import func, delete
+from sqlalchemy.orm import joinedload, load_only
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 from app.packages import handle_passwords, log_events, settings
 from app.packages.database.commands import session_commands
-from app.packages.database.models.models import Book, Comment, User, BookCategory
+from app.packages.database.models.models import Book, Comment, User, BookCategory, Starred
 from . import forms
-
 
 app = Flask(
     __name__,
@@ -469,10 +468,16 @@ def index():
         random_ids = get_random_books_ids(ids_list, MAX_BOOKS_ON_INDEX_PAGE)
     else:
         random_ids = get_random_books_ids(ids_list, len(ids_list))
-    first_books = session.query(Book).filter(Book.id.in_(random_ids)).all()
+    first_books = session.query(Book).filter(
+        Book.id.in_(random_ids)
+    ).options(
+        joinedload(Book.book_comments)
+    ).options(
+        joinedload(Book.starred)
+    ).all()
     session.close()
     return render_template(
-        "index.html", books=first_books, is_authenticated=current_user.is_authenticated
+        "index.html", books=first_books,is_authenticated=current_user.is_authenticated
     )
 
 
@@ -512,7 +517,13 @@ def books():
     Description: the books Flask route.
     """
     session = session_commands.get_a_database_session()
-    books = session.query(Book).order_by(Book.id).all()
+    books = session.query(Book).order_by(
+        Book.id
+    ).options(
+        joinedload(Book.book_comments)
+    ).options(
+        joinedload(Book.starred)
+    ).all()
     session.close()
     return render_template(
         "books.html", books=books, is_authenticated=current_user.is_authenticated
@@ -526,10 +537,23 @@ def book(book_id):
     Description: the book Flask route.
     """
     session = session_commands.get_a_database_session()
-    delete_book_form = forms.DeleteBookForm()
+    delete_book_form = forms.DeleteInstanceForm()
     form = forms.CommentForm()
-    book = session.get(Book, book_id)
+    book = session.query(Book).filter(
+        Book.id==book_id
+    ).options(
+        joinedload(Book.book_comments)
+    ).options(
+        joinedload(Book.starred)
+    ).first()
+
     comments = session.query(Comment).filter_by(book_id=book.id).all()
+
+    user_starred_books_id_list = session.query(Starred).filter(
+        Starred.user_id==current_user.id
+    ).with_entities(
+        Starred.book_id
+    ).all()
 
     logs_context = {
         "current_user": f"{current_user.username}",
@@ -543,8 +567,6 @@ def book(book_id):
             new_comment = Comment(
                 text=form.comment_text.data, author_id=current_user.id, book_id=book.id
             )
-            total_book_comments = book.nb_comments + 1
-            book.nb_comments = total_book_comments
             logs_context = {
                 "current_user": f"{current_user.username}",
                 "book_title": book.title,
@@ -558,9 +580,152 @@ def book(book_id):
     return render_template(
         "book.html",
         book=book,
+        user_starred_books_id_list=user_starred_books_id_list,
         form=form,
         delete_book_form=delete_book_form,
         comments=comments,
+        is_authenticated=current_user.is_authenticated,
+    )
+
+
+@app.route("/front/users/<int:user_id>/starred/")
+@login_required
+def user_starred(user_id):
+    """
+    Description: a user's book starred Flask route.
+    As soon as an user is authenticated he should be able to consult his starred books
+    and those from any existing users.
+    """
+    session = session_commands.get_a_database_session()
+    user = session.query(User).filter(
+        User.id==user_id
+    ).first()
+    if not user:
+        flash(f"Utilisateur id {user_id} inexistant", "error")
+        session.close()
+        return redirect(url_for("index"))
+    user_starred_books = session.query(
+        Book
+    ).join(
+        Starred
+    ).filter(
+        Book.id==Starred.book_id
+    ).filter(
+        Starred.user_id==user_id
+    ).options(
+        joinedload(Book.book_comments)
+    ).options(
+        joinedload(Book.starred)
+    ).all()
+    books = user_starred_books
+    session.close()
+    return render_template(
+        "books_starred.html", books=books, user=user, is_authenticated=current_user.is_authenticated
+    )
+
+
+@app.route("/front/users/<int:user_id>/books/<int:book_id>/starred/delete/", methods=["GET", "POST"])
+@login_required
+def delete_starred_book(user_id, book_id):
+    """
+    Description: the remove starred book Flask route.
+    """
+    session = session_commands.get_a_database_session()
+    form = forms.DeleteInstanceForm()
+    user = session.query(User).filter(User.id==user_id).first()
+    if not user:
+        flash(f"Utilisateur inexistant", "error")
+        session.close()
+        return redirect(url_for("index"))
+    if not user_id == current_user.id:
+        flash(f"Vous ne pouvez supprimer que vos favoris", "error")
+        session.close()
+        return redirect(url_for("index"))
+    if form.validate_on_submit():
+        starred_book_to_delete = session.query(Starred).filter(
+            Starred.book_id==book_id
+        ).filter(
+            Starred.user_id==user_id
+        ).first()
+        if not starred_book_to_delete:
+            flash(f"Favori inexistant", "error")
+            session.close()
+            return redirect(url_for("index"))
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "starred_book_deleted": starred_book_to_delete,
+        }
+        log_events.log_event("[+] Flask - Suppression favori.", logs_context)
+        session.delete(starred_book_to_delete)
+        session.commit()
+        flash(f"Favori supprimé", "info")
+        session.close()
+        return redirect(url_for(
+            "book",
+            book_id=starred_book_to_delete.id,
+            is_authenticated=current_user.is_authenticated,
+        ))
+    return render_template(
+        "delete_starred_book.html",
+        form=form,
+        book_to_delete=starred_book_to_delete,
+        is_authenticated=current_user.is_authenticated,
+    )
+
+
+@app.route("/front/users/<int:user_id>/books/<int:book_id>/starred/add/", methods=["GET", "POST"])
+@login_required
+def add_starred_book(user_id, book_id):
+    """
+    Description: the remove starred book Flask route.
+    """
+    session = session_commands.get_a_database_session()
+    form = forms.AddInstanceForm()
+    starred_book_to_add = session.query(Starred).filter(
+        Starred.book_id==book_id
+    ).filter(
+        Starred.user_id==user_id
+    ).first()
+
+    if starred_book_to_add:
+        flash(f"Vous avez deja ce livre en favori", "error")
+        session.close()
+        return redirect(url_for("index", is_authenticated=current_user.is_authenticated,))
+
+    if not user_id == current_user.id:
+        flash(f"Vous ne pouvez ajouter que vos favoris", "error")
+        session.close()
+        return redirect(url_for("index"))
+
+    if form.validate_on_submit():
+        book = session.query(Book).filter(Book.id==book_id).first()
+        if not book:
+            flash(f"Livre inexistant", "error")
+            session.close()
+            return redirect(url_for("index"))
+        new_starred_book = Starred(
+            user_id=current_user.id,
+            book_id=book_id,
+        )
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "starred_book_added": book,
+        }
+        log_events.log_event("[+] Flask - Ajout favori.", logs_context)
+        session.add(new_starred_book)
+        session.commit()
+        session.close()
+        flash(f"Livre en favori", "info")
+        return redirect(url_for(
+            "book",
+            book_id=book_id,
+            is_authenticated=current_user.is_authenticated,
+        ))
+    session.close()
+    return render_template(
+        "add_starred_book.html",
+        form=form,
+        book_to_add=book,
         is_authenticated=current_user.is_authenticated,
     )
 
@@ -600,9 +765,9 @@ def category_books(category_id):
     Description: the books from a category Flask route.
     """
     session = session_commands.get_a_database_session()
-    category = session.get(BookCategory, category_id)
+    category = session.query(BookCategory).filter(BookCategory.id==category_id).first()
     if not category:
-        flash(f"Categorie id {category_id} inexistante.", "error")
+        flash(f"Categorie id {category_id} inexistante", "error")
         session.close()
         return redirect(url_for("index"))
     category_books_query = session.query(Book).filter(
@@ -634,7 +799,7 @@ def user_books(user_id):
     session = session_commands.get_a_database_session()
     user = session.get(User, user_id)
     if not user:
-        flash(f"Utilisateur id {user_id} inexistant.", "error")
+        flash(f"Utilisateur id {user_id} inexistant", "error")
         session.close()
         return redirect(url_for("index"))
     books_query = session.query(Book).filter(
@@ -762,8 +927,6 @@ def add_book():
             session.commit()
             session.refresh(new_book)
             user = session.get(User, new_book.user_id)
-            total_user_publications = user.nb_publications + 1
-            user.nb_publications = total_user_publications
             session.commit()
             logs_context = {
                 "current_user": f"{current_user.username}",
@@ -808,18 +971,13 @@ def login():
         else:
             if check_password_hash(user.hashed_password, password):
                 login_user(user)
-                first_books = session.query(Book).order_by("id").all()[:3]
                 flash(f"Vous nous avez manqué {user} 🫶")
                 logs_context = {"username": f"{username}"}
                 log_events.log_event(
                     "[+] Flask - Connexion à application.", logs_context
                 )
                 session.close()
-                return render_template(
-                    "index.html",
-                    books=first_books,
-                    is_authenticated=current_user.is_authenticated,
-                )
+                return redirect(url_for("index"))
             else:
                 logs_context = {"username": f"{username}", "email": f"{email}"}
                 log_events.log_event(
@@ -975,7 +1133,7 @@ def add_user():
                 )
                 session.add(new_user)
                 session.commit()
-                flash(f"Creation utilisateur {username} faite.", "info")
+                flash(f"Creation utilisateur {username} faite", "info")
                 logs_context = {"username": f"{username}", "email": f"{email}"}
                 log_events.log_event(
                     "[+] Flask - Création compte utilisateur par admin.", logs_context
@@ -1031,7 +1189,13 @@ def update_book(book_id):
     Description: the update book Flask route.
     """
     session = session_commands.get_a_database_session()
-    book = session.get(Book, book_id)
+    book = session.query(Book).filter(
+        Book.id.in_([book_id])
+    ).options(
+        joinedload(Book.book_comments)
+    ).options(
+        joinedload(Book.starred)
+    ).first()
     if book:
         if current_user.id != book.user_id and current_user.role != "admin":
             session.close()
@@ -1215,6 +1379,39 @@ def add_book_category():
     )
 
 
+@app.route("/front/user/<int:user_id>/delete/", methods=["GET", "POST"])
+@login_required
+@admin_only
+def delete_user(user_id):
+    """
+    Description: the delete user Flask route.
+    """
+    session = session_commands.get_a_database_session()
+    form = forms.DeleteInstanceForm()
+    user_to_delete = session.get(User, user_id)
+    if user_id == 1:
+        session.close()
+        flash("Le compte admin ne peut pas etre supprime", "error")
+        return abort(403)
+    if form.validate_on_submit():
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "user_to_delete": user_to_delete.username,
+        }
+        log_events.log_event("[+] Flask - Suppression utilisateur.", logs_context)
+        session.delete(user_to_delete)
+        session.commit()
+        session.close()
+        return redirect(url_for("books"))
+    session.close()
+    return render_template(
+        "delete_user.html",
+        form=form,
+        user_to_delete=user_to_delete,
+        is_authenticated=current_user.is_authenticated,
+    )
+
+
 @app.route("/front/book/categories/<int:category_id>/delete/", methods=["GET", "POST"])
 @login_required
 @admin_only
@@ -1222,7 +1419,7 @@ def delete_book_category(category_id):
     """
     Description: delete a book category Flask route.
     """
-    form = forms.DeleteBookCategoryForm()
+    form = forms.DeleteInstanceForm()
     session = session_commands.get_a_database_session()
     category_to_delete = session.get(BookCategory, category_id)
     if category_to_delete is None:
@@ -1306,7 +1503,7 @@ def delete_book(book_id):
     Description: the delete book Flask route.
     """
     session = session_commands.get_a_database_session()
-    form = forms.DeleteBookForm()
+    form = forms.DeleteInstanceForm()
     book_to_delete = session.get(Book, book_id)
     user = session.get(User, book_to_delete.user_id)
     if current_user.id != book_to_delete.user_id and current_user.role != "admin":
@@ -1322,8 +1519,6 @@ def delete_book(book_id):
         book_picture_name = book_to_delete.book_picture_name
         session.delete(book_to_delete)
         os.remove(f"{app.instance_path}staticfiles/{book_picture_name}")
-        total_user_publications = user.nb_publications - 1
-        user.nb_publications = total_user_publications
         logs_context = {
             "current_user": f"{current_user.username}",
             "book_title": book_to_delete.title,
@@ -1348,7 +1543,7 @@ def delete_comment(comment_id):
     Description: the delete comment Flask route.
     """
     session = session_commands.get_a_database_session()
-    form = forms.DeleteCommentForm()
+    form = forms.DeleteInstanceForm()
     comment_to_delete = session.get(Comment, comment_id)
     book = session.get(Book, comment_to_delete.book_id)
     if current_user.id != comment_to_delete.author_id and current_user.role != "admin":
@@ -1371,8 +1566,6 @@ def delete_comment(comment_id):
         }
         log_events.log_event("[+] Flask - Suppression commentaire.", logs_context)
         session.delete(comment_to_delete)
-        total_book_comments = book.nb_comments - 1
-        book.nb_comments = total_book_comments
         session.commit()
         session.close()
         return redirect(url_for("books"))
@@ -1381,39 +1574,6 @@ def delete_comment(comment_id):
         "delete_comment.html",
         form=form,
         comment_to_delete=comment_to_delete,
-        is_authenticated=current_user.is_authenticated,
-    )
-
-
-@app.route("/front/user/<int:user_id>/delete/", methods=["GET", "POST"])
-@login_required
-@admin_only
-def delete_user(user_id):
-    """
-    Description: the delete user Flask route.
-    """
-    session = session_commands.get_a_database_session()
-    form = forms.DeleteUserForm()
-    user_to_delete = session.get(User, user_id)
-    if user_id == 1:
-        session.close()
-        flash("Le compte admin ne peut pas etre supprime", "error")
-        return abort(403)
-    if form.validate_on_submit():
-        logs_context = {
-            "current_user": f"{current_user.username}",
-            "user_to_delete": user_to_delete.username,
-        }
-        log_events.log_event("[+] Flask - Suppression utilisateur.", logs_context)
-        session.delete(user_to_delete)
-        session.commit()
-        session.close()
-        return redirect(url_for("books"))
-    session.close()
-    return render_template(
-        "delete_user.html",
-        form=form,
-        user_to_delete=user_to_delete,
         is_authenticated=current_user.is_authenticated,
     )
 

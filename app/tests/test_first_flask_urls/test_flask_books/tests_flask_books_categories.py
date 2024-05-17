@@ -64,16 +64,16 @@ def test_get_valid_category_books(client, access_session):
     assert b'DUMMY BLOG - LES LIVRES DE LA CATEGORIE' in response.data
 
 
-def test_get_invalid_category_books(client, access_session):
+def test_get_invalid_category_books(client, access_session_as_admin):
     """
-    Description: check if we can get all the books from a valid category.
+    Description: check if we can get all the books from an invalid category.
     """
     headers = {
-        "Cookie": f"session={access_session}"
+        "Cookie": f"session={access_session_as_admin}"
     }
     response = client.get("/front/books/categories/55555/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
-    assert b'Categorie id 55555 inexistante.' in response.data
+    assert b'Categorie id 55555 inexistante' in response.data
 
 
 def test_get_manage_books_categories_without_being_admin(client, access_session):
