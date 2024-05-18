@@ -35,5 +35,18 @@
           <hr />
       {% endfor %}
     </div>
+    {% if total_books > per_page %}
+        <div class="pagination_block d-flex flex-row justify-content-center gap-3">
+            <a href="{{ url_for('books', page=1) }}">Premiers</a>
+            {% if page > 1 %}
+                <a href="{{ url_for('books', page=page-1) }}">Précédents</a>
+            {% endif %}
+            Page {{ page }} sur {{ total_pages }}
+            {% if page < total_pages %}
+                <a href="{{ url_for('books', page=page+1) }}">Prochains</a>
+            {% endif %}
+            <a href="{{ url_for('books', page=total_pages) }}">Derniers</a>
+        </div>
+    {% endif %}
 </div>
 {% endblock content %}

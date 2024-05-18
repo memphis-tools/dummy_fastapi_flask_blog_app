@@ -139,7 +139,7 @@ input {
   align-items: start;
   justify-content: start;
   padding-bottom: 3%;
-  padding-left: 10%;
+  padding-left: 5%;
 }
 
 .op-container {
@@ -178,8 +178,8 @@ input {
 
 .post-preview {
   padding: 1% 4% 2% 0%;
-  margin-right: 5%;
-  width: 25%;
+  margin-right: 3%;
+  width: 30%;
 }
 
 .post-preview img {
@@ -519,6 +519,10 @@ footer #footer_date {
     width: 100%;
     padding: 0%;
     margin: 0%;
+  }
+
+  .pagination_block {
+    font-size: 0.8rem;
   }
 }
 

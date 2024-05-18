@@ -142,7 +142,7 @@ async def view_books(
     return books
 
 
-@app.get("/api/v1/books/categories/", tags=["books"])
+@app.get("/api/v1/books/categories/", tags=["books_categories"])
 async def view_books_categories(
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -155,7 +155,7 @@ async def view_books_categories(
     return categories
 
 
-@app.get("/api/v1/books/categories/{category_id}/", tags=["books"])
+@app.get("/api/v1/books/categories/{category_id}/", tags=["books_categories"])
 async def view_category_books(
     category_id: int,
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
@@ -176,7 +176,7 @@ async def view_category_books(
     return category_books
 
 
-@app.post("/api/v1/books/categories/", tags=["books"])
+@app.post("/api/v1/books/categories/", tags=["books_categories"])
 async def add_category_books(
     book_category: NewBookCategoryModel,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
@@ -202,7 +202,7 @@ async def add_category_books(
     return new_book_category
 
 
-@app.put("/api/v1/books/categories/{category_id}/", tags=["books"])
+@app.put("/api/v1/books/categories/{category_id}/", tags=["books_categories"])
 async def update_book_category(
     category_id: int,
     book_category_updated: UpdateBookCategoryModel,
@@ -242,7 +242,7 @@ async def update_book_category(
     return category
 
 
-@app.delete("/api/v1/books/categories/{category_id}/", tags=["books"])
+@app.delete("/api/v1/books/categories/{category_id}/", tags=["books_categories"])
 async def delete_book_category(
     category_id: int,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
@@ -602,8 +602,8 @@ async def view_users(
     """
     view_users return a list of users and all their books and comments. Each user is a dictionnary.
     """
-    books = database_crud_commands.view_all_instances(session, models.User)
-    return books
+    users = database_crud_commands.view_all_instances(session, models.User)
+    return users
 
 
 @app.get("/api/v1/users/{user_id}/", tags=["users"])
