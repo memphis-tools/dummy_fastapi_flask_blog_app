@@ -49,7 +49,7 @@ def test_flask_post_delete_comment_with_authentication(
     }
     data = {"csrf_token": get_flask_csrf_token}
     book = get_session.query(Book).filter(
-        Book.id==2
+        Book.id == 2
     ).options(
         joinedload(Book.book_comments)
     ).one()

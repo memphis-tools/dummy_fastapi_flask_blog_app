@@ -345,7 +345,7 @@ def test_flask_post_delete_book_being_authenticated_being_the_publisher(
     data = {"csrf_token": get_flask_csrf_token}
     book = get_session.get(Book, 8)
     user = get_session.query(User).filter(
-        User.id==book.user_id
+        User.id == book.user_id
     ).options(
         joinedload(User.books)
     ).one()
