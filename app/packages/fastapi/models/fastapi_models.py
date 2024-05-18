@@ -36,6 +36,42 @@ class UpdateBookCategoryModel(BaseModel):
     title: str
 
 
+class StarredModel(BaseModel):
+    """FastAPI Starred class"""
+
+    user_id: int
+
+
+class CommentModel(BaseModel):
+    """FastAPI Comment class"""
+
+    id: int
+    text: str
+    publication_date: dt.datetime
+    author_id: int
+    book_id: int
+
+
+class CommentReducedModel(BaseModel):
+    """FastAPI Reduced Comment class"""
+
+    id: int
+    author_id: int
+    book_id: int
+
+
+class NewCommentModel(BaseModel):
+    """FastAPI new Comment class"""
+
+    text: str
+
+
+class UpdateCommentModel(BaseModel):
+    """FastAPI update Comment class"""
+
+    text: str
+
+
 class BookModel(BaseModel):
     """FastAPI Book class"""
 
@@ -49,6 +85,21 @@ class BookModel(BaseModel):
     publication_date: dt.datetime
     book_picture_name: str
     user_id: int
+    book_comments: CommentReducedModel | None = None
+    starred: StarredModel | None = None
+
+
+class BookReducedModel(BaseModel):
+    """FastAPI Reduced Book class"""
+
+    id: int
+    title: str
+    author: str
+    category: str
+    year_of_publication: int
+    publication_date: dt.datetime
+    book_comments: CommentReducedModel | None = None
+    starred: StarredModel | None = None
 
 
 class NewBookModel(BaseModel):
@@ -87,9 +138,9 @@ class UserModel(BaseModel):
 
     id: int
     username: str
-    email: str | None = None
     role: Role
     disabled: bool | None = False
+    books: BookReducedModel | None = None
 
 
 class UserInDB(UserModel):
@@ -128,25 +179,3 @@ class UpdateUserEmailInDB(BaseModel):
     """FastAPI update User email class"""
 
     email: str
-
-
-class CommentModel(BaseModel):
-    """FastAPI Comment class"""
-
-    id: int
-    text: str
-    publication_date: dt.datetime
-    author_id: int
-    book_id: int
-
-
-class NewCommentModel(BaseModel):
-    """FastAPI new Comment class"""
-
-    text: str
-
-
-class UpdateCommentModel(BaseModel):
-    """FastAPI update Comment class"""
-
-    text: str
