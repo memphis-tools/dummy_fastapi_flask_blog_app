@@ -16,6 +16,7 @@ from flask import (
     redirect,
     request,
 )
+
 from flask_bootstrap import Bootstrap
 from flask_login import (
     LoginManager,
@@ -525,9 +526,26 @@ def books():
     ).options(
         joinedload(Book.starred)
     ).all()
+    total_books = len(books)
+    # Get the 'page' query parameter from the URL
+    page = request.args.get('page', 1, type=int)
+    per_page = app.config['POSTS_PER_PAGE']
+    # Calculate the start and end indices of the items to display
+    start = (page - 1) * per_page
+    end = start + per_page
+    # Get the subset of items for the current page
+    items = books[start:end]
+    # Calculate the total number of pages
+    total_pages = len(books) // per_page + (1 if len(books) % per_page > 0 else 0)
     session.close()
     return render_template(
-        "books.html", books=books, is_authenticated=current_user.is_authenticated
+        "books.html",
+        books=items,
+        page=page,
+        total_books=total_books,
+        per_page=per_page,
+        total_pages=total_pages,
+        is_authenticated=current_user.is_authenticated,
     )
 
 
