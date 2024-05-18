@@ -26,8 +26,8 @@ from flask_login import (
     current_user,
 )
 from flask_wtf import CSRFProtect
-from sqlalchemy import func, delete
-from sqlalchemy.orm import joinedload, load_only
+from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
@@ -479,7 +479,7 @@ def index():
     ).all()
     session.close()
     return render_template(
-        "index.html", books=first_books,is_authenticated=current_user.is_authenticated
+        "index.html", books=first_books, is_authenticated=current_user.is_authenticated
     )
 
 
@@ -559,7 +559,7 @@ def book(book_id):
     delete_book_form = forms.DeleteInstanceForm()
     form = forms.CommentForm()
     book = session.query(Book).filter(
-        Book.id==book_id
+        Book.id == book_id
     ).options(
         joinedload(Book.book_comments)
     ).options(
@@ -569,7 +569,7 @@ def book(book_id):
     comments = session.query(Comment).filter_by(book_id=book.id).all()
 
     user_starred_books_id_list = session.query(Starred).filter(
-        Starred.user_id==current_user.id
+        Starred.user_id == current_user.id
     ).with_entities(
         Starred.book_id
     ).all()
@@ -617,7 +617,7 @@ def user_starred(user_id):
     """
     session = session_commands.get_a_database_session()
     user = session.query(User).filter(
-        User.id==user_id
+        User.id == user_id
     ).first()
     if not user:
         flash(f"Utilisateur id {user_id} inexistant", "error")
@@ -628,9 +628,9 @@ def user_starred(user_id):
     ).join(
         Starred
     ).filter(
-        Book.id==Starred.book_id
+        Book.id == Starred.book_id
     ).filter(
-        Starred.user_id==user_id
+        Starred.user_id == user_id
     ).options(
         joinedload(Book.book_comments)
     ).options(
@@ -651,22 +651,22 @@ def delete_starred_book(user_id, book_id):
     """
     session = session_commands.get_a_database_session()
     form = forms.DeleteInstanceForm()
-    user = session.query(User).filter(User.id==user_id).first()
+    user = session.query(User).filter(User.id == user_id).first()
     if not user:
-        flash(f"Utilisateur inexistant", "error")
+        flash("Utilisateur inexistant", "error")
         session.close()
         return redirect(url_for("index"))
     starred_book_to_delete = session.query(Starred).filter(
-        Starred.book_id==book_id
+        Starred.book_id == book_id
     ).filter(
-        Starred.user_id==user_id
+        Starred.user_id == user_id
     ).first()
     if not starred_book_to_delete:
-        flash(f"Favori inexistant", "error")
+        flash("Favori inexistant", "error")
         session.close()
         return redirect(url_for("index"))
     if not user_id == current_user.id:
-        flash(f"Vous ne pouvez supprimer que vos favoris", "error")
+        flash("Vous ne pouvez supprimer que vos favoris", "error")
         session.close()
         return redirect(url_for("index"))
     if form.validate_on_submit():
@@ -677,7 +677,7 @@ def delete_starred_book(user_id, book_id):
         log_events.log_event("[+] Flask - Suppression favori.", logs_context)
         session.delete(starred_book_to_delete)
         session.commit()
-        flash(f"Favori supprimé", "info")
+        flash("Favori supprimé", "info")
         session.close()
         return redirect(url_for(
             "book",
@@ -701,27 +701,27 @@ def add_starred_book(user_id, book_id):
     session = session_commands.get_a_database_session()
     form = forms.AddInstanceForm()
     starred_book_to_add = session.query(Starred).filter(
-        Starred.book_id==book_id
+        Starred.book_id == book_id
     ).filter(
-        Starred.user_id==user_id
+        Starred.user_id == user_id
     ).first()
 
     if starred_book_to_add:
-        flash(f"Vous avez deja ce livre en favori", "error")
+        flash("Vous avez deja ce livre en favori", "error")
         session.close()
         return redirect(url_for("index", is_authenticated=current_user.is_authenticated,))
 
     if not user_id == current_user.id:
-        flash(f"Vous ne pouvez ajouter que vos favoris", "error")
+        flash("Vous ne pouvez ajouter que vos favoris", "error")
         session.close()
         return redirect(url_for("index"))
 
     if form.validate_on_submit():
         book = session.query(Book).filter(
-            Book.id==book_id
+            Book.id == book_id
         ).first()
         if not book:
-            flash(f"Livre inexistant", "error")
+            flash("Livre inexistant", "error")
             session.close()
             return redirect(url_for("index"))
         new_starred_book = Starred(
@@ -736,7 +736,7 @@ def add_starred_book(user_id, book_id):
         session.add(new_starred_book)
         session.commit()
         session.close()
-        flash(f"Livre en favori", "info")
+        flash("Livre en favori", "info")
         return redirect(url_for(
             "book",
             book_id=book_id,
@@ -786,7 +786,7 @@ def category_books(category_id):
     Description: the books from a category Flask route.
     """
     session = session_commands.get_a_database_session()
-    category = session.query(BookCategory).filter(BookCategory.id==category_id).first()
+    category = session.query(BookCategory).filter(BookCategory.id == category_id).first()
     if not category:
         flash(f"Categorie id {category_id} inexistante", "error")
         session.close()
