@@ -154,6 +154,8 @@ class Book(BASE):
             "year_of_publication": self.year_of_publication,
             "publication_date": self.publication_date,
             "user_id": self.user_id,
+            "book_comments": self.book_comments,
+            "starred": self.starred,
         }
 
     def get_json_for_update(self):
@@ -231,6 +233,9 @@ class User(BASE, UserMixin):
             "username": self.username,
             "email": self.email,
             "role": self.role,
+            "books": self.books,
+            "comments": self.comments,
+            "starred": self.starred,
         }
 
     def get_json_for_update(self):
