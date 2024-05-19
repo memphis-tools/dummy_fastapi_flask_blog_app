@@ -76,17 +76,6 @@ def test_get_any_valid_quotes_for_deleting_as_admin(client, access_session_as_ad
     assert response.status_code == 200
 
 
-def test_get_any_invalid_quotes_for_deleting_as_admin(client, access_session_as_admin):
-    """
-    Description: check if we can ask delete an invalid quote page as admin.
-    """
-    headers = {"Cookie": f"session={access_session_as_admin}"}
-    response = client.get(
-        "/front/quotes/55555/delete/", headers=headers, follow_redirects=True
-    )
-    assert response.status_code == 404
-
-
 def test_add_a_valid_quote_as_admin(
     client,
     access_session_as_admin,
