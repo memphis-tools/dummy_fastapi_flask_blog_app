@@ -64,6 +64,7 @@
                         <li class="nav-item"><a class="nav-link" href="https://forms.gle/bNJqv3PGSHuaSvTq5" target="_blank">SUGGESTIONS</a></li>
                         {% if is_authenticated %}
                           {% if current_user.role == "admin" %}
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('view_quotes') }}">CITATIONS</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('users') }}">UTILISATEURS</a></li>
                           {% endif %}
                             <li class="nav-item dropdown">
