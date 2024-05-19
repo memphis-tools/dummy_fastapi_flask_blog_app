@@ -19,8 +19,8 @@
               <img src="{{ url_for('static', filename=book.book_picture_name) }}" align="middle" />
               <legend>Auteur: {{ book.author }}</legend>
               <div class="counters">
-                  <legend>Commentaires: {{ book.nb_comments }}</legend>
-                  <legend>Favoris: {{ book.nb_starred }}</legend>
+                  <legend>Commentaires: {{ book.book_comments | length }}</legend>
+                  <legend>Favoris: {{ book.starred | length }}</legend>
               </div>
           </div>
           <hr />
