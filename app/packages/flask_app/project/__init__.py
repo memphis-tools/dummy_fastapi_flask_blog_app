@@ -33,7 +33,7 @@ from werkzeug.utils import secure_filename
 
 from app.packages import handle_passwords, log_events, settings
 from app.packages.database.commands import session_commands
-from app.packages.database.models.models import Book, Comment, User, BookCategory, Starred
+from app.packages.database.models.models import Book, Comment, User, BookCategory, Starred, Quote
 from . import forms
 
 app = Flask(
@@ -513,6 +513,35 @@ def contact():
     )
 
 
+def return_random_quote():
+    """
+    Description: return a random quote from the dedicated model.
+    """
+    session = session_commands.get_a_database_session()
+    quotes = session.query(Quote).all()
+    session.close()
+    total_quotes_indexes = len(quotes) - 1
+    random_quote = quotes[random.randint(0, total_quotes_indexes)]
+    return random_quote
+
+
+def return_pagination(items_to_paginate):
+    """
+    Description: manual pagination since we do not use Flask-SQLAlchemy.
+    """
+    # Get the 'page' query parameter from the URL
+    page = request.args.get('page', 1, type=int)
+    per_page = app.config['POSTS_PER_PAGE']
+    # Calculate the start and end indices of the items to display
+    start = (page - 1) * per_page
+    end = start + per_page
+    # Get the subset of items for the current page
+    items = items_to_paginate[start:end]
+    # Calculate the total number of pages
+    total_pages = len(items_to_paginate) // per_page + (1 if len(items_to_paginate) % per_page > 0 else 0)
+    return items, page, per_page, total_pages
+
+
 @app.route("/front/books/")
 def books():
     """
@@ -526,20 +555,13 @@ def books():
     ).options(
         joinedload(Book.starred)
     ).all()
-    total_books = len(books)
-    # Get the 'page' query parameter from the URL
-    page = request.args.get('page', 1, type=int)
-    per_page = app.config['POSTS_PER_PAGE']
-    # Calculate the start and end indices of the items to display
-    start = (page - 1) * per_page
-    end = start + per_page
-    # Get the subset of items for the current page
-    items = books[start:end]
-    # Calculate the total number of pages
-    total_pages = len(books) // per_page + (1 if len(books) % per_page > 0 else 0)
     session.close()
+    total_books = len(books)
+    items, page, per_page, total_pages = return_pagination(books)
+    random_quote = return_random_quote()
     return render_template(
         "books.html",
+        random_quote=random_quote,
         books=items,
         page=page,
         total_books=total_books,
@@ -623,7 +645,7 @@ def user_starred(user_id):
         flash(f"Utilisateur id {user_id} inexistant", "error")
         session.close()
         return redirect(url_for("index"))
-    user_starred_books = session.query(
+    books = session.query(
         Book
     ).join(
         Starred
@@ -636,10 +658,18 @@ def user_starred(user_id):
     ).options(
         joinedload(Book.starred)
     ).all()
-    books = user_starred_books
     session.close()
+    total_books = len(books)
+    items, page, per_page, total_pages = return_pagination(books)
     return render_template(
-        "books_starred.html", books=books, user=user, is_authenticated=current_user.is_authenticated
+        "books_starred.html",
+        books=items,
+        page=page,
+        total_books=total_books,
+        per_page=per_page,
+        total_pages=total_pages,
+        user=user,
+        is_authenticated=current_user.is_authenticated
     )
 
 
@@ -791,19 +821,28 @@ def category_books(category_id):
         flash(f"Categorie id {category_id} inexistante", "error")
         session.close()
         return redirect(url_for("index"))
-    category_books_query = session.query(Book).filter(
+    books = session.query(Book).filter(
         Book.category.in_(
             [
                 category_id,
             ]
         )
-    )
-    books = category_books_query.all()
+    ).options(
+        joinedload(Book.book_comments)
+    ).options(
+        joinedload(Book.starred)
+    ).all()
     session.close()
+    total_books = len(books)
+    items, page, per_page, total_pages = return_pagination(books)
     return render_template(
         "category_books.html",
         category=category,
-        books=books,
+        books=items,
+        page=page,
+        total_books=total_books,
+        per_page=per_page,
+        total_pages=total_pages,
         is_authenticated=current_user.is_authenticated,
     )
 
@@ -823,26 +862,39 @@ def user_books(user_id):
         flash(f"Utilisateur id {user_id} inexistant", "error")
         session.close()
         return redirect(url_for("index"))
-    books_query = session.query(Book).filter(
+    books = session.query(Book).filter(
         Book.user_id.in_(
             [
                 user_id,
             ]
         )
-    )
-    books = books_query.all()
+    ).options(
+        joinedload(Book.book_comments)
+    ).options(
+        joinedload(Book.starred)
+    ).all()
     session.close()
+    total_books = len(books)
+    items, page, per_page, total_pages = return_pagination(books)
     if current_user.id == user_id:
         return render_template(
             "user_books.html",
-            books=books,
+            books=items,
+            page=page,
+            total_books=total_books,
+            per_page=per_page,
+            total_pages=total_pages,
             user_name=user.username,
             is_authenticated=current_user.is_authenticated,
         )
     else:
         return render_template(
             "user_any_books.html",
-            books=books,
+            books=items,
+            page=page,
+            total_books=total_books,
+            per_page=per_page,
+            total_pages=total_pages,
             user_name=user.username,
             is_authenticated=current_user.is_authenticated,
         )
@@ -1396,6 +1448,111 @@ def add_book_category():
     return render_template(
         "add_book_category.html",
         form=form,
+        is_authenticated=current_user.is_authenticated,
+    )
+
+
+@app.route("/front/quotes/", methods=["GET"])
+@login_required
+@admin_only
+def view_quotes():
+    """
+    Description: the quotes Flask route.
+    """
+    session = session_commands.get_a_database_session()
+    quotes = session.query(Quote).all()
+    session.close()
+    return render_template(
+        "view_quotes.html", quotes=quotes, is_authenticated=current_user.is_authenticated
+    )
+
+
+@app.route("/front/quotes/<int:quote_id>/", methods=["GET"])
+@login_required
+@admin_only
+def view_quote(quote_id):
+    """
+    Description: the a quote Flask route.
+    """
+    session = session_commands.get_a_database_session()
+    form = forms.DeleteInstanceForm()
+    quote_to_view = session.get(Quote, quote_id)
+    session.close()
+    if not quote_to_view:
+        session.close()
+        flash("Citation inconnue", "error")
+        return abort(404)
+    return render_template(
+        "view_quote.html",
+        quote=quote_to_view,
+        is_authenticated=current_user.is_authenticated,
+    )
+
+
+@app.route("/front/quotes/add/", methods=["GET", "POST"])
+@login_required
+@admin_only
+def add_quote():
+    """
+    Description: the add quote Flask route.
+    """
+    form = forms.CreateQuoteForm()
+    if form.validate_on_submit():
+        session = session_commands.get_a_database_session()
+        author = str(form.author.data).lower()
+        book_title = str(form.book_title.data).lower()
+        quote = str(form.quote.data).lower()
+        new_quote = Quote(
+            author=author, book_title=book_title, quote=quote
+        )
+        session.add(new_quote)
+        session.commit()
+        flash(f"Ajout citation {author} {book_title} faite", "info")
+        logs_context = {
+            "author": f"{author}",
+            "book_title": f"{book_title}",
+            "quote": f"{quote}",
+        }
+        log_events.log_event(
+            "[+] Flask - Ajout citation par admin.", logs_context
+        )
+        session.close()
+        return redirect(url_for("books"))
+    return render_template(
+        "add_quote.html", form=form, is_authenticated=current_user.is_authenticated
+    )
+
+
+@app.route("/front/quotes/<int:quote_id>/delete/", methods=["GET", "POST"])
+@login_required
+@admin_only
+def delete_quote(quote_id):
+    """
+    Description: the delete quote Flask route.
+    """
+    session = session_commands.get_a_database_session()
+    form = forms.DeleteInstanceForm()
+    quote_to_delete = session.get(Quote, quote_id)
+    if not quote_to_delete:
+        session.close()
+        flash("Citation inconnue", "error")
+        return abort(404)
+    if form.validate_on_submit():
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "quote_to_delete": quote_to_delete.author,
+            "book_title": quote_to_delete.book_title,
+        }
+        log_events.log_event("[+] Flask - Suppression citation.", logs_context)
+        session.delete(quote_to_delete)
+        session.commit()
+        session.close()
+        return redirect(url_for("books"))
+    session.close()
+    return render_template(
+        "delete_quote.html",
+        form=form,
+        quote=quote_to_delete,
         is_authenticated=current_user.is_authenticated,
     )
 

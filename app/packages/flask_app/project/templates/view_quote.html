@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}BOOKS{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1>DUMMY BLOG - CITATION</h1>
+    <div class="section_intro">
+        <i>
+            <p>
+              "{{ quote.quote }}"
+            </p>
+            <p>
+                {{ quote.author }} - {{ quote.book_title }}
+            </p>
+        </i>
+    </div>
+    <div class="home-books-container">
+        <a class="btn btn-primary" href="{{ url_for('view_quotes') }}">RETOUR AUX CITATIONS</a>
+    </div>
+</div>
+{% endblock content %}

@@ -32,6 +32,36 @@ class Starred(BASE):
         return self.id
 
 
+class Quote(BASE):
+    """
+    Description: a quote model for the dummy blog.
+    Notice the quote does not necessary comes from a dummy blog's book.
+    """
+
+    __tablename__ = "quote_table"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    author = Column(String(150), nullable=False)
+    book_title = Column(String(200), nullable=False)
+    quote = Column(String(500), nullable=False)
+
+    def __str__(self, *args, **kwargs):
+        """
+        Description: rewrite the __str__ function for the model object.
+        """
+        return self.id
+
+    def get_json(self):
+        """
+        Description: get a quote instance as a json dict during general application execution.
+        """
+        return {
+            "id": self.id,
+            "author": self.author,
+            "book_title": self.book_title,
+            "quote": self.quote,
+        }
+
+
 class Comment(BASE):
     """
     Description: a comment model related to books of the dummy blog.

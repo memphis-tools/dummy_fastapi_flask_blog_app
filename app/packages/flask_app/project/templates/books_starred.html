@@ -4,16 +4,7 @@
 
 {% block content %}
 <div class="container">
-    <div class="section_intro">
-      <i>
-        <p>
-          "Chacun doit concevoir son credo selon sa propre longueur d'ondes et j'espère que le Grand Poste Récepteur est réglé pour capter toutes les longueurs d'ondes."
-        </p>
-        <p>
-            Rudyard Kipling - Au bout du voyage
-        </p>
-      </i>
-    </div>
+    <div class="section_intro"></div>
     <h1>DUMMY BLOG - LES FAVORIS DE {{ user | upper }}</h1>
     <div class="home-books-container">
       {% for book in books %}
@@ -35,5 +26,18 @@
           <hr />
       {% endfor %}
     </div>
+    {% if total_books > per_page %}
+        <div class="pagination_block d-flex flex-row justify-content-center gap-3">
+            <a href="{{ url_for('books', page=1) }}">Premiers</a>
+            {% if page > 1 %}
+                <a href="{{ url_for('books', page=page-1) }}">Précédents</a>
+            {% endif %}
+            Page {{ page }} sur {{ total_pages }}
+            {% if page < total_pages %}
+                <a href="{{ url_for('books', page=page+1) }}">Prochains</a>
+            {% endif %}
+            <a href="{{ url_for('books', page=total_pages) }}">Derniers</a>
+        </div>
+    {% endif %}
 </div>
 {% endblock content %}
