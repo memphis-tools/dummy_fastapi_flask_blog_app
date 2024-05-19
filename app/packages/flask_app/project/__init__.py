@@ -513,6 +513,20 @@ def contact():
     )
 
 
+def return_pagination(items_to_paginate):
+    # Get the 'page' query parameter from the URL
+    page = request.args.get('page', 1, type=int)
+    per_page = app.config['POSTS_PER_PAGE']
+    # Calculate the start and end indices of the items to display
+    start = (page - 1) * per_page
+    end = start + per_page
+    # Get the subset of items for the current page
+    items = items_to_paginate[start:end]
+    # Calculate the total number of pages
+    total_pages = len(items_to_paginate) // per_page + (1 if len(items_to_paginate) % per_page > 0 else 0)
+    return items, page, per_page, total_pages
+
+
 @app.route("/front/books/")
 def books():
     """
@@ -526,18 +540,9 @@ def books():
     ).options(
         joinedload(Book.starred)
     ).all()
-    total_books = len(books)
-    # Get the 'page' query parameter from the URL
-    page = request.args.get('page', 1, type=int)
-    per_page = app.config['POSTS_PER_PAGE']
-    # Calculate the start and end indices of the items to display
-    start = (page - 1) * per_page
-    end = start + per_page
-    # Get the subset of items for the current page
-    items = books[start:end]
-    # Calculate the total number of pages
-    total_pages = len(books) // per_page + (1 if len(books) % per_page > 0 else 0)
     session.close()
+    total_books = len(books)
+    items, page, per_page, total_pages = return_pagination(books)
     return render_template(
         "books.html",
         books=items,
@@ -623,7 +628,7 @@ def user_starred(user_id):
         flash(f"Utilisateur id {user_id} inexistant", "error")
         session.close()
         return redirect(url_for("index"))
-    user_starred_books = session.query(
+    books = session.query(
         Book
     ).join(
         Starred
@@ -636,10 +641,18 @@ def user_starred(user_id):
     ).options(
         joinedload(Book.starred)
     ).all()
-    books = user_starred_books
     session.close()
+    total_books = len(books)
+    items, page, per_page, total_pages = return_pagination(books)
     return render_template(
-        "books_starred.html", books=books, user=user, is_authenticated=current_user.is_authenticated
+        "books_starred.html",
+        books=items,
+        page=page,
+        total_books=total_books,
+        per_page=per_page,
+        total_pages=total_pages,
+        user=user,
+        is_authenticated=current_user.is_authenticated
     )
 
 
@@ -791,7 +804,7 @@ def category_books(category_id):
         flash(f"Categorie id {category_id} inexistante", "error")
         session.close()
         return redirect(url_for("index"))
-    category_books_query = session.query(Book).filter(
+    books = session.query(Book).filter(
         Book.category.in_(
             [
                 category_id,
@@ -801,13 +814,18 @@ def category_books(category_id):
         joinedload(Book.book_comments)
     ).options(
         joinedload(Book.starred)
-    )
-    books = category_books_query.all()
+    ).all()
     session.close()
+    total_books = len(books)
+    items, page, per_page, total_pages = return_pagination(books)
     return render_template(
         "category_books.html",
         category=category,
-        books=books,
+        books=items,
+        page=page,
+        total_books=total_books,
+        per_page=per_page,
+        total_pages=total_pages,
         is_authenticated=current_user.is_authenticated,
     )
 
@@ -827,7 +845,7 @@ def user_books(user_id):
         flash(f"Utilisateur id {user_id} inexistant", "error")
         session.close()
         return redirect(url_for("index"))
-    books_query = session.query(Book).filter(
+    books = session.query(Book).filter(
         Book.user_id.in_(
             [
                 user_id,
@@ -837,20 +855,29 @@ def user_books(user_id):
         joinedload(Book.book_comments)
     ).options(
         joinedload(Book.starred)
-    )
-    books = books_query.all()
+    ).all()
     session.close()
+    total_books = len(books)
+    items, page, per_page, total_pages = return_pagination(books)
     if current_user.id == user_id:
         return render_template(
             "user_books.html",
-            books=books,
+            books=items,
+            page=page,
+            total_books=total_books,
+            per_page=per_page,
+            total_pages=total_pages,
             user_name=user.username,
             is_authenticated=current_user.is_authenticated,
         )
     else:
         return render_template(
             "user_any_books.html",
-            books=books,
+            books=items,
+            page=page,
+            total_books=total_books,
+            per_page=per_page,
+            total_pages=total_pages,
             user_name=user.username,
             is_authenticated=current_user.is_authenticated,
         )
