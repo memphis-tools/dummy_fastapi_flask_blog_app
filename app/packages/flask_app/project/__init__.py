@@ -797,6 +797,10 @@ def category_books(category_id):
                 category_id,
             ]
         )
+    ).options(
+        joinedload(Book.book_comments)
+    ).options(
+        joinedload(Book.starred)
     )
     books = category_books_query.all()
     session.close()
@@ -829,6 +833,10 @@ def user_books(user_id):
                 user_id,
             ]
         )
+    ).options(
+        joinedload(Book.book_comments)
+    ).options(
+        joinedload(Book.starred)
     )
     books = books_query.all()
     session.close()
