@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from enum import Enum
 import datetime as dt
 from typing import Optional
@@ -70,6 +70,23 @@ class UpdateCommentModel(BaseModel):
     """FastAPI update Comment class"""
 
     text: str
+
+
+class QuoteModel(BaseModel):
+    """FastAPI Quote class"""
+
+    id: int
+    author: str
+    book_title: str
+    quote: str
+
+
+class NewQuoteModel(BaseModel):
+    """FastAPI new Quote class"""
+
+    author: str = Field(title="Name of the book's author", min_length=3)
+    book_title: str = Field(title="Title of the book", min_length=3)
+    quote: str = Field(title="Citation from the book", min_length=3)
 
 
 class BookModel(BaseModel):

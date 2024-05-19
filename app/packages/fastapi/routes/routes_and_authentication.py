@@ -21,6 +21,8 @@ from app.packages.fastapi.models.fastapi_models import (
     UpdateCommentModel,
     NewBookCategoryModel,
     UpdateBookCategoryModel,
+    QuoteModel,
+    NewQuoteModel,
     Token,
     TokenData,
 )
@@ -965,3 +967,125 @@ async def delete_book(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"book with id {book_id} does not exist",
     )
+
+
+@app.get("/api/v1/quotes/", tags=["quotes"])
+async def get_quotes(
+    current_user: Annotated[UserModel, Depends(get_current_user)]
+):
+    """return quotes"""
+    if current_user.role == "admin":
+        quotes = database_crud_commands.view_all_instances(session, models.Quote)
+        return quotes
+    else:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event(
+            "[+] FastAPI - Consultation citations refusee, vous n'etes pas admin.",
+            logs_context,
+        )
+        raise HTTPException(
+            status_code=status. HTTP_403_FORBIDDEN,
+            detail="Seul l'admin peut consulter les citations",
+        )
+
+
+@app.get("/api/v1/quotes/{quote_id}/", tags=["quotes"])
+async def get_quote(
+    quote_id: int,
+    current_user: Annotated[UserModel, Depends(get_current_user)]
+) -> QuoteModel:
+    """return a quote based on id"""
+    if current_user.role == "admin":
+        quote = database_crud_commands.get_instance(session, models.Quote, quote_id)
+        return quote
+    else:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event(
+            "[+] FastAPI - Consultation citation refusee, vous n'etes pas admin.",
+            logs_context,
+        )
+        raise HTTPException(
+            status_code=status. HTTP_403_FORBIDDEN,
+            detail="Seul l'admin peut consulter une citation",
+        )
+
+
+@app.post("/api/v1/quotes/", tags=["quotes"])
+async def add_quote(
+    quote: NewQuoteModel,
+    current_user: Annotated[UserModel, Depends(get_current_user)],
+) -> NewQuoteModel:
+    """add a quote and return it"""
+    if current_user.role == "admin":
+        new_quote = models.Quote(
+            author=quote.author,
+            book_title=quote.book_title,
+            quote=quote.quote,
+        )
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "author": new_quote.author,
+            "book_title": new_quote.book_title,
+            "quote": new_quote.quote,
+        }
+        log_events.log_event("[+] FastAPI - Ajout citation.", logs_context)
+        session.add(new_quote)
+        session.commit()
+        return new_quote
+    else:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event(
+            "[+] FastAPI - Ajout citation refusee, vous n'etes pas admin.",
+            logs_context,
+        )
+        raise HTTPException(
+            status_code=status. HTTP_403_FORBIDDEN,
+            detail="Seul l'admin peut ajouter une citation",
+        )
+
+
+@app.delete("/api/v1/quotes/{quote_id}/", tags=["quotes"])
+async def delete_quote(
+    quote_id: int,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+):
+    """
+    delete_quote allows to delete a quote base on id
+    """
+    if current_user.role == "admin":
+        quote = database_crud_commands.get_instance(session, models.Quote, quote_id)
+        if quote:
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "author": quote.author,
+                "book_title": quote.book_title,
+            }
+            log_events.log_event("[+] FastAPI - Suppression citation.", logs_context)
+            session.delete(quote)
+            session.commit()
+            raise HTTPException(
+                status_code=status.HTTP_204_NO_CONTENT,
+                detail=f"Citation id {quote_id} supprimée.",
+            )
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Citation id {quote_id} inexistante",
+        )
+    else:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event(
+            "[+] FastAPI - Suppression citation refusee, vous n'etes pas admin.",
+            logs_context,
+        )
+        raise HTTPException(
+            status_code=status. HTTP_403_FORBIDDEN,
+            detail="Seul l'admin peut supprimer une citation",
+        )

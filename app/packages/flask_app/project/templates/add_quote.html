@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}ADD QUOTE{% endblock title %}
+
+{% block content %}
+<div class="container">
+  <div class="section_intro"></div>
+  <h1>DUMMY BLOG - AJOUTER CITATION</h1>
+  <div class="d-flex flex-column justify-content-center align-items-center">
+    <div class="d-flex flex-column justify-content-center w-50">
+      <form class="form" action="" method="post">
+        {{ form.csrf_token }}
+        <label for="author">{{ form.author.label }}</label>{{ form.author }}
+        <label for="book_title">{{ form.book_title.label }}</label>{{ form.book_title }}
+        <label for="quote">{{ form.quote.label }}</label>{{ form.quote }}
+        <button type="submit" class="btn btn-primary" name="button">AJOUTER</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}

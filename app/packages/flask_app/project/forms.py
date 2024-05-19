@@ -221,6 +221,22 @@ class ContactForm(FlaskForm):
     )
 
 
+class CreateQuoteForm(FlaskForm):
+    """
+    Description: the create quote FlaskForm form.
+    """
+
+    author = StringField(
+        "NOM AUTEUR", validators=[DataRequired(), Length(min=3, max=150)]
+    )
+    book_title = StringField(
+        "TITRE LIVRE", validators=[DataRequired(), Length(min=2, max=200)]
+    )
+    quote = TextAreaField(
+        "CITATION", validators=[DataRequired(), Length(min=2, max=500)]
+    )
+
+
 class AddInstanceForm(FlaskForm):
     """
     Description: an add instance FlaskForm form.

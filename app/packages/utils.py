@@ -44,6 +44,14 @@ def call_dummy_setup(session):
         except Exception:
             print("[+] Starred already exists sir, nothing to do.")
 
+    dummy_quotes_list = set_dummies_quotes()
+    for quote in dummy_quotes_list:
+        try:
+            session.add(quote)
+            session.commit()
+        except Exception:
+            print("[+] Quote already exists sir, nothing to do.")
+
 
 def set_a_hash_password(password):
     """
@@ -290,3 +298,30 @@ def set_dummies_starred():
         ),
     ]
     return dummy_starred_list
+
+
+def set_dummies_quotes():
+    """
+    Description: set_dummies_quotes creates dummies book quotes
+    """
+    dummy_quotes_list: List[models.Quote] = [
+        models.Quote(
+            author="Rudyard Kipling",
+            book_title="Au bout du voyage",
+            quote="Chacun doit concevoir son credo selon sa propre longueur d'ondes et j'espère \
+                    que le Grand Poste Récepteur est réglé pour capter toutes les longueurs d'ondes."
+        ),
+        models.Quote(
+            author="Inconnu",
+            book_title="Provers chinois",
+            quote="En buvant l'eau du puits, n'oubliez pas ceux qui l'ont creusé \
+                    (Heshui buwang juejingren)."
+        ),
+        models.Quote(
+            author="Delphine de Vigan",
+            book_title="Les gratitudes",
+            quote="On croit toujours qu'on a le temps de dire les choses, et puis soudain \
+                    c'est trop tard."
+        ),
+    ]
+    return dummy_quotes_list
