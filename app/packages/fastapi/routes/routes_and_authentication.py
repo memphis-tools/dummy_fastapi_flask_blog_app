@@ -898,6 +898,11 @@ async def delete_user(
     delete_comment allows to delete an user base on id
     """
     user = database_crud_commands.get_instance(session, models.User, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"user with id {user_id} does not exist",
+        )
     if current_user.role == "admin":
         if user:
             logs_context = {
@@ -927,10 +932,6 @@ async def delete_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Seul l'admin peut supprimer un utilisateur",
         )
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"user with id {user_id} does not exist",
-    )
 
 
 @app.delete("/api/v1/books/{book_id}/", tags=["books"])
