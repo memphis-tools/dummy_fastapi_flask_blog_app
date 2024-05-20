@@ -83,7 +83,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     """get the current user"""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="Identifiants invalides",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -123,7 +123,7 @@ async def login_for_access_token(
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Nom utilisateur ou mot de passe invalide",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -171,7 +171,7 @@ async def view_category_books(
     if len(category_books) == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Incorrect category id",
+            detail="Catégorie avec id {category_id} inexistante.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -225,7 +225,7 @@ async def update_book_category(
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Incorrect category id",
+            detail="Catégorie avec id {category_id} inexistante.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     if book_category_updated.title is not None:
@@ -264,7 +264,7 @@ async def delete_book_category(
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Incorrect category id",
+            detail="catégorie avec id {category_id} inexistante",
             headers={"WWW-Authenticate": "Bearer"},
         )
     logs_context = {
@@ -276,7 +276,7 @@ async def delete_book_category(
     session.commit()
     raise HTTPException(
         status_code=status.HTTP_204_NO_CONTENT,
-        detail=f"category with id {category_id} removed.",
+        detail=f"catégorie avec id {category_id} supprimée.",
     )
 
 
@@ -593,7 +593,7 @@ async def update_book(
             )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"book with id {book_id} does not exist",
+        detail=f"livre avec id {book_id} inexistant",
     )
 
 
@@ -651,7 +651,7 @@ async def update_user(
             )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"user with id {user_id} does not exist",
+        detail=f"utilisateur avec id {user_id} inexistant",
     )
 
 
@@ -712,7 +712,7 @@ async def update_user_password(
             )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"user with id {user_id} does not exist",
+        detail=f"utilisateur avec id {user_id} inexistant",
     )
 
 
@@ -730,7 +730,7 @@ async def view_user_comments(
         return comments
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"user with id {user_id} does not exist",
+        detail=f"utilisateur avec id {user_id} inexistant",
     )
 
 
@@ -782,7 +782,7 @@ async def add_comment(
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"book with id {book_id} does not exist",
+        detail=f"livre avec id {book_id} inexistant",
     )
 
 
@@ -817,7 +817,7 @@ async def update_comment(
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"comment with id {comment_id} does not exist",
+        detail=f"commentaire avec id {comment_id} inexistant",
     )
 
 
@@ -870,7 +870,7 @@ async def delete_comment(
             session.commit()
             raise HTTPException(
                 status_code=status.HTTP_204_NO_CONTENT,
-                detail=f"comment with id {comment_id} removed",
+                detail=f"commentaire avec id {comment_id} supprimé",
             )
         logs_context = {
             "current_user": f"{current_user.username}",
@@ -886,7 +886,7 @@ async def delete_comment(
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"comment with id {comment_id} does not exist",
+        detail=f"commentaire avec id {comment_id} inexistant",
     )
 
 
@@ -901,7 +901,7 @@ async def delete_user(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"user with id {user_id} does not exist",
+            detail=f"utilisateur avec id {user_id} inexistant",
         )
     if current_user.role == "admin":
         if user:
@@ -914,7 +914,7 @@ async def delete_user(
             session.commit()
             raise HTTPException(
                 status_code=status.HTTP_204_NO_CONTENT,
-                detail=f"user with id {user_id} removed",
+                detail=f"utilisateur avec id {user_id} supprimé",
             )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur n'existe pas"
@@ -953,7 +953,7 @@ async def delete_book(
             session.commit()
             raise HTTPException(
                 status_code=status.HTTP_204_NO_CONTENT,
-                detail=f"book with id {book_id} removed.",
+                detail=f"livre avec id {book_id} supprimé.",
             )
         logs_context = {
             "current_user": f"{current_user.username}",
@@ -966,7 +966,7 @@ async def delete_book(
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"book with id {book_id} does not exist",
+        detail=f"livre avec id {book_id} inexistant",
     )
 
 
