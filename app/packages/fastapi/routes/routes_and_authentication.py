@@ -105,7 +105,7 @@ async def get_current_active_user(
 ):
     """return current user if not disabled"""
     if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
+        raise HTTPException(status_code=400, detail="Utilisateur inactif")
     return current_user
 
 
@@ -171,7 +171,7 @@ async def view_category_books(
     if len(category_books) == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Catégorie avec id {category_id} inexistante.",
+            detail=f"Catégorie avec id {category_id} inexistante.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -225,7 +225,7 @@ async def update_book_category(
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Catégorie avec id {category_id} inexistante.",
+            detail=f"Catégorie avec id {category_id} inexistante.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     if book_category_updated.title is not None:
@@ -895,7 +895,7 @@ async def delete_user(
     user_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
-    delete_comment allows to delete an user base on id
+    delete_user allows to delete an user base on id
     """
     user = database_crud_commands.get_instance(session, models.User, user_id)
     if not user:
@@ -904,20 +904,16 @@ async def delete_user(
             detail=f"utilisateur avec id {user_id} inexistant",
         )
     if current_user.role == "admin":
-        if user:
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "user_to_delete": user.username,
-            }
-            log_events.log_event("[+] FastAPI - Suppression utilisateur.", logs_context)
-            session.delete(user)
-            session.commit()
-            raise HTTPException(
-                status_code=status.HTTP_204_NO_CONTENT,
-                detail=f"utilisateur avec id {user_id} supprimé",
-            )
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "user_to_delete": user.username,
+        }
+        log_events.log_event("[+] FastAPI - Suppression utilisateur.", logs_context)
+        session.delete(user)
+        session.commit()
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur n'existe pas"
+            status_code=status.HTTP_204_NO_CONTENT,
+            detail=f"utilisateur avec id {user_id} supprimé",
         )
     else:
         logs_context = {
@@ -939,7 +935,7 @@ async def delete_book(
     book_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
-    delete_comment allows to delete a book base on id
+    delete_book allows to delete a book base on id
     """
     book = database_crud_commands.get_instance(session, models.Book, book_id)
     if book:
