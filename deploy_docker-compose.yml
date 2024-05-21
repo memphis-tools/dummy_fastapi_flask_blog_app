@@ -17,7 +17,6 @@ services:
       - certbot-var:/var/lib/letsencrypt
       - /etc/ssl/dhparam/dhparam.pem:/etc/ssl/dhparam/dhparam.pem
       - static_volume:/home/dummy-operator/flask/staticfiles
-      - media_volume:/home/dummy-operator/flask/mediafiles
 
   flask_front:
     image: memphistools/public_repo:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT
@@ -44,7 +43,6 @@ services:
       - fastapi
     volumes:
       - static_volume:/home/dummy-operator/flask/staticfiles
-      - media_volume:/home/dummy-operator/flask/mediafiles
 
   fastapi:
     image: memphistools/public_repo:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT
@@ -104,7 +102,6 @@ services:
 volumes:
   postgres_data:
   static_volume:
-  media_volume:
   certbot-etc:
   certbot-var:
   web-root:

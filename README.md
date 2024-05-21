@@ -443,6 +443,8 @@ For Flask i used:
 
 https://www.udemy.com/course/100-days-of-code/
 
+https://blog.miguelgrinberg.com/category/Flask
+
 For Flask image upload i used:
 
 https://flask-wtf.readthedocs.io/en/0.15.x/form/

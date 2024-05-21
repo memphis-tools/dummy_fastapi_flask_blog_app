@@ -3,10 +3,12 @@
 
 import os
 import base64
+import io
 from io import BytesIO
 import random
 from functools import wraps
 import matplotlib.pyplot as plt
+from PIL import Image
 from flask import (
     Flask,
     url_for,
@@ -42,7 +44,6 @@ app = Flask(
     instance_path="/home/dummy-operator/flask/",
 )
 app.config.from_pyfile("config.py")
-app.config["MAX_CONTENT_LENGTH"] = 1024 * 1024
 bootstrap = Bootstrap(app)
 csrf = CSRFProtect(app)
 login_manager = LoginManager(app)
@@ -51,6 +52,18 @@ login_manager.login_view = "/"
 login_manager.session_protection = "strong"
 WTF_CSRF_SECRET_KEY = os.getenv("SECRET_KEY")
 MAX_BOOKS_ON_INDEX_PAGE = 3
+
+
+def is_file_a_valid_image(image_file):
+    """
+    Description: check if uploaded file is an image.
+    """
+    try:
+        img = Image.open(io.BytesIO(image_file.read()))
+        img.verify()
+        return True
+    except (IOError, SyntaxError) as e:
+        return False
 
 
 @login_manager.user_loader
@@ -71,6 +84,11 @@ def unauthorized():
     """
     flash("Vous devez d'abord vous connecter", "error")
     return redirect(url_for("login"))
+
+
+@app.errorhandler(413)
+def too_large(e):
+    return "Taille fichier excède la limite prévue", 413
 
 
 def admin_only(f):
@@ -977,6 +995,7 @@ def add_book():
             )
         year_of_publication = form.year_of_publication.data
         book_picture = form.photo.data
+        uploaded_file = request.files['photo']
         filename = secure_filename(book_picture.filename)
         new_book = Book(
             title=title,
@@ -990,24 +1009,31 @@ def add_book():
         )
         book_is_valid = check_book_fields(new_book)
         if book_is_valid is True:
-            if os.getenv("SCOPE") == "production":
-                book_picture.save(
-                    os.path.join(app.instance_path, "staticfiles", filename)
-                )
-            else:
-                new_book.book_picture_name = "dummy_blank_book.png"
-            session.add(new_book)
-            session.commit()
-            session.refresh(new_book)
-            user = session.get(User, new_book.user_id)
-            session.commit()
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "book_title": new_book.title,
-            }
-            log_events.log_event("[+] Flask - Ajout livre.", logs_context)
-            session.close()
-            return redirect(url_for("books"))
+            if filename != '':
+                file_ext = os.path.splitext(filename)[1]
+                if file_ext not in app.config['UPLOAD_EXTENSIONS']:
+                    flash("Type image non accepté", "error")
+                    return redirect(url_for("index"))
+                if not is_file_a_valid_image(uploaded_file):
+                    flash("Fichier n'est pas une image valide", "error")
+                    return redirect(url_for("index"))
+                if os.getenv("SCOPE") == "production":
+                    file_path = os.path.join(app.instance_path, 'staticfiles/img/', filename)
+                    book_picture.save(file_path)
+                else:
+                    new_book.book_picture_name = "dummy_blank_book.png"
+                session.add(new_book)
+                session.commit()
+                session.refresh(new_book)
+                user = session.get(User, new_book.user_id)
+                session.commit()
+                logs_context = {
+                    "current_user": f"{current_user.username}",
+                    "book_title": new_book.title,
+                }
+                log_events.log_event("[+] Flask - Ajout livre.", logs_context)
+                session.close()
+                return redirect(url_for("books"))
         else:
             flash(book_is_valid, "error")
             session.close()
@@ -1269,120 +1295,128 @@ def update_book(book_id):
     ).options(
         joinedload(Book.starred)
     ).first()
-    if book:
-        if current_user.id != book.user_id and current_user.role != "admin":
-            session.close()
-            return abort(403)
-        book_picture_filename = book.book_picture_name
-        books_categories_query = session.query(BookCategory).all()
-        books_categories = [(i.id, i.title) for i in books_categories_query]
-        edit_form = forms.UpdateBookForm(
-            books_categories=books_categories,
-            book=book,
-        )
-        if edit_form.validate_on_submit():
-            form = request.form.to_dict()
-            form_file = request.files.to_dict
-            if "title" in form:
-                title = form["title"]
-            else:
-                title = book.title
-            if "summary" in form:
-                summary = form["summary"]
-            else:
-                summary = book.summary
-            if "content" in form:
-                content = form["content"]
-            else:
-                content = book.content
-            if "author" in form:
-                author = form["author"]
-            else:
-                author = book.author
-            if "year_of_publication" in form:
-                year_of_publication = int(form["year_of_publication"])
-            else:
-                year_of_publication = book.year_of_publication
-            if "categories" in form:
-                category_id_from_form = int(form["categories"])
-                try:
-                    category_id = (
-                        session.query(BookCategory)
-                        .filter(BookCategory.id == category_id_from_form)
-                        .first()
-                        .id
-                    )
-                except Exception:
-                    flash("Saisie invalide, categorie livre non prevue.", "error")
-                    return render_template(
-                        "update_book.html",
-                        form=edit_form,
-                        is_authenticated=current_user.is_authenticated,
-                    )
+    if not book:
+        flash("Livre non trouvé", "error")
+        session.close()
+        return redirect(url_for("books"))
+
+    if current_user.id != book.user_id and current_user.role != "admin":
+        session.close()
+        return abort(403)
+    book_picture_filename = book.book_picture_name
+    books_categories_query = session.query(BookCategory).all()
+    books_categories = [(i.id, i.title) for i in books_categories_query]
+    edit_form = forms.UpdateBookForm(
+        books_categories=books_categories,
+        book=book,
+    )
+    if edit_form.validate_on_submit():
+        form = request.form.to_dict()
+        form_file = request.files.to_dict
+        if "title" in form:
+            title = form["title"]
+        else:
+            title = book.title
+        if "summary" in form:
+            summary = form["summary"]
+        else:
+            summary = book.summary
+        if "content" in form:
+            content = form["content"]
+        else:
+            content = book.content
+        if "author" in form:
+            author = form["author"]
+        else:
+            author = book.author
+        if "year_of_publication" in form:
+            year_of_publication = int(form["year_of_publication"])
+        else:
+            year_of_publication = book.year_of_publication
+        if "categories" in form:
+            category_id_from_form = int(form["categories"])
             try:
-                book_picture = form_file["photo"]
+                category_id = (
+                    session.query(BookCategory)
+                    .filter(BookCategory.id == category_id_from_form)
+                    .first()
+                    .id
+                )
             except Exception:
-                book_picture = None
-            if book_picture is not None:
-                filename = secure_filename(book_picture.filename)
-            else:
-                filename = book_picture_filename
-            publication_date = book.publication_date
-            updated_book = Book(
-                title=title,
-                summary=summary,
-                content=content,
-                author=author,
-                category=category_id,
-                year_of_publication=year_of_publication,
-                book_picture_name=filename,
-                publication_date=publication_date,
-                user_id=book.user_id,
-            )
-            if book_picture_filename != filename:
+                flash("Saisie invalide, categorie livre non prevue.", "error")
+                return render_template(
+                    "update_book.html",
+                    form=edit_form,
+                    is_authenticated=current_user.is_authenticated,
+                )
+        try:
+            book_picture = edit_form["photo"]
+            uploaded_file = request.files['photo']
+            if not is_file_a_valid_image(uploaded_file):
+                flash("Fichier n'est pas une image valide", "error")
+                return redirect(url_for("index"))
+        except Exception:
+            book_picture = None
+        if book_picture is not None:
+            filename = secure_filename(book_picture.filename)
+        else:
+            filename = book_picture_filename
+        publication_date = book.publication_date
+        updated_book = Book(
+            title=title,
+            summary=summary,
+            content=content,
+            author=author,
+            category=category_id,
+            year_of_publication=year_of_publication,
+            book_picture_name=filename,
+            publication_date=publication_date,
+            user_id=book.user_id,
+        )
+        if book_picture_filename != filename:
+            if filename != '':
+                file_ext = os.path.splitext(filename)[1]
+                if file_ext not in app.config['UPLOAD_EXTENSIONS']:
+                    return "Image invalide", 400
                 if os.getenv("SCOPE") == "production":
-                    book_picture.save(
-                        os.path.join(app.instance_path, "staticfiles", filename)
-                    )
+                    file_path = os.path.join(app.instance_path, 'staticfiles/img/', filename)
+                    book_picture.save(file_path)
                     try:
                         os.remove(
-                            f"{app.instance_path}staticfiles/{book_picture_filename}"
+                            f"{app.instance_path}staticfiles/img/{book_picture_filename}"
                         )
                     except FileNotFoundError:
                         pass
                 else:
                     updated_book.book_picture_name = "dummy_blank_book.png"
 
-            session.query(Book).where(Book.id == book_id).update(
-                updated_book.get_json_for_update()
-            )
-            book_is_valid = check_book_fields(updated_book)
-            if book_is_valid is True:
-                session.commit()
-                session.close()
-                logs_context = {
-                    "current_user": f"{current_user.username}",
-                    "book_title": updated_book.title,
-                }
-                log_events.log_event("[+] Flask - Mise à jour livre.", logs_context)
-                return redirect(url_for("book", book_id=book_id))
-            else:
-                flash(book_is_valid, "error")
-                session.close()
-                return render_template(
-                    "update_book.html",
-                    form=edit_form,
-                    is_authenticated=current_user.is_authenticated,
-                )
-        return render_template(
-            "update_book.html",
-            form=edit_form,
-            is_authenticated=current_user.is_authenticated,
+        session.query(Book).where(Book.id == book_id).update(
+            updated_book.get_json_for_update()
         )
-    else:
-        flash("Livre non trouvé", "error")
-        return redirect(url_for("books"))
-    session.close()
+        book_is_valid = check_book_fields(updated_book)
+        if book_is_valid is True:
+            session.commit()
+            session.close()
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "book_title": updated_book.title,
+            }
+            log_events.log_event("[+] Flask - Mise à jour livre.", logs_context)
+            return redirect(url_for("book", book_id=book_id))
+        else:
+            flash(book_is_valid, "error")
+            session.close()
+            return render_template(
+                "update_book.html",
+                form=edit_form,
+                is_authenticated=current_user.is_authenticated,
+            )
+    return render_template(
+        "update_book.html",
+        form=edit_form,
+        book=book,
+        is_authenticated=current_user.is_authenticated,
+    )
 
 
 @app.route("/front/users/", methods=["GET"])
