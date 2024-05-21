@@ -133,7 +133,7 @@ class BookForm(FlaskForm):
         validators=[
             FileRequired(),
             FileAllowed(
-                ["jpg", "jpeg", "png"], "Seuls format autorisés: .jpg, .jpeg, .png!"
+                ["jpg", "jpeg", "png"], "Seuls format autorisés: .jpg, .jpeg, .png"
             ),
         ],
     )
@@ -183,7 +183,7 @@ class UpdateBookForm(FlaskForm):
         "IMAGE",
         validators=[
             FileAllowed(
-                ["jpg", "jpeg", "png"], "Seuls format autorisés: .jpg, .jpeg, .png!"
+                ["jpg", "jpeg", "png"], "Seuls format autorisés: .jpg, .jpeg, .png"
             ),
         ],
     )

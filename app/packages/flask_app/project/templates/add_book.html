@@ -5,6 +5,11 @@
 
 {% block content %}
 <div class="container">
+    {% if form.errors %}
+        <ul class=flashes>
+            <li class="error">{{ form.errors["photo"][0] }}</li>
+        </ul>
+    {% endif %}
     <div class="section_intro"></div>
     <h1>DUMMY BLOG - AJOUTER UN LIVRE</h1>
     <div class="d-flex flex-column justify-content-center align-items-center">

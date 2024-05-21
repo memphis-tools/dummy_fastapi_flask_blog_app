@@ -16,7 +16,6 @@ services:
     volumes:
       - ./nginx/local_conf:/etc/nginx/conf.d
       - static_volume:/home/dummy-operator/flask/staticfiles
-      - media_volume:/home/dummy-operator/flask/media
 
   flask_front:
     build:
@@ -45,7 +44,6 @@ services:
       - fastapi
     volumes:
       - static_volume:/home/dummy-operator/flask/staticfiles
-      - media_volume:/home/dummy-operator/flask/media
 
   fastapi:
     build:
@@ -96,7 +94,6 @@ services:
 volumes:
   postgres_data:
   static_volume:
-  media_volume:
 
 networks:
   app-network:
