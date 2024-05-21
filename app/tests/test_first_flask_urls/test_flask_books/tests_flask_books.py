@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 from sqlalchemy.orm import joinedload
 
 from app.packages.database.models.models import Book, User
-from app.packages.flask_app.project.__init__ import check_book_fields, get_pie_colors
+from app.packages.flask_app.project.__init__ import check_book_fields, get_pie_colors, is_file_a_valid_image
 
 
 def test_flask_get_a_book_without_authentication(client):
@@ -666,3 +666,19 @@ def test_update_book_with_corrupted_image_type(
     )
     assert response.status_code == 200
     assert b"Fichier n&#39;est pas une image valide" in response.data
+
+
+def test_update_book_with_invalid_image():
+    """
+    Description: check if we can add a book with a corrupted image.
+    Notice size limit is 5mo.
+    """
+    resources = Path(__file__).parent
+    stream = FileStorage(
+            stream=(resources / "dummy_image.png").open("rb"),
+            filename="dummy_image.png",
+            content_type="image/png"
+            )
+    response = is_file_a_valid_image(stream)
+
+    assert response is False
