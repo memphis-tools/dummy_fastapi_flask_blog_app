@@ -251,9 +251,9 @@ def categories_stats():
                 <link href='https://fonts.googleapis.com/css2?family=Truculenta:opsz,wght@12..72,100..900&display=swap'
                  rel='stylesheet'>
                 <!--  Boostrap css -->
-                <link rel='stylesheet' href='/static/bootstrap.min.css'>
+                <link rel='stylesheet' href='/static/css/bootstrap.min.css'>
                 <!-- Custom css -->
-                <link rel='stylesheet' href='/static/styles.css'>
+                <link rel='stylesheet' href='/static/css/styles.css'>
             </head>
             <body>
             <header>
@@ -318,9 +318,9 @@ def categories_stats():
                       </div>
                   </div>
               </footer>
-              <script src='/static/scripts.js'></script>
-              <script src='/static/all.js'></script>
-              <script src='/static/bootstrap.bundle.min.js'></script>
+              <script src='/static/js/scripts.js'></script>
+              <script src='/static/js/all.js'></script>
+              <script src='/static/js/bootstrap.bundle.min.js'></script>
             </body>
         </html>
     """
@@ -392,9 +392,9 @@ def users_stats():
                 <link href='https://fonts.googleapis.com/css2?family=Truculenta:opsz,wght@12..72,100..900&display=swap'
                 rel='stylesheet'>
                 <!--  Boostrap css -->
-                <link rel='stylesheet' href='/static/bootstrap.min.css'>
+                <link rel='stylesheet' href='/static/css/bootstrap.min.css'>
                 <!-- Custom css -->
-                <link rel='stylesheet' href='/static/styles.css'>
+                <link rel='stylesheet' href='/static/css/styles.css'>
             </head>
             <body>
             <header>
@@ -459,9 +459,9 @@ def users_stats():
                       </div>
                   </div>
               </footer>
-              <script src='/static/scripts.js'></script>
-              <script src='/static/all.js'></script>
-              <script src='/static/bootstrap.bundle.min.js'></script>
+              <script src='/static/js/scripts.js'></script>
+              <script src='/static/js/all.js'></script>
+              <script src='/static/js/bootstrap.bundle.min.js'></script>
             </body>
         </html>
     """
@@ -1699,7 +1699,6 @@ def update_book_category(category_id):
             flash(book_category_is_valid, "error")
             session.close()
             return redirect(url_for("index"))
-        return redirect(url_for("manage_books_categories"))
     return render_template(
         "update_book_category.html",
         category_to_update=category_to_update,
@@ -1708,7 +1707,7 @@ def update_book_category(category_id):
     )
 
 
-@app.route("/front/book//<int:book_id>/delete/", methods=["GET", "POST"])
+@app.route("/front/book/<int:book_id>/delete/", methods=["GET", "POST"])
 @login_required
 def delete_book(book_id):
     """
