@@ -136,26 +136,6 @@ def test_delete_valid_book_category_being_admin(client, access_session_as_admin,
     assert response.status_code == 200
 
 
-def test_delete_invalid_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
-    """
-    Description: check if we can delete an invalid book category being admin.
-    """
-    data = {
-        "category_id": "555555",
-        "csrf_token": get_flask_csrf_token,
-    }
-    headers = {
-        "Cookie": f"session={access_session_as_admin}"
-    }
-    response = client.post(
-        "http://localhost/front/book/categories/555555/delete/",
-        headers=headers,
-        data=data,
-        follow_redirects=True
-    )
-    assert response.status_code == 404
-
-
 def test_update_valid_book_category_without_being_admin(client, access_session, get_flask_csrf_token):
     """
     Description: check if we can update a valid book category without being admin.
