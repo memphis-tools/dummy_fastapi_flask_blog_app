@@ -214,6 +214,8 @@ legend {
 
 .flashes .error {
   color: red;
+  display: flex;
+  justify-content: center;
 }
 
 .flashes .info {

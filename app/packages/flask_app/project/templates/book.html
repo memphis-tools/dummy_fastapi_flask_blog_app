@@ -14,7 +14,7 @@
           <h4 class="d-flex flex-column">Catégorie: {{ book.category|format_book_category() }}</h4>
           <h4 class="d-flex flex-column">Année édition: {{ book.year_of_publication }}</h4>
           <h4 class="d-flex flex-column">Sous-titre: {{ book.summary }}</h4>
-          <img style="width:200px;height:auto;" src="{{ url_for('static', filename=book.book_picture_name) }}" align="middle" />
+          <img style="width:200px;height:auto;" src='{{ url_for("static", filename="img/" + book.book_picture_name) }}' align="middle" />
           <p class="post-publisher">
               Publié par <a href="{{ url_for('user_books', user_id=book.user_id) }}">{{ book.user_id|format_user() }}</a>
               on {{ book.publication_date|format_datetime() }}

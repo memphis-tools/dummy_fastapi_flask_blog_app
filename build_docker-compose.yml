@@ -22,7 +22,6 @@ services:
       - 8001
     volumes:
       - static_volume:/home/dummy-operator/flask/staticfiles
-      - media_volume:/home/dummy-operator/flask/mediafiles
 
   fastapi:
     build:
@@ -33,7 +32,6 @@ services:
 
 volumes:
   static_volume:
-  media_volume:
 
 networks:
   app-network:

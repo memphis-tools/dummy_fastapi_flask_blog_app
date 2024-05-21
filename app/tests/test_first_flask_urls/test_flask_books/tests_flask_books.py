@@ -438,3 +438,231 @@ def test_flask_index_route_with_three_random_books(client, access_session):
     total_books = len(soup.find_all("div", {"class": "post-preview"}))
     assert response.status_code == 200
     assert total_books == 3
+
+
+def test_add_book_with_invalid_image_size(
+    client,
+    access_session,
+    get_flask_csrf_token
+):
+    """
+    Description: check if we can add a book with an invalid image type.
+    Notice size limit is 5mo.
+    """
+    resources = Path(__file__).parent
+    headers = {
+        "Content-Type": "multipart/form-data",
+        "Cookie": f"session={access_session}",
+    }
+    book_form = {
+        "title": "This is a dummy title sir",
+        "summary": "string",
+        "content": "This is a dummy content sir",
+        "year_of_publication": "2023",
+        "categories": "3",
+        "author": "Dummy Boy",
+        "photo": FileStorage(
+            stream=(resources / "photo_pexels.com_by_inga_seliverstova.png").open("rb"),
+            filename="photo_pexels.com_by_inga_seliverstova.png",
+            content_type="image/png",
+        ),
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/books/add/",
+        headers=headers,
+        data=book_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 413
+    assert b"Taille fichier exc\xc3\xa8de la limite pr\xc3\xa9vue" in response.data
+
+
+def test_add_book_with_invalid_image_type(
+    client,
+    access_session,
+    get_flask_csrf_token
+):
+    """
+    Description: check if we can add a book with an invalid image type.
+    Notice only types accepted: .jpg, .jpeg, .png
+    """
+    resources = Path(__file__).parent
+    headers = {
+        "Content-Type": "multipart/form-data",
+        "Cookie": f"session={access_session}",
+    }
+    book_form = {
+        "title": "This is a dummy title sir",
+        "summary": "string",
+        "content": "This is a dummy content sir",
+        "year_of_publication": "2023",
+        "categories": "3",
+        "author": "Dummy Boy",
+        "photo": FileStorage(
+            stream=(resources / "photo_pexels.com_by_inga_seliverstova.gif").open("rb"),
+            filename="photo_pexels.com_by_inga_seliverstova.gif",
+            content_type="image/gif",
+        ),
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/books/add/",
+        headers=headers,
+        data=book_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"Seuls format autoris\xc3\xa9s: .jpg, .jpeg, .png" in response.data
+
+
+def test_add_book_with_corrupted_image_type(
+    client,
+    access_session,
+    get_flask_csrf_token
+):
+    """
+    Description: check if we can add a book with an invalid image type.
+    Notice only types accepted: .jpg, .jpeg, .png
+    """
+    resources = Path(__file__).parent
+    headers = {
+        "Content-Type": "multipart/form-data",
+        "Cookie": f"session={access_session}",
+    }
+    book_form = {
+        "title": "This is a dummy title sir",
+        "summary": "This is a dummy summary sir",
+        "content": "This is a dummy content sir",
+        "year_of_publication": "2023",
+        "categories": "3",
+        "author": "Dummy Boy",
+        "photo": FileStorage(
+            stream=(resources / "dummy_image.png").open("rb"),
+            filename="dummy_image.png",
+            content_type="image/png",
+        ),
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/books/add/",
+        headers=headers,
+        data=book_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"Fichier n&#39;est pas une image valide" in response.data
+
+
+def test_update_book_with_invalid_image_size(
+    client,
+    access_session,
+    get_flask_csrf_token
+):
+    """
+    Description: check if we can add a book with an invalid image type.
+    Notice size limit is 5mo.
+    """
+    resources = Path(__file__).parent
+    headers = {
+        "Content-Type": "multipart/form-data",
+        "Cookie": f"session={access_session}",
+    }
+    book_form = {
+        "title": "This is a dummy title sir",
+        "summary": "This is a dummy summary",
+        "content": "This is a dummy content sir",
+        "year_of_publication": "2023",
+        "categories": "3",
+        "author": "Dummy Boy",
+        "photo": FileStorage(
+            stream=(resources / "photo_pexels.com_by_inga_seliverstova.png").open("rb"),
+            filename="photo_pexels.com_by_inga_seliverstova.png",
+            content_type="image/png",
+        ),
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/book/1/update/",
+        headers=headers,
+        data=book_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 413
+    assert b"Taille fichier exc\xc3\xa8de la limite pr\xc3\xa9vue" in response.data
+
+
+def test_update_book_with_invalid_image_type(
+    client,
+    access_session,
+    get_flask_csrf_token
+):
+    """
+    Description: check if we can add a book with an invalid image type.
+    Notice only types accepted: .jpg, .jpeg, .png
+    """
+    resources = Path(__file__).parent
+    headers = {
+        "Content-Type": "multipart/form-data",
+        "Cookie": f"session={access_session}",
+    }
+    book_form = {
+        "title": "This is a dummy title sir",
+        "summary": "string",
+        "content": "This is a dummy content sir",
+        "year_of_publication": "2023",
+        "categories": "3",
+        "author": "Dummy Boy",
+        "photo": FileStorage(
+            stream=(resources / "photo_pexels.com_by_inga_seliverstova.gif").open("rb"),
+            filename="photo_pexels.com_by_inga_seliverstova.gif",
+            content_type="image/gif",
+        ),
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/book/1/update/",
+        headers=headers,
+        data=book_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"Seuls format autoris\xc3\xa9s: .jpg, .jpeg, .png" in response.data
+
+
+def test_update_book_with_corrupted_image_type(
+    client,
+    access_session,
+    get_flask_csrf_token
+):
+    """
+    Description: check if we can add a book with an invalid image type.
+    Notice only types accepted: .jpg, .jpeg, .png
+    """
+    resources = Path(__file__).parent
+    headers = {
+        "Content-Type": "multipart/form-data",
+        "Cookie": f"session={access_session}",
+    }
+    book_form = {
+        "title": "This is a dummy title sir",
+        "summary": "This is a dummy summary sir",
+        "content": "This is a dummy content sir",
+        "year_of_publication": "2023",
+        "categories": "3",
+        "author": "Dummy Boy",
+        "photo": FileStorage(
+            stream=(resources / "dummy_image.png").open("rb"),
+            filename="dummy_image.png",
+            content_type="image/png",
+        ),
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "/front/book/1/update/",
+        headers=headers,
+        data=book_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"Fichier n&#39;est pas une image valide" in response.data
