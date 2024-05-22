@@ -2,14 +2,11 @@
 
 
 import base64
-from functools import wraps
+from io import BytesIO
 import matplotlib.pyplot as plt
 from flask import (
     Blueprint,
     render_template,
-    flash,
-    abort,
-    redirect,
 )
 from flask_login import (
     current_user,
@@ -17,10 +14,9 @@ from flask_login import (
 )
 from sqlalchemy import func
 
-from app.packages import handle_passwords, log_events
 from app.packages.database.commands import session_commands
-from . import forms
-
+from app.packages.database.models.models import Book, BookCategory, User
+from .shared_functions_and_decorators import get_pie_colors
 
 stat_routes_blueprint = Blueprint('stat_routes_blueprint', __name__)
 

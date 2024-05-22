@@ -1,7 +1,6 @@
 """ The Comment blueprint routes """
 
 
-from functools import wraps
 from flask import (
     Blueprint,
     url_for,
@@ -15,11 +14,10 @@ from flask_login import (
     login_required,
 )
 
-from app.packages import handle_passwords, log_events
+from app.packages import log_events
 from app.packages.database.commands import session_commands
 from app.packages.database.models.models import Comment, Book
 from . import forms
-from .shared_functions_and_decorators import admin_only
 
 comment_routes_blueprint = Blueprint('comment_routes_blueprint', __name__)
 

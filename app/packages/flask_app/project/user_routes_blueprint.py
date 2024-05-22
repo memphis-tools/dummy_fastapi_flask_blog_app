@@ -1,7 +1,6 @@
 """ The User blueprint routes """
 
 
-from functools import wraps
 from flask import (
     Blueprint,
     url_for,
