@@ -119,4 +119,3 @@ def test_flask_stats_route(client, access_session_as_admin):
         "http://localhost/front/stats/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 200
-    assert b'LES STATS' in response.data

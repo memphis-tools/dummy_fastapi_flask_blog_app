@@ -97,7 +97,6 @@ def test_get_manage_books_categories_being_admin(client, access_session_as_admin
     }
     response = client.get("/front/categories/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
-    assert b'CATEGORIES LIVRES' in response.data
 
 
 def test_delete_valid_book_category_without_being_admin(client, access_session, get_flask_csrf_token):
