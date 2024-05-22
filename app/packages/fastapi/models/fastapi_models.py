@@ -100,7 +100,6 @@ class BookModel(BaseModel):
     category: str
     year_of_publication: int
     publication_date: dt.datetime
-    book_picture_name: str
     user_id: int
     book_comments: CommentReducedModel | None = None
     starred: StarredModel | None = None
@@ -128,7 +127,6 @@ class NewBookModel(BaseModel):
     content: str
     category: str
     year_of_publication: int
-    book_picture_name: str
 
 
 class UpdateBookModel(BaseModel):
@@ -140,7 +138,6 @@ class UpdateBookModel(BaseModel):
     content: Optional[str] | None = None
     category: Optional[str] | None = None
     year_of_publication: Optional[int] | None = None
-    book_picture_name: Optional[str] | None = None
 
 
 class Role(str, Enum):
