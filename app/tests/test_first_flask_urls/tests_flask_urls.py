@@ -108,3 +108,14 @@ def test_flask_users_stats_route(client):
     response = client.get("http://localhost/front/books/users/stats/", follow_redirects=True)
     assert response.status_code == 200
     assert b'Vous devez d&#39;abord vous connecter' in response.data
+
+
+def test_flask_stats_route(client, access_session_as_admin):
+    """
+    Description: check if we can reach the stats route
+    """
+    headers = {"Cookie": f"session={access_session_as_admin}"}
+    response = client.get(
+        "http://localhost/front/stats/", headers=headers, follow_redirects=True
+    )
+    assert response.status_code == 200
