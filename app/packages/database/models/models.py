@@ -261,7 +261,6 @@ class User(BASE, UserMixin):
         return {
             "id": self.id,
             "username": self.username,
-            "email": self.email,
             "role": self.role,
             "books": self.books,
             "comments": self.comments,
