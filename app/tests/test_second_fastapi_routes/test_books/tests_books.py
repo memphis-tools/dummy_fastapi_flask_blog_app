@@ -138,7 +138,6 @@ async def test_post_book_with_authentication_with_valid_datas(get_fastapi_client
         "author": "Carl Barks",
         "summary": "Donald a trouvé un emploi au musée : il doit dépoussiérer la collection de pierres.",
         "content": "what a great story sir",
-        "book_picture_name": "dummy_photo_name.jpg",
         "year_of_publication": "2013",
         "category": "politique"
     }
@@ -162,7 +161,6 @@ async def test_check_book_fields(get_fastapi_client):
         author="Carl Barks",
         summary="Donald a trouvé un emploi au musée : il doit dépoussiérer la collection de pierres.",
         content="what a great story sir",
-        book_picture_name="dummy_photo_name.jpg",
         year_of_publication="bebopalula",
         category="art"
     )
@@ -180,7 +178,6 @@ async def test_post_book_without_authentication(get_fastapi_client):
         "author": "Carl Barks",
         "summary": "Donald a trouvé un emploi au musée : il doit dépoussiérer la collection de pierres.",
         "content": "what a great story sir",
-        "book_picture_name": "dummy_photo_name.jpg",
         "year_of_publication": "2013",
         "category": "art"
     }
@@ -223,7 +220,6 @@ async def test_post_book_with_authentication_without_valid_book_category(get_fas
         "author": "Carl Barks",
         "summary": "Donald a trouvé un emploi au musée : il doit dépoussiérer la collection de pierres.",
         "content": "what a great story sir",
-        "book_picture_name": "dummy_photo_name.jpg",
         "year_of_publication": "2013",
         "category": "supplication"
     }
@@ -249,7 +245,6 @@ async def test_post_book_with_authentication_without_valid_publication_year(get_
         "author": "Carl Barks",
         "summary": "Donald a trouvé un emploi au musée : il doit dépoussiérer la collection de pierres.",
         "content": "what a great story sir",
-        "book_picture_name": "dummy_photo_name.jpg",
         "year_of_publication": "bebopalula",
         "category": "supplication"
     }
@@ -273,7 +268,6 @@ async def test_post_book_with_authentication_with_invalid_keyword_string(get_fas
         "author": "StRing",
         "summary": "Donald a trouvé un emploi au musée : il doit dépoussiérer la collection de pierres.",
         "content": "what a great story sir",
-        "book_picture_name": "dummy_photo_name.jpg",
         "year_of_publication": "1984",
         "category": "art"
     }

@@ -192,7 +192,7 @@ async def add_category_books(
             detail="Acces reserve au seul compte admin",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    new_book_category = models.BookCategory(title=book_category.title)
+    new_book_category = models.BookCategory(title=str(book_category.title).lower())
     check_book_category_fields(new_book_category)
     logs_context = {
         "current_user": f"{current_user.username}",
@@ -233,10 +233,10 @@ async def update_book_category(
         logs_context = {
             "current_user": f"{current_user.username}",
             "updated_category_old": category.title,
-            "updated_category_new": book_category_updated.title,
+            "updated_category_new": str(book_category_updated.title).lower(),
         }
         log_events.log_event("[+] FastAPI - Mise à jour catégorie livre.", logs_context)
-        category.title = book_category_updated.title
+        category.title = str(book_category_updated.title).lower()
         session.query(models.BookCategory).where(
             models.BookCategory.id == category_id
         ).update(category.get_json_for_update())
@@ -453,7 +453,6 @@ def check_book_fields(book):
             str(book.summary).lower() == "string",
             str(book.content).lower() == "string",
             str(book.category).lower() == "string",
-            str(book.book_picture_name).lower() == "string",
         ]
     ):
         raise HTTPException(
@@ -498,7 +497,7 @@ async def post_book(
     add a book.
     """
     check_book_fields(book)
-    category = book.category
+    category = str(book.category).lower()
     try:
         category_id = (
             session.query(models.BookCategory)
@@ -518,7 +517,7 @@ async def post_book(
         content=book.content,
         category=category_id,
         year_of_publication=book.year_of_publication,
-        book_picture_name=book.book_picture_name,
+        book_picture_name="dummy_blank_book.png",
         user_id=current_user.id,
     )
     logs_context = {
@@ -528,6 +527,7 @@ async def post_book(
     log_events.log_event("[+] FastAPI - Ajout livre.", logs_context)
     session.add(new_book)
     session.commit()
+    session.refresh(new_book)
     return new_book
 
 
@@ -550,7 +550,7 @@ async def update_book(
             if book_updated.summary is not None:
                 book.summary = book_updated.summary
             if book_updated.category is not None:
-                category = book_updated.category
+                category = str(book_updated.category).lower()
                 try:
                     category_id = (
                         session.query(models.BookCategory)
@@ -566,8 +566,7 @@ async def update_book(
                 book.category = category_id
             if book_updated.year_of_publication is not None:
                 book.year_of_publication = book_updated.year_of_publication
-            if book_updated.book_picture_name is not None:
-                book.book_picture_name = book_updated.book_picture_name
+            book.book_picture_name = "dummy_blank_book.png"
             check_book_fields(book)
             session.query(models.Book).where(models.Book.id == book_id).update(
                 book.get_json_for_update()
