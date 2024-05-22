@@ -142,6 +142,6 @@ def mock_function_delete_book(mocker):
     Description: we mock the delete_book function.
     We do not want to really remove the book's illustration file (image).
     """
-    mocker.patch("app.packages.flask_app.project.__init__.delete_book", return_value=True)
+    mocker.patch("app.packages.flask_app.project.book_routes_blueprint.delete_book", return_value=True)
     mocker.patch("os.remove")
     return

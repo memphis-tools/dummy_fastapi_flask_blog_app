@@ -8,7 +8,7 @@
   <h1>DUMMY BLOG - UTILISATEURS</h1>
   <div class="d-flex flex-column justify-content-center">
       <div class="user-add d-flex flex-column">
-          <a class="btn btn-primary" href="{{ url_for('add_user') }}">AJOUTER UTILISATEUR</a>
+          <a class="btn btn-primary" href="{{ url_for('user_routes_blueprint.add_user') }}">AJOUTER UTILISATEUR</a>
           <hr>
       </div>
       <div class="users-preview d-flex flex-column">
@@ -16,7 +16,7 @@
               {% for user in users %}
                   <tr>
                       <td><p class="post-title">{{ user.username|upper }}</p></td>
-                      <td><a class="btn btn-primary" href="{{ url_for('delete_user', user_id=user.id) }}">SUPPRIMER UTILISATEUR</a></td>
+                      <td><a class="btn btn-primary" href="{{ url_for('user_routes_blueprint.delete_user', user_id=user.id) }}">SUPPRIMER UTILISATEUR</a></td>
                   </tr>
               {% endfor %}
           </table>

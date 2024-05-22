@@ -10,7 +10,7 @@
       {% for category in categories_list %}
           <div class="post-preview">
               <p class="post-title">
-                <a href="{{ url_for('category_books', category_id=category['id']) }}">{{ category["name"]|upper }}</a>
+                <a href="{{ url_for('book_category_routes_blueprint.category_books', category_id=category['id']) }}">{{ category["name"]|upper }}</a>
                 ({{ category["total_books"] }})
               </p>
           </div>

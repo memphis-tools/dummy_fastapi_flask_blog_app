@@ -8,7 +8,7 @@
   <h1>DUMMY BLOG - LES CITATIONS</h1>
   <div class="d-flex flex-column justify-content-center">
       <div class="user-add d-flex flex-column">
-          <a class="btn btn-primary" href="{{ url_for('add_quote') }}">AJOUTER CITATION</a>
+          <a class="btn btn-primary" href="{{ url_for('quote_routes_blueprint.add_quote') }}">AJOUTER CITATION</a>
           <hr>
       </div>
       <div class="users-preview d-flex flex-column">
@@ -17,8 +17,8 @@
                   <tr>
                       <td><p class="post-title">{{ quote.author|upper }}</p></td>
                       <td><p class="post-title">{{ quote.book_title|upper }}</p></td>
-                      <td><a class="btn btn-primary" href="{{ url_for('view_quote', quote_id=quote.id) }}">VOIR CITATION</a></td>
-                      <td><a class="btn btn-primary" href="{{ url_for('delete_quote', quote_id=quote.id) }}">SUPPRIMER CITATION</a></td>
+                      <td><a class="btn btn-primary" href="{{ url_for('quote_routes_blueprint.view_quote', quote_id=quote.id) }}">VOIR CITATION</a></td>
+                      <td><a class="btn btn-primary" href="{{ url_for('quote_routes_blueprint.delete_quote', quote_id=quote.id) }}">SUPPRIMER CITATION</a></td>
                   </tr>
               {% endfor %}
           </table>

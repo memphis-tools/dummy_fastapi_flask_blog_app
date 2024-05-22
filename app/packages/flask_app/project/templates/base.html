@@ -34,20 +34,20 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle bg-dark" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">LIVRES</a>
                             <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownMenuLink">
-                                <li><a class="dropdown-item" href="{{ url_for('books') }}">VOIR LES LIVRES</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('categories') }}">VOIR LES CATEGORIES</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('book_routes_blueprint.books') }}">VOIR LES LIVRES</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('book_category_routes_blueprint.categories') }}">VOIR LES CATEGORIES</a></li>
                                 {% if is_authenticated %}
                                     {% if current_user.role != "admin" %}
-                                        <li><a class="dropdown-item" href="{{ url_for('user_starred', user_id=current_user.id) }}">VOIR VOS FAVORIS</a></li>
-                                        <li><a class="dropdown-item" href="{{ url_for('user_books', user_id=current_user.id) }}">VOIR VOS LIVRES</a></li>
-                                        <li><a class="dropdown-item" href="{{ url_for('add_book') }}">AJOUTER UN LIVRE</a></li>
+                                        <li><a class="dropdown-item" href="{{ url_for('user_routes_blueprint.user_starred', user_id=current_user.id) }}">VOIR VOS FAVORIS</a></li>
+                                        <li><a class="dropdown-item" href="{{ url_for('user_routes_blueprint.user_books', user_id=current_user.id) }}">VOIR VOS LIVRES</a></li>
+                                        <li><a class="dropdown-item" href="{{ url_for('book_routes_blueprint.add_book') }}">AJOUTER UN LIVRE</a></li>
                                     {% endif %}
                                     {% if current_user.role == "admin" %}
                                       <li class="nav-item">
-                                          <a class="dropdown-item" href="{{ url_for('manage_books_categories') }}">GERER CATEGORIES</a>
+                                          <a class="dropdown-item" href="{{ url_for('book_category_routes_blueprint.manage_books_categories') }}">GERER CATEGORIES</a>
                                       </li>
                                     {% endif %}
-                                    <li><a class="dropdown-item" href="{{ url_for('stats') }}">VOIR LES STATISTIQUES</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('stat_routes_blueprint.stats') }}">VOIR LES STATISTIQUES</a></li>
                                 {% endif %}
                             </ul>
                         </li>
@@ -64,8 +64,8 @@
                         <li class="nav-item"><a class="nav-link" href="https://forms.gle/bNJqv3PGSHuaSvTq5" target="_blank">SUGGESTIONS</a></li>
                         {% if is_authenticated %}
                           {% if current_user.role == "admin" %}
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('view_quotes') }}">CITATIONS</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('users') }}">UTILISATEURS</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('quote_routes_blueprint.view_quotes') }}">CITATIONS</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('user_routes_blueprint.users') }}">UTILISATEURS</a></li>
                           {% endif %}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -73,7 +73,7 @@
                                 </a>
                                 <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownMenuLink">
                                   <li><a class="dropdown-item disabled_link" href="#">PROFILE</a></li>
-                                  <li><a class="dropdown-item" href="{{ url_for('update_password') }}">UPDATE PASSWORD</a></li>
+                                  <li><a class="dropdown-item" href="{{ url_for('user_routes_blueprint.update_password') }}">UPDATE PASSWORD</a></li>
                                   <li><a class="dropdown-item" href="{{ url_for('logout') }}">SE DECONNECTER</a></li>
                                 </ul>
                             </li>
