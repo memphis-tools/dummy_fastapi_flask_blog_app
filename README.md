@@ -297,6 +297,8 @@ You do not need to create a python virtualenv.
 
 ### HOW CHECK PEP'S RECOMMENDED SYNTAX
 
+      pip install black pylint flake8-html
+
       python -m flake8 --format html --htmldir flake8_html_report/
 
   You can use black to format code
@@ -305,9 +307,9 @@ You do not need to create a python virtualenv.
 
       black app/tests/
 
-### HOW CHECK LINT SCORE
+  You can check the lint score
 
-    pylint app/
+      pylint app/
 
 
 ### HOW RUN IT IN PRODUCTION

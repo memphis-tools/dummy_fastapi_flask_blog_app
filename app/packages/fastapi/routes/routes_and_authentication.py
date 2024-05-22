@@ -109,7 +109,7 @@ async def get_current_active_user(
     return current_user
 
 
-@app.post("/token/")
+@app.post("/token/", tags=["DEFAULT"])
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> Token:
@@ -133,7 +133,7 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")
 
 
-@app.get("/api/v1/books/", tags=["books"])
+@app.get("/api/v1/books/", tags=["BOOKS"])
 async def view_books(
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -144,7 +144,7 @@ async def view_books(
     return books
 
 
-@app.get("/api/v1/books/categories/", tags=["books_categories"])
+@app.get("/api/v1/books/categories/", tags=["BOOKS_CATEGORIES"])
 async def view_books_categories(
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -157,7 +157,7 @@ async def view_books_categories(
     return categories
 
 
-@app.get("/api/v1/books/categories/{category_id}/", tags=["books_categories"])
+@app.get("/api/v1/books/categories/{category_id}/", tags=["BOOKS_CATEGORIES"])
 async def view_category_books(
     category_id: int,
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
@@ -178,7 +178,7 @@ async def view_category_books(
     return category_books
 
 
-@app.post("/api/v1/books/categories/", tags=["books_categories"])
+@app.post("/api/v1/books/categories/", tags=["BOOKS_CATEGORIES"])
 async def add_category_books(
     book_category: NewBookCategoryModel,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
@@ -204,7 +204,7 @@ async def add_category_books(
     return new_book_category
 
 
-@app.put("/api/v1/books/categories/{category_id}/", tags=["books_categories"])
+@app.put("/api/v1/books/categories/{category_id}/", tags=["BOOKS_CATEGORIES"])
 async def update_book_category(
     category_id: int,
     book_category_updated: UpdateBookCategoryModel,
@@ -244,7 +244,7 @@ async def update_book_category(
     return category
 
 
-@app.delete("/api/v1/books/categories/{category_id}/", tags=["books_categories"])
+@app.delete("/api/v1/books/categories/{category_id}/", tags=["BOOKS_CATEGORIES"])
 async def delete_book_category(
     category_id: int,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
@@ -280,7 +280,7 @@ async def delete_book_category(
     )
 
 
-@app.get("/api/v1/books/{book_id}/", tags=["books"])
+@app.get("/api/v1/books/{book_id}/", tags=["BOOKS"])
 async def view_book(
     book_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -305,7 +305,7 @@ async def view_book(
         )
 
 
-@app.get("/api/v1/users/{user_id}/books/", tags=["books"])
+@app.get("/api/v1/users/{user_id}/books/", tags=["USERS"])
 async def user_books(
     user_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -323,7 +323,7 @@ async def user_books(
         )
 
 
-@app.post("/api/v1/register/")
+@app.post("/api/v1/register/", tags=["DEFAULT"])
 async def register(user: NewUserInDBModel):
     """
     register new user.
@@ -387,7 +387,7 @@ async def register(user: NewUserInDBModel):
         return new_user
 
 
-@app.post("/api/v1/users/", tags=["users"])
+@app.post("/api/v1/users/", tags=["USERS"])
 async def add_user(
     user: NewUserInDBModel,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
@@ -489,7 +489,7 @@ def check_book_category_fields(category):
         )
 
 
-@app.post("/api/v1/books/", tags=["books"])
+@app.post("/api/v1/books/", tags=["BOOKS"])
 async def post_book(
     book: NewBookModel,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
@@ -531,7 +531,7 @@ async def post_book(
     return new_book
 
 
-@app.put("/api/v1/books/{book_id}/", tags=["books"])
+@app.put("/api/v1/books/{book_id}/", tags=["BOOKS"])
 async def update_book(
     book_id: int,
     book_updated: UpdateBookModel,
@@ -597,7 +597,7 @@ async def update_book(
     )
 
 
-@app.get("/api/v1/users/", tags=["users"])
+@app.get("/api/v1/users/", tags=["USERS"])
 async def view_users(
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -608,7 +608,7 @@ async def view_users(
     return users
 
 
-@app.get("/api/v1/users/{user_id}/", tags=["users"])
+@app.get("/api/v1/users/{user_id}/", tags=["USERS"])
 async def view_user(
     user_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -619,7 +619,7 @@ async def view_user(
     return user
 
 
-@app.put("/api/v1/users/{user_id}/", tags=["users"])
+@app.put("/api/v1/users/{user_id}/", tags=["USERS"])
 async def update_user(
     user_id: int,
     user_updated: UpdateUserModel,
@@ -655,7 +655,7 @@ async def update_user(
     )
 
 
-@app.put("/api/v1/users/{user_id}/password/", tags=["users"])
+@app.put("/api/v1/users/{user_id}/password/", tags=["USERS"])
 async def update_user_password(
     user_id: int,
     user_updated: UpdateUserPasswordInDB,
@@ -716,7 +716,7 @@ async def update_user_password(
     )
 
 
-@app.get("/api/v1/users/{user_id}/comments/", tags=["comments"])
+@app.get("/api/v1/users/{user_id}/comments/", tags=["USERS"])
 async def view_user_comments(
     user_id: int,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
@@ -734,7 +734,7 @@ async def view_user_comments(
     )
 
 
-@app.get("/api/v1/books/comments/all/", tags=["comments"])
+@app.get("/api/v1/books/comments/all/", tags=["COMMENTS"])
 async def view_comments(
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
 ):
@@ -745,7 +745,7 @@ async def view_comments(
     return comments
 
 
-@app.get("/api/v1/books/comments/{comment_id}/", tags=["comments"])
+@app.get("/api/v1/books/comments/{comment_id}/", tags=["COMMENTS"])
 async def view_comment(
     comment_id: int,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
@@ -757,7 +757,7 @@ async def view_comment(
     return comment
 
 
-@app.post("/api/v1/books/comments/", tags=["comments"])
+@app.post("/api/v1/books/comments/", tags=["COMMENTS"])
 async def add_comment(
     comment: NewCommentModel,
     book_id: int,
@@ -786,7 +786,7 @@ async def add_comment(
     )
 
 
-@app.put("/api/v1/books/comments/{comment_id}/", tags=["comments"])
+@app.put("/api/v1/books/comments/{comment_id}/", tags=["COMMENTS"])
 async def update_comment(
     comment_id: int,
     comment_updated: UpdateCommentModel,
@@ -821,7 +821,7 @@ async def update_comment(
     )
 
 
-@app.get("/api/v1/books/{book_id}/comments/", tags=["comments"])
+@app.get("/api/v1/books/{book_id}/comments/", tags=["COMMENTS"])
 async def view_book_comments(
     book_id: int,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
@@ -838,7 +838,7 @@ async def view_book_comments(
     return comments
 
 
-@app.delete("/api/v1/books/{book_id}/comments/{comment_id}/", tags=["comments"])
+@app.delete("/api/v1/books/{book_id}/comments/{comment_id}/", tags=["COMMENTS"])
 async def delete_comment(
     comment_id: int,
     book_id: int,
@@ -890,7 +890,7 @@ async def delete_comment(
     )
 
 
-@app.delete("/api/v1/users/{user_id}/", tags=["users"])
+@app.delete("/api/v1/users/{user_id}/", tags=["USERS"])
 async def delete_user(
     user_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -930,7 +930,7 @@ async def delete_user(
         )
 
 
-@app.delete("/api/v1/books/{book_id}/", tags=["books"])
+@app.delete("/api/v1/books/{book_id}/", tags=["BOOKS"])
 async def delete_book(
     book_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
@@ -966,7 +966,7 @@ async def delete_book(
     )
 
 
-@app.get("/api/v1/quotes/", tags=["quotes"])
+@app.get("/api/v1/quotes/", tags=["QUOTES"])
 async def get_quotes(
     current_user: Annotated[UserModel, Depends(get_current_user)]
 ):
@@ -988,7 +988,7 @@ async def get_quotes(
         )
 
 
-@app.get("/api/v1/quotes/{quote_id}/", tags=["quotes"])
+@app.get("/api/v1/quotes/{quote_id}/", tags=["QUOTES"])
 async def get_quote(
     quote_id: int,
     current_user: Annotated[UserModel, Depends(get_current_user)]
@@ -1011,7 +1011,7 @@ async def get_quote(
         )
 
 
-@app.post("/api/v1/quotes/", tags=["quotes"])
+@app.post("/api/v1/quotes/", tags=["QUOTES"])
 async def add_quote(
     quote: NewQuoteModel,
     current_user: Annotated[UserModel, Depends(get_current_user)],
@@ -1047,7 +1047,7 @@ async def add_quote(
         )
 
 
-@app.delete("/api/v1/quotes/{quote_id}/", tags=["quotes"])
+@app.delete("/api/v1/quotes/{quote_id}/", tags=["QUOTES"])
 async def delete_quote(
     quote_id: int,
     current_user: Annotated[UserModel, Depends(get_current_active_user)]
