@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 
 
-INSTANCE_PATH="/home/dummy-operator/flask/"
+INSTANCE_PATH = "/home/dummy-operator/flask/"
 
 DOTENV_NAME = ".envrc.local"
 DOTENV_PATH = load_dotenv(DOTENV_NAME)
