@@ -2,8 +2,6 @@
 
 
 import os
-import random
-from functools import wraps
 from flask import (
     Blueprint,
     url_for,
@@ -20,7 +18,7 @@ from flask_login import (
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 
-from app.packages import handle_passwords, log_events, settings
+from app.packages import log_events, settings
 from app.packages.database.commands import session_commands
 from app.packages.database.models.models import User, Book, BookCategory, Comment, Starred
 from . import forms

@@ -1,7 +1,6 @@
 """ The Quote blueprint routes """
 
 
-from functools import wraps
 from flask import (
     Blueprint,
     url_for,
@@ -14,7 +13,7 @@ from flask_login import (
     current_user,
     login_required,
 )
-from app.packages import handle_passwords, log_events
+from app.packages import log_events
 from app.packages.database.commands import session_commands
 from app.packages.database.models.models import Quote
 from . import forms

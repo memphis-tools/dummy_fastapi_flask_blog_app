@@ -2,16 +2,12 @@
 
 
 import os
-from io import BytesIO
-import random
 from flask import (
     Flask,
     url_for,
     render_template,
     flash,
-    abort,
     redirect,
-    request,
 )
 
 from flask_bootstrap import Bootstrap
@@ -27,7 +23,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from app.packages import handle_passwords, log_events, settings
 from app.packages.database.commands import session_commands
-from app.packages.database.models.models import Book, Comment, User, BookCategory, Quote
+from app.packages.database.models.models import Book, User, BookCategory
 from .user_routes_blueprint import user_routes_blueprint
 from .stat_routes_blueprint import stat_routes_blueprint
 from .book_routes_blueprint import book_routes_blueprint

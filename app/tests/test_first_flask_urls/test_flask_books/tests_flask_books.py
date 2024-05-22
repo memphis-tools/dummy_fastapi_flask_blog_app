@@ -676,10 +676,10 @@ def test_update_book_with_invalid_image():
     """
     resources = Path(__file__).parent
     stream = FileStorage(
-            stream=(resources / "dummy_image.png").open("rb"),
-            filename="dummy_image.png",
-            content_type="image/png"
-            )
+        stream=(resources / "dummy_image.png").open("rb"),
+        filename="dummy_image.png",
+        content_type="image/png"
+    )
     response = is_file_a_valid_image(stream)
 
     assert response is False
