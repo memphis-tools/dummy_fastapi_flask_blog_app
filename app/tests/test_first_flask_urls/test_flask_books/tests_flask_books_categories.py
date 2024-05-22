@@ -4,7 +4,8 @@ Notice that by default we already add dummies data through the application utils
 """
 
 from app.packages.database.models.models import BookCategory
-from app.packages.flask_app.project.__init__ import check_book_category_fields, format_book_category
+from app.packages.flask_app.project.__init__ import format_book_category
+from app.packages.flask_app.project.book_category_routes_blueprint import check_book_category_fields
 
 
 def test_check_book_category_fields_with_valid_datas():

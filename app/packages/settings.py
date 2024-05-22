@@ -4,6 +4,8 @@ import os
 from dotenv import load_dotenv
 
 
+INSTANCE_PATH="/home/dummy-operator/flask/"
+
 DOTENV_NAME = ".envrc.local"
 DOTENV_PATH = load_dotenv(DOTENV_NAME)
 DEFAULT_ADMIN_NAME = os.getenv("ADMIN_LOGIN")
@@ -55,3 +57,6 @@ PIE_COLORS = [
     "lightcoral",
     "lightskyblue",
 ]
+
+POSTS_PER_PAGE = 6
+UPLOAD_EXTENSIONS = [".jpg", ".jpeg", ".png"]

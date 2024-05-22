@@ -10,7 +10,8 @@ from bs4 import BeautifulSoup
 from sqlalchemy.orm import joinedload
 
 from app.packages.database.models.models import Book, User
-from app.packages.flask_app.project.__init__ import check_book_fields, get_pie_colors, is_file_a_valid_image
+from app.packages.flask_app.project.shared_functions_and_decorators import get_pie_colors, is_file_a_valid_image
+from app.packages.flask_app.project.book_routes_blueprint import check_book_fields
 
 
 def test_flask_get_a_book_without_authentication(client):

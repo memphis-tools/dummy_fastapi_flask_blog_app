@@ -5,7 +5,7 @@ Notice that by default we already add dummies data through the application utils
 
 import pytest
 from app.packages.database.models.models import Book
-from app.packages.flask_app.project.__init__ import check_book_fields
+from app.packages.flask_app.project.book_routes_blueprint import check_book_fields
 
 
 @pytest.mark.asyncio

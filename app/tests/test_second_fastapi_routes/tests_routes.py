@@ -8,7 +8,7 @@ from httpx import AsyncClient
 
 from app.packages.fastapi.models import fastapi_models
 from app.packages.fastapi.routes import routes_and_authentication
-from app.packages.flask_app.project.__init__ import check_book_fields
+from app.packages.flask_app.project.book_routes_blueprint import check_book_fields
 
 
 app = routes_and_authentication.app
