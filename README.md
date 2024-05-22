@@ -445,6 +445,8 @@ https://www.udemy.com/course/100-days-of-code/
 
 https://blog.miguelgrinberg.com/category/Flask
 
+https://realpython.com/flask-blueprint/
+
 For Flask image upload i used:
 
 https://flask-wtf.readthedocs.io/en/0.15.x/form/

@@ -29,10 +29,10 @@
       <div class="post-preview">
         <p class="post-title m-0">{{ book.title }}</p>
         <p class="post-meta m-0">
-          Publié par <a href="{{ url_for('user_books', user_id=book.user_id) }}">{{ book.user_id|format_user() }}</a> le {{ book.publication_date|format_datetime() }}
+          Publié par <a href="{{ url_for('user_routes_blueprint.user_books', user_id=book.user_id) }}">{{ book.user_id|format_user() }}</a> le {{ book.publication_date|format_datetime() }}
         </p>
         <p>
-            <a class="about-book" href="{{ url_for('book', book_id=book.id) }}">A propos du livre</a>
+            <a class="about-book" href="{{ url_for('book_routes_blueprint.book', book_id=book.id) }}">A propos du livre</a>
         </p>
         <div class="book-image d-flex flex-column">
             <img src='{{ url_for("static", filename="img/" + book.book_picture_name) }}' align="middle" />
@@ -48,10 +48,10 @@
     </div>
     <div class="d-flex flex-column align-items-center justify-content-center mb-4 mt-1">
       {% if books|length > 0 %}
-          <a class="btn btn-primary text-uppercase w-15" href="{{ url_for('books') }}">TOUS LES LIVRES</a>
+          <a class="btn btn-primary text-uppercase w-15" href="{{ url_for('book_routes_blueprint.books') }}">TOUS LES LIVRES</a>
       {% else %}
           <p>Aucuns livres pour le moment.</p>
-          <a class="btn btn-primary text-uppercase" href="{{ url_for('add_book') }}">AJOUTER UN LIVRE</a>
+          <a class="btn btn-primary text-uppercase" href="{{ url_for('book_routes_blueprint.add_book') }}">AJOUTER UN LIVRE</a>
       {% endif %}
     </div>
 </div>

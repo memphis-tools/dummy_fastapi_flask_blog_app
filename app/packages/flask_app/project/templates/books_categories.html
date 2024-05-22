@@ -7,15 +7,15 @@
   <div class="section_intro"></div>
   <h1>DUMMY BLOG - CATEGORIES LIVRES</h1>
   <div class="d-flex flex-column justify-content-center">
-    <a class="btn btn-primary" href="{{ url_for('add_book_category') }}">AJOUTER CATEGORIE</a>
+    <a class="btn btn-primary" href="{{ url_for('book_category_routes_blueprint.add_book_category') }}">AJOUTER CATEGORIE</a>
     <hr />
         <div class="category-preview d-flex flex-column">
           <table>
               {% for category in categories %}
                   <tr>
                       <td><p class="post-title">{{ category|upper }}</p></td>
-                      <td><a class="btn btn-primary" href="{{ url_for('update_book_category', category_id=category.id) }}">MODIFIER CATEGORIE</a></td>
-                      <td><a class="btn btn-primary" href="{{ url_for('delete_book_category', category_id=category.id) }}">SUPPRIMER CATEGORIE</a></td>
+                      <td><a class="btn btn-primary" href="{{ url_for('book_category_routes_blueprint.update_book_category', category_id=category.id) }}">MODIFIER CATEGORIE</a></td>
+                      <td><a class="btn btn-primary" href="{{ url_for('book_category_routes_blueprint.delete_book_category', category_id=category.id) }}">SUPPRIMER CATEGORIE</a></td>
                   </tr>
               {% endfor %}
           </table>
