@@ -184,13 +184,12 @@ async def add_category_books(
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
 ):
     """
-    add_category_books a category if it has been created.
+    add_category_books adds category and return it if it has been created.
     """
     if current_user.id != 1:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Acces reserve au seul compte admin",
-            headers={"WWW-Authenticate": "Bearer"},
+            detail="Acces reserve au seul compte admin"
         )
     new_book_category = models.BookCategory(title=str(book_category.title).lower())
     check_book_category_fields(new_book_category)
@@ -201,13 +200,14 @@ async def add_category_books(
     log_events.log_event("[+] FastAPI - Ajout catégorie livre.", logs_context)
     session.add(new_book_category)
     session.commit()
+    session.refresh(new_book_category)
     return new_book_category
 
 
 @app.put("/api/v1/books/categories/{category_id}/", tags=["BOOKS_CATEGORIES"])
 async def update_book_category(
     category_id: int,
-    book_category_updated: UpdateBookCategoryModel,
+    book_category_updated: NewBookCategoryModel,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
 ):
     """
@@ -217,7 +217,6 @@ async def update_book_category(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Acces reserve au seul compte admin",
-            headers={"WWW-Authenticate": "Bearer"},
         )
     category = database_crud_commands.get_instance(
         session, models.BookCategory, category_id
@@ -226,7 +225,6 @@ async def update_book_category(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Catégorie avec id {category_id} inexistante.",
-            headers={"WWW-Authenticate": "Bearer"},
         )
     if book_category_updated.title is not None:
         check_book_category_fields(book_category_updated)
@@ -256,7 +254,6 @@ async def delete_book_category(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Acces reserve au seul compte admin",
-            headers={"WWW-Authenticate": "Bearer"},
         )
     category = database_crud_commands.get_instance(
         session, models.BookCategory, category_id
@@ -265,7 +262,6 @@ async def delete_book_category(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="catégorie avec id {category_id} inexistante",
-            headers={"WWW-Authenticate": "Bearer"},
         )
     logs_context = {
         "current_user": f"{current_user.username}",
@@ -282,7 +278,8 @@ async def delete_book_category(
 
 @app.get("/api/v1/books/{book_id}/", tags=["BOOKS"])
 async def view_book(
-    book_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    book_id: int,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     view_books return a book.
@@ -393,7 +390,7 @@ async def add_user(
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
 ):
     """
-    add user as an admin
+    Add a new user. Only admin has this privilege.
     """
     user.username = str(user.username).lower()
     user.email = str(user.email).lower()
@@ -438,7 +435,7 @@ async def add_user(
         )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Seul l'admin peut ajouter un utilisateur",
+            detail="Seul l'admin peut ajouter un utilisateur"
         )
 
 
@@ -531,69 +528,136 @@ async def post_book(
     return new_book
 
 
-@app.put("/api/v1/books/{book_id}/", tags=["BOOKS"])
+@app.patch("/api/v1/books/{book_id}/", tags=["BOOKS"])
 async def update_book(
     book_id: int,
     book_updated: UpdateBookModel,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
 ):
     """
-    update a book instance.
+    update partially a book instance.
     """
     book = database_crud_commands.get_instance(session, models.Book, book_id)
-    if book:
-        if current_user.id == book.user_id or current_user.username == "admin":
-            if book_updated.title is not None:
-                book.title = book_updated.title
-            if book_updated.author is not None:
-                book.author = book_updated.author
-            if book_updated.summary is not None:
-                book.summary = book_updated.summary
-            if book_updated.category is not None:
-                category = str(book_updated.category).lower()
-                try:
-                    category_id = (
-                        session.query(models.BookCategory)
-                        .filter(models.BookCategory.title == category)
-                        .first()
-                        .id
-                    )
-                except Exception:
-                    raise HTTPException(
-                        status_code=status.HTTP_404_NOT_FOUND,
-                        detail="Saisie invalide, categorie livre non prevue.",
-                    )
-                book.category = category_id
-            if book_updated.year_of_publication is not None:
-                book.year_of_publication = book_updated.year_of_publication
-            book.book_picture_name = "dummy_blank_book.png"
-            check_book_fields(book)
-            session.query(models.Book).where(models.Book.id == book_id).update(
-                book.get_json_for_update()
+    if not book:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"livre avec id {book_id} inexistant"
+        )
+
+    if current_user.id != book.user_id and current_user.username != "admin":
+        logs_context = {
+            "current_user": current_user.username,
+            "book_title": book.title,
+        }
+        log_events.log_event(
+            "[+] FastAPI - Book update refused.", logs_context
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour le livre",
+        )
+
+    if current_user.id == book.user_id or current_user.username == "admin":
+        if book_updated.title is not None:
+            book.title = book_updated.title
+        if book_updated.author is not None:
+            book.author = book_updated.author
+        if book_updated.summary is not None:
+            book.summary = book_updated.summary
+        if book_updated.category is not None:
+            category = str(book_updated.category).lower()
+            try:
+                category_id = (
+                    session.query(models.BookCategory)
+                    .filter(models.BookCategory.title == category)
+                    .first()
+                    .id
+                )
+            except Exception:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Saisie invalide, categorie livre non prevue.",
+                )
+            book.category = category_id
+        if book_updated.year_of_publication is not None:
+            book.year_of_publication = book_updated.year_of_publication
+        book.book_picture_name = "dummy_blank_book.png"
+        check_book_fields(book)
+        session.query(models.Book).where(models.Book.id == book_id).update(
+            book.get_json_for_update()
+        )
+        session.commit()
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "book_title": book.title,
+        }
+        log_events.log_event("[+] FastAPI - Mise à jour livre.", logs_context)
+        return book
+
+
+@app.put("/api/v1/books/{book_id}/", tags=["BOOKS"])
+async def update_book(
+    book_id: int,
+    book_updated: NewBookModel,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)],
+):
+    """
+    full update of a book instance.
+    """
+    book = database_crud_commands.get_instance(session, models.Book, book_id)
+    if not book:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"livre avec id {book_id} inexistant"
+        )
+
+    if current_user.id != book.user_id and current_user.username != "admin":
+        logs_context = {
+            "current_user": current_user.username,
+            "book_title": book.title,
+        }
+        log_events.log_event(
+            "[+] FastAPI - Book update refused.", logs_context
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour le livre",
+        )
+
+    if current_user.id == book.user_id or current_user.username == "admin":
+        check_book_fields(book)
+        category = str(book.category).lower()
+        try:
+            category_id = (
+                session.query(models.BookCategory)
+                .filter(models.BookCategory.title == book_updated.category)
+                .first()
+                .id
             )
-            session.commit()
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "book_title": book.title,
-            }
-            log_events.log_event("[+] FastAPI - Mise à jour livre.", logs_context)
-            return book
-        else:
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "book_title": book.title,
-            }
-            log_events.log_event(
-                "[+] FastAPI - Mise à jour livre refusée.", logs_context
-            )
+        except Exception:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour le livre",
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Saisie invalide, categorie livre non connue.",
             )
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"livre avec id {book_id} inexistant",
-    )
+        new_book = models.Book(
+            title=book.title,
+            author=book.author,
+            summary=book.summary,
+            content=book.content,
+            category=category_id,
+            year_of_publication=book.year_of_publication,
+            book_picture_name="dummy_blank_book.png",
+            user_id=current_user.id,
+        )
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "book_title": new_book.title,
+        }
+        log_events.log_event("[+] FastAPI - Ajout livre.", logs_context)
+        session.add(new_book)
+        session.commit()
+        session.refresh(new_book)
+        return new_book
 
 
 @app.get("/api/v1/users/", tags=["USERS"])
@@ -618,14 +682,14 @@ async def view_user(
     return user
 
 
-@app.put("/api/v1/users/{user_id}/", tags=["USERS"])
+@app.patch("/api/v1/users/{user_id}/", tags=["USERS"])
 async def update_user(
     user_id: int,
     user_updated: UpdateUserModel,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
 ):
     """
-    update an user instance.
+    update partially an user instance.
     """
     user = database_crud_commands.get_instance(session, models.User, user_id)
     if user:
@@ -654,6 +718,68 @@ async def update_user(
     )
 
 
+@app.put("/api/v1/users/{user_id}/", tags=["USERS"])
+async def update_user(
+    user_id: int,
+    user_updated: NewUserInDBModel,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)],
+):
+    """
+    full update of an user instance.
+    """
+    user = database_crud_commands.get_instance(session, models.User, user_id)
+    if user:
+        user.username = str(user.username).lower()
+        user.email = str(user.email).lower()
+        existing_user = (
+            session.query(models.User)
+            .filter_by(username=str(user.username).lower())
+            .first()
+        )
+        existing_email = (
+            session.query(models.User).filter_by(email=str(user.email).lower()).first()
+        )
+        hashed_password = generate_password_hash(
+            user.password, "pbkdf2:sha256", salt_length=8
+        )
+        valid_password = handle_passwords.check_password(user.password)
+        if current_user.role == "admin":
+            if not valid_password:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Mot de passe trop simple, essayez de nouveau.",
+                )
+            if not existing_user and not existing_email:
+                new_user = models.User(
+                    username=str(user.username).lower(),
+                    email=str(user.email).lower(),
+                    hashed_password=hashed_password,
+                )
+                session.add(new_user)
+                session.commit()
+                return {"200": f"Utilisateur {str(user.username).lower()} mis à jour"}
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Utilisateur existe deja"
+            )
+        else:
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "user_to_add": user.username,
+            }
+            log_events.log_event(
+                "[+] FastAPI - Mise a jour utilisateur refusee, vous n'etes pas admin.",
+                logs_context,
+            )
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Seul l'admin peut ajouter un utilisateur"
+            )
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"utilisateur avec id {user_id} inexistant",
+    )
+
+
 @app.put("/api/v1/users/{user_id}/password/", tags=["USERS"])
 async def update_user_password(
     user_id: int,
@@ -661,7 +787,7 @@ async def update_user_password(
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
 ):
     """
-    update password of an user instance.
+    full update password of an user instance.
     """
     user = database_crud_commands.get_instance(session, models.User, user_id)
     if user:
@@ -792,7 +918,7 @@ async def update_comment(
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
 ):
     """
-    update a comment instance.
+    full update of a comment instance.
     """
     comment = database_crud_commands.get_instance(session, models.Comment, comment_id)
     if comment:
@@ -891,7 +1017,8 @@ async def delete_comment(
 
 @app.delete("/api/v1/users/{user_id}/", tags=["USERS"])
 async def delete_user(
-    user_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    user_id: int,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     delete_user allows to delete an user base on id
@@ -931,7 +1058,8 @@ async def delete_user(
 
 @app.delete("/api/v1/books/{book_id}/", tags=["BOOKS"])
 async def delete_book(
-    book_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    book_id: int,
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     delete_book allows to delete a book base on id

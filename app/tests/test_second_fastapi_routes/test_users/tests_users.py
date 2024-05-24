@@ -300,7 +300,7 @@ async def test_update_forbidden_user_with_authentication(get_fastapi_client, get
         "Content-Type": "application/json",
     }
     access_token = get_fastapi_token
-    response = get_fastapi_client.put(
+    response = get_fastapi_client.patch(
         "/api/v1/users/3/",
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
@@ -320,7 +320,7 @@ async def test_update_user_with_authentication_with_valid_datas(get_fastapi_clie
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/users/2/", headers=headers, json=json)
+    response = get_fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
     assert response.status_code == 200
 
 
@@ -337,7 +337,7 @@ async def test_update_uneixsting_user_with_authentication_with_valid_datas(get_f
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/users/55555555/", headers=headers, json=json)
+    response = get_fastapi_client.patch("/api/v1/users/55555555/", headers=headers, json=json)
     assert response.status_code == 404
 
 
