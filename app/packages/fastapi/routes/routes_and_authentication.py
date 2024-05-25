@@ -624,40 +624,41 @@ async def update_book(
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour le livre",
         )
 
-    if current_user.id == book.user_id or current_user.username == "admin":
-        check_book_fields(book)
-        category = str(book.category).lower()
-        try:
-            category_id = (
-                session.query(models.BookCategory)
-                .filter(models.BookCategory.title == book_updated.category)
-                .first()
-                .id
-            )
-        except Exception:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Saisie invalide, categorie livre non connue.",
-            )
-        new_book = models.Book(
-            title=book.title,
-            author=book.author,
-            summary=book.summary,
-            content=book.content,
-            category=category_id,
-            year_of_publication=book.year_of_publication,
-            book_picture_name="dummy_blank_book.png",
-            user_id=current_user.id,
+    check_book_fields(book_updated)
+    category = str(book_updated.category).lower()
+    try:
+        category_id = (
+            session.query(models.BookCategory)
+            .filter(models.BookCategory.title == category)
+            .first()
+            .id
         )
-        logs_context = {
-            "current_user": f"{current_user.username}",
-            "book_title": new_book.title,
-        }
-        log_events.log_event("[+] FastAPI - Ajout livre.", logs_context)
-        session.add(new_book)
-        session.commit()
-        session.refresh(new_book)
-        return new_book
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Saisie invalide, categorie livre non connue.",
+        )
+    new_book = models.Book(
+        title=book_updated.title,
+        author=book_updated.author,
+        summary=book_updated.summary,
+        content=book_updated.content,
+        category=category_id,
+        publication_date=book.publication_date,
+        year_of_publication=book_updated.year_of_publication,
+        book_picture_name="dummy_blank_book.png",
+        user_id=book.user_id,
+    )
+    logs_context = {
+        "current_user": f"{current_user.username}",
+        "book_title": new_book.title,
+    }
+    log_events.log_event("[+] FastAPI - Ajout livre.", logs_context)
+    session.query(models.Book).where(models.Book.id == book_id).update(
+        new_book.get_json_for_update()
+    )
+    session.commit()
+    return new_book
 
 
 @app.get("/api/v1/users/", tags=["USERS"])
@@ -729,51 +730,48 @@ async def update_user(
     """
     user = database_crud_commands.get_instance(session, models.User, user_id)
     if user:
-        user.username = str(user.username).lower()
-        user.email = str(user.email).lower()
-        existing_user = (
-            session.query(models.User)
-            .filter_by(username=str(user.username).lower())
-            .first()
-        )
         existing_email = (
-            session.query(models.User).filter_by(email=str(user.email).lower()).first()
+            session.query(models.User).filter_by(email=str(user_updated.email).lower()).first()
         )
+        user.username = str(user_updated.username).lower()
         hashed_password = generate_password_hash(
-            user.password, "pbkdf2:sha256", salt_length=8
+            user_updated.password, "pbkdf2:sha256", salt_length=8
         )
-        valid_password = handle_passwords.check_password(user.password)
+        valid_password = handle_passwords.check_password(user_updated.password)
         if current_user.role == "admin":
             if not valid_password:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Mot de passe trop simple, essayez de nouveau.",
                 )
-            if not existing_user and not existing_email:
+            if not existing_email:
                 new_user = models.User(
-                    username=str(user.username).lower(),
-                    email=str(user.email).lower(),
+                    username=str(user_updated.username).lower(),
+                    email=str(user_updated.email).lower(),
                     hashed_password=hashed_password,
+                    role=str(user.role)
                 )
-                session.add(new_user)
+                session.query(models.User).where(models.User.id == user_id).update(
+                    new_user.get_json_for_update()
+                )
                 session.commit()
-                return {"200": f"Utilisateur {str(user.username).lower()} mis à jour"}
+                return {"200": f"Ancien utilisateur {str(user.username).lower()} mis à jour"}
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Utilisateur existe deja"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Email existe déjà."
             )
-        else:
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "user_to_add": user.username,
-            }
-            log_events.log_event(
-                "[+] FastAPI - Mise a jour utilisateur refusee, vous n'etes pas admin.",
-                logs_context,
-            )
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Seul l'admin peut ajouter un utilisateur"
-            )
+
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "user_to_update": user.username,
+        }
+        log_events.log_event(
+            "[+] FastAPI - Mise a jour utilisateur refusee, vous n'etes pas admin.",
+            logs_context,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Seul l'admin peut ajouter un utilisateur"
+        )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"utilisateur avec id {user_id} inexistant",
