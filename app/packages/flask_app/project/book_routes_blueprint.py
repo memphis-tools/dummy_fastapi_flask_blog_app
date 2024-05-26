@@ -362,7 +362,8 @@ def update_book(book_id):
                         pass
                 else:
                     updated_book.book_picture_name = "dummy_blank_book.png"
-
+            else:
+                updated_book.book_picture_name = book_picture_filename
         session.query(Book).where(Book.id == book_id).update(
             updated_book.get_json_for_update()
         )
