@@ -1,6 +1,5 @@
 """ The Quote blueprint routes """
 
-
 from flask import (
     Blueprint,
     url_for,
@@ -20,7 +19,7 @@ from . import forms
 from .shared_functions_and_decorators import admin_only
 
 
-quote_routes_blueprint = Blueprint('quote_routes_blueprint', __name__)
+quote_routes_blueprint = Blueprint("quote_routes_blueprint", __name__)
 
 
 @quote_routes_blueprint.route("/front/quotes/", methods=["GET"])
@@ -34,7 +33,9 @@ def view_quotes():
     quotes = session.query(Quote).all()
     session.close()
     return render_template(
-        "view_quotes.html", quotes=quotes, is_authenticated=current_user.is_authenticated
+        "view_quotes.html",
+        quotes=quotes,
+        is_authenticated=current_user.is_authenticated,
     )
 
 
@@ -73,9 +74,7 @@ def add_quote():
         author = str(form.author.data).lower()
         book_title = str(form.book_title.data).lower()
         quote = str(form.quote.data).lower()
-        new_quote = Quote(
-            author=author, book_title=book_title, quote=quote
-        )
+        new_quote = Quote(author=author, book_title=book_title, quote=quote)
         session.add(new_quote)
         session.commit()
         flash(f"Ajout citation {author} {book_title} faite", "info")
@@ -84,9 +83,7 @@ def add_quote():
             "book_title": f"{book_title}",
             "quote": f"{quote}",
         }
-        log_events.log_event(
-            "[+] Flask - Ajout citation par admin.", logs_context
-        )
+        log_events.log_event("[+] Flask - Ajout citation par admin.", logs_context)
         session.close()
         return redirect(url_for("book_routes_blueprint.books"))
     return render_template(
@@ -94,7 +91,9 @@ def add_quote():
     )
 
 
-@quote_routes_blueprint.route("/front/quotes/<int:quote_id>/delete/", methods=["GET", "POST"])
+@quote_routes_blueprint.route(
+    "/front/quotes/<int:quote_id>/delete/", methods=["GET", "POST"]
+)
 @login_required
 @admin_only
 def delete_quote(quote_id):
