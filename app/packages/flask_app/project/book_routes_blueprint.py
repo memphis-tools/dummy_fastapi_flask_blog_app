@@ -234,7 +234,7 @@ def delete_book(book_id):
     if form.validate_on_submit():
         book_picture_name = book_to_delete.book_picture_name
         session.delete(book_to_delete)
-        os.remove(f"{settings.INSTANCE_PATH}staticfiles/{book_picture_name}")
+        os.remove(f"{settings.INSTANCE_PATH}staticfiles/img/{book_picture_name}")
         logs_context = {
             "current_user": f"{current_user.username}",
             "book_title": book_to_delete.title,
