@@ -1,6 +1,5 @@
 """ All the methods needed to be call from different blueprints """
 
-
 import random
 import io
 from PIL import Image
@@ -32,7 +31,7 @@ def return_pagination(items_to_paginate):
     Description: manual pagination since we do not use Flask-SQLAlchemy.
     """
     # Get the 'page' query parameter from the URL
-    page = request.args.get('page', 1, type=int)
+    page = request.args.get("page", 1, type=int)
     per_page = settings.POSTS_PER_PAGE
     # Calculate the start and end indices of the items to display
     start = (page - 1) * per_page
@@ -40,7 +39,9 @@ def return_pagination(items_to_paginate):
     # Get the subset of items for the current page
     items = items_to_paginate[start:end]
     # Calculate the total number of pages
-    total_pages = len(items_to_paginate) // per_page + (1 if len(items_to_paginate) % per_page > 0 else 0)
+    total_pages = len(items_to_paginate) // per_page + (
+        1 if len(items_to_paginate) % per_page > 0 else 0
+    )
     return items, page, per_page, total_pages
 
 
@@ -54,18 +55,6 @@ def return_random_quote():
     total_quotes_indexes = len(quotes) - 1
     random_quote = quotes[random.randint(0, total_quotes_indexes)]
     return random_quote
-
-
-def is_file_a_valid_image(image_file):
-    """
-    Description: check if uploaded file is an image.
-    """
-    try:
-        img = Image.open(io.BytesIO(image_file.read()))
-        img.verify()
-        return True
-    except (IOError, SyntaxError) as e:
-        return False
 
 
 def get_random_color(colors_list):
@@ -105,3 +94,23 @@ def get_random_books_ids(ids_list, max_ids_to_get):
     while len(random_ids) < max_ids_to_get:
         random_ids.add(random.choice(ids_list))
     return random_ids
+
+
+def check_book_fields(book):
+    """
+    Description: vérifier que l'utilisateur renseigne le livre correctement.
+    """
+    if any(
+        [
+            str(book.title).lower() == "string",
+            str(book.author).lower() == "string",
+            str(book.summary).lower() == "string",
+            str(book.content).lower() == "string",
+        ]
+    ):
+        error = "Saisie invalide, mot clef string non utilisable."
+        return error
+    if not isinstance(book.year_of_publication, int):
+        error = "Saisie invalide, annee publication livre doit etre un entier."
+        return error
+    return True

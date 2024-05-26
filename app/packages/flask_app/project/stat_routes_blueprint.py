@@ -1,6 +1,5 @@
 """ The Stat blueprint routes """
 
-
 import base64
 from io import BytesIO
 import matplotlib.pyplot as plt
@@ -18,7 +17,7 @@ from app.packages.database.commands import session_commands
 from app.packages.database.models.models import Book, BookCategory, User
 from .shared_functions_and_decorators import get_pie_colors
 
-stat_routes_blueprint = Blueprint('stat_routes_blueprint', __name__)
+stat_routes_blueprint = Blueprint("stat_routes_blueprint", __name__)
 
 
 @stat_routes_blueprint.route("/front/stats/")
