@@ -1,6 +1,5 @@
 """ The User blueprint routes """
 
-
 from flask import (
     Blueprint,
     url_for,
@@ -22,7 +21,7 @@ from app.packages.database.models.models import Book, User, Starred
 from . import forms
 from .shared_functions_and_decorators import admin_only, return_pagination
 
-user_routes_blueprint = Blueprint('user_routes_blueprint', __name__)
+user_routes_blueprint = Blueprint("user_routes_blueprint", __name__)
 
 
 @user_routes_blueprint.route("/front/users/", methods=["GET"])
@@ -92,7 +91,9 @@ def add_user():
     )
 
 
-@user_routes_blueprint.route("/front/user/<int:user_id>/delete/", methods=["GET", "POST"])
+@user_routes_blueprint.route(
+    "/front/user/<int:user_id>/delete/", methods=["GET", "POST"]
+)
 @login_required
 @admin_only
 def delete_user(user_id):
@@ -186,17 +187,19 @@ def user_books(user_id):
         flash(f"Utilisateur id {user_id} inexistant", "error")
         session.close()
         return redirect(url_for("index"))
-    books = session.query(Book).filter(
-        Book.user_id.in_(
-            [
-                user_id,
-            ]
+    books = (
+        session.query(Book)
+        .filter(
+            Book.user_id.in_(
+                [
+                    user_id,
+                ]
+            )
         )
-    ).options(
-        joinedload(Book.book_comments)
-    ).options(
-        joinedload(Book.starred)
-    ).all()
+        .options(joinedload(Book.book_comments))
+        .options(joinedload(Book.starred))
+        .all()
+    )
     session.close()
     total_books = len(books)
     items, page, per_page, total_pages = return_pagination(books)
@@ -233,26 +236,20 @@ def user_starred(user_id):
     and those from any existing users.
     """
     session = session_commands.get_a_database_session()
-    user = session.query(User).filter(
-        User.id == user_id
-    ).first()
+    user = session.query(User).filter(User.id == user_id).first()
     if not user:
         flash(f"Utilisateur id {user_id} inexistant", "error")
         session.close()
         return redirect(url_for("index"))
-    books = session.query(
-        Book
-    ).join(
-        Starred
-    ).filter(
-        Book.id == Starred.book_id
-    ).filter(
-        Starred.user_id == user_id
-    ).options(
-        joinedload(Book.book_comments)
-    ).options(
-        joinedload(Book.starred)
-    ).all()
+    books = (
+        session.query(Book)
+        .join(Starred)
+        .filter(Book.id == Starred.book_id)
+        .filter(Starred.user_id == user_id)
+        .options(joinedload(Book.book_comments))
+        .options(joinedload(Book.starred))
+        .all()
+    )
     session.close()
     total_books = len(books)
     items, page, per_page, total_pages = return_pagination(books)
@@ -264,11 +261,14 @@ def user_starred(user_id):
         per_page=per_page,
         total_pages=total_pages,
         user=user,
-        is_authenticated=current_user.is_authenticated
+        is_authenticated=current_user.is_authenticated,
     )
 
 
-@user_routes_blueprint.route("/front/users/<int:user_id>/books/<int:book_id>/starred/delete/", methods=["GET", "POST"])
+@user_routes_blueprint.route(
+    "/front/users/<int:user_id>/books/<int:book_id>/starred/delete/",
+    methods=["GET", "POST"],
+)
 @login_required
 def delete_starred_book(user_id, book_id):
     """
@@ -281,11 +281,12 @@ def delete_starred_book(user_id, book_id):
         flash("Utilisateur inexistant", "error")
         session.close()
         return redirect(url_for("index"))
-    starred_book_to_delete = session.query(Starred).filter(
-        Starred.book_id == book_id
-    ).filter(
-        Starred.user_id == user_id
-    ).first()
+    starred_book_to_delete = (
+        session.query(Starred)
+        .filter(Starred.book_id == book_id)
+        .filter(Starred.user_id == user_id)
+        .first()
+    )
     if not starred_book_to_delete:
         flash("Favori inexistant", "error")
         session.close()
@@ -304,11 +305,13 @@ def delete_starred_book(user_id, book_id):
         session.commit()
         flash("Favori supprimé", "info")
         session.close()
-        return redirect(url_for(
-            "book_routes_blueprint.book",
-            book_id=starred_book_to_delete.id,
-            is_authenticated=current_user.is_authenticated,
-        ))
+        return redirect(
+            url_for(
+                "book_routes_blueprint.book",
+                book_id=starred_book_to_delete.id,
+                is_authenticated=current_user.is_authenticated,
+            )
+        )
     return render_template(
         "delete_starred_book.html",
         form=form,
@@ -317,7 +320,10 @@ def delete_starred_book(user_id, book_id):
     )
 
 
-@user_routes_blueprint.route("/front/users/<int:user_id>/books/<int:book_id>/starred/add/", methods=["GET", "POST"])
+@user_routes_blueprint.route(
+    "/front/users/<int:user_id>/books/<int:book_id>/starred/add/",
+    methods=["GET", "POST"],
+)
 @login_required
 def add_starred_book(user_id, book_id):
     """
@@ -325,16 +331,22 @@ def add_starred_book(user_id, book_id):
     """
     session = session_commands.get_a_database_session()
     form = forms.AddInstanceForm()
-    starred_book_to_add = session.query(Starred).filter(
-        Starred.book_id == book_id
-    ).filter(
-        Starred.user_id == user_id
-    ).first()
+    starred_book_to_add = (
+        session.query(Starred)
+        .filter(Starred.book_id == book_id)
+        .filter(Starred.user_id == user_id)
+        .first()
+    )
 
     if starred_book_to_add:
         flash("Vous avez deja ce livre en favori", "error")
         session.close()
-        return redirect(url_for("index", is_authenticated=current_user.is_authenticated,))
+        return redirect(
+            url_for(
+                "index",
+                is_authenticated=current_user.is_authenticated,
+            )
+        )
 
     if not user_id == current_user.id:
         flash("Vous ne pouvez ajouter que vos favoris", "error")
@@ -342,9 +354,7 @@ def add_starred_book(user_id, book_id):
         return redirect(url_for("index"))
 
     if form.validate_on_submit():
-        book = session.query(Book).filter(
-            Book.id == book_id
-        ).first()
+        book = session.query(Book).filter(Book.id == book_id).first()
         if not book:
             flash("Livre inexistant", "error")
             session.close()
@@ -362,11 +372,13 @@ def add_starred_book(user_id, book_id):
         session.commit()
         session.close()
         flash("Livre en favori", "info")
-        return redirect(url_for(
-            "book_routes_blueprint.book",
-            book_id=book_id,
-            is_authenticated=current_user.is_authenticated,
-        ))
+        return redirect(
+            url_for(
+                "book_routes_blueprint.book",
+                book_id=book_id,
+                is_authenticated=current_user.is_authenticated,
+            )
+        )
     session.close()
     return render_template(
         "add_starred_book.html",

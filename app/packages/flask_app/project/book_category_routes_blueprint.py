@@ -1,6 +1,5 @@
 """ The Book Category blueprint routes """
 
-
 from flask import (
     Blueprint,
     url_for,
@@ -22,7 +21,7 @@ from . import forms
 from .shared_functions_and_decorators import admin_only, return_pagination
 
 
-book_category_routes_blueprint = Blueprint('book_category_routes_blueprint', __name__)
+book_category_routes_blueprint = Blueprint("book_category_routes_blueprint", __name__)
 
 
 def check_book_category_fields(category):
@@ -85,22 +84,26 @@ def category_books(category_id):
     Description: the books from a category Flask route.
     """
     session = session_commands.get_a_database_session()
-    category = session.query(BookCategory).filter(BookCategory.id == category_id).first()
+    category = (
+        session.query(BookCategory).filter(BookCategory.id == category_id).first()
+    )
     if not category:
         flash(f"Categorie id {category_id} inexistante", "error")
         session.close()
         return redirect(url_for("index"))
-    books = session.query(Book).filter(
-        Book.category.in_(
-            [
-                category_id,
-            ]
+    books = (
+        session.query(Book)
+        .filter(
+            Book.category.in_(
+                [
+                    category_id,
+                ]
+            )
         )
-    ).options(
-        joinedload(Book.book_comments)
-    ).options(
-        joinedload(Book.starred)
-    ).all()
+        .options(joinedload(Book.book_comments))
+        .options(joinedload(Book.starred))
+        .all()
+    )
     session.close()
     total_books = len(books)
     items, page, per_page, total_pages = return_pagination(books)
@@ -133,7 +136,9 @@ def manage_books_categories():
     )
 
 
-@book_category_routes_blueprint.route("/front/book/categories/add/", methods=["GET", "POST"])
+@book_category_routes_blueprint.route(
+    "/front/book/categories/add/", methods=["GET", "POST"]
+)
 @login_required
 @admin_only
 def add_book_category():
@@ -159,7 +164,9 @@ def add_book_category():
         else:
             flash(category_is_valid, "error")
         session.close()
-        return redirect(url_for("book_category_routes_blueprint.manage_books_categories"))
+        return redirect(
+            url_for("book_category_routes_blueprint.manage_books_categories")
+        )
     return render_template(
         "add_book_category.html",
         form=form,
@@ -167,7 +174,9 @@ def add_book_category():
     )
 
 
-@book_category_routes_blueprint.route("/front/book/categories/<int:category_id>/delete/", methods=["GET", "POST"])
+@book_category_routes_blueprint.route(
+    "/front/book/categories/<int:category_id>/delete/", methods=["GET", "POST"]
+)
 @login_required
 @admin_only
 def delete_book_category(category_id):
@@ -191,7 +200,9 @@ def delete_book_category(category_id):
         session.delete(category_to_delete)
         session.commit()
         session.close()
-        return redirect(url_for("book_category_routes_blueprint.manage_books_categories"))
+        return redirect(
+            url_for("book_category_routes_blueprint.manage_books_categories")
+        )
     return render_template(
         "delete_book_category.html",
         category_to_delete=category_to_delete,
@@ -200,7 +211,9 @@ def delete_book_category(category_id):
     )
 
 
-@book_category_routes_blueprint.route("/front/book/categories/<int:category_id>/update/", methods=["GET", "POST"])
+@book_category_routes_blueprint.route(
+    "/front/book/categories/<int:category_id>/update/", methods=["GET", "POST"]
+)
 @login_required
 @admin_only
 def update_book_category(category_id):
@@ -237,7 +250,9 @@ def update_book_category(category_id):
             )
             session.commit()
             session.close()
-            return redirect(url_for("book_category_routes_blueprint.manage_books_categories"))
+            return redirect(
+                url_for("book_category_routes_blueprint.manage_books_categories")
+            )
         else:
             flash(book_category_is_valid, "error")
             session.close()

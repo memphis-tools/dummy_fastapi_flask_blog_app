@@ -1,6 +1,5 @@
 """ The Flask app definition.Notice we do not use the app factory pattern """
 
-
 import os
 from flask import (
     Flask,
@@ -132,13 +131,13 @@ def index():
         random_ids = get_random_books_ids(ids_list, MAX_BOOKS_ON_INDEX_PAGE)
     else:
         random_ids = get_random_books_ids(ids_list, len(ids_list))
-    first_books = session.query(Book).filter(
-        Book.id.in_(random_ids)
-    ).options(
-        joinedload(Book.book_comments)
-    ).options(
-        joinedload(Book.starred)
-    ).all()
+    first_books = (
+        session.query(Book)
+        .filter(Book.id.in_(random_ids))
+        .options(joinedload(Book.book_comments))
+        .options(joinedload(Book.starred))
+        .all()
+    )
     session.close()
     return render_template(
         "index.html", books=first_books, is_authenticated=current_user.is_authenticated

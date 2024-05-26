@@ -1,6 +1,5 @@
 """ The Book blueprint routes """
 
-
 import os
 from flask import (
     Blueprint,
@@ -20,32 +19,22 @@ from werkzeug.utils import secure_filename
 
 from app.packages import log_events, settings
 from app.packages.database.commands import session_commands
-from app.packages.database.models.models import User, Book, BookCategory, Comment, Starred
+from app.packages.database.models.models import (
+    User,
+    Book,
+    BookCategory,
+    Comment,
+    Starred,
+)
 from . import forms
-from .shared_functions_and_decorators import return_pagination, return_random_quote, is_file_a_valid_image
+from .shared_functions_and_decorators import (
+    return_pagination,
+    return_random_quote,
+    check_book_fields,
+)
 
 
-book_routes_blueprint = Blueprint('book_routes_blueprint', __name__)
-
-
-def check_book_fields(book):
-    """
-    Description: vérifier que l'utilisateur renseigne le livre correctement.
-    """
-    if any(
-        [
-            str(book.title).lower() == "string",
-            str(book.author).lower() == "string",
-            str(book.summary).lower() == "string",
-            str(book.content).lower() == "string",
-        ]
-    ):
-        error = "Saisie invalide, mot clef string non utilisable."
-        return error
-    if not isinstance(book.year_of_publication, int):
-        error = "Saisie invalide, annee publication livre doit etre un entier."
-        return error
-    return True
+book_routes_blueprint = Blueprint("book_routes_blueprint", __name__)
 
 
 @book_routes_blueprint.route("/front/books/")
@@ -54,13 +43,13 @@ def books():
     Description: the books Flask route.
     """
     session = session_commands.get_a_database_session()
-    books = session.query(Book).order_by(
-        Book.id
-    ).options(
-        joinedload(Book.book_comments)
-    ).options(
-        joinedload(Book.starred)
-    ).all()
+    books = (
+        session.query(Book)
+        .order_by(Book.id)
+        .options(joinedload(Book.book_comments))
+        .options(joinedload(Book.starred))
+        .all()
+    )
     session.close()
     total_books = len(books)
     items, page, per_page, total_pages = return_pagination(books)
@@ -86,21 +75,22 @@ def book(book_id):
     session = session_commands.get_a_database_session()
     delete_book_form = forms.DeleteInstanceForm()
     form = forms.CommentForm()
-    book = session.query(Book).filter(
-        Book.id == book_id
-    ).options(
-        joinedload(Book.book_comments)
-    ).options(
-        joinedload(Book.starred)
-    ).first()
+    book = (
+        session.query(Book)
+        .filter(Book.id == book_id)
+        .options(joinedload(Book.book_comments))
+        .options(joinedload(Book.starred))
+        .first()
+    )
 
     comments = session.query(Comment).filter_by(book_id=book.id).all()
 
-    user_starred_books_id_list = session.query(Starred).filter(
-        Starred.user_id == current_user.id
-    ).with_entities(
-        Starred.book_id
-    ).all()
+    user_starred_books_id_list = (
+        session.query(Starred)
+        .filter(Starred.user_id == current_user.id)
+        .with_entities(Starred.book_id)
+        .all()
+    )
 
     logs_context = {
         "current_user": f"{current_user.username}",
@@ -167,7 +157,7 @@ def add_book():
             )
         year_of_publication = form.year_of_publication.data
         book_picture = form.photo.data
-        uploaded_file = request.files['photo']
+        uploaded_file = request.files["photo"]
         filename = secure_filename(book_picture.filename)
         new_book = Book(
             title=title,
@@ -181,17 +171,17 @@ def add_book():
         )
         book_is_valid = check_book_fields(new_book)
         if book_is_valid is True:
-            if filename != '':
+            if filename != "":
                 file_ext = os.path.splitext(filename)[1]
                 if file_ext not in settings.UPLOAD_EXTENSIONS:
                     flash("Type image non accepté", "error")
                     return redirect(url_for("index"))
-                if not is_file_a_valid_image(uploaded_file):
-                    flash("Fichier n'est pas une image valide", "error")
-                    return redirect(url_for("index"))
                 if os.getenv("SCOPE") == "production":
-                    file_path = os.path.join(settings.INSTANCE_PATH, 'staticfiles/img/', filename)
-                    book_picture.save(file_path)
+                    book_picture.save(
+                        os.path.join(
+                            settings.INSTANCE_PATH, "staticfiles/img", filename
+                        )
+                    )
                 else:
                     new_book.book_picture_name = "dummy_blank_book.png"
                 session.add(new_book)
@@ -220,7 +210,9 @@ def add_book():
     )
 
 
-@book_routes_blueprint.route("/front/book/<int:book_id>/delete/", methods=["GET", "POST"])
+@book_routes_blueprint.route(
+    "/front/book/<int:book_id>/delete/", methods=["GET", "POST"]
+)
 @login_required
 def delete_book(book_id):
     """
@@ -260,20 +252,22 @@ def delete_book(book_id):
     )
 
 
-@book_routes_blueprint.route("/front/book/<int:book_id>/update/", methods=["GET", "POST"])
+@book_routes_blueprint.route(
+    "/front/book/<int:book_id>/update/", methods=["GET", "POST"]
+)
 @login_required
 def update_book(book_id):
     """
     Description: the update book Flask route.
     """
     session = session_commands.get_a_database_session()
-    book = session.query(Book).filter(
-        Book.id.in_([book_id])
-    ).options(
-        joinedload(Book.book_comments)
-    ).options(
-        joinedload(Book.starred)
-    ).first()
+    book = (
+        session.query(Book)
+        .filter(Book.id.in_([book_id]))
+        .options(joinedload(Book.book_comments))
+        .options(joinedload(Book.starred))
+        .first()
+    )
     if not book:
         flash("Livre non trouvé", "error")
         session.close()
@@ -330,14 +324,11 @@ def update_book(book_id):
                 )
         try:
             book_picture = edit_form["photo"]
-            uploaded_file = request.files['photo']
-            if not is_file_a_valid_image(uploaded_file):
-                flash("Fichier n'est pas une image valide", "error")
-                return redirect(url_for("index"))
+            uploaded_file = request.files["photo"]
         except Exception:
             book_picture = None
         if book_picture is not None:
-            filename = secure_filename(book_picture.filename)
+            filename = secure_filename(uploaded_file.filename)
         else:
             filename = book_picture_filename
         publication_date = book.publication_date
@@ -353,13 +344,16 @@ def update_book(book_id):
             user_id=book.user_id,
         )
         if book_picture_filename != filename:
-            if filename != '':
+            if filename != "":
                 file_ext = os.path.splitext(filename)[1]
                 if file_ext not in settings.UPLOAD_EXTENSIONS:
                     return "Image invalide", 400
                 if os.getenv("SCOPE") == "production":
-                    file_path = os.path.join(settings.INSTANCE_PATH, 'staticfiles/img/', filename)
-                    book_picture.save(file_path)
+                    uploaded_file.save(
+                        os.path.join(
+                            settings.INSTANCE_PATH, "staticfiles/img", filename
+                        )
+                    )
                     try:
                         os.remove(
                             f"{settings.INSTANCE_PATH}staticfiles/img/{book_picture_filename}"
@@ -382,14 +376,14 @@ def update_book(book_id):
             }
             log_events.log_event("[+] Flask - Mise à jour livre.", logs_context)
             return redirect(url_for("book_routes_blueprint.book", book_id=book_id))
-        else:
-            flash(book_is_valid, "error")
-            session.close()
-            return render_template(
-                "update_book.html",
-                form=edit_form,
-                is_authenticated=current_user.is_authenticated,
-            )
+
+        flash("Erreur avec image illustration", "error")
+        session.close()
+        return render_template(
+            "update_book.html",
+            form=edit_form,
+            is_authenticated=current_user.is_authenticated,
+        )
     return render_template(
         "update_book.html",
         form=edit_form,
