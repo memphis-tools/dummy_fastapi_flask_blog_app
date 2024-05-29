@@ -692,14 +692,6 @@ async def partial_update_user(
     """
     user = database_crud_commands.get_instance(session, models.User, user_id)
     if user:
-        existing_email = (
-            session.query(models.User).filter_by(email=str(user_updated.email).lower()).first()
-        )
-        if existing_email:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Email utilisateur {user.email} existe déjà."
-            )
         if current_user.id == user.id or current_user.username == "admin":
             if user_updated.username is not None:
                 existing_user = (
@@ -710,10 +702,18 @@ async def partial_update_user(
                 if existing_user:
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail="Nom utilisateur {user.username} existe déjà."
+                        detail=f"Nom utilisateur {user_updated.username} existe déjà."
                     )
                 user.username = user_updated.username
             if user_updated.email is not None:
+                existing_email = (
+                    session.query(models.User).filter_by(email=str(user_updated.email).lower()).first()
+                )
+                if existing_email:
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail=f"Email utilisateur {user.email} existe déjà."
+                    )
                 user.email = user_updated.email
             if user_updated.disabled is not None:
                 user.disabled = user_updated.disabled
@@ -778,6 +778,11 @@ async def update_user(
                 .filter_by(username=str(user_updated.username).lower())
                 .first()
             )
+            if existing_user:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail=f"Nom utilisateur {user_updated.username} existe déjà."
+                )
             existing_email = (
                 session.query(models.User).filter_by(email=str(user_updated.email).lower()).first()
             )
@@ -793,10 +798,6 @@ async def update_user(
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Mot de passe trop simple, essayez de nouveau.",
-                )
-            if existing_user:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED, detail="Nom utilisateur existe déjà."
                 )
             if existing_email:
                 raise HTTPException(
