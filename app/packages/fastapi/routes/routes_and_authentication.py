@@ -314,7 +314,7 @@ async def user_books(
         return books
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Aucun utilisateur avec id {user_id} en base",
+        detail=f"Aucun Utilisateur avec id {user_id} en base",
     )
 
 
@@ -539,7 +539,7 @@ async def partial_update_book(
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"livre avec id {book_id} inexistant"
+            detail=f"Livre avec id {book_id} inexistant"
         )
 
     if current_user.id != book.user_id and current_user.username != "admin":
@@ -606,7 +606,7 @@ async def update_book(
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"livre avec id {book_id} inexistant"
+            detail=f"Livre avec id {book_id} inexistant"
         )
 
     if current_user.id != book.user_id and current_user.username != "admin":
@@ -757,7 +757,7 @@ async def partial_update_user(
             )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"utilisateur avec id {user_id} inexistant",
+        detail=f"Utilisateur avec id {user_id} inexistant",
     )
 
 
@@ -847,7 +847,7 @@ async def update_user(
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"utilisateur avec id {user_id} inexistant",
+        detail=f"Utilisateur avec id {user_id} inexistant",
     )
 
 
@@ -908,7 +908,7 @@ async def update_user_password(
             )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"utilisateur avec id {user_id} inexistant",
+        detail=f"Utilisateur avec id {user_id} inexistant",
     )
 
 
@@ -926,7 +926,7 @@ async def view_user_comments(
         return comments
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"utilisateur avec id {user_id} inexistant",
+        detail=f"Utilisateur avec id {user_id} inexistant",
     )
 
 
@@ -978,7 +978,7 @@ async def add_comment(
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"livre avec id {book_id} inexistant",
+        detail=f"Livre avec id {book_id} inexistant",
     )
 
 
@@ -1098,7 +1098,7 @@ async def delete_user(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"utilisateur avec id {user_id} inexistant",
+            detail=f"Utilisateur avec id {user_id} inexistant",
         )
     if current_user.role == "admin":
         logs_context = {
@@ -1110,7 +1110,7 @@ async def delete_user(
         session.commit()
         raise HTTPException(
             status_code=status.HTTP_204_NO_CONTENT,
-            detail=f"utilisateur avec id {user_id} supprimé",
+            detail=f"Utilisateur avec id {user_id} supprimé",
         )
     else:
         logs_context = {
@@ -1147,7 +1147,7 @@ async def delete_book(
             session.commit()
             raise HTTPException(
                 status_code=status.HTTP_204_NO_CONTENT,
-                detail=f"livre avec id {book_id} supprimé.",
+                detail=f"Livre avec id {book_id} supprimé.",
             )
         logs_context = {
             "current_user": f"{current_user.username}",
@@ -1160,7 +1160,7 @@ async def delete_book(
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"livre avec id {book_id} inexistant",
+        detail=f"Livre avec id {book_id} inexistant",
     )
 
 
