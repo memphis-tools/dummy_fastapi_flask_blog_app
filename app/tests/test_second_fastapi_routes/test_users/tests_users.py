@@ -288,9 +288,178 @@ async def test_update_user_with_authentication_without_valid_datas(get_fastapi_c
 
 
 @pytest.mark.asyncio
-async def test_update_forbidden_user_with_authentication(get_fastapi_client, get_fastapi_token):
+async def test_update_user_with_authentication_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token_for_admin
+):
     """
-    Description: test update_user id 3 route with FastAPI TestClient with token.
+    Description: test update_user id 3 being authenticated as admin.
+    """
+    json = {
+        "username": "donaldino",
+        "email": "donaldino.duck@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "role": "user",
+        "disabled": False
+    }
+    access_token = get_fastapi_token_for_admin
+    response = get_fastapi_client.put(
+        "/api/v1/users/3/",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json=json
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_update_user_with_authentication_with_already_existing_email(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test update_user id 2 with forbidden role as legitimate user.
+    """
+    json = {
+        "username": "donaldinou",
+        "email": "donald@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "role": "user"
+    }
+    access_token = get_fastapi_token
+    response = get_fastapi_client.put(
+        "/api/v1/users/2/",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json=json
+    )
+    assert response.status_code == 401
+    assert b'{"detail":"Email existe d\xc3\xa9j\xc3\xa0."}' in response.content
+
+
+@pytest.mark.asyncio
+async def test_update_user_with_authentication_with_forbidden_role(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test update_user id 2 with forbidden role as legitimate user.
+    """
+    json = {
+        "username": "donaldinou",
+        "email": "d.duck@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "role": "admin"
+    }
+    access_token = get_fastapi_token
+    response = get_fastapi_client.put(
+        "/api/v1/users/2/",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json=json
+    )
+    assert response.status_code == 401
+    assert b'{"detail":"Affecter role admin autoris\xc3\xa9 aux seuls admins."}' in response.content
+
+
+@pytest.mark.asyncio
+async def test_update_user_with_authentication_with_unexisting_role(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test update_user id 2 with unexisting role as legitimate user.
+    """
+    json = {
+        "username": "donaldinou",
+        "email": "d.duck@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "role": "bucheron"
+    }
+    access_token = get_fastapi_token
+    response = get_fastapi_client.put(
+        "/api/v1/users/2/",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json=json
+    )
+    assert response.status_code == 404
+    assert b'{"detail":"Role inconnu."}' in response.content
+
+
+@pytest.mark.asyncio
+async def test_update_unexisting_user_with_authentication(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test update_user id 2 with unexisting role as legitimate user.
+    """
+    json = {
+        "username": "donaldinou",
+        "email": "d.duck@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "role": "bucheron"
+    }
+    access_token = get_fastapi_token
+    response = get_fastapi_client.put(
+        "/api/v1/users/55555555/",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json=json
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_update_user_with_authentication_with_disabling_true(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test update_user id 2 with unexisting role as legitimate user.
+    """
+    json = {
+        "username": "donaldinou",
+        "email": "d.duck@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "role": "user",
+        "disabled": True
+    }
+    access_token = get_fastapi_token
+    response = get_fastapi_client.put(
+        "/api/v1/users/2/",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json=json
+    )
+    assert response.status_code == 401
+    assert b'{"detail":"D\xc3\xa9sactiver utilisateur autoris\xc3\xa9 aux seuls admins."}' in response.content
+
+
+@pytest.mark.asyncio
+async def test_update_user_with_authentication_being_unlegetimate_user(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test update_user id 3 as unlegitimate user.
+    """
+    json = {
+        "username": "daisy",
+        "email": "daisy.duck@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "role": "user"
+    }
+    access_token = get_fastapi_token
+    response = get_fastapi_client.put(
+        "/api/v1/users/3/",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json=json
+    )
+    assert response.status_code == 401
+    assert b'{"detail":"Seul l\'utilisateur ou l\'admin peuvent mettre \xc3\xa0 jour l\'utilisateur"}' in response.content
+
+
+@pytest.mark.asyncio
+async def test_partial_update_forbidden_user_with_authentication(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test partial update_user id 3 route with FastAPI TestClient with token.
     """
     access_token = get_fastapi_token
     json = {"email": "donald.duck@localhost.fr"}
@@ -309,9 +478,9 @@ async def test_update_forbidden_user_with_authentication(get_fastapi_client, get
 
 
 @pytest.mark.asyncio
-async def test_update_user_with_authentication_with_valid_datas(get_fastapi_client, get_fastapi_token):
+async def test_partial_update_user_with_authentication_with_valid_datas(get_fastapi_client, get_fastapi_token):
     """
-    Description: test update_user id 2 route with FastAPI TestClient with token.
+    Description: test partial update_user id 2 route with FastAPI TestClient with token.
     """
     access_token = get_fastapi_token
     json = {"email": "donald.duck@localhost.fr"}
@@ -325,9 +494,48 @@ async def test_update_user_with_authentication_with_valid_datas(get_fastapi_clie
 
 
 @pytest.mark.asyncio
-async def test_update_uneixsting_user_with_authentication_with_valid_datas(get_fastapi_client, get_fastapi_token):
+async def test_partial_update_user_with_authentication_with_forbidden_role(
+    get_fastapi_client,
+    get_fastapi_token
+):
     """
-    Description: test update_user id 55555555 route with FastAPI TestClient with token.
+    Description: test partial update_user id 2 with forbidden role route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    json = {"role": "admin"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
+    assert response.status_code == 401
+    assert b'{"detail":"Affecter role admin autoris\xc3\xa9 aux seuls admins."}' in response.content
+
+
+@pytest.mark.asyncio
+async def test_partial_update_user_with_authentication_with_unexisting_role(get_fastapi_client, get_fastapi_token):
+    """
+    Description: test partial update_user id 2 with unexisting role route with FastAPI TestClient with token.
+    """
+    access_token = get_fastapi_token
+    json = {"role": "bucheron"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = get_fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_partial_update_unexisting_user_with_authentication_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token
+):
+    """
+    Description: test partial update_user id 55555555 route with FastAPI TestClient with token.
     User does not exist.
     """
     access_token = get_fastapi_token

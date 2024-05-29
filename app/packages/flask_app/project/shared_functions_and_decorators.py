@@ -1,8 +1,6 @@
 """ All the methods needed to be call from different blueprints """
 
 import random
-import io
-from PIL import Image
 from functools import wraps
 from flask import request, abort
 from flask_login import current_user

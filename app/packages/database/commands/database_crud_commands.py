@@ -11,6 +11,19 @@ def commit_update(session):
     return True
 
 
+def is_user_role_valid(role):
+    """
+    Description: check if user role exists
+
+    Parameters:
+    role -- str, the expected user role
+    """
+    roles_list = [r.value for r in models.Role]
+    if role not in roles_list:
+        return False
+    return True
+
+
 def add_instance(session, instance):
     """add an instance of a model"""
     session.add(instance)
