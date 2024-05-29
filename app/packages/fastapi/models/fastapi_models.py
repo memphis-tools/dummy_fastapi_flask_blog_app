@@ -170,6 +170,8 @@ class NewUserInDBModel(BaseModel):
     email: str
     password: str
     password_check: str
+    role: str | None = None
+    disabled: bool | None = False
 
 
 class UpdateUserModel(BaseModel):
@@ -177,7 +179,7 @@ class UpdateUserModel(BaseModel):
 
     username: str | None = None
     email: str | None = None
-    role: Role | None = None
+    role: str | None = None
     disabled: bool | None = False
 
 

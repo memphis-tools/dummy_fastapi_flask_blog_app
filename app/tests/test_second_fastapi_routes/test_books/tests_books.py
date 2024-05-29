@@ -48,7 +48,7 @@ async def test_view_unexisting_book_being_authenticated(get_fastapi_client, get_
 
 
 @pytest.mark.asyncio
-async def test_update_book_with_authentication_without_valid_datas(
+async def test_partial_update_book_with_authentication_without_valid_datas(
     get_fastapi_client,
     get_fastapi_token
 ):
