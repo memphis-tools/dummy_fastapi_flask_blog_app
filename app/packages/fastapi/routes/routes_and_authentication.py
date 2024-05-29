@@ -20,7 +20,6 @@ from app.packages.fastapi.models.fastapi_models import (
     NewCommentModel,
     UpdateCommentModel,
     NewBookCategoryModel,
-    UpdateBookCategoryModel,
     QuoteModel,
     NewQuoteModel,
     Token,
@@ -313,11 +312,10 @@ async def user_books(
     if user:
         books = database_crud_commands.view_all_user_books(session, user_id)
         return books
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Aucun utilisateur avec id {user_id} en base",
-        )
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Aucun utilisateur avec id {user_id} en base",
+    )
 
 
 @app.post("/api/v1/register/", tags=["DEFAULT"])
@@ -529,7 +527,7 @@ async def post_book(
 
 
 @app.patch("/api/v1/books/{book_id}/", tags=["BOOKS"])
-async def update_book(
+async def partial_update_book(
     book_id: int,
     book_updated: UpdateBookModel,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
@@ -684,7 +682,7 @@ async def view_user(
 
 
 @app.patch("/api/v1/users/{user_id}/", tags=["USERS"])
-async def update_user(
+async def partial_update_user(
     user_id: int,
     user_updated: UpdateUserModel,
     current_user: Annotated[UserModel, Depends(get_current_active_user)],
@@ -694,15 +692,59 @@ async def update_user(
     """
     user = database_crud_commands.get_instance(session, models.User, user_id)
     if user:
+        existing_email = (
+            session.query(models.User).filter_by(email=str(user_updated.email).lower()).first()
+        )
+        if existing_email:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Email utilisateur {user.email} existe déjà."
+            )
         if current_user.id == user.id or current_user.username == "admin":
             if user_updated.username is not None:
+                existing_user = (
+                    session.query(models.User)
+                    .filter_by(username=str(user_updated.username).lower())
+                    .first()
+                )
+                if existing_user:
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Nom utilisateur {user.username} existe déjà."
+                    )
                 user.username = user_updated.username
             if user_updated.email is not None:
                 user.email = user_updated.email
-            if user_updated.role is not None:
-                user.role = user_updated.role
             if user_updated.disabled is not None:
                 user.disabled = user_updated.disabled
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "user_to_update": user_updated.username,
+            }
+            if user_updated.role is not None:
+                if not database_crud_commands.is_user_role_valid(str(user_updated.role).lower()):
+                    raise HTTPException(
+                        status_code=status. HTTP_404_NOT_FOUND, detail="Role inconnu."
+                    )
+                if str(user_updated.role).lower() == "admin" and not current_user.role == "admin":
+                    log_events.log_event(
+                        "[+] FastAPI - Mise a jour role utilisateur en admin refusee, vous n'etes pas admin.",
+                        logs_context,
+                    )
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Affecter role admin autorisé aux seuls admins."
+                    )
+                user.role = user_updated.role
+            if str(user_updated.disabled) == "True" and not current_user.role == "admin":
+                log_events.log_event(
+                    "[+] FastAPI - Mise a jour utilisateur refusee, vous n'etes pas admin.",
+                    logs_context,
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Désactiver utilisateur autorisé aux seuls admins."
+                )
             session.query(models.User).where(models.User.id == user_id).update(
                 user.get_json_for_update()
             )
@@ -730,47 +772,78 @@ async def update_user(
     """
     user = database_crud_commands.get_instance(session, models.User, user_id)
     if user:
-        existing_email = (
-            session.query(models.User).filter_by(email=str(user_updated.email).lower()).first()
-        )
-        user.username = str(user_updated.username).lower()
-        hashed_password = generate_password_hash(
-            user_updated.password, "pbkdf2:sha256", salt_length=8
-        )
-        valid_password = handle_passwords.check_password(user_updated.password)
-        if current_user.role == "admin":
+        if current_user.id == user.id or current_user.username == "admin":
+            existing_user = (
+                session.query(models.User)
+                .filter_by(username=str(user_updated.username).lower())
+                .first()
+            )
+            existing_email = (
+                session.query(models.User).filter_by(email=str(user_updated.email).lower()).first()
+            )
+            hashed_password = generate_password_hash(
+                user_updated.password, "pbkdf2:sha256", salt_length=8
+            )
+            valid_password = handle_passwords.check_password(user_updated.password)
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "user_to_update": user.username,
+            }
             if not valid_password:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Mot de passe trop simple, essayez de nouveau.",
                 )
-            if not existing_email:
-                new_user = models.User(
-                    username=str(user_updated.username).lower(),
-                    email=str(user_updated.email).lower(),
-                    hashed_password=hashed_password,
-                    role=str(user.role)
+            if existing_user:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED, detail="Nom utilisateur existe déjà."
                 )
-                session.query(models.User).where(models.User.id == user_id).update(
-                    new_user.get_json_for_update()
+            if existing_email:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED, detail="Email existe déjà."
                 )
-                session.commit()
-                return {"200": f"Ancien utilisateur {str(user.username).lower()} mis à jour"}
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Email existe déjà."
-            )
+            if user_updated.role is not None:
+                if not database_crud_commands.is_user_role_valid(str(user_updated.role).lower()):
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND, detail="Role inconnu."
+                    )
+                if str(user_updated.role).lower() == "admin" and not current_user.role == "admin":
+                    log_events.log_event(
+                        "[+] FastAPI - Mise a jour utilisateur refusee, vous n'etes pas admin.",
+                        logs_context,
+                    )
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED, detail="Affecter role admin autorisé aux seuls admins."
+                    )
+                user.role = str(user_updated.role).lower()
+            if user_updated.disabled is not None:
+                if str(user_updated.disabled) == "True" and not current_user.role == "admin":
+                    log_events.log_event(
+                        "[+] FastAPI - Mise a jour utilisateur refusee, vous n'etes pas admin.",
+                        logs_context,
+                    )
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED, detail="Désactiver utilisateur autorisé aux seuls admins."
+                    )
+            else:
+                user_updated.disabled = False
 
-        logs_context = {
-            "current_user": f"{current_user.username}",
-            "user_to_update": user.username,
-        }
-        log_events.log_event(
-            "[+] FastAPI - Mise a jour utilisateur refusee, vous n'etes pas admin.",
-            logs_context,
-        )
+            new_user = models.User(
+                username=str(user_updated.username).lower(),
+                email=str(user_updated.email).lower(),
+                hashed_password=hashed_password,
+                role=str(user_updated.role).lower(),
+                disabled=user_updated.disabled
+            )
+            session.query(models.User).where(models.User.id == user_id).update(
+                new_user.get_json_for_update()
+            )
+            session.commit()
+            session.refresh(user)
+            return new_user.get_json()
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Seul l'admin peut ajouter un utilisateur"
+            detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur",
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
