@@ -282,7 +282,7 @@ You do not need to create a python virtualenv.
 
       python -m coverage run -m pytest --cov-report html:cov_html --cov=.
 
-  80 is a minimum relevent score.
+  90 should be the minimum relevent score.
 
   To run test during the gilab-ci execution, see .gitlab-ci.yml file.
 
