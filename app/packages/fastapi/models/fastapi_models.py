@@ -1,7 +1,9 @@
-from pydantic import BaseModel, Field
+""" Les modèles de classe FastAPI"""
+
 from enum import Enum
 import datetime as dt
 from typing import Optional
+from pydantic import BaseModel, Field
 
 
 class Token(BaseModel):

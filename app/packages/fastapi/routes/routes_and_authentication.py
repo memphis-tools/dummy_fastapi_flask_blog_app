@@ -1,3 +1,4 @@
+"""The FastAPI routes"""
 import os
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
@@ -293,13 +294,13 @@ async def view_book(
         }
         log_events.log_event("[+] FastAPI - Consultation livre.", logs_context)
         return book
-    else:
-        logs_context = {"current_user": f"{current_user.username}", "book_id": book_id}
-        log_events.log_event("[+] FastAPI - Consultation livre inconnu.", logs_context)
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="FastAPI - Consultation livre inconnu.",
-        )
+
+    logs_context = {"current_user": f"{current_user.username}", "book_id": book_id}
+    log_events.log_event("[+] FastAPI - Consultation livre inconnu.", logs_context)
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="FastAPI - Consultation livre inconnu.",
+    )
 
 
 @app.get("/api/v1/users/{user_id}/books/", tags=["USERS"])
@@ -367,20 +368,20 @@ async def register(user: NewUserInDBModel):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Mots de passe ne correspondent pas",
         )
-    else:
-        new_user = models.User(
-            username=str(user.username).lower(),
-            email=str(user.email).lower(),
-            hashed_password=hashed_password,
-        )
-        logs_context = {
-            "username": f"{str(user.username).lower()}",
-            "email": f"{str(user.email).lower()}",
-        }
-        log_events.log_event("[+] FastAPI - Création compte utilisateur.", logs_context)
-        session.add(new_user)
-        session.commit()
-        return new_user
+
+    new_user = models.User(
+        username=str(user.username).lower(),
+        email=str(user.email).lower(),
+        hashed_password=hashed_password,
+    )
+    logs_context = {
+        "username": f"{str(user.username).lower()}",
+        "email": f"{str(user.email).lower()}",
+    }
+    log_events.log_event("[+] FastAPI - Création compte utilisateur.", logs_context)
+    session.add(new_user)
+    session.commit()
+    return new_user
 
 
 @app.post("/api/v1/users/", tags=["USERS"])
@@ -423,19 +424,19 @@ async def add_user(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Utilisateur existe deja"
         )
-    else:
-        logs_context = {
-            "current_user": f"{current_user.username}",
-            "user_to_add": user.username,
-        }
-        log_events.log_event(
-            "[+] FastAPI - Ajout utilisateur refusee, vous n'etes pas admin.",
-            logs_context,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Seul l'admin peut ajouter un utilisateur"
-        )
+
+    logs_context = {
+        "current_user": f"{current_user.username}",
+        "user_to_add": user.username,
+    }
+    log_events.log_event(
+        "[+] FastAPI - Ajout utilisateur refusee, vous n'etes pas admin.",
+        logs_context,
+    )
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Seul l'admin peut ajouter un utilisateur"
+    )
 
 
 def check_book_fields(book):
@@ -540,7 +541,7 @@ async def partial_update_book(
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Livre avec id {book_id} inexistant"
+            detail=f"Livre avec id {book_id} inexistant."
         )
 
     if current_user.id != book.user_id and current_user.username != "admin":
@@ -607,7 +608,7 @@ async def update_book(
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Livre avec id {book_id} inexistant"
+            detail=f"Livre avec id {book_id} inexistant."
         )
 
     if current_user.id != book.user_id and current_user.username != "admin":
@@ -755,14 +756,14 @@ async def partial_update_user(
             session.commit()
             session.refresh(user)
             return user
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur",
-            )
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur",
+        )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Utilisateur avec id {user_id} inexistant",
+        detail=f"Utilisateur avec id {user_id} inexistant.",
     )
 
 
@@ -853,7 +854,7 @@ async def update_user(
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Utilisateur avec id {user_id} inexistant",
+        detail=f"Utilisateur avec id {user_id} inexistant.",
     )
 
 
@@ -902,19 +903,19 @@ async def update_user_password(
                 )
                 session.commit()
                 return user
-            else:
-                raise HTTPException(
-                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                    detail="Mots de passe non renseignés",
-                )
-        else:
+
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur",
+                status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                detail="Mots de passe non renseignés",
             )
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur",
+        )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Utilisateur avec id {user_id} inexistant",
+        detail=f"Utilisateur avec id {user_id} inexistant.",
     )
 
 
@@ -932,7 +933,7 @@ async def view_user_comments(
         return comments
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Utilisateur avec id {user_id} inexistant",
+        detail=f"Utilisateur avec id {user_id} inexistant.",
     )
 
 
@@ -984,7 +985,7 @@ async def add_comment(
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Livre avec id {book_id} inexistant",
+        detail=f"Livre avec id {book_id} inexistant.",
     )
 
 
@@ -1020,7 +1021,7 @@ async def update_comment(
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"commentaire avec id {comment_id} inexistant",
+        detail=f"Commentaire avec id {comment_id} inexistant.",
     )
 
 
@@ -1073,7 +1074,7 @@ async def delete_comment(
             session.commit()
             raise HTTPException(
                 status_code=status.HTTP_204_NO_CONTENT,
-                detail=f"commentaire avec id {comment_id} supprimé",
+                detail=f"Commentaire avec id {comment_id} supprimé",
             )
         logs_context = {
             "current_user": f"{current_user.username}",
@@ -1089,7 +1090,7 @@ async def delete_comment(
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"commentaire avec id {comment_id} inexistant",
+        detail=f"Commentaire avec id {comment_id} inexistant.",
     )
 
 
@@ -1105,7 +1106,7 @@ async def delete_user(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Utilisateur avec id {user_id} inexistant",
+            detail=f"Utilisateur avec id {user_id} inexistant.",
         )
     if current_user.role == "admin":
         logs_context = {
@@ -1119,19 +1120,19 @@ async def delete_user(
             status_code=status.HTTP_204_NO_CONTENT,
             detail=f"Utilisateur avec id {user_id} supprimé",
         )
-    else:
-        logs_context = {
-            "current_user": f"{current_user.username}",
-            "user_to_delete": user.username,
-        }
-        log_events.log_event(
-            "[+] FastAPI - Suppression utilisateur refusée, utilisateur non admin.",
-            logs_context,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Seul l'admin peut supprimer un utilisateur",
-        )
+
+    logs_context = {
+        "current_user": f"{current_user.username}",
+        "user_to_delete": user.username,
+    }
+    log_events.log_event(
+        "[+] FastAPI - Suppression utilisateur refusée, utilisateur non admin.",
+        logs_context,
+    )
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Seul l'admin peut supprimer un utilisateur",
+    )
 
 
 @app.delete("/api/v1/books/{book_id}/", tags=["BOOKS"])
@@ -1167,7 +1168,7 @@ async def delete_book(
         )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Livre avec id {book_id} inexistant",
+        detail=f"Livre avec id {book_id} inexistant.",
     )
 
 
@@ -1179,18 +1180,18 @@ async def get_quotes(
     if current_user.role == "admin":
         quotes = database_crud_commands.view_all_instances(session, models.Quote)
         return quotes
-    else:
-        logs_context = {
-            "current_user": f"{current_user.username}",
-        }
-        log_events.log_event(
-            "[+] FastAPI - Consultation citations refusee, vous n'etes pas admin.",
-            logs_context,
-        )
-        raise HTTPException(
-            status_code=status. HTTP_403_FORBIDDEN,
-            detail="Seul l'admin peut consulter les citations",
-        )
+
+    logs_context = {
+        "current_user": f"{current_user.username}",
+    }
+    log_events.log_event(
+        "[+] FastAPI - Consultation citations refusee, vous n'etes pas admin.",
+        logs_context,
+    )
+    raise HTTPException(
+        status_code=status. HTTP_403_FORBIDDEN,
+        detail="Seul l'admin peut consulter les citations",
+    )
 
 
 @app.get("/api/v1/quotes/{quote_id}/", tags=["QUOTES"])
@@ -1202,18 +1203,18 @@ async def get_quote(
     if current_user.role == "admin":
         quote = database_crud_commands.get_instance(session, models.Quote, quote_id)
         return quote
-    else:
-        logs_context = {
-            "current_user": f"{current_user.username}",
-        }
-        log_events.log_event(
-            "[+] FastAPI - Consultation citation refusee, vous n'etes pas admin.",
-            logs_context,
-        )
-        raise HTTPException(
-            status_code=status. HTTP_403_FORBIDDEN,
-            detail="Seul l'admin peut consulter une citation",
-        )
+
+    logs_context = {
+        "current_user": f"{current_user.username}",
+    }
+    log_events.log_event(
+        "[+] FastAPI - Consultation citation refusee, vous n'etes pas admin.",
+        logs_context,
+    )
+    raise HTTPException(
+        status_code=status. HTTP_403_FORBIDDEN,
+        detail="Seul l'admin peut consulter une citation",
+    )
 
 
 @app.post("/api/v1/quotes/", tags=["QUOTES"])
@@ -1238,18 +1239,18 @@ async def add_quote(
         session.add(new_quote)
         session.commit()
         return new_quote
-    else:
-        logs_context = {
-            "current_user": f"{current_user.username}",
-        }
-        log_events.log_event(
-            "[+] FastAPI - Ajout citation refusee, vous n'etes pas admin.",
-            logs_context,
-        )
-        raise HTTPException(
-            status_code=status. HTTP_403_FORBIDDEN,
-            detail="Seul l'admin peut ajouter une citation",
-        )
+
+    logs_context = {
+        "current_user": f"{current_user.username}",
+    }
+    log_events.log_event(
+        "[+] FastAPI - Ajout citation refusee, vous n'etes pas admin.",
+        logs_context,
+    )
+    raise HTTPException(
+        status_code=status. HTTP_403_FORBIDDEN,
+        detail="Seul l'admin peut ajouter une citation",
+    )
 
 
 @app.delete("/api/v1/quotes/{quote_id}/", tags=["QUOTES"])
@@ -1279,15 +1280,15 @@ async def delete_quote(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Citation id {quote_id} inexistante",
         )
-    else:
-        logs_context = {
-            "current_user": f"{current_user.username}",
-        }
-        log_events.log_event(
-            "[+] FastAPI - Suppression citation refusee, vous n'etes pas admin.",
-            logs_context,
-        )
-        raise HTTPException(
-            status_code=status. HTTP_403_FORBIDDEN,
-            detail="Seul l'admin peut supprimer une citation",
-        )
+
+    logs_context = {
+        "current_user": f"{current_user.username}",
+    }
+    log_events.log_event(
+        "[+] FastAPI - Suppression citation refusee, vous n'etes pas admin.",
+        logs_context,
+    )
+    raise HTTPException(
+        status_code=status. HTTP_403_FORBIDDEN,
+        detail="Seul l'admin peut supprimer une citation",
+    )

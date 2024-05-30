@@ -78,6 +78,9 @@ def unauthorized():
 
 @app.errorhandler(413)
 def too_large(e):
+    """
+    Description: custom error message when uploaded image size is too big.
+    """
     return "Taille fichier excède la limite prévue", 413
 
 

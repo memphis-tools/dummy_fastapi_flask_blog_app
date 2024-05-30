@@ -29,7 +29,7 @@ async def test_view_book_with_authentication(get_fastapi_client, get_fastapi_tok
 
 
 @pytest.mark.asyncio
-async def test_view_book_without_authentication(get_fastapi_client, get_fastapi_token):
+async def test_view_book_without_authentication(get_fastapi_client):
     """
     Description: test view_book id 1 route with FastAPI TestClient with token.
     """
@@ -84,7 +84,7 @@ async def test_update_book_with_authentication_with_forbidden_user(
     access_token = get_fastapi_token
     response = get_fastapi_client.patch(
         "/api/v1/books/2/",
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=headers,
         json=json
     )
     assert response.status_code == 401
@@ -109,7 +109,7 @@ async def test_update_unexisting_book_with_authentication(
     access_token = get_fastapi_token
     response = get_fastapi_client.patch(
         "/api/v1/books/55555/",
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=headers,
         json=json
     )
     assert response.status_code == 404
@@ -167,7 +167,7 @@ async def test_post_book_with_authentication_with_valid_datas(
 
 
 @pytest.mark.asyncio
-async def test_check_book_fields(get_fastapi_client):
+async def test_check_book_fields():
     """
     Description: test check_book_fields when adding a new book
     """
@@ -462,10 +462,9 @@ async def test_full_update_book_with_authentication_with_forbidden_user(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    access_token = get_fastapi_token
     response = get_fastapi_client.put(
         "/api/v1/books/2/",
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=headers,
         json=json
     )
     assert response.status_code == 401
@@ -491,10 +490,9 @@ async def test_full_update_unexisting_book_with_authentication(get_fastapi_clien
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    access_token = get_fastapi_token
     response = get_fastapi_client.put(
         "/api/v1/books/55555/",
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=headers,
         json=json
     )
     assert response.status_code == 404
