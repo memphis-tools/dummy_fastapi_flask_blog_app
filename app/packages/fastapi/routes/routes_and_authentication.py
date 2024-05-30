@@ -749,6 +749,7 @@ async def partial_update_user(
                 user.get_json_for_update()
             )
             session.commit()
+            session.refresh(user)
             return user
         else:
             raise HTTPException(
@@ -841,7 +842,7 @@ async def update_user(
             )
             session.commit()
             session.refresh(user)
-            return new_user.get_json()
+            return user.get_json()
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur",
