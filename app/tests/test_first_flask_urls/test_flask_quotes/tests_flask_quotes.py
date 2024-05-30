@@ -73,6 +73,7 @@ def test_get_an_unexisting_quote_as_a_admin(client, access_session_as_admin):
     response = client.get(
         "/front/quotes/555555/", headers=headers, follow_redirects=True
     )
+    print(f"DEBUG SIR response.data: {response.data}")
     assert response.status_code == 404
 
 
@@ -204,4 +205,5 @@ def test_flask_delete_unexisting_quote_with_authentication_as_admin(
         data=form,
         follow_redirects=True,
     )
+    print(f"DEBUG SIR response.data: {response.data}")
     assert response.status_code == 404
