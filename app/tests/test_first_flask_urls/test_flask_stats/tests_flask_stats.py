@@ -5,9 +5,7 @@ Notice that by default we already add dummies data through the application utils
 
 from app.packages.flask_app.project.stat_routes_blueprint import (
     create_books_categories_chart,
-    categories_stats,
     create_users_chart,
-    users_stats
 )
 
 
@@ -26,7 +24,7 @@ def test_create_books_categories_chart():
 
 def test_categories_stats(client, access_session):
     """
-    Description: ensure we a get a stats pie chart from categories_stats
+    Description: ensure we a get a stats pie chart from categories_stats route
     """
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -51,13 +49,13 @@ def test_create_users_chart():
         "donald": 2,
         "daisy": 1
     }
-    fig = create_books_categories_chart(total_books, users_books_count_dict)
+    fig = create_users_chart(total_books, users_books_count_dict)
     assert f"{fig}" == "Figure(900x600)"
 
 
 def test_users_stats(client, access_session):
     """
-    Description: ensure we a get a stats pie chart from users_stats
+    Description: ensure we a get a stats pie chart from users_stats route
     """
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
