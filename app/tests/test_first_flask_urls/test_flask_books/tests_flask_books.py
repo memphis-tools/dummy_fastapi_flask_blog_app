@@ -426,7 +426,7 @@ def test_get_pie_colors():
     Description: check the get pie colors.
     """
     response = get_pie_colors()
-    assert type(response) is list
+    assert isinstance(response, list)
 
 
 def test_flask_index_route_with_three_random_books(client, access_session):

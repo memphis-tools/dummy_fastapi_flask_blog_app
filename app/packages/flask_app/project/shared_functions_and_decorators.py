@@ -71,7 +71,7 @@ def get_pie_colors():
     """
     colors = []
     colors_list = settings.PIE_COLORS.copy()
-    for category in settings.BOOKS_CATEGORIES:
+    for _ in settings.BOOKS_CATEGORIES:
         color_index = get_random_color(colors_list)
         color = colors_list[color_index]
         colors.append(color)

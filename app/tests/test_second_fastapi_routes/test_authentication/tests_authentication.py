@@ -4,8 +4,8 @@ Notice that by default we already add dummies data through the application utils
 """
 
 import os
-import pytest
 from datetime import timedelta
+import pytest
 
 import app.packages.settings as settings
 from app.packages.fastapi.models import fastapi_models
@@ -30,7 +30,7 @@ def test_create_access_token():
     access_token = routes_and_authentication.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    assert type(access_token) is str
+    assert isinstance(access_token, str)
 
 
 @pytest.mark.asyncio
@@ -238,7 +238,7 @@ def test_authenticate_user_with_good_credentials():
     username = "donald"
     password = settings.TEST_USER_PWD
     response = routes_and_authentication.authenticate_user(username, password)
-    assert type(response) is fastapi_models.UserInDB
+    assert isinstance(response, fastapi_models.UserInDB)
 
 
 def test_authenticate_user_with_bad_credentials():
