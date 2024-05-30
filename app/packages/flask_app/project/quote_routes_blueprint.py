@@ -47,7 +47,6 @@ def view_quote(quote_id):
     Description: the a quote Flask route.
     """
     session = session_commands.get_a_database_session()
-    form = forms.DeleteInstanceForm()
     quote_to_view = session.get(Quote, quote_id)
     session.close()
     if not quote_to_view:

@@ -83,8 +83,7 @@ def add_user():
                 )
                 session.close()
                 return redirect(url_for("login"))
-            else:
-                flash("Nom utilisateur existe deja, veuillez le modifier", "error")
+            flash("Nom utilisateur existe deja, veuillez le modifier", "error")
     session.close()
     return render_template(
         "add_user.html", form=form, is_authenticated=current_user.is_authenticated

@@ -4,7 +4,6 @@ Notice that by default we already add dummies data through the application utils
 """
 
 import pytest
-from httpx import AsyncClient
 
 from app.packages.fastapi.models import fastapi_models
 from app.packages.fastapi.routes import routes_and_authentication
@@ -48,15 +47,14 @@ async def test_read_main(get_fastapi_client, get_fastapi_token):
 
 
 @pytest.mark.asyncio
-async def test_read_main_without_valid_token():
+async def test_read_main_without_valid_token(get_fastapi_client):
     """
     Description:
     Ensure that we can not reach the books uri served by FastAPI without a valid authentication token.
     """
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response = await ac.get(
-            "/api/v1/books/", headers={"Authorization": "Bearer somethingWeird"}
-        )
+    response = get_fastapi_client.get(
+        "/api/v1/books/", headers={"Authorization": "Bearer somethingWeird"}
+    )
     assert response.status_code == 401
 
 
