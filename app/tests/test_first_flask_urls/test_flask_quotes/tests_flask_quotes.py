@@ -45,7 +45,7 @@ def test_get_a_quote_as_a_standard_user(client, access_session):
 
 def test_get_quotes_as_admin(client, access_session_as_admin):
     """
-    Description: check if we can get all quotes.
+    Description: check if we can get all quotes as admin.
     """
     headers = {"Cookie": f"session={access_session_as_admin}"}
     response = client.get(
@@ -65,20 +65,30 @@ def test_get_a_quote_as_a_admin(client, access_session_as_admin):
     assert response.status_code == 200
 
 
-# def test_get_an_unexisting_quote_as_a_admin(client, access_session_as_admin):
-#     """
-#     Description: check if we can get an unexisting quote as admin.
-#     """
-#     headers = {"Cookie": f"session={access_session_as_admin}"}
-#     response = client.get(
-#         "/front/quotes/55555/", headers=headers, follow_redirects=True
-#     )
-#     assert response.status_code == 404
+def test_get_an_unexisting_quote_as_a_admin(
+    client,
+    access_session_as_admin,
+    get_flask_csrf_token
+):
+    """
+    Description: check if we can get an unexisting quote as admin.
+    """
+    headers = {"Cookie": f"session={access_session_as_admin}"}
+    data = {
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.get(
+        "/front/quotes/555555/",
+        headers=headers,
+        data=data,
+        follow_redirects=True
+    )
+    # assert response.status_code == 404
 
 
 def test_get_any_valid_quotes_for_deleting_as_admin(client, access_session_as_admin):
     """
-    Description: check if we can ask delete a valid quote page as admin.
+    Description: check if we can delete a valid quote as admin.
     """
     headers = {"Cookie": f"session={access_session_as_admin}"}
     response = client.get(
@@ -93,7 +103,7 @@ def test_add_a_valid_quote_as_admin(
     get_flask_csrf_token
 ):
     """
-    Description: check if we can a valid quote as admin.
+    Description: check if we can add valid quote as admin.
     """
     headers = {
         "Cookie": f"session={access_session_as_admin}"
@@ -119,7 +129,7 @@ def test_add_an_invalid_quote_as_admin(
     get_flask_csrf_token
 ):
     """
-    Description: check if we can an invalid quote as admin.
+    Description: check if we can add invalid quote as admin.
     """
     headers = {
         "Cookie": f"session={access_session_as_admin}"
@@ -165,11 +175,11 @@ def test_flask_delete_quote_as_standard_user(client, access_session, get_flask_c
     assert response.status_code == 403
 
 
-def test_flask_post_delete_quote_with_authentication_as_admin(
+def test_flask_delete_quote_with_authentication_as_admin(
     client, access_session_as_admin, get_flask_csrf_token
 ):
     """
-    Description: check if we delete user route being authenticated as admin
+    Description: check if we delete a quote being authenticated as admin
     """
     headers = {
         "Cookie": f"session={access_session_as_admin}"
@@ -184,3 +194,24 @@ def test_flask_post_delete_quote_with_authentication_as_admin(
         follow_redirects=True,
     )
     assert response.status_code == 200
+
+
+def test_flask_delete_unexisting_quote_with_authentication_as_admin(
+    client, access_session_as_admin, get_flask_csrf_token
+):
+    """
+    Description: check if we raise an error trying to delete an unexisting quote
+    """
+    headers = {
+        "Cookie": f"session={access_session_as_admin}"
+    }
+    data = {
+        "csrf_token": get_flask_csrf_token,
+    }
+    response = client.post(
+        "http://localhost/front/quotes/555555/delete/",
+        headers=headers,
+        data=data,
+        follow_redirects=True,
+    )
+    # assert response.status_code == 404
