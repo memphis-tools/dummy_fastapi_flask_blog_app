@@ -704,7 +704,6 @@ async def partial_update_user(
                         status_code=status.HTTP_401_UNAUTHORIZED,
                         detail=f"Nom utilisateur {user_updated.username} existe déjà."
                     )
-                user.username = user_updated.username
             if user_updated.email is not None:
                 existing_email = (
                     session.query(models.User).filter_by(email=str(user_updated.email).lower()).first()
@@ -714,9 +713,6 @@ async def partial_update_user(
                         status_code=status.HTTP_401_UNAUTHORIZED,
                         detail=f"Email utilisateur {user.email} existe déjà."
                     )
-                user.email = user_updated.email
-            if user_updated.disabled is not None:
-                user.disabled = user_updated.disabled
             logs_context = {
                 "current_user": f"{current_user.username}",
                 "user_to_update": user_updated.username,
@@ -735,7 +731,6 @@ async def partial_update_user(
                         status_code=status.HTTP_401_UNAUTHORIZED,
                         detail="Affecter role admin autorisé aux seuls admins."
                     )
-                user.role = user_updated.role
             if str(user_updated.disabled) == "True" and not current_user.role == "admin":
                 log_events.log_event(
                     "[+] FastAPI - Mise a jour utilisateur refusee, vous n'etes pas admin.",
@@ -745,6 +740,14 @@ async def partial_update_user(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Désactiver utilisateur autorisé aux seuls admins."
                 )
+            if user_updated.username is not None:
+                user.username = user_updated.username
+            if user_updated.email is not None:
+                user.email = user_updated.email
+            if user_updated.role is not None:
+                user.role = user_updated.role
+            if user_updated.disabled is not None:
+                user.disabled = user_updated.disabled
             session.query(models.User).where(models.User.id == user_id).update(
                 user.get_json_for_update()
             )
