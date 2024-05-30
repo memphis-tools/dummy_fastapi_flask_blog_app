@@ -238,6 +238,7 @@ async def update_book_category(
             models.BookCategory.id == category_id
         ).update(category.get_json_for_update())
         session.commit()
+        session.refresh(category)
     return category
 
 
@@ -1011,6 +1012,7 @@ async def update_comment(
                 comment.get_json_for_update()
             )
             session.commit()
+            session.refresh(comment)
             return comment
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
