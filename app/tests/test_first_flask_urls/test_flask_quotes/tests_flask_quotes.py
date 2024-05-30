@@ -65,13 +65,23 @@ def test_get_a_quote_as_a_admin(client, access_session_as_admin):
     assert response.status_code == 200
 
 
-def test_get_an_unexisting_quote_as_a_admin(client, access_session_as_admin):
+def test_get_an_unexisting_quote_as_a_admin(
+    client,
+    access_session_as_admin,
+    get_flask_csrf_token
+):
     """
     Description: check if we can get an unexisting quote as admin.
     """
     headers = {"Cookie": f"session={access_session_as_admin}"}
+    data = {
+        "csrf_token": get_flask_csrf_token,
+    }
     response = client.get(
-        "/front/quotes/555555/", headers=headers, follow_redirects=True
+        "/front/quotes/555555/",
+        headers=headers,
+        data=data,
+        follow_redirects=True
     )
     print(f"DEBUG SIR response.data: {response.data}")
     assert response.status_code == 404
@@ -196,13 +206,13 @@ def test_flask_delete_unexisting_quote_with_authentication_as_admin(
     headers = {
         "Cookie": f"session={access_session_as_admin}"
     }
-    form = {
+    data = {
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
         "http://localhost/front/quotes/555555/delete/",
         headers=headers,
-        data=form,
+        data=data,
         follow_redirects=True,
     )
     print(f"DEBUG SIR response.data: {response.data}")
