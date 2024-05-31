@@ -11,7 +11,7 @@ from app.packages.flask_app import project
 from app.packages import settings
 
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 2
+ACCESS_TOKEN_EXPIRE_MINUTES = 3
 
 
 @pytest.fixture
