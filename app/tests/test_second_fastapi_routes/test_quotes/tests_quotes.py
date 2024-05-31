@@ -4,9 +4,6 @@ Notice that by default we already add dummies data through the application utils
 """
 
 import pytest
-from app.packages.fastapi.routes import routes_and_authentication
-
-app = routes_and_authentication.app
 
 
 @pytest.mark.asyncio

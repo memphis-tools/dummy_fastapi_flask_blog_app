@@ -4,12 +4,6 @@ Notice that by default we already add dummies data through the application utils
 """
 
 import pytest
-from httpx import AsyncClient
-
-from app.packages.fastapi.routes import routes_and_authentication
-
-
-app = routes_and_authentication.app
 
 
 @pytest.mark.asyncio
@@ -23,30 +17,28 @@ async def test_view_comments_with_authentication(get_fastapi_client, get_fastapi
 
 
 @pytest.mark.asyncio
-async def test_view_comments(get_fastapi_token):
+async def test_view_comments(get_fastapi_client, get_fastapi_token):
     """
     Description:
     Check if we can reach the comments uri served by FastAPI with a valid authentication token.
     Check if we can get the dummy comments created for tests purposes.
     Notice that the dummies datas (users, books, comments) are in the test database.
     """
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response = await ac.get(
-            "/api/v1/books/comments/all/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
-        )
+    response = get_fastapi_client.get(
+        "/api/v1/books/comments/all/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+    )
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
-async def test_view_comments_without_valid_token():
+async def test_view_comments_without_valid_token(get_fastapi_client):
     """
     Description:
     Ensure that we can not reach the comments uri served by FastAPI without a valid authentication token.
     """
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response = await ac.get(
-            "/api/v1/books/comments/all/", headers={"Authorization": "Bearer somethingWeird"}
-        )
+    response = get_fastapi_client.get(
+        "/api/v1/books/comments/all/", headers={"Authorization": "Bearer somethingWeird"}
+    )
     assert response.status_code == 401
 
 
@@ -222,7 +214,10 @@ async def test_update_comment_with_auth_with_valid_datas_for_unexisting_comment(
 
 
 @pytest.mark.asyncio
-async def test_post_comment_with_authentication_with_valid_datas(get_fastapi_client, get_fastapi_token):
+async def test_post_comment_with_authentication_with_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token
+):
     """
     Description: test add comment to book id 2 route with FastAPI TestClient with token.
     Notice we have set a token for user id 2 ("donald")
@@ -255,7 +250,10 @@ async def test_post_comment_without_being_authenticated(get_fastapi_client, get_
 
 
 @pytest.mark.asyncio
-async def test_post_comment_with_authentication_without_valid_datas(get_fastapi_client, get_fastapi_token):
+async def test_post_comment_with_authentication_without_valid_datas(
+    get_fastapi_client,
+    get_fastapi_token
+):
     """
     Description: test add comment to book id 1 route with FastAPI TestClient with token.
     Notice we have set a token for user id 2 ("donald")
@@ -376,15 +374,15 @@ async def test_delete_comment_with_authentication_with_unexisting_comment(get_fa
 
 
 @pytest.mark.asyncio
-async def test_view_user_comments_without_authentication():
+async def test_view_user_comments_without_authentication(get_fastapi_client):
     """
     Description:
     Check if we can reach the user's comments uri served by FastAPI without being authenticated.
     """
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response = await ac.get(
-            "/api/v1/users/2/comments/", headers={"Authorization": "Bearer bebopalula"}
-        )
+    response = get_fastapi_client.get(
+        "/api/v1/users/2/comments/",
+        headers={"Authorization": "Bearer bebopalula"}
+    )
     assert response.status_code == 401
 
 

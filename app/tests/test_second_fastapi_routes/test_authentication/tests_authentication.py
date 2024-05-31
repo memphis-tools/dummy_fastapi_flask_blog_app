@@ -10,6 +10,7 @@ import pytest
 import app.packages.settings as settings
 from app.packages.fastapi.models import fastapi_models
 from app.packages.fastapi.routes import routes_and_authentication
+from app.packages.fastapi.routes.dependencies import authenticate_user, get_user
 
 
 def test_register_uri(get_fastapi_client):
@@ -25,7 +26,7 @@ def test_create_access_token():
     Description: check if we can create an access token.
     """
     username = "donald"
-    user = routes_and_authentication.get_user(username)
+    user = get_user(username)
     access_token_expires = timedelta(minutes=routes_and_authentication.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = routes_and_authentication.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
@@ -237,7 +238,7 @@ def test_authenticate_user_with_good_credentials():
     """
     username = "donald"
     password = settings.TEST_USER_PWD
-    response = routes_and_authentication.authenticate_user(username, password)
+    response = authenticate_user(username, password)
     assert isinstance(response, fastapi_models.UserInDB)
 
 
@@ -247,7 +248,7 @@ def test_authenticate_user_with_bad_credentials():
     """
     username = settings.TEST_USER_USERNAME
     password = settings.TEST_USER_PWD
-    response = routes_and_authentication.authenticate_user(username, password)
+    response = authenticate_user(username, password)
     assert response is False
 
 
@@ -257,5 +258,5 @@ def test_authenticate_unexisting_user():
     """
     username = "milou"
     password = settings.TEST_USER_PWD
-    response = routes_and_authentication.authenticate_user(username, password)
+    response = authenticate_user(username, password)
     assert response is False
