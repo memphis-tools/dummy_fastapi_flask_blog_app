@@ -1,4 +1,4 @@
 [flake8]
 exclude = env, .env, .venv, venv, .envrc, .git, __pycache__, .pytest_cache, poetry.lock
-ignore = F841
+ignore = F841, W503
 max-line-length = 119

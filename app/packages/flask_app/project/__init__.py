@@ -98,12 +98,12 @@ def format_datetime(value):
 
 
 @app.template_filter()
-def format_user(id):
+def format_user(user_id):
     """
     Description: a custom filter for username to be used in templates
     """
     session = session_commands.get_a_database_session()
-    user = session.get(User, id)
+    user = session.get(User, user_id)
     session.close()
     if current_user.is_authenticated:
         if current_user.id == user.id:
@@ -112,12 +112,12 @@ def format_user(id):
 
 
 @app.template_filter()
-def format_book_category(id):
+def format_book_category(book_id):
     """
     Description: a custom filter for book category to be used in templates
     """
     session = session_commands.get_a_database_session()
-    category = session.get(BookCategory, id)
+    category = session.get(BookCategory, book_id)
     session.close()
     return category
 
@@ -160,7 +160,7 @@ def contact():
         debug_level = os.getenv("LOGGING_LEVEL")
         if os.getenv("EMAIL_SERVER") == "localhost":
             file_path = os.getenv("LOCAL_EMAIL_LOGS_FILE")
-            with open(file_path, "a") as fd:
+            with open(file_path, "a", encoding="utf-8") as fd:
                 fd.write(f"{debug_level}: MAIL FROM {email}| aka {name}: {message}\n")
             return render_template(
                 "mail_sent.html",
@@ -196,23 +196,23 @@ def login():
                 "[+] Flask - Echec connexion à application.", logs_context
             )
             flash("Identifiants invalides", "error")
-        else:
-            if check_password_hash(user.hashed_password, password):
-                login_user(user)
-                flash(f"Vous nous avez manqué {user} 🫶")
-                logs_context = {"username": f"{username}"}
-                log_events.log_event(
-                    "[+] Flask - Connexion à application.", logs_context
-                )
-                session.close()
-                return redirect(url_for("index"))
-            else:
-                logs_context = {"username": f"{username}", "email": f"{email}"}
-                log_events.log_event(
-                    "[+] Flask - Echec connexion à application. Mot de passe invalide.",
-                    logs_context,
-                )
-                flash("Mot de passe invalide", "error")
+            session.close()
+            return redirect(url_for("index"))
+
+        if check_password_hash(user.hashed_password, password):
+            login_user(user)
+            flash(f"Vous nous avez manqué {user} 🫶")
+            logs_context = {"username": f"{username}"}
+            log_events.log_event("[+] Flask - Connexion à application.", logs_context)
+            session.close()
+            return redirect(url_for("index"))
+
+        logs_context = {"username": f"{username}", "email": f"{email}"}
+        log_events.log_event(
+            "[+] Flask - Echec connexion à application. Mot de passe invalide.",
+            logs_context,
+        )
+        flash("Mot de passe invalide", "error")
         session.close()
     return render_template(
         "login.html", form=form, is_authenticated=current_user.is_authenticated
@@ -271,8 +271,7 @@ def register():
                 )
                 session.close()
                 return redirect(url_for("login"))
-            else:
-                flash("Nom utilisateur existe deja, veuillez le modifier", "error")
+            flash("Nom utilisateur existe deja, veuillez le modifier", "error")
     session.close()
     return render_template(
         "register.html", form=form, is_authenticated=current_user.is_authenticated

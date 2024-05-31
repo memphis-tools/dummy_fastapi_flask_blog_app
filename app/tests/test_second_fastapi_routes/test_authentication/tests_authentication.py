@@ -7,17 +7,17 @@ import os
 from datetime import timedelta
 import pytest
 
-import app.packages.settings as settings
+from app.packages import settings
 from app.packages.fastapi.models import fastapi_models
 from app.packages.fastapi.routes import routes_and_authentication
 from app.packages.fastapi.routes.dependencies import authenticate_user, get_user
 
 
-def test_register_uri(get_fastapi_client):
+def test_register_uri(fastapi_client):
     """
     Description: test a get register url, method is not allowed.
     """
-    response = get_fastapi_client.get("/api/v1/register/")
+    response = fastapi_client.get("/api/v1/register/")
     assert response.status_code == 405
 
 
@@ -35,11 +35,11 @@ def test_create_access_token():
 
 
 @pytest.mark.asyncio
-async def test_register_with_valid_datas(get_fastapi_client, get_fastapi_token):
+async def test_register_with_valid_datas(fastapi_client, fastapi_token):
     """
     Description: test register new user through FastAPI.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "username": "tintin",
         "email": "tintin@localhost.fr",
@@ -52,19 +52,19 @@ async def test_register_with_valid_datas(get_fastapi_client, get_fastapi_token):
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/register/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/register/", headers=headers, json=json)
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
 async def test_register_with_valid_datas_for_already_existing_username(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test register new user through FastAPI whereas username already exists.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "username": "tintin",
         "email": "tintin@localhost.fr",
@@ -77,19 +77,19 @@ async def test_register_with_valid_datas_for_already_existing_username(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/register/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/register/", headers=headers, json=json)
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_register_with_valid_datas_for_already_existing_email(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test register new user through FastAPI whereas email already exists.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "username": "lustucru",
         "email": "tintin@localhost.fr",
@@ -102,19 +102,19 @@ async def test_register_with_valid_datas_for_already_existing_email(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/register/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/register/", headers=headers, json=json)
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_register_with_invalid_username_data(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test register new user through FastAPI with invalid datad.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "username": "string",
         "email": "tintin@localhost.fr",
@@ -127,19 +127,19 @@ async def test_register_with_invalid_username_data(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/register/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/register/", headers=headers, json=json)
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_register_with_invalid_password_data(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test register new user through FastAPI with unmatching passwords.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "username": "string",
         "email": "tintin@localhost.fr",
@@ -152,19 +152,19 @@ async def test_register_with_invalid_password_data(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/register/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/register/", headers=headers, json=json)
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_register_with_not_enough_complex_password_data(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test register new user through FastAPI with password not enough complex.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "username": "string",
         "email": "tintin@localhost.fr",
@@ -177,19 +177,19 @@ async def test_register_with_not_enough_complex_password_data(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/register/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/register/", headers=headers, json=json)
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_register_with_invalid_datas(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test register new user through FastAPI with invalid datas.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "username": "tintin",
         "email": "tintin@localhost.fr",
@@ -201,12 +201,12 @@ async def test_register_with_invalid_datas(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/register/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/register/", headers=headers, json=json)
     assert response.status_code == 422
 
 
 @pytest.mark.asyncio
-async def test_get_token_for_enabled_user(get_fastapi_client):
+async def test_get_token_for_enabled_user(fastapi_client):
     """
     Description: test a get token for enabled user.
     """
@@ -214,13 +214,13 @@ async def test_get_token_for_enabled_user(get_fastapi_client):
         username="donald",
         password=settings.TEST_USER_PWD
     )
-    response = get_fastapi_client.post("/api/v1/token/", data=form_data, follow_redirects=True)
+    response = fastapi_client.post("/api/v1/token/", data=form_data, follow_redirects=True)
     assert response.status_code == 200
     assert "access_token" in response.json()
 
 
 @pytest.mark.asyncio
-async def test_get_token_for_unexisting_user(get_fastapi_client):
+async def test_get_token_for_unexisting_user(fastapi_client):
     """
     Description: test a get token for unexisting user.
     """
@@ -228,7 +228,7 @@ async def test_get_token_for_unexisting_user(get_fastapi_client):
         username="donaldxyz",
         password=settings.TEST_USER_PWD
     )
-    response = get_fastapi_client.post("/api/v1/token/", data=form_data, follow_redirects=True)
+    response = fastapi_client.post("/api/v1/token/", data=form_data, follow_redirects=True)
     assert response.status_code == 401
 
 

@@ -136,9 +136,7 @@ def manage_books_categories():
     )
 
 
-@book_category_routes_blueprint.route(
-    "/book/categories/add/", methods=["GET", "POST"]
-)
+@book_category_routes_blueprint.route("/book/categories/add/", methods=["GET", "POST"])
 @login_required
 @admin_only
 def add_book_category():
@@ -161,8 +159,7 @@ def add_book_category():
             log_events.log_event("[+] Flask - Ajout catégorie livre.", logs_context)
             session.add(new_category)
             session.commit()
-        else:
-            flash(category_is_valid, "error")
+        flash("Categorie invalide", "error")
         session.close()
         return redirect(
             url_for("book_category_routes_blueprint.manage_books_categories")
@@ -253,10 +250,10 @@ def update_book_category(category_id):
             return redirect(
                 url_for("book_category_routes_blueprint.manage_books_categories")
             )
-        else:
-            flash(book_category_is_valid, "error")
-            session.close()
-            return redirect(url_for("index"))
+
+        flash(book_category_is_valid, "error")
+        session.close()
+        return redirect(url_for("index"))
     return render_template(
         "update_book_category.html",
         category_to_update=category_to_update,

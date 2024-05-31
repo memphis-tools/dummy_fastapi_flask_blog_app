@@ -9,55 +9,55 @@ from app.packages.flask_app.project.book_routes_blueprint import check_book_fiel
 
 
 @pytest.mark.asyncio
-async def test_view_books_with_authentication(get_fastapi_client, get_fastapi_token):
+async def test_view_books_with_authentication(fastapi_client, fastapi_token):
     """
     Description: test view_books route with FastAPI TestClient with token.
     """
-    access_token = get_fastapi_token
-    response = get_fastapi_client.get("/api/v1/books/", headers={"Authorization": f"Bearer {access_token}"})
+    access_token = fastapi_token
+    response = fastapi_client.get("/api/v1/books/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
-async def test_view_book_with_authentication(get_fastapi_client, get_fastapi_token):
+async def test_view_book_with_authentication(fastapi_client, fastapi_token):
     """
     Description: test view_book id 1 route with FastAPI TestClient with token.
     """
-    access_token = get_fastapi_token
-    response = get_fastapi_client.get("/api/v1/books/1/", headers={"Authorization": f"Bearer {access_token}"})
+    access_token = fastapi_token
+    response = fastapi_client.get("/api/v1/books/1/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
-async def test_view_book_without_authentication(get_fastapi_client):
+async def test_view_book_without_authentication(fastapi_client):
     """
     Description: test view_book id 1 route with FastAPI TestClient with token.
     """
-    response = get_fastapi_client.get("/api/v1/books/1/", headers={"Authorization": "Bearer bebopalula"})
+    response = fastapi_client.get("/api/v1/books/1/", headers={"Authorization": "Bearer bebopalula"})
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
-async def test_view_unexisting_book_being_authenticated(get_fastapi_client, get_fastapi_token):
+async def test_view_unexisting_book_being_authenticated(fastapi_client, fastapi_token):
     """
     Description: test view_book id 55555 route with FastAPI TestClient with token.
     """
-    access_token = get_fastapi_token
-    response = get_fastapi_client.get("/api/v1/books/55555/", headers={"Authorization": f"Bearer {access_token}"})
+    access_token = fastapi_token
+    response = fastapi_client.get("/api/v1/books/55555/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_partial_update_book_with_authentication_without_valid_datas(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test partial update_book id 3 route with FastAPI TestClient with token.
     """
     json = {"summary": "such a book"}
-    access_token = get_fastapi_token
-    response = get_fastapi_client.patch(
+    access_token = fastapi_token
+    response = fastapi_client.patch(
         "/api/v1/books/3/",
         headers={"Authorization": f"Bearer {access_token}"},
         data=json
@@ -67,22 +67,22 @@ async def test_partial_update_book_with_authentication_without_valid_datas(
 
 @pytest.mark.asyncio
 async def test_update_book_with_authentication_with_forbidden_user(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test partial update_book id 2 route with FastAPI TestClient with token.
     The book has not been published by authenticated user.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {"summary": "such a book"}
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    access_token = get_fastapi_token
-    response = get_fastapi_client.patch(
+    access_token = fastapi_token
+    response = fastapi_client.patch(
         "/api/v1/books/2/",
         headers=headers,
         json=json
@@ -92,22 +92,22 @@ async def test_update_book_with_authentication_with_forbidden_user(
 
 @pytest.mark.asyncio
 async def test_update_unexisting_book_with_authentication(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test partial update_book id 55555 route with FastAPI TestClient with token.
     The book does not exists.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {"summary": "such a book"}
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    access_token = get_fastapi_token
-    response = get_fastapi_client.patch(
+    access_token = fastapi_token
+    response = fastapi_client.patch(
         "/api/v1/books/55555/",
         headers=headers,
         json=json
@@ -117,14 +117,14 @@ async def test_update_unexisting_book_with_authentication(
 
 @pytest.mark.asyncio
 async def test_update_book_with_authentication_with_valid_datas(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test partial update_book id 1 route with FastAPI TestClient with token.
     The book has been published by authenticated user.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "summary": "such a book",
         "year_of_publication": "2013",
@@ -135,19 +135,19 @@ async def test_update_book_with_authentication_with_valid_datas(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.patch("/api/v1/books/1/", headers=headers, json=json)
+    response = fastapi_client.patch("/api/v1/books/1/", headers=headers, json=json)
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
 async def test_post_book_with_authentication_with_valid_datas(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test add book route with FastAPI TestClient with token.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "title": "Perdus dans les Andes",
         "author": "Carl Barks",
@@ -162,7 +162,7 @@ async def test_post_book_with_authentication_with_valid_datas(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/books/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/books/", headers=headers, json=json)
     assert response.status_code == 200
 
 
@@ -184,7 +184,7 @@ async def test_check_book_fields():
 
 
 @pytest.mark.asyncio
-async def test_post_book_without_authentication(get_fastapi_client):
+async def test_post_book_without_authentication(fastapi_client):
     """
     Description: test add book without being authenticated
     """
@@ -202,40 +202,40 @@ async def test_post_book_without_authentication(get_fastapi_client):
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/books/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/books/", headers=headers, json=json)
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_post_book_with_authentication_without_valid_datas(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test add book route with FastAPI TestClient with token, without valid datas.
     We must supply all attributes in order to post a book.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {"summary": "such a book", "other_id": "1"}
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.post("/api/v1/books/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/books/", headers=headers, json=json)
     assert response.status_code == 422
 
 
 @pytest.mark.asyncio
 async def test_post_book_with_authentication_without_valid_book_category(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test add book route with FastAPI TestClient with token, without valid datas.
     Category "supplication" does not exist so FastAPI will return a 422 error.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "title": "Perdus dans les Andes",
         "author": "Carl Barks",
@@ -249,21 +249,21 @@ async def test_post_book_with_authentication_without_valid_book_category(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.post("/api/v1/books/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/books/", headers=headers, json=json)
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_post_book_with_authentication_without_valid_publication_year(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test add book route with FastAPI TestClient with token, without valid datas.
     Publication year is relative to the publication year (in real world, not published on the app).
     A String will return a 422 error.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "title": "Perdus dans les Andes",
         "author": "Carl Barks",
@@ -277,19 +277,19 @@ async def test_post_book_with_authentication_without_valid_publication_year(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.post("/api/v1/books/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/books/", headers=headers, json=json)
     assert response.status_code == 422
 
 
 @pytest.mark.asyncio
 async def test_post_book_with_authentication_with_invalid_keyword_string(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test add book route with FastAPI TestClient with token, with the invalid keyword string.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "title": "Perdus dans les Andes",
         "author": "StRing",
@@ -303,19 +303,19 @@ async def test_post_book_with_authentication_with_invalid_keyword_string(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.post("/api/v1/books/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/books/", headers=headers, json=json)
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_update_book_with_authentication_with_invalid_keyword_string(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test partial update book with FastAPI TestClient with token, with the invalid keyword string.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "title": "Perdus dans les Andes",
         "author": "StRing",
@@ -325,45 +325,45 @@ async def test_update_book_with_authentication_with_invalid_keyword_string(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.patch("/api/v1/books/1/", headers=headers, json=json)
+    response = fastapi_client.patch("/api/v1/books/1/", headers=headers, json=json)
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_delete_book_with_authentication_with_forbidden_user(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test delete_book id 2 route with FastAPI TestClient with token.
     Notice we try to delete a book that authenticated user has not published
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json"
     }
-    response = get_fastapi_client.delete("/api/v1/books/2/", headers=headers)
+    response = fastapi_client.delete("/api/v1/books/2/", headers=headers)
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
-async def test_delete_book_with_authentication(get_fastapi_client, get_fastapi_token):
+async def test_delete_book_with_authentication(fastapi_client, fastapi_token):
     """
     Description: test delete_book id 1 route with FastAPI TestClient with token.
     Notice we try to delete a book that authenticated user has published
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json"
     }
-    response = get_fastapi_client.delete("/api/v1/books/1/", headers=headers)
+    response = fastapi_client.delete("/api/v1/books/1/", headers=headers)
     assert response.status_code == 204
 
 
 @pytest.mark.asyncio
-async def test_delete_book_without_authentication(get_fastapi_client,):
+async def test_delete_book_without_authentication(fastapi_client,):
     """
     Description: test delete_book id 1 route without being authenticated
     """
@@ -371,29 +371,29 @@ async def test_delete_book_without_authentication(get_fastapi_client,):
         "Authorization": "Bearer dummyToken",
         "accept": "application/json"
     }
-    response = get_fastapi_client.delete("/api/v1/books/1/", headers=headers)
+    response = fastapi_client.delete("/api/v1/books/1/", headers=headers)
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
-async def test_delete_unexisting_book(get_fastapi_client, get_fastapi_token):
+async def test_delete_unexisting_book(fastapi_client, fastapi_token):
     """
     Description: test delete_book id 55555 route with FastAPI TestClient with token.
     Notice we try to delete an unexisting book
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json"
     }
-    response = get_fastapi_client.delete("/api/v1/books/55555/", headers=headers)
+    response = fastapi_client.delete("/api/v1/books/55555/", headers=headers)
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_full_update_book_with_authentication_without_valid_datas(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test full update_book id 3 route with FastAPI TestClient with token.
@@ -406,8 +406,8 @@ async def test_full_update_book_with_authentication_without_valid_datas(
         "year_of_publication": "1984",
         "category": "art"
     }
-    access_token = get_fastapi_token
-    response = get_fastapi_client.put(
+    access_token = fastapi_token
+    response = fastapi_client.put(
         "/api/v1/books/3/",
         headers={"Authorization": f"Bearer {access_token}"},
         data=json
@@ -417,8 +417,8 @@ async def test_full_update_book_with_authentication_without_valid_datas(
 
 @pytest.mark.asyncio
 async def test_update_book_with_authentication_without_valid_datas(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test full update_book id 3 route with FastAPI TestClient with token.
@@ -430,8 +430,8 @@ async def test_update_book_with_authentication_without_valid_datas(
         "year_of_publication": "1984",
         "category": "art"
     }
-    access_token = get_fastapi_token
-    response = get_fastapi_client.patch(
+    access_token = fastapi_token
+    response = fastapi_client.patch(
         "/api/v1/books/3/",
         headers={"Authorization": f"Bearer {access_token}"},
         data=json
@@ -441,14 +441,14 @@ async def test_update_book_with_authentication_without_valid_datas(
 
 @pytest.mark.asyncio
 async def test_full_update_book_with_authentication_with_forbidden_user(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test update_book id 2 route with FastAPI TestClient with token.
     The book has not been published by authenticated user.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "title": "Perdus dans les Andes",
         "author": "John doe",
@@ -462,7 +462,7 @@ async def test_full_update_book_with_authentication_with_forbidden_user(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put(
+    response = fastapi_client.put(
         "/api/v1/books/2/",
         headers=headers,
         json=json
@@ -471,12 +471,12 @@ async def test_full_update_book_with_authentication_with_forbidden_user(
 
 
 @pytest.mark.asyncio
-async def test_full_update_unexisting_book_with_authentication(get_fastapi_client, get_fastapi_token):
+async def test_full_update_unexisting_book_with_authentication(fastapi_client, fastapi_token):
     """
     Description: test update_book with unexisting id 55555 route with FastAPI TestClient with token.
     The book does not exists.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "title": "Perdus dans les Andes",
         "author": "StRing",
@@ -490,7 +490,7 @@ async def test_full_update_unexisting_book_with_authentication(get_fastapi_clien
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put(
+    response = fastapi_client.put(
         "/api/v1/books/55555/",
         headers=headers,
         json=json
@@ -500,14 +500,14 @@ async def test_full_update_unexisting_book_with_authentication(get_fastapi_clien
 
 @pytest.mark.asyncio
 async def test_full_update_book_with_authentication_with_valid_datas(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test update_book id 1 route with FastAPI TestClient with token.
     The book has been published by authenticated user.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "title": "Perdus dans les Andes",
         "author": "Walt Disney",
@@ -521,19 +521,19 @@ async def test_full_update_book_with_authentication_with_valid_datas(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/books/5/", headers=headers, json=json)
+    response = fastapi_client.put("/api/v1/books/5/", headers=headers, json=json)
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
 async def test_full_update_book_with_authentication_with_invalid_keyword_string(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test update book route with FastAPI TestClient with token, with the invalid keyword string.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "title": "Perdus dans les Andes",
         "author": "StRing",
@@ -547,5 +547,5 @@ async def test_full_update_book_with_authentication_with_invalid_keyword_string(
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.put("/api/v1/books/2/", headers=headers, json=json)
+    response = fastapi_client.put("/api/v1/books/2/", headers=headers, json=json)
     assert response.status_code == 401

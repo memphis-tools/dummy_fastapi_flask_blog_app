@@ -1,8 +1,7 @@
 """The FastAPI routes for books categories"""
 
-
-from fastapi import APIRouter
 from typing import Annotated
+from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 
 from app.packages import log_events
@@ -40,7 +39,7 @@ def check_book_category_fields(category):
 
 @router.get("/api/v1/books/categories/", tags=["BOOKS_CATEGORIES"])
 async def view_books_categories(
-    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    current_user: Annotated[UserModel, Depends(get_current_active_user)],
 ):
     """
     view_books_categories return a list of books categories.
@@ -54,7 +53,7 @@ async def view_books_categories(
 @router.get("/api/v1/books/categories/{category_id}/", tags=["BOOKS_CATEGORIES"])
 async def view_category_books(
     category_id: int,
-    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    current_user: Annotated[UserModel, Depends(get_current_active_user)],
 ):
     """
     view_category_books return a list of books from a category.
@@ -83,7 +82,7 @@ async def add_category_books(
     if current_user.id != 1:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Acces reserve au seul compte admin"
+            detail="Acces reserve au seul compte admin",
         )
     new_book_category = models.BookCategory(title=str(book_category.title).lower())
     check_book_category_fields(new_book_category)

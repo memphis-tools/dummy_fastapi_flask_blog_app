@@ -1,8 +1,7 @@
 """The FastAPI routes for books"""
 
-
-from fastapi import APIRouter
 from typing import Annotated
+from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 
 from app.packages import log_events
@@ -35,7 +34,7 @@ def check_book_fields(book):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Saisie invalide, mot clef string non utilisable.",
         )
-    if type(book.year_of_publication) is not int:
+    if not isinstance(book.year_of_publication, int):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Saisie invalide, annee publication livre doit etre un entier.",
@@ -56,8 +55,7 @@ async def view_books(
 
 @router.get("/api/v1/books/{book_id}/", tags=["BOOKS"])
 async def view_book(
-    book_id: int,
-    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    book_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     view_books return a book.
@@ -136,7 +134,7 @@ async def partial_update_book(
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Livre avec id {book_id} inexistant."
+            detail=f"Livre avec id {book_id} inexistant.",
         )
 
     if current_user.id != book.user_id and current_user.username != "admin":
@@ -144,9 +142,7 @@ async def partial_update_book(
             "current_user": current_user.username,
             "book_title": book.title,
         }
-        log_events.log_event(
-            "[+] FastAPI - Book update refused.", logs_context
-        )
+        log_events.log_event("[+] FastAPI - Book update refused.", logs_context)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour le livre",
@@ -203,7 +199,7 @@ async def update_book(
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Livre avec id {book_id} inexistant."
+            detail=f"Livre avec id {book_id} inexistant.",
         )
 
     if current_user.id != book.user_id and current_user.username != "admin":
@@ -211,9 +207,7 @@ async def update_book(
             "current_user": current_user.username,
             "book_title": book.title,
         }
-        log_events.log_event(
-            "[+] FastAPI - Book update refused.", logs_context
-        )
+        log_events.log_event("[+] FastAPI - Book update refused.", logs_context)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour le livre",
@@ -258,8 +252,7 @@ async def update_book(
 
 @router.delete("/api/v1/books/{book_id}/", tags=["BOOKS"])
 async def delete_book(
-    book_id: int,
-    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    book_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     delete_book allows to delete a book base on id

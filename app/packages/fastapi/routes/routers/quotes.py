@@ -1,8 +1,7 @@
 """The FastAPI routes for quotes"""
 
-
-from fastapi import APIRouter
 from typing import Annotated
+from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 
 from app.packages import log_events
@@ -35,15 +34,14 @@ async def get_quotes(
         logs_context,
     )
     raise HTTPException(
-        status_code=status. HTTP_403_FORBIDDEN,
+        status_code=status.HTTP_403_FORBIDDEN,
         detail="Seul l'admin peut consulter les citations",
     )
 
 
 @router.get("/api/v1/quotes/{quote_id}/", tags=["QUOTES"])
 async def get_quote(
-    quote_id: int,
-    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    quote_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ) -> QuoteModel:
     """return a quote based on id"""
     if current_user.role == "admin":
@@ -58,7 +56,7 @@ async def get_quote(
         logs_context,
     )
     raise HTTPException(
-        status_code=status. HTTP_403_FORBIDDEN,
+        status_code=status.HTTP_403_FORBIDDEN,
         detail="Seul l'admin peut consulter une citation",
     )
 
@@ -94,15 +92,14 @@ async def add_quote(
         logs_context,
     )
     raise HTTPException(
-        status_code=status. HTTP_403_FORBIDDEN,
+        status_code=status.HTTP_403_FORBIDDEN,
         detail="Seul l'admin peut ajouter une citation",
     )
 
 
 @router.delete("/api/v1/quotes/{quote_id}/", tags=["QUOTES"])
 async def delete_quote(
-    quote_id: int,
-    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+    quote_id: int, current_user: Annotated[UserModel, Depends(get_current_active_user)]
 ):
     """
     delete_quote allows to delete a quote base on id
@@ -135,6 +132,6 @@ async def delete_quote(
         logs_context,
     )
     raise HTTPException(
-        status_code=status. HTTP_403_FORBIDDEN,
+        status_code=status.HTTP_403_FORBIDDEN,
         detail="Seul l'admin peut supprimer une citation",
     )

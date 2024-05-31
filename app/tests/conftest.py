@@ -11,7 +11,7 @@ from app.packages.flask_app import project
 from app.packages import settings
 
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 2
+ACCESS_TOKEN_EXPIRE_MINUTES = 3
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def get_session():
 
 
 @pytest.fixture
-def get_fastapi_client(get_session):
+def fastapi_client(get_session):
     """
     Description: fixture offers a Flask TestClient
     """
@@ -33,7 +33,7 @@ def get_fastapi_client(get_session):
 
 
 @pytest.fixture
-def get_fastapi_token():
+def fastapi_token():
     """
     Description: fixture offers a FastAPI user's token.
     """
@@ -47,7 +47,7 @@ def get_fastapi_token():
 
 
 @pytest.fixture
-def get_fastapi_token_for_admin():
+def fastapi_token_for_admin():
     """
     Description: fixture offers a FastAPI user's token.
     """
@@ -144,4 +144,3 @@ def mock_function_delete_book(mocker):
     """
     mocker.patch("app.packages.flask_app.project.book_routes_blueprint.delete_book", return_value=True)
     mocker.patch("os.remove")
-    return

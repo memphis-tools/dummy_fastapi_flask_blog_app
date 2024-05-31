@@ -33,10 +33,10 @@ def users():
     """
     session = session_commands.get_a_database_session()
     # remember that user with id 1 is the application admin (wr remove it from dataset)
-    users = session.query(User).all()[1:]
+    all_users = session.query(User).all()[1:]
     session.close()
     return render_template(
-        "users.html", users=users, is_authenticated=current_user.is_authenticated
+        "users.html", users=all_users, is_authenticated=current_user.is_authenticated
     )
 
 
@@ -90,9 +90,7 @@ def add_user():
     )
 
 
-@user_routes_blueprint.route(
-    "/user/<int:user_id>/delete/", methods=["GET", "POST"]
-)
+@user_routes_blueprint.route("/user/<int:user_id>/delete/", methods=["GET", "POST"])
 @login_required
 @admin_only
 def delete_user(user_id):
@@ -104,7 +102,6 @@ def delete_user(user_id):
     user_to_delete = session.get(User, user_id)
     if user_id == 1:
         session.close()
-        flash("Le compte admin ne peut pas etre supprime", "error")
         return abort(403)
     if form.validate_on_submit():
         logs_context = {
@@ -163,7 +160,7 @@ def update_password():
             session.commit()
             flash(f"Mot de passe mis a jour {current_user} 💪")
             session.close()
-            return redirect(url_for("index"))
+        return redirect(url_for("index"))
     return render_template(
         "update_password.html",
         form=form,
@@ -177,9 +174,6 @@ def user_books(user_id):
     """
     Description: the user's book Flask route.
     """
-    if not current_user.is_authenticated:
-        flash("Acces page interdit aux utilisateurs non connectés.", "error")
-        return redirect(url_for("register"))
     session = session_commands.get_a_database_session()
     user = session.get(User, user_id)
     if not user:
@@ -213,17 +207,17 @@ def user_books(user_id):
             user_name=user.username,
             is_authenticated=current_user.is_authenticated,
         )
-    else:
-        return render_template(
-            "user_any_books.html",
-            books=items,
-            page=page,
-            total_books=total_books,
-            per_page=per_page,
-            total_pages=total_pages,
-            user_name=user.username,
-            is_authenticated=current_user.is_authenticated,
-        )
+
+    return render_template(
+        "user_any_books.html",
+        books=items,
+        page=page,
+        total_books=total_books,
+        per_page=per_page,
+        total_pages=total_pages,
+        user_name=user.username,
+        is_authenticated=current_user.is_authenticated,
+    )
 
 
 @user_routes_blueprint.route("/users/<int:user_id>/starred/")
