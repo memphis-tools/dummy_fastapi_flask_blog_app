@@ -163,7 +163,6 @@ def test_flask_delete_user_admin_with_authentication(
         follow_redirects=True,
     )
     assert response.status_code == 403
-    # assert b'Le compte admin ne peut pas etre supprime' in response.data
 
 
 def test_get_users_without_being_admin(client, access_session):
@@ -221,7 +220,7 @@ def test_add_user_being_admin(
     response = client.post(
         "/users/add/", headers=headers, data=data, follow_redirects=True
     )
-    # assert b"Mot de passe trop simple" in response.data
+    assert b"Mot de passe trop simple" in response.data
     assert response.status_code == 200
 
 
@@ -265,7 +264,7 @@ def test_add_user_with_unmatching_passwords_being_admin(
     }
     response = client.post("/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
-    # assert b"Mots de passe ne correspondent pas" in response.data
+    assert b"Mots de passe ne correspondent pas" in response.data
 
 
 def test_add_user_with_existing_email_being_admin(
@@ -287,7 +286,7 @@ def test_add_user_with_existing_email_being_admin(
     }
     response = client.post("/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
-    # assert b"Email existe deja en base" in response.data
+    assert b"Email existe deja en base" in response.data
 
 
 def test_add_user_with_existing_username_being_admin(
@@ -310,7 +309,7 @@ def test_add_user_with_existing_username_being_admin(
     }
     response = client.post("/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
-    # assert b"Nom utilisateur existe deja, veuillez le modifier" in response.data
+    assert b"Nom utilisateur existe deja, veuillez le modifier" in response.data
 
 
 def test_update_user_password_being_admin(
@@ -333,7 +332,7 @@ def test_update_user_password_being_admin(
         "/users/password/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 200
-    # assert b"Mot de passe mis a jour" in response.data
+    assert b"Mot de passe mis a jour" in response.data
 
 
 def test_update_user_password_being_legitimate_user(
@@ -402,7 +401,6 @@ def test_update_user_password_being_legitimate_user_with_blank_current_password(
         "/users/password/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 200
-    # assert b"Champs attendus non saisis" in response.data
 
 
 def test_update_user_password_being_legitimate_user_with_blank_new_password(
@@ -425,7 +423,6 @@ def test_update_user_password_being_legitimate_user_with_blank_new_password(
         "/users/password/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 200
-    # assert b"Champs attendus non saisis" in response.data
 
 
 def test_update_user_password_being_legitimate_user_with_blank_new_password_check(
@@ -448,7 +445,6 @@ def test_update_user_password_being_legitimate_user_with_blank_new_password_chec
         "/users/password/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 200
-    # assert b"Champs attendus non saisis" in response.data
 
 
 def test_update_user_password_being_legitimate_user_with_uncomplex_new_password(
