@@ -29,7 +29,6 @@ services:
 before_script:
   - pip install -r app/requirements.txt
   - pip install -r app/packages/flask_app/requirements.txt
-  - pip install coverage codacy-coverage
 
 unit_tests_development_branch:
   stage: test_development_branch
