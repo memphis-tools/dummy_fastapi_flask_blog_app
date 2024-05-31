@@ -281,6 +281,10 @@ You do not need to create a python virtualenv.
 
       python -m flake8 --format html --htmldir flake8_html_report/
 
+      or
+
+      flake8 app/ --max-line-length=127 --count --statistics
+
   You can use black to format code
 
       black app/packages/
@@ -444,6 +448,8 @@ https://stackoverflow.com/questions/4830535/how-do-i-format-a-date-in-jinja2
 For FastAPI, the ci-cd i used:
 
 https://fastapi.tiangolo.com/tutorial/security/
+
+https://fastapi.tiangolo.com/tutorial/bigger-applications/
 
 https://pypi.org/project/pytest-postgresql/
 

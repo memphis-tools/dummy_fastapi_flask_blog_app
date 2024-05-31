@@ -4,10 +4,7 @@ This is a dummy fastapi application using a database.
 
 import uvicorn
 
-try:
-    from app.packages.fastapi.routes import routes_and_authentication
-except ModuleNotFoundError:
-    from packages.fastapi.routes import routes_and_authentication
+from app.packages.fastapi.routes import routes_and_authentication
 
 
 app = routes_and_authentication.app

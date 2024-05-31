@@ -5,13 +5,11 @@ Notice that by default we already add dummies data through the application utils
 
 from datetime import timedelta
 import pytest
-from httpx import AsyncClient
 
 import app.packages.settings as settings
 from app.packages.fastapi.models import fastapi_models
 from app.packages.fastapi.routes import routes_and_authentication
-
-app = routes_and_authentication.app
+from app.packages.fastapi.routes.dependencies import get_user, get_current_user, verify_password
 
 
 def test_get_existing_user():
@@ -19,7 +17,7 @@ def test_get_existing_user():
     Description: check if we can get an user based on his username.
     """
     username = "donald"
-    response = routes_and_authentication.get_user(username)
+    response = get_user(username)
     assert type(response) is fastapi_models.UserInDB
 
 
@@ -28,7 +26,7 @@ def test_get_unexisting_user():
     Description: check if we can get an unexisting user.
     """
     username = settings.TEST_USER_USERNAME
-    response = routes_and_authentication.get_user(username)
+    response = get_user(username)
     assert response is None
 
 
@@ -47,7 +45,7 @@ def test_verify_password_hash():
     """
     plain_password = settings.TEST_USER_PWD
     hashed_password = routes_and_authentication.get_password_hash(plain_password)
-    response = routes_and_authentication.verify_password(plain_password, hashed_password)
+    response = verify_password(plain_password, hashed_password)
     assert response is True
 
 
@@ -57,12 +55,12 @@ async def test_get_current_user():
     Description: check if we can find user based on token.
     """
     username = "donald"
-    user = routes_and_authentication.get_user(username)
+    user = get_user(username)
     access_token_expires = timedelta(minutes=routes_and_authentication.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = routes_and_authentication.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    user_found = await routes_and_authentication.get_current_user(access_token)
+    user_found = await get_current_user(access_token)
     assert user_found.username == "donald"
 
 
@@ -72,12 +70,12 @@ async def test_get_current_active_user():
     Description: check if we can get current user if active.
     """
     username = "donald"
-    user = routes_and_authentication.get_user(username)
+    user = get_user(username)
     access_token_expires = timedelta(minutes=routes_and_authentication.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = routes_and_authentication.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    user_found = await routes_and_authentication.get_current_user(access_token)
+    user_found = await get_current_user(access_token)
     active_user = await routes_and_authentication.get_current_active_user(user_found)
     assert type(active_user) is fastapi_models.UserInDB
 
@@ -88,12 +86,12 @@ async def test_get_current_disabled_user():
     Description: check if we can get current user if disabled.
     """
     username = "louloute"
-    user = routes_and_authentication.get_user(username)
+    user = get_user(username)
     access_token_expires = timedelta(minutes=routes_and_authentication.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = routes_and_authentication.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    user_found = await routes_and_authentication.get_current_user(access_token)
+    user_found = await get_current_user(access_token)
     active_user = await routes_and_authentication.get_current_active_user(user)
     assert type(active_user) is fastapi_models.UserInDB
 
@@ -109,17 +107,16 @@ async def test_view_users_with_authentication(get_fastapi_client, get_fastapi_to
 
 
 @pytest.mark.asyncio
-async def test_view_users(get_fastapi_token):
+async def test_view_users(get_fastapi_client, get_fastapi_token):
     """
     Description:
     Check if we can reach the users uri served by FastAPI with a valid authentication token.
     Check if we can get the dummy users created for tests purposes.
     Notice that the dummies datas (users, books, comments) are in the test database.
     """
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response = await ac.get(
-            "/api/v1/users/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
-        )
+    response = get_fastapi_client.get(
+        "/api/v1/users/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+    )
     assert response.status_code == 200
 
 
@@ -247,15 +244,14 @@ async def test_delete_unexisting_user_being_admin(get_fastapi_client, get_fastap
 
 
 @pytest.mark.asyncio
-async def test_view_users_without_valid_token():
+async def test_view_users_without_valid_token(get_fastapi_client):
     """
     Description:
     Ensure that we can not reach the users uri served by FastAPI without a valid authentication token.
     """
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response = await ac.get(
-            "/api/v1/users/", headers={"Authorization": "Bearer somethingWeird"}
-        )
+    response = get_fastapi_client.get(
+        "/api/v1/users/", headers={"Authorization": "Bearer somethingWeird"}
+    )
     assert response.status_code == 401
 
 
@@ -636,32 +632,30 @@ async def test_view_user_without_authentication(get_fastapi_client):
 
 
 @pytest.mark.asyncio
-async def test_get_user_books(get_fastapi_token):
+async def test_get_user_books(get_fastapi_client, get_fastapi_token):
     """
     Description:
     Ensure that we can get any user book's diffusion.
     """
     user_id = 2
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response = await ac.get(
-            f"/api/v1/users/{user_id}/books/",
-            headers={"Authorization": f"Bearer {get_fastapi_token}"}
-        )
+    response = get_fastapi_client.get(
+        f"/api/v1/users/{user_id}/books/",
+        headers={"Authorization": f"Bearer {get_fastapi_token}"}
+    )
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
-async def test_get_invalid_user_books(get_fastapi_token):
+async def test_get_invalid_user_books(get_fastapi_client, get_fastapi_token):
     """
     Description:
     Ensure that we can get any invalid user diffusion.
     """
     user_id = 2555
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        response = await ac.get(
-            f"/api/v1/users/{user_id}/books/",
-            headers={"Authorization": f"Bearer {get_fastapi_token}"}
-        )
+    response = get_fastapi_client.get(
+        f"/api/v1/users/{user_id}/books/",
+        headers={"Authorization": f"Bearer {get_fastapi_token}"}
+    )
     assert response.status_code == 404
 
 
