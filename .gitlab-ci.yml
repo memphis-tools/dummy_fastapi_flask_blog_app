@@ -16,6 +16,7 @@ variables:
 
 stages:
   - test_development_branch
+  - report
   - test_master_branch
   - build_init_certbot
   - build
@@ -26,8 +27,8 @@ services:
   - postgres:latest
 
 before_script:
-  - pip install -r app/requirements.txt
-  - pip install -r app/packages/flask_app/requirements.txt
+  - python -m pip install -r app/requirements.txt
+  - python -m pip install -r app/packages/flask_app/requirements.txt
 
 unit_tests_development_branch:
   stage: test_development_branch
@@ -49,11 +50,21 @@ unit_tests_development_branch:
     - echo "Running tests"
     - coverage run -m pytest
     - coverage report
-    - coverage html
+    - coverage xml
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
   artifacts:
     paths:
-      - htmlcov/
+      - coverage.xml
+
+report:
+  stage: report
+  only:
+    - development
+  image: python:3.11.6
+  script:
+    - python-codacy-coverage -r coverage.xml
+  dependencies:
+    - unit_tests_development_branch
 
 unit_tests_master_branch:
   stage: test_master_branch
