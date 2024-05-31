@@ -16,6 +16,7 @@ variables:
 
 stages:
   - test_development_branch
+  - report
   - test_master_branch
   - build_init_certbot
   - build
@@ -28,6 +29,7 @@ services:
 before_script:
   - pip install -r app/requirements.txt
   - pip install -r app/packages/flask_app/requirements.txt
+  - pip install coverage codacy-coverage
 
 unit_tests_development_branch:
   stage: test_development_branch
@@ -49,11 +51,20 @@ unit_tests_development_branch:
     - echo "Running tests"
     - coverage run -m pytest
     - coverage report
-    - coverage html
+    - coverage xml
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
   artifacts:
     paths:
-      - htmlcov/
+      - coverage.xml
+
+report:
+  stage: report
+  only:
+    - development
+  script:
+    - python-codacy-coverage -r coverage.xml
+  dependencies:
+    - unit_tests_development_branch
 
 unit_tests_master_branch:
   stage: test_master_branch
@@ -76,7 +87,6 @@ unit_tests_master_branch:
     - coverage run -m pytest -vs app/
     - coverage report
     - coveralls
-    - bash <(curl -Ls https://coverage.codacy.com/get.sh)
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
 
 build_init_certbot_images:
