@@ -76,6 +76,7 @@ unit_tests_master_branch:
     - coverage run -m pytest -vs app/
     - coverage report
     - coveralls
+    - bash <(curl -Ls https://coverage.codacy.com/get.sh)
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
 
 build_init_certbot_images:
