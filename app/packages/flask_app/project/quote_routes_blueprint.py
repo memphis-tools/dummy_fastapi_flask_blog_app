@@ -51,7 +51,6 @@ def view_quote(quote_id):
     session.close()
     if not quote_to_view:
         session.close()
-        flash("Citation inconnue", "error")
         return abort(404)
     return render_template(
         "view_quote.html",
@@ -104,7 +103,6 @@ def delete_quote(quote_id):
     quote_to_delete = session.get(Quote, quote_id)
     if not quote_to_delete:
         session.close()
-        flash("Citation inconnue", "error")
         return abort(404)
     if form.validate_on_submit():
         logs_context = {

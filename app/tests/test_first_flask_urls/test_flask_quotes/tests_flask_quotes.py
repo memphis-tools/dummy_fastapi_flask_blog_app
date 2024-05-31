@@ -121,6 +121,7 @@ def test_add_a_valid_quote_as_admin(
         follow_redirects=True
     )
     assert response.status_code == 200
+    assert b'Ajout citation' in response.data
 
 
 def test_add_an_invalid_quote_as_admin(
@@ -188,7 +189,7 @@ def test_flask_delete_quote_with_authentication_as_admin(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "http://localhost/quotes/4/delete/",
+        "/quotes/4/delete/",
         headers=headers,
         data=form,
         follow_redirects=True,
@@ -209,9 +210,9 @@ def test_flask_delete_unexisting_quote_with_authentication_as_admin(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "http://localhost/quotes/555555/delete/",
+        "/quotes/555555/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,
     )
-    # assert response.status_code == 404
+    assert response.status_code == 404

@@ -161,8 +161,7 @@ def add_book_category():
             log_events.log_event("[+] Flask - Ajout catégorie livre.", logs_context)
             session.add(new_category)
             session.commit()
-        else:
-            flash(category_is_valid, "error")
+        flash("Categorie invalide", "error")
         session.close()
         return redirect(
             url_for("book_category_routes_blueprint.manage_books_categories")

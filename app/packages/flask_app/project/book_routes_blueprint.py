@@ -99,20 +99,20 @@ def book(book_id):
     }
     log_events.log_event("[+] Flask - Consultation livre.", logs_context)
 
-    if request.method == "POST":
-        if form.validate_on_submit():
-            new_comment = Comment(
-                text=form.comment_text.data, author_id=current_user.id, book_id=book.id
-            )
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "book_title": book.title,
-            }
-            log_events.log_event("[+] Flask - Ajout commentaire.", logs_context)
-            session.add(new_comment)
-            session.commit()
+    if form.validate_on_submit():
+        new_comment = Comment(
+            text=form.comment_text.data, author_id=current_user.id, book_id=book.id
+        )
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "book_title": book.title,
+        }
+        log_events.log_event("[+] Flask - Ajout commentaire.", logs_context)
+        session.add(new_comment)
+        session.commit()
         session.close()
         return redirect(url_for("book_routes_blueprint.books"))
+
     session.close()
     return render_template(
         "book.html",

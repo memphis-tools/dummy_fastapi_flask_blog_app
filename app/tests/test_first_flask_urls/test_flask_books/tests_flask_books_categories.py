@@ -65,7 +65,7 @@ def test_get_valid_category_books(client, access_session):
     assert b'DUMMY BLOG - LES LIVRES DE LA CATEGORIE' in response.data
 
 
-def test_get_invalid_category_books(client, access_session_as_admin):
+def test_get_unexisting_category_books(client, access_session_as_admin):
     """
     Description: check if we can get all the books from an invalid category.
     """
@@ -75,6 +75,22 @@ def test_get_invalid_category_books(client, access_session_as_admin):
     response = client.get("/books/categories/55555/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
     assert b'Categorie id 55555 inexistante' in response.data
+
+
+def test_get_invalid_category_books(client, access_session_as_admin, get_flask_csrf_token):
+    """
+    Description: check if we can get all the books from an invalid category.
+    """
+    data = {
+        "title": "string",
+        "csrf_token": get_flask_csrf_token,
+    }
+    headers = {
+        "Cookie": f"session={access_session_as_admin}"
+    }
+    response = client.post("/book/categories/add/", headers=headers, data=data, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Categorie invalide' in response.data
 
 
 def test_get_manage_books_categories_without_being_admin(client, access_session):
@@ -110,7 +126,7 @@ def test_delete_valid_book_category_without_being_admin(client, access_session, 
         "Cookie": f"session={access_session}"
     }
     response = client.post(
-        "http://localhost/book/categories/2/delete/",
+        "/book/categories/2/delete/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -129,12 +145,36 @@ def test_delete_valid_book_category_being_admin(client, access_session_as_admin,
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
-        "http://localhost/book/categories/4/delete/",
+        "/book/categories/4/delete/",
         headers=headers,
         data=data,
         follow_redirects=True
     )
     assert response.status_code == 200
+
+
+def test_delete_unexisting_book_category_being_admin(
+    client,
+    access_session_as_admin,
+    get_flask_csrf_token
+):
+    """
+    Description: check if we can delete an unexisting book category being admin.
+    """
+    data = {
+        "csrf_token": get_flask_csrf_token,
+    }
+    headers = {
+        "Cookie": f"session={access_session_as_admin}"
+    }
+    response = client.post(
+        "/book/categories/555555/delete/",
+        headers=headers,
+        data=data,
+        follow_redirects=True
+    )
+    assert response.status_code == 404
+    # assert b'Categorie livre non trouvee' in response.data
 
 
 def test_update_valid_book_category_without_being_admin(client, access_session, get_flask_csrf_token):
@@ -149,7 +189,7 @@ def test_update_valid_book_category_without_being_admin(client, access_session, 
         "Cookie": f"session={access_session}"
     }
     response = client.post(
-        "http://localhost/book/categories/2/update/",
+        "/book/categories/2/update/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -169,7 +209,7 @@ def test_update_valid_book_category_being_admin(client, access_session_as_admin,
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
-        "http://localhost/book/categories/3/update/",
+        "/book/categories/3/update/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -197,7 +237,7 @@ def test_add_book_category_without_being_admin(client, access_session, get_flask
         "Cookie": f"session={access_session}"
     }
     response = client.post(
-        "http://localhost/book/categories/add/",
+        "/book/categories/add/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -217,7 +257,7 @@ def test_add_book_category_being_admin(client, access_session_as_admin, get_flas
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
-        "http://localhost/book/categories/add/",
+        "/book/categories/add/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -237,7 +277,7 @@ def test_add_existing_book_category_being_admin(client, access_session_as_admin,
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
-        "http://localhost/book/categories/add/",
+        "/book/categories/add/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -246,21 +286,22 @@ def test_add_existing_book_category_being_admin(client, access_session_as_admin,
     # assert b'Saisie invalide, categorie existe deja' in response.data
 
 
-# def test_update_invalid_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
-#     """
-#     Description: check if we can update an invalid book category being admin.
-#     """
-#     data = {
-#         "name": "something",
-#         "csrf_token": get_flask_csrf_token,
-#     }
-#     headers = {
-#         "Cookie": f"session={access_session_as_admin}"
-#     }
-#     response = client.post(
-#         "/book/categories/55555/update/",
-#         headers=headers,
-#         data=data,
-#         follow_redirects=True
-#     )
-#     assert response.status_code == 404
+def test_update_unexisting_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+    """
+    Description: check if we can update an invalid book category being admin.
+    """
+    data = {
+        "title": "something",
+        "csrf_token": get_flask_csrf_token,
+    }
+    headers = {
+        "Cookie": f"session={access_session_as_admin}"
+    }
+    response = client.post(
+        "/book/categories/55555/update/",
+        headers=headers,
+        data=data,
+        follow_redirects=True
+    )
+    assert response.status_code == 404
+    # assert b'Categorie livre non trouvee' in response.data
