@@ -220,6 +220,7 @@ def test_add_user_being_admin(
     response = client.post(
         "/users/add/", headers=headers, data=data, follow_redirects=True
     )
+    print(f"DEBUG SIR reponse: {response.data}")
     assert b"Mot de passe trop simple" in response.data
     assert response.status_code == 200
 
@@ -264,6 +265,7 @@ def test_add_user_with_unmatching_passwords_being_admin(
     }
     response = client.post("/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
+    print(f"DEBUG SIR reponse: {response.data}")
     assert b"Mots de passe ne correspondent pas" in response.data
 
 
@@ -286,6 +288,7 @@ def test_add_user_with_existing_email_being_admin(
     }
     response = client.post("/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
+    print(f"DEBUG SIR reponse: {response.data}")
     assert b"Email existe deja en base" in response.data
 
 
@@ -309,6 +312,7 @@ def test_add_user_with_existing_username_being_admin(
     }
     response = client.post("/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
+    print(f"DEBUG SIR reponse: {response.data}")
     assert b"Nom utilisateur existe deja, veuillez le modifier" in response.data
 
 
