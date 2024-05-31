@@ -22,7 +22,7 @@ comment_routes_blueprint = Blueprint("comment_routes_blueprint", __name__)
 
 
 @comment_routes_blueprint.route(
-    "/front/comment/<int:comment_id>/delete/", methods=["GET", "POST"]
+    "/comment/<int:comment_id>/delete/", methods=["GET", "POST"]
 )
 @login_required
 def delete_comment(comment_id):
@@ -66,7 +66,7 @@ def delete_comment(comment_id):
 
 
 @comment_routes_blueprint.route(
-    "/front/comment/<int:comment_id>/update/", methods=["GET", "POST"]
+    "/comment/<int:comment_id>/update/", methods=["GET", "POST"]
 )
 @login_required
 def update_comment(comment_id):

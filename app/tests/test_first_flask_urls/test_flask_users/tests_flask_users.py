@@ -11,7 +11,7 @@ def test_flask_get_users_without_authentication(client):
     """
     Description: check if we can reach a users page without authentication
     """
-    response = client.get("http://localhost/front/users/", follow_redirects=False)
+    response = client.get("http://localhost/users/", follow_redirects=False)
     assert response.status_code == 302
 
 
@@ -19,7 +19,7 @@ def test_flask_get_users_without_authentication_following_redirect(client):
     """
     Description: check if we can reach a users page without authentication
     """
-    response = client.get("http://localhost/front/users/", follow_redirects=True)
+    response = client.get("http://localhost/users/", follow_redirects=True)
     assert response.status_code == 200
 
 
@@ -29,7 +29,7 @@ def test_get_current_user_books(client, access_session):
     """
     headers = {"Cookie": f"session={access_session}"}
     response = client.get(
-        "/front/user/2/books/", headers=headers, follow_redirects=True
+        "/user/2/books/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 200
     assert b"DUMMY BLOG - VOS LIVRES" in response.data
@@ -42,7 +42,7 @@ def test_get_any_valid_user_books(client, access_session):
     """
     headers = {"Cookie": f"session={access_session}"}
     response = client.get(
-        "/front/user/3/books/", headers=headers, follow_redirects=True
+        "/user/3/books/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 200
     assert b"DUMMY BLOG - LIVRES DE " in response.data
@@ -55,7 +55,7 @@ def test_get_invalid_user_books(client, access_session):
     """
     headers = {"Cookie": f"session={access_session}"}
     response = client.get(
-        "/front/user/55555555/books/", headers=headers, follow_redirects=True
+        "/user/55555555/books/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 200
     assert b"Utilisateur id 55555555 inexistant" in response.data
@@ -66,7 +66,7 @@ def test_flask_get_delete_user(client):
     Description: check if we can reach the delete user route with GET method
     """
     response = client.get(
-        "http://localhost/front/user/1/delete/", follow_redirects=False
+        "http://localhost/user/1/delete/", follow_redirects=False
     )
     assert response.status_code == 302
 
@@ -75,7 +75,7 @@ def test_flask_post_users(client):
     """
     Description: check if we can reach the delete user route with POST method
     """
-    response = client.post("http://localhost/front/users/", follow_redirects=True)
+    response = client.post("http://localhost/users/", follow_redirects=True)
     assert response.status_code == 405
 
 
@@ -83,7 +83,7 @@ def test_flask_put_users(client):
     """
     Description: check if we can reach the user route with PUT method
     """
-    response = client.put("http://localhost/front/users/", follow_redirects=True)
+    response = client.put("http://localhost/users/", follow_redirects=True)
     assert response.status_code == 405
 
 
@@ -91,7 +91,7 @@ def test_flask_delete_users(client):
     """
     Description: check if we can reach the user route with DELETE method
     """
-    response = client.delete("http://localhost/front/users/", follow_redirects=True)
+    response = client.delete("http://localhost/users/", follow_redirects=True)
     assert response.status_code == 405
 
 
@@ -100,7 +100,7 @@ def test_flask_post_delete_user_without_authentication(client):
     Description: check if we can reach the delete user route without authentication
     """
     response = client.post(
-        "http://localhost/front/user/1/delete/", follow_redirects=False
+        "http://localhost/user/1/delete/", follow_redirects=False
     )
     assert response.status_code == 400
 
@@ -117,7 +117,7 @@ def test_flask_post_delete_user_with_authentication_as_admin(
     }
     data = {"csrf_token": get_flask_csrf_token}
     response = client.post(
-        "http://localhost/front/user/4/delete/",
+        "http://localhost/user/4/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,
@@ -137,7 +137,7 @@ def test_flask_post_delete_user_with_authentication_without_being_admin(
     }
     data = {"csrf_token": get_flask_csrf_token}
     response = client.post(
-        "http://localhost/front/user/4/delete/",
+        "http://localhost/user/4/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,
@@ -157,7 +157,7 @@ def test_flask_post_delete_user_admin_with_authentication(
     }
     data = {"csrf_token": get_flask_csrf_token}
     response = client.post(
-        "http://localhost/front/user/1/delete/",
+        "http://localhost/user/1/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,
@@ -170,7 +170,7 @@ def test_get_users_without_being_admin(client, access_session):
     Description: check if we can get users uri without being admin.
     """
     headers = {"Cookie": f"session={access_session}"}
-    response = client.get("/front/users/", headers=headers, follow_redirects=True)
+    response = client.get("/users/", headers=headers, follow_redirects=True)
     assert response.status_code == 403
 
 
@@ -179,7 +179,7 @@ def test_get_users_being_admin(client, access_session_as_admin):
     Description: check if we can get users uri being admin.
     """
     headers = {"Cookie": f"session={access_session_as_admin}"}
-    response = client.get("/front/users/", headers=headers, follow_redirects=True)
+    response = client.get("/users/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
 
 
@@ -196,7 +196,7 @@ def test_add_user_without_being_admin(client, access_session, get_flask_csrf_tok
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/users/add/", headers=headers, data=data, follow_redirects=True
+        "/users/add/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 403
 
@@ -218,7 +218,7 @@ def test_add_user_being_admin(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/users/add/", headers=headers, data=data, follow_redirects=True
+        "/users/add/", headers=headers, data=data, follow_redirects=True
     )
     # assert b"Mot de passe trop simple" in response.data
     assert response.status_code == 200
@@ -239,7 +239,7 @@ def test_add_invalid_email_user_without_being_admin(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/users/add/", headers=headers, data=data, follow_redirects=True
+        "/users/add/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 403
 
@@ -262,7 +262,7 @@ def test_add_user_with_unmatching_passwords_being_admin(
         "email": "dupond@localhost.fr",
         "csrf_token": get_flask_csrf_token,
     }
-    response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
+    response = client.post("/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
     # assert b"Mots de passe ne correspondent pas" in response.data
 
@@ -284,7 +284,7 @@ def test_add_user_with_existing_email_being_admin(
         "email": "donald@localhost.fr",
         "csrf_token": get_flask_csrf_token,
     }
-    response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
+    response = client.post("/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
     # assert b"Email existe deja en base" in response.data
 
@@ -307,7 +307,7 @@ def test_add_user_with_existing_username_being_admin(
         "email": "dupond@localhost.fr",
         "csrf_token": get_flask_csrf_token,
     }
-    response = client.post("/front/users/add/", headers=headers, data=data, follow_redirects=True)
+    response = client.post("/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
     # assert b"Nom utilisateur existe deja, veuillez le modifier" in response.data
 
@@ -329,7 +329,7 @@ def test_update_user_password_being_admin(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+        "/users/password/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 200
     # assert b"Mot de passe mis a jour" in response.data
@@ -352,7 +352,7 @@ def test_update_user_password_being_legitimate_user(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+        "/users/password/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 200
     assert b"Mot de passe mis a jour" in response.data
@@ -375,7 +375,7 @@ def test_update_user_password_being_legitimate_user_with_wrong_current_password(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+        "/users/password/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 200
     assert b"Mot de passe actuel ne correspond pas" in response.data
@@ -398,7 +398,7 @@ def test_update_user_password_being_legitimate_user_with_blank_current_password(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+        "/users/password/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 200
     # assert b"Champs attendus non saisis" in response.data
@@ -421,7 +421,7 @@ def test_update_user_password_being_legitimate_user_with_blank_new_password(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+        "/users/password/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 200
     # assert b"Champs attendus non saisis" in response.data
@@ -444,7 +444,7 @@ def test_update_user_password_being_legitimate_user_with_blank_new_password_chec
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+        "/users/password/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 200
     # assert b"Champs attendus non saisis" in response.data
@@ -467,7 +467,7 @@ def test_update_user_password_being_legitimate_user_with_uncomplex_new_password(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+        "/users/password/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 200
     assert b"Mot de passe trop simple" in response.data
@@ -490,7 +490,7 @@ def test_update_user_password_being_legitimate_user_with_mismatched_new_password
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/users/password/", headers=headers, data=data, follow_redirects=True
+        "/users/password/", headers=headers, data=data, follow_redirects=True
     )
     assert response.status_code == 200
     assert b"Mots de passes ne correspondent pas" in response.data

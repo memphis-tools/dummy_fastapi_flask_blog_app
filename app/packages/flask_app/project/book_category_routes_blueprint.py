@@ -49,7 +49,7 @@ def check_book_category_fields(category):
     return True
 
 
-@book_category_routes_blueprint.route("/front/books/categories/")
+@book_category_routes_blueprint.route("/books/categories/")
 def categories():
     """
     Description: the books categories Flask route.
@@ -78,7 +78,7 @@ def categories():
     )
 
 
-@book_category_routes_blueprint.route("/front/books/categories/<int:category_id>/")
+@book_category_routes_blueprint.route("/books/categories/<int:category_id>/")
 def category_books(category_id):
     """
     Description: the books from a category Flask route.
@@ -119,7 +119,7 @@ def category_books(category_id):
     )
 
 
-@book_category_routes_blueprint.route("/front/categories/", methods=["GET"])
+@book_category_routes_blueprint.route("/categories/", methods=["GET"])
 @login_required
 @admin_only
 def manage_books_categories():
@@ -137,7 +137,7 @@ def manage_books_categories():
 
 
 @book_category_routes_blueprint.route(
-    "/front/book/categories/add/", methods=["GET", "POST"]
+    "/book/categories/add/", methods=["GET", "POST"]
 )
 @login_required
 @admin_only
@@ -175,7 +175,7 @@ def add_book_category():
 
 
 @book_category_routes_blueprint.route(
-    "/front/book/categories/<int:category_id>/delete/", methods=["GET", "POST"]
+    "/book/categories/<int:category_id>/delete/", methods=["GET", "POST"]
 )
 @login_required
 @admin_only
@@ -212,7 +212,7 @@ def delete_book_category(category_id):
 
 
 @book_category_routes_blueprint.route(
-    "/front/book/categories/<int:category_id>/update/", methods=["GET", "POST"]
+    "/book/categories/<int:category_id>/update/", methods=["GET", "POST"]
 )
 @login_required
 @admin_only
