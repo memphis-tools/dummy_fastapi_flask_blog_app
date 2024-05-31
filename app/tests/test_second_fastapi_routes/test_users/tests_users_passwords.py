@@ -50,6 +50,7 @@ async def test_update_user_password_being_admin(fastapi_client, fastapi_token_fo
         headers=headers,
         json=json
     )
+    print(f"DEBUG SIR reponse: {response.content}")
     assert response.status_code == 200
 
 
