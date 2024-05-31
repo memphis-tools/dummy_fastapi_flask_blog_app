@@ -333,7 +333,7 @@ async def update_user_password(
                 ):
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail="Mot de passe actuel incorrect.",
+                        detail="Mot de passe actuel incorrect it should be: {user.}",
                     )
                 if user_updated.new_password != user_updated.new_password_check:
                     raise HTTPException(
