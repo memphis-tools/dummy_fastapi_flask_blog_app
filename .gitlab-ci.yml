@@ -60,6 +60,7 @@ report:
   stage: report
   only:
     - development
+  image: python:3.11.6
   script:
     - python-codacy-coverage -r coverage.xml
   dependencies:
