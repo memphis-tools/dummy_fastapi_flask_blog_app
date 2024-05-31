@@ -12,7 +12,7 @@ def test_flask_get_delete_comment(client):
     Description: check if we can reach the delete comment route with GET method
     """
     response = client.get(
-        "http://localhost/front/comment/1/delete/", follow_redirects=False
+        "http://localhost/comment/1/delete/", follow_redirects=False
     )
     assert response.status_code == 302
 
@@ -21,7 +21,7 @@ def test_flask_post_comments(client):
     """
     Description: check if we can reach the delete comment route with POST method
     """
-    response = client.post("http://localhost/front/comments/", follow_redirects=True)
+    response = client.post("http://localhost/comments/", follow_redirects=True)
     assert response.status_code == 404
 
 
@@ -30,7 +30,7 @@ def test_flask_post_delete_comment_without_authentication(client):
     Description: check if we can reach the delete comment route without authentication
     """
     response = client.post(
-        "http://localhost/front/comment/1/delete/", headers="", follow_redirects=False
+        "http://localhost/comment/1/delete/", headers="", follow_redirects=False
     )
     assert response.status_code == 400
 
@@ -56,7 +56,7 @@ def test_flask_post_delete_comment_with_authentication(
     current_total_comments = len(book.book_comments)
     assert current_total_comments == 1
     response = client.post(
-        "http://localhost/front/comment/2/delete/",
+        "http://localhost/comment/2/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,
@@ -78,7 +78,7 @@ def test_flask_post_delete_comment_with_auth_without_being_author(
     }
     data = {"csrf_token": get_flask_csrf_token}
     response = client.post(
-        "http://localhost/front/comment/1/delete/",
+        "http://localhost/comment/1/delete/",
         headers=headers,
         data=data,
         follow_redirects=False,
@@ -98,7 +98,7 @@ def test_flask_post_delete_comment_with_auth_as_admin(
     }
     data = {"csrf_token": get_flask_csrf_token}
     response = client.post(
-        "http://localhost/front/comment/1/delete/",
+        "http://localhost/comment/1/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,
@@ -119,7 +119,7 @@ def test_flask_post_update_comment_without_being_logged_in(
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     response = client.post(
-        "/front/comment/1/update/",
+        "/comment/1/update/",
         headers=headers,
         data=user_form,
         follow_redirects=True,
@@ -144,7 +144,7 @@ def test_flask_post_update_comment_when_user_is_the_author(
         "Cookie": f"session={access_session}",
     }
     response = client.post(
-        "/front/comment/5/update/",
+        "/comment/5/update/",
         headers=headers,
         data=user_form,
         follow_redirects=True,
@@ -169,7 +169,7 @@ def test_flask_post_update_comment_authenticated_without_comment_id(
         "Cookie": f"session={access_session}",
     }
     response = client.post(
-        "/front/comment/update/",
+        "/comment/update/",
         headers=headers,
         data=user_form,
         follow_redirects=True,
@@ -193,7 +193,7 @@ def test_flask_post_update_comment_when_user_is_not_the_author(
         "Cookie": f"session={access_session}",
     }
     response = client.post(
-        "/front/comment/6/update/",
+        "/comment/6/update/",
         headers=headers,
         data=user_form,
         follow_redirects=True,
@@ -217,7 +217,7 @@ def test_flask_post_update_comment_as_admin(
         "Cookie": f"session={access_session_as_admin}",
     }
     response = client.post(
-        "/front/comment/6/update/",
+        "/comment/6/update/",
         headers=headers,
         data=user_form,
         follow_redirects=True,

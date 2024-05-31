@@ -48,7 +48,7 @@ def test_get_books_categories(client, access_session):
     headers = {
         "Cookie": f"session={access_session}"
     }
-    response = client.get("/front/books/categories/", headers=headers, follow_redirects=True)
+    response = client.get("/books/categories/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
     assert b'DUMMY BLOG - LES LIVRES PAR CATEGORIES' in response.data
 
@@ -60,7 +60,7 @@ def test_get_valid_category_books(client, access_session):
     headers = {
         "Cookie": f"session={access_session}"
     }
-    response = client.get("/front/books/categories/1/", headers=headers, follow_redirects=True)
+    response = client.get("/books/categories/1/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
     assert b'DUMMY BLOG - LES LIVRES DE LA CATEGORIE' in response.data
 
@@ -72,7 +72,7 @@ def test_get_invalid_category_books(client, access_session_as_admin):
     headers = {
         "Cookie": f"session={access_session_as_admin}"
     }
-    response = client.get("/front/books/categories/55555/", headers=headers, follow_redirects=True)
+    response = client.get("/books/categories/55555/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
     assert b'Categorie id 55555 inexistante' in response.data
 
@@ -84,7 +84,7 @@ def test_get_manage_books_categories_without_being_admin(client, access_session)
     headers = {
         "Cookie": f"session={access_session}"
     }
-    response = client.get("/front/categories/", headers=headers, follow_redirects=True)
+    response = client.get("/categories/", headers=headers, follow_redirects=True)
     assert response.status_code == 403
 
 
@@ -95,7 +95,7 @@ def test_get_manage_books_categories_being_admin(client, access_session_as_admin
     headers = {
         "Cookie": f"session={access_session_as_admin}"
     }
-    response = client.get("/front/categories/", headers=headers, follow_redirects=True)
+    response = client.get("/categories/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
 
 
@@ -110,7 +110,7 @@ def test_delete_valid_book_category_without_being_admin(client, access_session, 
         "Cookie": f"session={access_session}"
     }
     response = client.post(
-        "http://localhost/front/book/categories/2/delete/",
+        "http://localhost/book/categories/2/delete/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -129,7 +129,7 @@ def test_delete_valid_book_category_being_admin(client, access_session_as_admin,
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
-        "http://localhost/front/book/categories/4/delete/",
+        "http://localhost/book/categories/4/delete/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -149,7 +149,7 @@ def test_update_valid_book_category_without_being_admin(client, access_session, 
         "Cookie": f"session={access_session}"
     }
     response = client.post(
-        "http://localhost/front/book/categories/2/update/",
+        "http://localhost/book/categories/2/update/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -169,7 +169,7 @@ def test_update_valid_book_category_being_admin(client, access_session_as_admin,
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
-        "http://localhost/front/book/categories/3/update/",
+        "http://localhost/book/categories/3/update/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -197,7 +197,7 @@ def test_add_book_category_without_being_admin(client, access_session, get_flask
         "Cookie": f"session={access_session}"
     }
     response = client.post(
-        "http://localhost/front/book/categories/add/",
+        "http://localhost/book/categories/add/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -217,7 +217,7 @@ def test_add_book_category_being_admin(client, access_session_as_admin, get_flas
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
-        "http://localhost/front/book/categories/add/",
+        "http://localhost/book/categories/add/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -237,7 +237,7 @@ def test_add_existing_book_category_being_admin(client, access_session_as_admin,
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
-        "http://localhost/front/book/categories/add/",
+        "http://localhost/book/categories/add/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -258,7 +258,7 @@ def test_add_existing_book_category_being_admin(client, access_session_as_admin,
 #         "Cookie": f"session={access_session_as_admin}"
 #     }
 #     response = client.post(
-#         "/front/book/categories/55555/update/",
+#         "/book/categories/55555/update/",
 #         headers=headers,
 #         data=data,
 #         follow_redirects=True

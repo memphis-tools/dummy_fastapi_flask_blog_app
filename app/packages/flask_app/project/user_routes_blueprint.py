@@ -24,7 +24,7 @@ from .shared_functions_and_decorators import admin_only, return_pagination
 user_routes_blueprint = Blueprint("user_routes_blueprint", __name__)
 
 
-@user_routes_blueprint.route("/front/users/", methods=["GET"])
+@user_routes_blueprint.route("/users/", methods=["GET"])
 @login_required
 @admin_only
 def users():
@@ -40,7 +40,7 @@ def users():
     )
 
 
-@user_routes_blueprint.route("/front/users/add/", methods=["GET", "POST"])
+@user_routes_blueprint.route("/users/add/", methods=["GET", "POST"])
 @login_required
 @admin_only
 def add_user():
@@ -91,7 +91,7 @@ def add_user():
 
 
 @user_routes_blueprint.route(
-    "/front/user/<int:user_id>/delete/", methods=["GET", "POST"]
+    "/user/<int:user_id>/delete/", methods=["GET", "POST"]
 )
 @login_required
 @admin_only
@@ -125,7 +125,7 @@ def delete_user(user_id):
     )
 
 
-@user_routes_blueprint.route("/front/users/password/", methods=["GET", "POST"])
+@user_routes_blueprint.route("/users/password/", methods=["GET", "POST"])
 @login_required
 def update_password():
     """
@@ -171,7 +171,7 @@ def update_password():
     )
 
 
-@user_routes_blueprint.route("/front/user/<int:user_id>/books/")
+@user_routes_blueprint.route("/user/<int:user_id>/books/")
 @login_required
 def user_books(user_id):
     """
@@ -226,7 +226,7 @@ def user_books(user_id):
         )
 
 
-@user_routes_blueprint.route("/front/users/<int:user_id>/starred/")
+@user_routes_blueprint.route("/users/<int:user_id>/starred/")
 @login_required
 def user_starred(user_id):
     """
@@ -265,7 +265,7 @@ def user_starred(user_id):
 
 
 @user_routes_blueprint.route(
-    "/front/users/<int:user_id>/books/<int:book_id>/starred/delete/",
+    "/users/<int:user_id>/books/<int:book_id>/starred/delete/",
     methods=["GET", "POST"],
 )
 @login_required
@@ -320,7 +320,7 @@ def delete_starred_book(user_id, book_id):
 
 
 @user_routes_blueprint.route(
-    "/front/users/<int:user_id>/books/<int:book_id>/starred/add/",
+    "/users/<int:user_id>/books/<int:book_id>/starred/add/",
     methods=["GET", "POST"],
 )
 @login_required

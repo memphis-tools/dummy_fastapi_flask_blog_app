@@ -31,7 +31,7 @@ def test_categories_stats(client, access_session):
         "Cookie": f"session={access_session}",
     }
     response = client.get(
-        "/front/books/categories/stats/",
+        "/books/categories/stats/",
         headers=headers,
         follow_redirects=True
     )
@@ -62,7 +62,7 @@ def test_users_stats(client, access_session):
         "Cookie": f"session={access_session}",
     }
     response = client.get(
-        "/front/books/users/stats/",
+        "/books/users/stats/",
         headers=headers,
         follow_redirects=True
     )

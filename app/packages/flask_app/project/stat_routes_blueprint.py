@@ -20,7 +20,7 @@ from .shared_functions_and_decorators import get_pie_colors
 stat_routes_blueprint = Blueprint("stat_routes_blueprint", __name__)
 
 
-@stat_routes_blueprint.route("/front/stats/")
+@stat_routes_blueprint.route("/stats/")
 @login_required
 def stats():
     """
@@ -55,7 +55,7 @@ def create_books_categories_chart(total_books, categories_books_count_dict):
     return fig
 
 
-@stat_routes_blueprint.route("/front/books/categories/stats/")
+@stat_routes_blueprint.route("/books/categories/stats/")
 @login_required
 def categories_stats():
     """
@@ -107,7 +107,7 @@ def categories_stats():
             <!-- Navigation-->
             <nav class='navbar navbar-expand-lg navbar-dark fixed-top bg-dark'>
               <div class='container-fluid navbar-container'>
-                <a class='dummy_logo navbar-brand' href='/front/home/'>DUMMY-OPS</a>
+                <a class='dummy_logo navbar-brand' href='/home/'>DUMMY-OPS</a>
                 <button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarCollapse'
                 aria-controls='navbarCollapse' aria-expanded='false' aria-label='Toggle navigation'>
                     <span class='navbar-toggler-icon'></span>
@@ -199,7 +199,7 @@ def create_users_chart(total_books, users_books_count_dict):
     return fig
 
 
-@stat_routes_blueprint.route("/front/books/users/stats/")
+@stat_routes_blueprint.route("/books/users/stats/")
 @login_required
 def users_stats():
     """
@@ -248,7 +248,7 @@ def users_stats():
             <!-- Navigation-->
             <nav class='navbar navbar-expand-lg navbar-dark fixed-top bg-dark'>
               <div class='container-fluid navbar-container'>
-                <a class='dummy_logo navbar-brand' href='/front/home/'>DUMMY-OPS</a>
+                <a class='dummy_logo navbar-brand' href='/home/'>DUMMY-OPS</a>
                 <button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarCollapse'
                 aria-controls='navbarCollapse' aria-expanded='false' aria-label='Toggle navigation'>
                     <span class='navbar-toggler-icon'></span>

@@ -122,8 +122,8 @@ def format_book_category(id):
     return category
 
 
-@app.route("/front")
-@app.route("/front/home/")
+@app.route("/")
+@app.route("/home/")
 def index():
     """
     Description: the index /home, Flask route.
@@ -147,7 +147,7 @@ def index():
     )
 
 
-@app.route("/front/contact/", methods=["GET", "POST"])
+@app.route("/contact/", methods=["GET", "POST"])
 def contact():
     """
     Description: the contact Flask route.
@@ -177,7 +177,7 @@ def contact():
     )
 
 
-@app.route("/front/login/", methods=["GET", "POST"])
+@app.route("/login/", methods=["GET", "POST"])
 def login():
     """
     Description: the login Flask route.
@@ -219,7 +219,7 @@ def login():
     )
 
 
-@app.route("/front/logout/")
+@app.route("/logout/")
 def logout():
     """
     Description: the logout Flask route.
@@ -229,7 +229,7 @@ def logout():
     return redirect(url_for("index"))
 
 
-@app.route("/front/register/", methods=["GET", "POST"])
+@app.route("/register/", methods=["GET", "POST"])
 def register():
     """
     Description: the register Flask route.
@@ -279,7 +279,7 @@ def register():
     )
 
 
-@app.route("/front/ops/")
+@app.route("/ops/")
 def ops():
     """
     Description: the ops Flask route.
@@ -287,7 +287,7 @@ def ops():
     return render_template("ops.html", is_authenticated=current_user.is_authenticated)
 
 
-@app.route("/front/moocs/")
+@app.route("/moocs/")
 def moocs():
     """
     Description: the moocs Flask route.

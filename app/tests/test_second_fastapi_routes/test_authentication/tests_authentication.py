@@ -213,7 +213,7 @@ async def test_get_token_for_enabled_user(get_fastapi_client):
         username="donald",
         password=settings.TEST_USER_PWD
     )
-    response = get_fastapi_client.post("/token/", data=form_data, follow_redirects=True)
+    response = get_fastapi_client.post("/api/v1/token/", data=form_data, follow_redirects=True)
     assert response.status_code == 200
     assert "access_token" in response.json()
 
@@ -227,7 +227,7 @@ async def test_get_token_for_unexisting_user(get_fastapi_client):
         username="donaldxyz",
         password=settings.TEST_USER_PWD
     )
-    response = get_fastapi_client.post("/token/", data=form_data, follow_redirects=True)
+    response = get_fastapi_client.post("/api/v1/token/", data=form_data, follow_redirects=True)
     assert response.status_code == 401
 
 

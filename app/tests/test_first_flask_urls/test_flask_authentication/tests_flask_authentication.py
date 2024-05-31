@@ -11,7 +11,7 @@ def test_flask_login_route(client):
     """
     Description: check if we can reach the login route
     """
-    response = client.get("http://localhost/front/login/")
+    response = client.get("http://localhost/login/")
     assert response.status_code == 200
     assert b"DUMMY BLOG - SE CONNECTER" in response.data
 
@@ -20,7 +20,7 @@ def test_flask_post_logout_route_without_authentication(client):
     """
     Description: check if we can reach the logout route with POST action.
     """
-    response = client.post("http://localhost/front/logout/", follow_redirects=True)
+    response = client.post("http://localhost/logout/", follow_redirects=True)
     assert response.status_code == 405
 
 
@@ -32,7 +32,7 @@ def test_flask_post_logout_route_with_authentication(
     """
     headers = {"Cookie": f"session={access_session}"}
     response = client.get(
-        "http://localhost/front/logout/", headers=headers, follow_redirects=True
+        "http://localhost/logout/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 200
 
@@ -41,7 +41,7 @@ def test_flask_logout_route_without_authentication(client):
     """
     Description: check if we can reach the logout route
     """
-    response = client.get("http://localhost/front/logout/", follow_redirects=False)
+    response = client.get("http://localhost/logout/", follow_redirects=False)
     assert response.status_code == 302
 
 
@@ -49,7 +49,7 @@ def test_flask_logout_route_without_authentication_following_redirect(client):
     """
     Description: check if we can reach the logout route
     """
-    response = client.get("http://localhost/front/logout/", follow_redirects=True)
+    response = client.get("http://localhost/logout/", follow_redirects=True)
     assert response.status_code == 200
 
 
@@ -57,7 +57,7 @@ def test_flask_register_route(client):
     """
     Description: check if we can reach the register route
     """
-    response = client.get("http://localhost/front/register/")
+    response = client.get("http://localhost/register/")
     assert response.status_code == 200
 
 
@@ -75,7 +75,7 @@ def test_post_flask_register_route(client, get_flask_csrf_token):
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     response = client.post(
-        "http://localhost/front/register/",
+        "http://localhost/register/",
         headers=headers,
         data=user_form,
         follow_redirects=True,
@@ -98,7 +98,7 @@ def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_to
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     response = client.post(
-        "http://localhost/front/register/",
+        "http://localhost/register/",
         headers=headers,
         data=user_form,
         follow_redirects=True,
@@ -123,7 +123,7 @@ def test_post_flask_register_route_with_passwords_mismatch(
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     response = client.post(
-        "http://localhost/front/register/",
+        "http://localhost/register/",
         headers=headers,
         data=user_form,
         follow_redirects=True,
@@ -146,7 +146,7 @@ def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_tok
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     response = client.post(
-        "http://localhost/front/register/",
+        "http://localhost/register/",
         headers=headers,
         data=user_form,
         follow_redirects=False,
@@ -165,7 +165,7 @@ def test_post_flask_register_route_with_invalid_data(client):
         "password": settings.TEST_USER_PWD,
     }
     response = client.post(
-        "http://localhost/front/register/", headers="", data=user_form
+        "http://localhost/register/", headers="", data=user_form
     )
     assert response.status_code == 400
 
@@ -184,7 +184,7 @@ def test_flask_login_with_valid_credentials(client, get_flask_csrf_token):
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/login/",
+        "/login/",
         headers=headers,
         data=login_form,
         follow_redirects=True,
@@ -207,7 +207,7 @@ def test_flask_login_with_invalid_login(client, get_flask_csrf_token):
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/login/",
+        "/login/",
         headers=headers,
         data=login_form,
         follow_redirects=True,
@@ -230,7 +230,7 @@ def test_flask_login_with_invalid_email(client, get_flask_csrf_token):
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/login/",
+        "/login/",
         headers=headers,
         data=login_form,
         follow_redirects=True,
@@ -253,7 +253,7 @@ def test_flask_login_with_invalid_password(client, get_flask_csrf_token):
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/login/",
+        "/login/",
         headers=headers,
         data=login_form,
         follow_redirects=True,
@@ -269,6 +269,6 @@ def test_flask_get_logout(client, access_session):
     headers = {
         "Cookie": f"session={access_session}"
     }
-    response = client.get("http://localhost/front/logout/", headers=headers, follow_redirects=True)
+    response = client.get("http://localhost/logout/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
     assert b"plus connect" in response.data

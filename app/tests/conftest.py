@@ -98,7 +98,7 @@ def get_flask_csrf_token(client):
     """
     Description: get a csrf_token from Flask app in order for tests to run.
     """
-    url = "http://localhost/front/register/"
+    url = "http://localhost/register/"
     soup = BeautifulSoup(client.get(url).text, 'html.parser')
     token = soup.find('input', {'name': 'csrf_token'})['value']
     return token
@@ -115,7 +115,7 @@ def access_session(client, get_flask_csrf_token):
         "email": "donald@localhost.fr",
         "csrf_token": get_flask_csrf_token
     }
-    response = client.post("http://localhost/front/login/", data=data)
+    response = client.post("http://localhost/login/", data=data)
     session = response.headers.pop('Set-Cookie')
     return session
 
@@ -131,7 +131,7 @@ def access_session_as_admin(client, get_flask_csrf_token):
         "email": "admin@localhost.fr",
         "csrf_token": get_flask_csrf_token
     }
-    response = client.post("http://localhost/front/login/", data=data)
+    response = client.post("http://localhost/login/", data=data)
     session = response.headers.pop('Set-Cookie')
     return session
 
