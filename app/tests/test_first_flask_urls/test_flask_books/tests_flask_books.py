@@ -18,7 +18,7 @@ def test_flask_get_a_book_without_authentication(client):
     """
     Description: check if we can reach a book page without authentication
     """
-    response = client.get("http://localhost/front/book/1/", follow_redirects=False)
+    response = client.get("http://localhost/book/1/", follow_redirects=False)
     assert response.status_code == 302
 
 
@@ -26,7 +26,7 @@ def test_flask_get_a_book_without_authentication_following_redirect(client):
     """
     Description: check if we can reach a book page without authentication
     """
-    response = client.get("http://localhost/front/book/1/", follow_redirects=True)
+    response = client.get("http://localhost/book/1/", follow_redirects=True)
     assert response.status_code == 200
 
 
@@ -54,7 +54,7 @@ def test_flask_post_add_book_with_authentication(
         "csrf_token": get_flask_csrf_token,
     }
 
-    url = "http://localhost/front/books/add/"
+    url = "http://localhost/books/add/"
     response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
     assert response.status_code == 200
 
@@ -79,7 +79,7 @@ def test_flask_post_add_book_without_authentication(client, get_flask_csrf_token
         "csrf_token": get_flask_csrf_token,
     }
 
-    url = "http://localhost/front/books/add/"
+    url = "http://localhost/books/add/"
     response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
     assert response.status_code == 200
     assert b"Vous devez d&#39;abord vous connecter" in response.data
@@ -96,7 +96,7 @@ def test_flask_post_add_book_without_authentication_with_invalid_datas(client):
         "content": "This is a dummy content sir",
     }
 
-    url = "http://localhost/front/books/add/"
+    url = "http://localhost/books/add/"
     response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
     assert response.status_code == 400
 
@@ -114,7 +114,7 @@ def test_flask_post_add_book_without_authentication_with_invalid_book_category(c
         "category": "supplication"
     }
 
-    url = "http://localhost/front/books/add/"
+    url = "http://localhost/books/add/"
     response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
     assert response.status_code == 400
 
@@ -124,7 +124,7 @@ def test_flask_get_delete_book(client):
     Description: check if we can reach the delete book route with GET method
     """
     response = client.get(
-        "http://localhost/front/book/1/delete/", follow_redirects=False
+        "http://localhost/book/1/delete/", follow_redirects=False
     )
     assert response.status_code == 302
 
@@ -133,7 +133,7 @@ def test_flask_post_books(client):
     """
     Description: check if we can reach the delete book route with POST method
     """
-    response = client.post("http://localhost/front/books/", follow_redirects=True)
+    response = client.post("http://localhost/books/", follow_redirects=True)
     assert response.status_code == 405
 
 
@@ -155,7 +155,7 @@ def test_flask_update_book_being_authenticated(
         "Cookie": f"session={access_session}",
     }
     response = client.post(
-        "http://localhost/front/book/1/update/",
+        "http://localhost/book/1/update/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -181,7 +181,7 @@ def test_flask_update_book_being_authenticated_without_book_id(
         "Cookie": f"session={access_session}",
     }
     response = client.post(
-        "http://localhost/front/book/update/",
+        "http://localhost/book/update/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -207,7 +207,7 @@ def test_flask_update_book_being_authenticated_without_being_publisher(
         "Cookie": f"session={access_session}",
     }
     response = client.post(
-        "http://localhost/front/book/2/update/",
+        "http://localhost/book/2/update/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -233,7 +233,7 @@ def test_flask_update_book_being_authenticated_as_admin(
         "Cookie": f"session={access_session_as_admin}",
     }
     response = client.post(
-        "http://localhost/front/book/2/update/",
+        "http://localhost/book/2/update/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -259,7 +259,7 @@ def test_flask_update_unexisting_book_being_authenticated_as_admin(
         "Cookie": f"session={access_session_as_admin}",
     }
     response = client.post(
-        "http://localhost/front/book/55555555/update/",
+        "http://localhost/book/55555555/update/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -280,7 +280,7 @@ def test_flask_update_book_without_authentication(client, get_flask_csrf_token):
         "Content-Type": "application/x-www-form-urlencoded",
     }
     response = client.post(
-        "http://localhost/front/book/1/update/",
+        "http://localhost/book/1/update/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -298,7 +298,7 @@ def test_flask_post_delete_book_without_authentication(client, get_flask_csrf_to
     }
     data = {"csrf_token": get_flask_csrf_token}
     response = client.post(
-        "http://localhost/front/book/1/delete/",
+        "http://localhost/book/1/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,
@@ -319,7 +319,7 @@ def test_flask_post_delete_book_being_authenticated_without_being_the_publisher(
     }
     data = {"csrf_token": get_flask_csrf_token}
     response = client.post(
-        "http://localhost/front/book/2/delete/",
+        "http://localhost/book/2/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,
@@ -354,7 +354,7 @@ def test_flask_post_delete_book_being_authenticated_being_the_publisher(
     assert current_user_total_publications == 3
 
     response = client.post(
-        "http://localhost/front/book/8/delete/",
+        "http://localhost/book/8/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,
@@ -394,7 +394,7 @@ def test_add_book_check_book_fields(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/books/add/",
+        "/books/add/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -434,7 +434,7 @@ def test_flask_index_route_with_three_random_books(client, access_session):
     Description: check if we get 3 books while more than 3 exist in database.
     By default 3 books are expected.
     """
-    response = client.get("http://localhost/front/home/")
+    response = client.get("http://localhost/home/")
     soup = BeautifulSoup(response.data, "html.parser")
     total_books = len(soup.find_all("div", {"class": "post-preview"}))
     assert response.status_code == 200
@@ -470,7 +470,7 @@ def test_add_book_with_invalid_image_size(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/books/add/",
+        "/books/add/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -508,7 +508,7 @@ def test_add_book_with_invalid_image_type(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/books/add/",
+        "/books/add/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -546,7 +546,7 @@ def test_add_book_with_corrupted_image_type(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/books/add/",
+        "/books/add/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -583,7 +583,7 @@ def test_update_book_with_invalid_image_size(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/book/1/update/",
+        "/book/1/update/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -620,7 +620,7 @@ def test_update_book_with_invalid_image_type(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/book/1/update/",
+        "/book/1/update/",
         headers=headers,
         data=book_form,
         follow_redirects=True,
@@ -658,7 +658,7 @@ def test_update_book_with_corrupted_image_type(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/book/1/update/",
+        "/book/1/update/",
         headers=headers,
         data=book_form,
         follow_redirects=True,

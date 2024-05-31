@@ -22,7 +22,7 @@ from .shared_functions_and_decorators import admin_only
 quote_routes_blueprint = Blueprint("quote_routes_blueprint", __name__)
 
 
-@quote_routes_blueprint.route("/front/quotes/", methods=["GET"])
+@quote_routes_blueprint.route("/quotes/", methods=["GET"])
 @login_required
 @admin_only
 def view_quotes():
@@ -39,7 +39,7 @@ def view_quotes():
     )
 
 
-@quote_routes_blueprint.route("/front/quotes/<int:quote_id>/", methods=["GET"])
+@quote_routes_blueprint.route("/quotes/<int:quote_id>/", methods=["GET"])
 @login_required
 @admin_only
 def view_quote(quote_id):
@@ -60,7 +60,7 @@ def view_quote(quote_id):
     )
 
 
-@quote_routes_blueprint.route("/front/quotes/add/", methods=["GET", "POST"])
+@quote_routes_blueprint.route("/quotes/add/", methods=["GET", "POST"])
 @login_required
 @admin_only
 def add_quote():
@@ -91,7 +91,7 @@ def add_quote():
 
 
 @quote_routes_blueprint.route(
-    "/front/quotes/<int:quote_id>/delete/", methods=["GET", "POST"]
+    "/quotes/<int:quote_id>/delete/", methods=["GET", "POST"]
 )
 @login_required
 @admin_only

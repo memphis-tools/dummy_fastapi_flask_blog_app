@@ -8,7 +8,7 @@ def test_flask_get_quotes_without_authentication(client):
     """
     Description: check if we can reach a quotes page without authentication
     """
-    response = client.get("http://localhost/front/quotes/", follow_redirects=False)
+    response = client.get("http://localhost/quotes/", follow_redirects=False)
     assert response.status_code == 302
 
 
@@ -16,7 +16,7 @@ def test_flask_get_quotes_without_authentication_following_redirect(client):
     """
     Description: check if we can reach a quotes page without authentication
     """
-    response = client.get("http://localhost/front/quotes/", follow_redirects=True)
+    response = client.get("http://localhost/quotes/", follow_redirects=True)
     assert response.status_code == 200
     assert b"Vous devez d&#39;abord vous connecter" in response.data
 
@@ -27,7 +27,7 @@ def test_get_quotes_as_a_standard_user(client, access_session):
     """
     headers = {"Cookie": f"session={access_session}"}
     response = client.get(
-        "/front/quotes/", headers=headers, follow_redirects=True
+        "/quotes/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 403
 
@@ -38,7 +38,7 @@ def test_get_a_quote_as_a_standard_user(client, access_session):
     """
     headers = {"Cookie": f"session={access_session}"}
     response = client.get(
-        "/front/quotes/1/", headers=headers, follow_redirects=True
+        "/quotes/1/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 403
 
@@ -49,7 +49,7 @@ def test_get_quotes_as_admin(client, access_session_as_admin):
     """
     headers = {"Cookie": f"session={access_session_as_admin}"}
     response = client.get(
-        "/front/quotes/", headers=headers, follow_redirects=True
+        "/quotes/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 200
 
@@ -60,7 +60,7 @@ def test_get_a_quote_as_a_admin(client, access_session_as_admin):
     """
     headers = {"Cookie": f"session={access_session_as_admin}"}
     response = client.get(
-        "/front/quotes/1/", headers=headers, follow_redirects=True
+        "/quotes/1/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 200
 
@@ -78,7 +78,7 @@ def test_get_an_unexisting_quote_as_a_admin(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.get(
-        "/front/quotes/555555/",
+        "/quotes/555555/",
         headers=headers,
         data=data,
         follow_redirects=True
@@ -92,7 +92,7 @@ def test_get_any_valid_quotes_for_deleting_as_admin(client, access_session_as_ad
     """
     headers = {"Cookie": f"session={access_session_as_admin}"}
     response = client.get(
-        "/front/quotes/1/delete/", headers=headers, follow_redirects=True
+        "/quotes/1/delete/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 200
 
@@ -115,7 +115,7 @@ def test_add_a_valid_quote_as_admin(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/quotes/add/",
+        "/quotes/add/",
         headers=headers,
         data=form,
         follow_redirects=True
@@ -140,7 +140,7 @@ def test_add_an_invalid_quote_as_admin(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "/front/quotes/add/",
+        "/quotes/add/",
         headers=headers,
         data=form,
         follow_redirects=True
@@ -152,7 +152,7 @@ def test_flask_delete_quote_without_authentication(client, access_session):
     """
     Description: check if we can delete a quote without authentication
     """
-    response = client.post("http://localhost/front/quotes/2/delete/", follow_redirects=True)
+    response = client.post("http://localhost/quotes/2/delete/", follow_redirects=True)
     assert response.status_code == 400
 
 
@@ -167,7 +167,7 @@ def test_flask_delete_quote_as_standard_user(client, access_session, get_flask_c
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "http://localhost/front/quotes/4/delete/",
+        "http://localhost/quotes/4/delete/",
         headers=headers,
         data=form,
         follow_redirects=True
@@ -188,7 +188,7 @@ def test_flask_delete_quote_with_authentication_as_admin(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "http://localhost/front/quotes/4/delete/",
+        "http://localhost/quotes/4/delete/",
         headers=headers,
         data=form,
         follow_redirects=True,
@@ -209,7 +209,7 @@ def test_flask_delete_unexisting_quote_with_authentication_as_admin(
         "csrf_token": get_flask_csrf_token,
     }
     response = client.post(
-        "http://localhost/front/quotes/555555/delete/",
+        "http://localhost/quotes/555555/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,

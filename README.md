@@ -35,12 +35,11 @@ Deployment is done on a small VirtualMachine so there may be a lack of performan
 
 If the dummy example application is up you will find it at:
 
-  FastAPI Front: https://dummy-ops.dev/docs
+  Flask Front: https://dummy-ops.dev
 
-  Flask Front: https://dummy-ops.dev/front
+  FastAPI Front: https://dummy-ops.dev/api/v1/docs
 
 A **visitor account** is created for anybody: visiteur / @pplepie94 / visiteur@localhost.fr
-
 
 **About Vault and sensitive datas**
 
@@ -200,43 +199,15 @@ Lynis (for the virtual machine, droplet, hardening)
         export BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
 
 
-### HOW RUN IT LOCALLY AS A SINGLE APPLICATION
+### HOW RUN IT LOCALLY
 ----------------------------------------------
 
-1. Clone the repository
+Clone the repository
 
     `git clone https://github.com/memphis-tools/dummy_fastapi_flask_blog_app.git`
 
     `cd dummy_fastapi_flask_blog_app`
 
-2. Setup a virtualenv
-
-      python -m venv env
-
-      source env/bin/activate
-
-      pip install -U pip
-
-      pip install -r app/requirements.txt
-
-      pip install -r app/flask_app/requirements.txt
-
-3. Run the application
-
-      python app/main.py
-
-  - Swagger docs will then be served at:
-
-        http://localhost:8000/docs
-
-  - If you need to run Flask locally without docker, you can not right now.
-
-    Either update app/main.py or set yourself a multi-process (Gunicorn and Uvicorn).
-
-    Notice that pytest will import the Flask app (see fixtures at app/tests/conftest.py). So we test FastAPI routes and Flask also.
-
-### HOW RUN IT LOCALLY AS A DOCKER APPLICATION
-----------------------------------------------
 You do not need to create a python virtualenv.
 
   - Example (for Linux):
@@ -249,8 +220,13 @@ You do not need to create a python virtualenv.
 
       docker-compose -f local-docker-compose.yml down
 
+  - Flask front-end will be reachable at:
+
+      http://localhost/
+
   - Swagger docs will then be served at:
-        http://localhost/docs
+
+      http://localhost/api/v1/docs
 
     As we run locally, there is a default test database set with some dummies data (see app/packages/utils.py).
 
@@ -258,21 +234,25 @@ You do not need to create a python virtualenv.
 
     You can set some default variables in "app/packages/settings.py".
 
-  - Flask front-end will be reachable at:
-
-        http://localhost/front/
-
 ### HOW TEST IT
 ---------------
   Notice we set a pytest.ini file to define our patterns.
 
-  Tests occure when you run locally without docker, or during the ci-cd execution.
+  Tests occure when you run it locally, or during the ci-cd execution.
 
   Avoid to change tests order (particulary about the session cookie in tests_flask_urls).
 
   To run test for a local execution (ensure postgresql service is started):
 
+      python -m venv env
+
       source venv/bin/activate
+
+      pip install -U pip
+
+      pip install -r app/requirements.txt
+
+      pip install -r app/flask_app/requirements.txt
 
       python -m coverage run -m pytest -vs
 
@@ -296,7 +276,7 @@ You do not need to create a python virtualenv.
       POSTGRES_DB: test_dummy_blog
 
 ### HOW CHECK PEP'S RECOMMENDED SYNTAX
-
+--------------------------------------
       pip install black pylint flake8-html
 
       python -m flake8 --format html --htmldir flake8_html_report/

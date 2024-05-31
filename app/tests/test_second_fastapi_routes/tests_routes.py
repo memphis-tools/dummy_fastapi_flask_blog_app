@@ -17,7 +17,7 @@ def test_docs_uri(get_fastapi_client):
     """
     Description: test a get docs url.
     """
-    response = get_fastapi_client.get("/docs")
+    response = get_fastapi_client.get("/api/v1/docs")
     assert response.status_code == 200
 
 

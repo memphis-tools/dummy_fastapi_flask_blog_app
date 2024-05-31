@@ -28,13 +28,16 @@ from app.packages.fastapi.models.fastapi_models import (
 )
 
 
-# tokenUrl leads to the URI "/token"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+# tokenUrl leads to the URI "/api/v1/token"
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/token")
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 app: FastAPI = FastAPI(
-    title="DUMMY-OPS API", swagger_ui_parameters={"defaultModelsExpandDepth": -1}
+    title="DUMMY-OPS API",
+    docs_url="/api/v1/docs/",
+    openapi_url="/api/v1/openapi.json",
+    swagger_ui_parameters={"defaultModelsExpandDepth": -1}
 )
 # session used by the FastAPI application
 session = session_commands.init_and_get_a_database_session()
@@ -109,7 +112,7 @@ async def get_current_active_user(
     return current_user
 
 
-@app.post("/token/", tags=["DEFAULT"])
+@app.post("/api/v1/token/", tags=["DEFAULT"])
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> Token:

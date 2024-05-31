@@ -37,7 +37,7 @@ from .shared_functions_and_decorators import (
 book_routes_blueprint = Blueprint("book_routes_blueprint", __name__)
 
 
-@book_routes_blueprint.route("/front/books/")
+@book_routes_blueprint.route("/books/")
 def books():
     """
     Description: the books Flask route.
@@ -66,7 +66,7 @@ def books():
     )
 
 
-@book_routes_blueprint.route("/front/book/<int:book_id>/", methods=["GET", "POST"])
+@book_routes_blueprint.route("/book/<int:book_id>/", methods=["GET", "POST"])
 @login_required
 def book(book_id):
     """
@@ -125,7 +125,7 @@ def book(book_id):
     )
 
 
-@book_routes_blueprint.route("/front/books/add/", methods=["GET", "POST"])
+@book_routes_blueprint.route("/books/add/", methods=["GET", "POST"])
 @login_required
 def add_book():
     """
@@ -211,7 +211,7 @@ def add_book():
 
 
 @book_routes_blueprint.route(
-    "/front/book/<int:book_id>/delete/", methods=["GET", "POST"]
+    "/book/<int:book_id>/delete/", methods=["GET", "POST"]
 )
 @login_required
 def delete_book(book_id):
@@ -253,7 +253,7 @@ def delete_book(book_id):
 
 
 @book_routes_blueprint.route(
-    "/front/book/<int:book_id>/update/", methods=["GET", "POST"]
+    "/book/<int:book_id>/update/", methods=["GET", "POST"]
 )
 @login_required
 def update_book(book_id):
