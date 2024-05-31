@@ -10,6 +10,7 @@
 ![Screenshot](https://img.shields.io/badge/digitalocean--black?logo=digitalocean&logoColor=yellow&color=blue)
 ![Screenshot](https://img.shields.io/badge/betterstack--blue)
 ![Screenshot](https://img.shields.io/badge/coveralls--blue?logo=coveralls&logoColor=yellow)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e9f84f556ca04c829b0f8b0e25929890)](https://app.codacy.com/gh/memphis-tools/dummy_fastapi_flask_blog_app?utm_source=github.com&utm_medium=referral&utm_content=memphis-tools/dummy_fastapi_flask_blog_app&utm_campaign=Badge_Grade)
 [![Coverage Status](https://coveralls.io/repos/gitlab/memphis-tools/dummy_fastapi_flask_blog_app/badge.svg?branch=HEAD)](https://coveralls.io/gitlab/memphis-tools/dummy_fastapi_flask_blog_app?branch=HEAD)
 
 # DUMMY APP FOR LEARNING PURPOSES
