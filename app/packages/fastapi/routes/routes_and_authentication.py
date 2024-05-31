@@ -8,10 +8,6 @@ from fastapi.security import OAuth2PasswordRequestForm
 from werkzeug.security import generate_password_hash
 import jwt
 
-# Because of the current architecture, in order to run tests_users and tests_authentication
-# We set "noqa: F401" for the unused get_user dependencie.
-from .dependencies import get_user  # noqa: F401
-
 from .dependencies import (
     get_current_active_user,
     session,
@@ -19,13 +15,17 @@ from .dependencies import (
     SECRET_KEY,
     ALGORITHM
 )
-from .routers import books_categories, books, comments, quotes, users
 from app.packages import handle_passwords, log_events
 from app.packages.database.models import models
 from app.packages.fastapi.models.fastapi_models import (
-    NewUserInDBModel,
-    Token,
+NewUserInDBModel,
+Token,
 )
+
+# Because of the current architecture, in order to run tests_users and tests_authentication
+# We set "noqa: F401" for the unused get_user dependencie.
+from .dependencies import get_user  # noqa: F401
+from .routers import books_categories, books, comments, quotes, users
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -87,7 +87,7 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": form_data.username}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
 

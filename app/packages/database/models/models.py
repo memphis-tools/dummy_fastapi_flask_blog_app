@@ -31,6 +31,16 @@ class Starred(BASE):
         """
         return self.id
 
+    def get_json(self):
+        """
+        Description: get a starred instance as a json dict during general application execution.
+        """
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "book_id": self.book_id,
+        }
+
 
 class Quote(BASE):
     """

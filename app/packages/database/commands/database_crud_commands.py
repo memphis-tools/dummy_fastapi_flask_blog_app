@@ -36,9 +36,9 @@ def delete_instance(session, instance):
     return commit_update(session)
 
 
-def get_instance(session, instance, id):
+def get_instance(session, instance, instance_id):
     """get an instance of a model from an id"""
-    instance_query = session.get(instance, id)
+    instance_query = session.get(instance, instance_id)
     return instance_query
 
 

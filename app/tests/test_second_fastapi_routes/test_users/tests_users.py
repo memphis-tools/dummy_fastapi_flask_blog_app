@@ -6,7 +6,7 @@ Notice that by default we already add dummies data through the application utils
 from datetime import timedelta
 import pytest
 from fastapi import HTTPException
-import app.packages.settings as settings
+from app.packages import settings
 from app.packages.fastapi.models import fastapi_models
 from app.packages.fastapi.routes import routes_and_authentication
 from app.packages.fastapi.routes.dependencies import get_user, get_current_user, verify_password, get_current_active_user
@@ -18,7 +18,7 @@ def test_get_existing_user():
     """
     username = "donald"
     response = get_user(username)
-    assert type(response) is fastapi_models.UserInDB
+    assert isinstance(response, fastapi_models.UserInDB)
 
 
 def test_get_unexisting_user():
@@ -36,7 +36,7 @@ def test_get_password_hash():
     """
     password = settings.TEST_USER_PWD
     response = routes_and_authentication.get_password_hash(password)
-    assert type(response) is str
+    assert isinstance(response, str)
 
 
 def test_verify_password_hash():
@@ -77,7 +77,7 @@ async def test_get_current_active_user():
     )
     user_found = await get_current_user(access_token)
     active_user = await get_current_active_user(user_found)
-    assert type(active_user) is fastapi_models.UserInDB
+    assert isinstance(active_user, fastapi_models.UserInDB)
 
 
 @pytest.mark.asyncio
@@ -92,9 +92,8 @@ async def test_get_current_disabled_user():
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     user_found = await get_current_user(access_token)
-    assert type(user) is fastapi_models.UserInDB
+    assert isinstance(user, fastapi_models.UserInDB)
     active_user = await get_current_active_user(user)
-    print(f"DEBUG SIR active_user: {active_user}")
 
 
 @pytest.mark.asyncio

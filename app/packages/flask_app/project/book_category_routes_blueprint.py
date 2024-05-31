@@ -252,10 +252,10 @@ def update_book_category(category_id):
             return redirect(
                 url_for("book_category_routes_blueprint.manage_books_categories")
             )
-        else:
-            flash(book_category_is_valid, "error")
-            session.close()
-            return redirect(url_for("index"))
+
+        flash(book_category_is_valid, "error")
+        session.close()
+        return redirect(url_for("index"))
     return render_template(
         "update_book_category.html",
         category_to_update=category_to_update,

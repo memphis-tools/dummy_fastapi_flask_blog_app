@@ -43,7 +43,7 @@ def books():
     Description: the books Flask route.
     """
     session = session_commands.get_a_database_session()
-    books = (
+    all_books = (
         session.query(Book)
         .order_by(Book.id)
         .options(joinedload(Book.book_comments))
@@ -51,8 +51,8 @@ def books():
         .all()
     )
     session.close()
-    total_books = len(books)
-    items, page, per_page, total_pages = return_pagination(books)
+    total_books = len(all_books)
+    items, page, per_page, total_pages = return_pagination(all_books)
     random_quote = return_random_quote()
     return render_template(
         "books.html",
@@ -75,7 +75,7 @@ def book(book_id):
     session = session_commands.get_a_database_session()
     delete_book_form = forms.DeleteInstanceForm()
     form = forms.CommentForm()
-    book = (
+    a_book = (
         session.query(Book)
         .filter(Book.id == book_id)
         .options(joinedload(Book.book_comments))
@@ -83,7 +83,7 @@ def book(book_id):
         .first()
     )
 
-    comments = session.query(Comment).filter_by(book_id=book.id).all()
+    comments = session.query(Comment).filter_by(book_id=a_book.id).all()
 
     user_starred_books_id_list = (
         session.query(Starred)
@@ -95,17 +95,17 @@ def book(book_id):
     logs_context = {
         "current_user": f"{current_user.username}",
         "book_id": book_id,
-        "book_title": book.title,
+        "book_title": a_book.title,
     }
     log_events.log_event("[+] Flask - Consultation livre.", logs_context)
 
     if form.validate_on_submit():
         new_comment = Comment(
-            text=form.comment_text.data, author_id=current_user.id, book_id=book.id
+            text=form.comment_text.data, author_id=current_user.id, book_id=a_book.id
         )
         logs_context = {
             "current_user": f"{current_user.username}",
-            "book_title": book.title,
+            "book_title": a_book.title,
         }
         log_events.log_event("[+] Flask - Ajout commentaire.", logs_context)
         session.add(new_comment)
@@ -116,7 +116,7 @@ def book(book_id):
     session.close()
     return render_template(
         "book.html",
-        book=book,
+        book=a_book,
         user_starred_books_id_list=user_starred_books_id_list,
         form=form,
         delete_book_form=delete_book_form,
