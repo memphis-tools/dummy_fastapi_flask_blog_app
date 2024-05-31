@@ -86,6 +86,7 @@ def test_get_invalid_category_books(client, access_session_as_admin, get_flask_c
         "csrf_token": get_flask_csrf_token,
     }
     headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post("/book/categories/add/", headers=headers, data=data, follow_redirects=True)
@@ -123,6 +124,7 @@ def test_delete_valid_book_category_without_being_admin(client, access_session, 
         "csrf_token": get_flask_csrf_token,
     }
     headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": f"session={access_session}"
     }
     response = client.post(
@@ -142,6 +144,7 @@ def test_delete_valid_book_category_being_admin(client, access_session_as_admin,
         "csrf_token": get_flask_csrf_token,
     }
     headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
@@ -165,6 +168,7 @@ def test_delete_unexisting_book_category_being_admin(
         "csrf_token": get_flask_csrf_token,
     }
     headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
@@ -186,6 +190,7 @@ def test_update_valid_book_category_without_being_admin(client, access_session, 
         "csrf_token": get_flask_csrf_token,
     }
     headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": f"session={access_session}"
     }
     response = client.post(
@@ -206,6 +211,7 @@ def test_update_valid_book_category_being_admin(client, access_session_as_admin,
         "csrf_token": get_flask_csrf_token,
     }
     headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
@@ -234,6 +240,7 @@ def test_add_book_category_without_being_admin(client, access_session, get_flask
         "csrf_token": get_flask_csrf_token,
     }
     headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": f"session={access_session}"
     }
     response = client.post(
@@ -254,6 +261,7 @@ def test_add_book_category_being_admin(client, access_session_as_admin, get_flas
         "csrf_token": get_flask_csrf_token,
     }
     headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
@@ -274,6 +282,7 @@ def test_add_existing_book_category_being_admin(client, access_session_as_admin,
         "csrf_token": get_flask_csrf_token,
     }
     headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": f"session={access_session_as_admin}"
     }
     response = client.post(
@@ -286,18 +295,23 @@ def test_add_existing_book_category_being_admin(client, access_session_as_admin,
     # assert b'Saisie invalide, categorie existe deja' in response.data
 
 
-def test_update_unexisting_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+def test_update_unexisting_book_category_being_admin(
+    client,
+    access_session_as_admin,
+    get_flask_csrf_token
+):
     """
-    Description: check if we can update an invalid book category being admin.
+    Description: check if we can update an unexisting book category being admin.
     """
     data = {
         "title": "something",
         "csrf_token": get_flask_csrf_token,
     }
     headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": f"session={access_session_as_admin}"
     }
-    response = client.get(
+    response = client.post(
         "/book/categories/55555/update/",
         headers=headers,
         data=data,
