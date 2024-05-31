@@ -54,6 +54,30 @@ async def test_update_user_password_being_admin(fastapi_client, fastapi_token_fo
 
 
 @pytest.mark.asyncio
+async def test_update_user_password_with_wrong_method(fastapi_client, fastapi_token):
+    """
+    Description: test update user password with post method.
+    """
+    access_token = fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    json = {
+        "current_password": settings.TEST_USER_PWD,
+        "new_password": f"{settings.TEST_USER_PWD}123",
+        "new_password_check": f"{settings.TEST_USER_PWD}123",
+    }
+    response = fastapi_client.post(
+        "/api/v1/users/2/password/",
+        headers=headers,
+        json=json
+    )
+    assert response.status_code == 405
+
+
+@pytest.mark.asyncio
 async def test_update_user_password_with_uncomplex_being_legitimate_user(
     fastapi_client,
     fastapi_token
@@ -75,30 +99,6 @@ async def test_update_user_password_with_uncomplex_being_legitimate_user(
     response = fastapi_client.put("/api/v1/users/2/password/", headers=headers, json=json)
     assert response.status_code == 401
     assert b'{"detail":"Mot de passe trop simple, essayez de nouveau."}' in response.content
-
-
-@pytest.mark.asyncio
-async def test_update_user_password_with_wrong_method(fastapi_client, fastapi_token):
-    """
-    Description: test update user password with post method.
-    """
-    access_token = fastapi_token
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "accept": "application/json",
-        "Content-Type": "application/json",
-    }
-    json = {
-        "current_password": f"{settings.TEST_USER_PWD}123",
-        "new_password": f"{settings.TEST_USER_PWD}456",
-        "new_password_check": f"{settings.TEST_USER_PWD}456",
-    }
-    response = fastapi_client.post(
-        "/api/v1/users/2/password/",
-        headers=headers,
-        json=json
-    )
-    assert response.status_code == 405
 
 
 @pytest.mark.asyncio
