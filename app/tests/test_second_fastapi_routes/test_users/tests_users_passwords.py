@@ -87,7 +87,7 @@ async def test_update_user_password_with_uncomplex_being_legitimate_user(
     """
     access_token = fastapi_token
     json = {
-        "current_password": f"{settings.TEST_USER_PWD}123",
+        "current_password": f"{settings.TEST_USER_PWD}",
         "new_password": settings.TEST_USER_PWD[:5],
         "new_password_check": settings.TEST_USER_PWD[:5],
     }
@@ -113,7 +113,7 @@ async def test_update_user_password_being_legitimate_user(fastapi_client, fastap
         "Content-Type": "application/json",
     }
     json = {
-        "current_password": f"{settings.TEST_USER_PWD}123",
+        "current_password": f"{settings.TEST_USER_PWD}",
         "new_password": f"{settings.TEST_USER_PWD}456",
         "new_password_check": f"{settings.TEST_USER_PWD}456",
     }
