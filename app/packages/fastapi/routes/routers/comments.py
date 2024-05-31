@@ -1,8 +1,8 @@
 """The FastAPI routes for comments"""
 
 
-from fastapi import APIRouter
 from typing import Annotated
+from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 
 from app.packages import log_events

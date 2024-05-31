@@ -1,8 +1,8 @@
 """The FastAPI routes for books"""
 
 
-from fastapi import APIRouter
 from typing import Annotated
+from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 
 from app.packages import log_events
@@ -35,7 +35,7 @@ def check_book_fields(book):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Saisie invalide, mot clef string non utilisable.",
         )
-    if type(book.year_of_publication) is not int:
+    if not isinstance(book.year_of_publication, int):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Saisie invalide, annee publication livre doit etre un entier.",

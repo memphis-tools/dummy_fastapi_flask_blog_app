@@ -2,9 +2,9 @@
 
 
 import os
+from typing import Annotated
 from werkzeug.security import check_password_hash
 import jwt
-from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from app.packages.database.models import models
@@ -30,6 +30,7 @@ def get_user(username: str):
     user = session.query(models.User).filter_by(username=username).first()
     if user:
         return UserInDB(**user.get_json())
+    return None
 
 
 def verify_password(plain_password, hashed_password):

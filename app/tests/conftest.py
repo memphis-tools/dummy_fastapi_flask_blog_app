@@ -144,4 +144,3 @@ def mock_function_delete_book(mocker):
     """
     mocker.patch("app.packages.flask_app.project.book_routes_blueprint.delete_book", return_value=True)
     mocker.patch("os.remove")
-    return

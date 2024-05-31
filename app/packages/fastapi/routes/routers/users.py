@@ -1,9 +1,9 @@
 """The FastAPI routes for users"""
 
 
+from typing import Annotated
 from werkzeug.security import generate_password_hash
 from fastapi import APIRouter
-from typing import Annotated
 from fastapi import Depends, HTTPException, status
 
 from app.packages import handle_passwords, log_events

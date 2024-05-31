@@ -33,10 +33,10 @@ def users():
     """
     session = session_commands.get_a_database_session()
     # remember that user with id 1 is the application admin (wr remove it from dataset)
-    users = session.query(User).all()[1:]
+    all_users = session.query(User).all()[1:]
     session.close()
     return render_template(
-        "users.html", users=users, is_authenticated=current_user.is_authenticated
+        "users.html", users=all_users, is_authenticated=current_user.is_authenticated
     )
 
 
@@ -210,17 +210,17 @@ def user_books(user_id):
             user_name=user.username,
             is_authenticated=current_user.is_authenticated,
         )
-    else:
-        return render_template(
-            "user_any_books.html",
-            books=items,
-            page=page,
-            total_books=total_books,
-            per_page=per_page,
-            total_pages=total_pages,
-            user_name=user.username,
-            is_authenticated=current_user.is_authenticated,
-        )
+
+    return render_template(
+        "user_any_books.html",
+        books=items,
+        page=page,
+        total_books=total_books,
+        per_page=per_page,
+        total_pages=total_pages,
+        user_name=user.username,
+        is_authenticated=current_user.is_authenticated,
+    )
 
 
 @user_routes_blueprint.route("/users/<int:user_id>/starred/")

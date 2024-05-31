@@ -7,7 +7,7 @@ import os
 from datetime import timedelta
 import pytest
 
-import app.packages.settings as settings
+from app.packages import settings
 from app.packages.fastapi.models import fastapi_models
 from app.packages.fastapi.routes import routes_and_authentication
 from app.packages.fastapi.routes.dependencies import authenticate_user, get_user
