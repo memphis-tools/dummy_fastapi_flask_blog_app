@@ -177,9 +177,6 @@ def user_books(user_id):
     """
     Description: the user's book Flask route.
     """
-    if not current_user.is_authenticated:
-        flash("Acces page interdit aux utilisateurs non connectés.", "error")
-        return redirect(url_for("register"))
     session = session_commands.get_a_database_session()
     user = session.get(User, user_id)
     if not user:

@@ -11,7 +11,7 @@ def test_flask_get_users_without_authentication(client):
     """
     Description: check if we can reach a users page without authentication
     """
-    response = client.get("http://localhost/users/", follow_redirects=False)
+    response = client.get("/users/", follow_redirects=False)
     assert response.status_code == 302
 
 
@@ -19,7 +19,7 @@ def test_flask_get_users_without_authentication_following_redirect(client):
     """
     Description: check if we can reach a users page without authentication
     """
-    response = client.get("http://localhost/users/", follow_redirects=True)
+    response = client.get("/users/", follow_redirects=True)
     assert response.status_code == 200
 
 
@@ -66,7 +66,7 @@ def test_flask_get_delete_user(client):
     Description: check if we can reach the delete user route with GET method
     """
     response = client.get(
-        "http://localhost/user/1/delete/", follow_redirects=False
+        "/user/1/delete/", follow_redirects=False
     )
     assert response.status_code == 302
 
@@ -75,7 +75,7 @@ def test_flask_post_users(client):
     """
     Description: check if we can reach the delete user route with POST method
     """
-    response = client.post("http://localhost/users/", follow_redirects=True)
+    response = client.post("/users/", follow_redirects=True)
     assert response.status_code == 405
 
 
@@ -83,7 +83,7 @@ def test_flask_put_users(client):
     """
     Description: check if we can reach the user route with PUT method
     """
-    response = client.put("http://localhost/users/", follow_redirects=True)
+    response = client.put("/users/", follow_redirects=True)
     assert response.status_code == 405
 
 
@@ -91,21 +91,21 @@ def test_flask_delete_users(client):
     """
     Description: check if we can reach the user route with DELETE method
     """
-    response = client.delete("http://localhost/users/", follow_redirects=True)
+    response = client.delete("/users/", follow_redirects=True)
     assert response.status_code == 405
 
 
-def test_flask_post_delete_user_without_authentication(client):
+def test_flask_delete_user_without_authentication(client):
     """
     Description: check if we can reach the delete user route without authentication
     """
     response = client.post(
-        "http://localhost/user/1/delete/", follow_redirects=False
+        "/user/1/delete/", follow_redirects=False
     )
     assert response.status_code == 400
 
 
-def test_flask_post_delete_user_with_authentication_as_admin(
+def test_flask_delete_user_with_authentication_as_admin(
     client, access_session_as_admin, get_flask_csrf_token
 ):
     """
@@ -117,7 +117,7 @@ def test_flask_post_delete_user_with_authentication_as_admin(
     }
     data = {"csrf_token": get_flask_csrf_token}
     response = client.post(
-        "http://localhost/user/4/delete/",
+        "/user/4/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,
@@ -125,7 +125,7 @@ def test_flask_post_delete_user_with_authentication_as_admin(
     assert response.status_code == 200
 
 
-def test_flask_post_delete_user_with_authentication_without_being_admin(
+def test_flask_delete_user_with_authentication_without_being_admin(
     client, access_session, get_flask_csrf_token
 ):
     """
@@ -137,7 +137,7 @@ def test_flask_post_delete_user_with_authentication_without_being_admin(
     }
     data = {"csrf_token": get_flask_csrf_token}
     response = client.post(
-        "http://localhost/user/4/delete/",
+        "/user/4/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,
@@ -145,7 +145,7 @@ def test_flask_post_delete_user_with_authentication_without_being_admin(
     assert response.status_code == 403
 
 
-def test_flask_post_delete_user_admin_with_authentication(
+def test_flask_delete_user_admin_with_authentication(
     client, access_session, get_flask_csrf_token
 ):
     """
@@ -157,12 +157,13 @@ def test_flask_post_delete_user_admin_with_authentication(
     }
     data = {"csrf_token": get_flask_csrf_token}
     response = client.post(
-        "http://localhost/user/1/delete/",
+        "/user/1/delete/",
         headers=headers,
         data=data,
         follow_redirects=True,
     )
     assert response.status_code == 403
+    # assert b'Le compte admin ne peut pas etre supprime' in response.data
 
 
 def test_get_users_without_being_admin(client, access_session):
