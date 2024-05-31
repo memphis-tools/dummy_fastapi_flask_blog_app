@@ -13,46 +13,46 @@ from app.packages.flask_app.project.book_routes_blueprint import check_book_fiel
 app = routes_and_authentication.app
 
 
-def test_docs_uri(get_fastapi_client):
+def test_docs_uri(fastapi_client):
     """
     Description: test a get docs url.
     """
-    response = get_fastapi_client.get("/api/v1/docs")
+    response = fastapi_client.get("/api/v1/docs")
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
-async def test_views_without_authentication(get_fastapi_client):
+async def test_views_without_authentication(fastapi_client):
     """
     Description: test view routes from FastAPI TestClient without token.
     """
     uris = ["users", "books", "books/comments"]
     for uri in uris:
-        response = get_fastapi_client.get(f"/api/v1/{uri}")
+        response = fastapi_client.get(f"/api/v1/{uri}")
         assert response.status_code == 401
 
 
 @pytest.mark.asyncio
-async def test_read_main(get_fastapi_client, get_fastapi_token):
+async def test_read_main(fastapi_client, fastapi_token):
     """
     Description:
     Check if we can reach the books uri served by FastAPI with a valid authentication token.
     Check if we can get the dummy books created for tests purposes.
     Notice that the dummies datas (users, books, comments) are in the test database.
     """
-    response = get_fastapi_client.get(
-        "/api/v1/books/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+    response = fastapi_client.get(
+        "/api/v1/books/", headers={"Authorization": f"Bearer {fastapi_token}"}
     )
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
-async def test_read_main_without_valid_token(get_fastapi_client):
+async def test_read_main_without_valid_token(fastapi_client):
     """
     Description:
     Ensure that we can not reach the books uri served by FastAPI without a valid authentication token.
     """
-    response = get_fastapi_client.get(
+    response = fastapi_client.get(
         "/api/v1/books/", headers={"Authorization": "Bearer somethingWeird"}
     )
     assert response.status_code == 401

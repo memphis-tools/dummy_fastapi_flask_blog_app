@@ -24,7 +24,7 @@ def get_session():
 
 
 @pytest.fixture
-def get_fastapi_client(get_session):
+def fastapi_client(get_session):
     """
     Description: fixture offers a Flask TestClient
     """
@@ -33,7 +33,7 @@ def get_fastapi_client(get_session):
 
 
 @pytest.fixture
-def get_fastapi_token():
+def fastapi_token():
     """
     Description: fixture offers a FastAPI user's token.
     """
@@ -47,7 +47,7 @@ def get_fastapi_token():
 
 
 @pytest.fixture
-def get_fastapi_token_for_admin():
+def fastapi_token_for_admin():
     """
     Description: fixture offers a FastAPI user's token.
     """

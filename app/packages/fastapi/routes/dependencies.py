@@ -1,6 +1,5 @@
 """The FastAPI dependencies"""
 
-
 import os
 from typing import Annotated
 from werkzeug.security import check_password_hash

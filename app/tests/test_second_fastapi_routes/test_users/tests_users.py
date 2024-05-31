@@ -5,11 +5,11 @@ Notice that by default we already add dummies data through the application utils
 
 from datetime import timedelta
 import pytest
-from fastapi import HTTPException
+# from fastapi import HTTPException
 from app.packages import settings
 from app.packages.fastapi.models import fastapi_models
 from app.packages.fastapi.routes import routes_and_authentication
-from app.packages.fastapi.routes.dependencies import get_user, get_current_user, verify_password, get_current_active_user
+from app.packages.fastapi.routes.dependencies import get_user, get_current_user, get_current_active_user
 
 
 def test_get_existing_user():
@@ -28,25 +28,6 @@ def test_get_unexisting_user():
     username = settings.TEST_USER_USERNAME
     response = get_user(username)
     assert response is None
-
-
-def test_get_password_hash():
-    """
-    Description: try to get a hash password from plain text.
-    """
-    password = settings.TEST_USER_PWD
-    response = routes_and_authentication.get_password_hash(password)
-    assert isinstance(response, str)
-
-
-def test_verify_password_hash():
-    """
-    Description: check if password can be hashed.
-    """
-    plain_password = settings.TEST_USER_PWD
-    hashed_password = routes_and_authentication.get_password_hash(plain_password)
-    response = verify_password(plain_password, hashed_password)
-    assert response is True
 
 
 @pytest.mark.asyncio
@@ -97,35 +78,35 @@ async def test_get_current_disabled_user():
 
 
 @pytest.mark.asyncio
-async def test_view_users_with_authentication(get_fastapi_client, get_fastapi_token):
+async def test_view_users_with_authentication(fastapi_client, fastapi_token):
     """
     Description: test view_users route with FastAPI TestClient with token.
     """
-    access_token = get_fastapi_token
-    response = get_fastapi_client.get("/api/v1/users/", headers={"Authorization": f"Bearer {access_token}"})
+    access_token = fastapi_token
+    response = fastapi_client.get("/api/v1/users/", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
-async def test_view_users(get_fastapi_client, get_fastapi_token):
+async def test_view_users(fastapi_client, fastapi_token):
     """
     Description:
     Check if we can reach the users uri served by FastAPI with a valid authentication token.
     Check if we can get the dummy users created for tests purposes.
     Notice that the dummies datas (users, books, comments) are in the test database.
     """
-    response = get_fastapi_client.get(
-        "/api/v1/users/", headers={"Authorization": f"Bearer {get_fastapi_token}"}
+    response = fastapi_client.get(
+        "/api/v1/users/", headers={"Authorization": f"Bearer {fastapi_token}"}
     )
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
-async def test_add_user_being_admin(get_fastapi_client, get_fastapi_token_for_admin):
+async def test_add_user_being_admin(fastapi_client, fastapi_token_for_admin):
     """
     Description: test add user being admin.
     """
-    access_token = get_fastapi_token_for_admin
+    access_token = fastapi_token_for_admin
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
@@ -137,7 +118,7 @@ async def test_add_user_being_admin(get_fastapi_client, get_fastapi_token_for_ad
         "password": settings.TEST_USER_PWD,
         "password_check": settings.TEST_USER_PWD,
     }
-    response = get_fastapi_client.post(
+    response = fastapi_client.post(
         "/api/v1/users/",
         headers=headers,
         json=json
@@ -146,11 +127,11 @@ async def test_add_user_being_admin(get_fastapi_client, get_fastapi_token_for_ad
 
 
 @pytest.mark.asyncio
-async def test_add_user_with_invalid_datas(get_fastapi_client, get_fastapi_token_for_admin):
+async def test_add_user_with_invalid_datas(fastapi_client, fastapi_token_for_admin):
     """
     Description: test add user without valid datas.
     """
-    access_token = get_fastapi_token_for_admin
+    access_token = fastapi_token_for_admin
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json"
@@ -160,7 +141,7 @@ async def test_add_user_with_invalid_datas(get_fastapi_client, get_fastapi_token
         "email": "georges@localhost.fr",
         "password": settings.TEST_USER_PWD,
     }
-    response = get_fastapi_client.post(
+    response = fastapi_client.post(
         "/api/v1/users/",
         headers=headers,
         json=json
@@ -169,11 +150,11 @@ async def test_add_user_with_invalid_datas(get_fastapi_client, get_fastapi_token
 
 
 @pytest.mark.asyncio
-async def test_add_user_without_being_admin(get_fastapi_client, get_fastapi_token):
+async def test_add_user_without_being_admin(fastapi_client, fastapi_token):
     """
     Description: test add user without being admin.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json"
@@ -184,7 +165,7 @@ async def test_add_user_without_being_admin(get_fastapi_client, get_fastapi_toke
         "password": settings.TEST_USER_PWD,
         "password_check": settings.TEST_USER_PWD,
     }
-    response = get_fastapi_client.post(
+    response = fastapi_client.post(
         "/api/v1/users/",
         headers=headers,
         json=json
@@ -193,16 +174,16 @@ async def test_add_user_without_being_admin(get_fastapi_client, get_fastapi_toke
 
 
 @pytest.mark.asyncio
-async def test_delete_user_without_being_admin(get_fastapi_client, get_fastapi_token):
+async def test_delete_user_without_being_admin(fastapi_client, fastapi_token):
     """
     Description: test delete user id 3 whereas user is not admin.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json"
     }
-    response = get_fastapi_client.delete(
+    response = fastapi_client.delete(
         "/api/v1/users/3/",
         headers={"Authorization": f"Bearer {access_token}"}
     )
@@ -210,16 +191,16 @@ async def test_delete_user_without_being_admin(get_fastapi_client, get_fastapi_t
 
 
 @pytest.mark.asyncio
-async def test_delete_user_being_admin(get_fastapi_client, get_fastapi_token_for_admin):
+async def test_delete_user_being_admin(fastapi_client, fastapi_token_for_admin):
     """
     Description: test delete user id 5 being admin.
     """
-    access_token = get_fastapi_token_for_admin
+    access_token = fastapi_token_for_admin
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json"
     }
-    response = get_fastapi_client.delete(
+    response = fastapi_client.delete(
         "/api/v1/users/5/",
         headers={"Authorization": f"Bearer {access_token}"}
     )
@@ -227,16 +208,16 @@ async def test_delete_user_being_admin(get_fastapi_client, get_fastapi_token_for
 
 
 @pytest.mark.asyncio
-async def test_delete_unexisting_user_being_admin(get_fastapi_client, get_fastapi_token_for_admin):
+async def test_delete_unexisting_user_being_admin(fastapi_client, fastapi_token_for_admin):
     """
     Description: test delete unexisting user id 55555555 being admin.
     """
-    access_token = get_fastapi_token_for_admin
+    access_token = fastapi_token_for_admin
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json"
     }
-    response = get_fastapi_client.delete(
+    response = fastapi_client.delete(
         "/api/v1/users/55555555/",
         headers={"Authorization": f"Bearer {access_token}"}
     )
@@ -244,24 +225,24 @@ async def test_delete_unexisting_user_being_admin(get_fastapi_client, get_fastap
 
 
 @pytest.mark.asyncio
-async def test_view_users_without_valid_token(get_fastapi_client):
+async def test_view_users_without_valid_token(fastapi_client):
     """
     Description:
     Ensure that we can not reach the users uri served by FastAPI without a valid authentication token.
     """
-    response = get_fastapi_client.get(
+    response = fastapi_client.get(
         "/api/v1/users/", headers={"Authorization": "Bearer somethingWeird"}
     )
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
-async def test_view_user_with_authentication(get_fastapi_client, get_fastapi_token):
+async def test_view_user_with_authentication(fastapi_client, fastapi_token):
     """
     Description: test view_user id 1 route with FastAPI TestClient with token.
     """
-    access_token = get_fastapi_token
-    response = get_fastapi_client.get(
+    access_token = fastapi_token
+    response = fastapi_client.get(
         "/api/v1/users/1/",
         headers={"Authorization": f"Bearer {access_token}"}
     )
@@ -269,13 +250,13 @@ async def test_view_user_with_authentication(get_fastapi_client, get_fastapi_tok
 
 
 @pytest.mark.asyncio
-async def test_update_user_with_authentication_with_invalid_datas(get_fastapi_client, get_fastapi_token):
+async def test_update_user_with_authentication_with_invalid_datas(fastapi_client, fastapi_token):
     """
     Description: test update_user id 3 route with FastAPI TestClient with token.
     """
     json = {"email": "donald.duck@localhost.fr"}
-    access_token = get_fastapi_token
-    response = get_fastapi_client.put(
+    access_token = fastapi_token
+    response = fastapi_client.put(
         "/api/v1/users/3/",
         headers={"Authorization": f"Bearer {access_token}"},
         data=json
@@ -285,8 +266,8 @@ async def test_update_user_with_authentication_with_invalid_datas(get_fastapi_cl
 
 @pytest.mark.asyncio
 async def test_update_user_with_authentication_with_valid_datas(
-    get_fastapi_client,
-    get_fastapi_token_for_admin
+    fastapi_client,
+    fastapi_token_for_admin
 ):
     """
     Description: test update_user id 3 being authenticated as admin.
@@ -299,8 +280,8 @@ async def test_update_user_with_authentication_with_valid_datas(
         "role": "user",
         "disabled": False
     }
-    access_token = get_fastapi_token_for_admin
-    response = get_fastapi_client.put(
+    access_token = fastapi_token_for_admin
+    response = fastapi_client.put(
         "/api/v1/users/3/",
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
@@ -310,8 +291,8 @@ async def test_update_user_with_authentication_with_valid_datas(
 
 @pytest.mark.asyncio
 async def test_update_user_with_authentication_with_existing_email(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test update_user id 2 with forbidden role as legitimate user.
@@ -323,8 +304,8 @@ async def test_update_user_with_authentication_with_existing_email(
         "password_check": settings.TEST_USER_PWD,
         "role": "user"
     }
-    access_token = get_fastapi_token
-    response = get_fastapi_client.put(
+    access_token = fastapi_token
+    response = fastapi_client.put(
         "/api/v1/users/2/",
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
@@ -335,8 +316,8 @@ async def test_update_user_with_authentication_with_existing_email(
 
 @pytest.mark.asyncio
 async def test_update_user_with_authentication_with_existing_username(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test update_user id 2 with existing username.
@@ -348,8 +329,8 @@ async def test_update_user_with_authentication_with_existing_username(
         "password_check": settings.TEST_USER_PWD,
         "role": "user"
     }
-    access_token = get_fastapi_token
-    response = get_fastapi_client.put(
+    access_token = fastapi_token
+    response = fastapi_client.put(
         "/api/v1/users/2/",
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
@@ -360,8 +341,8 @@ async def test_update_user_with_authentication_with_existing_username(
 
 @pytest.mark.asyncio
 async def test_update_user_with_authentication_with_forbidden_role(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test update_user id 2 with forbidden role as legitimate user.
@@ -373,8 +354,8 @@ async def test_update_user_with_authentication_with_forbidden_role(
         "password_check": settings.TEST_USER_PWD,
         "role": "admin"
     }
-    access_token = get_fastapi_token
-    response = get_fastapi_client.put(
+    access_token = fastapi_token
+    response = fastapi_client.put(
         "/api/v1/users/2/",
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
@@ -385,8 +366,8 @@ async def test_update_user_with_authentication_with_forbidden_role(
 
 @pytest.mark.asyncio
 async def test_update_user_with_authentication_with_unexisting_role(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test update_user id 2 with unexisting role as legitimate user.
@@ -398,8 +379,8 @@ async def test_update_user_with_authentication_with_unexisting_role(
         "password_check": settings.TEST_USER_PWD,
         "role": "bucheron"
     }
-    access_token = get_fastapi_token
-    response = get_fastapi_client.put(
+    access_token = fastapi_token
+    response = fastapi_client.put(
         "/api/v1/users/2/",
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
@@ -410,8 +391,8 @@ async def test_update_user_with_authentication_with_unexisting_role(
 
 @pytest.mark.asyncio
 async def test_update_unexisting_user_with_authentication(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test update_user id 2 with unexisting role as legitimate user.
@@ -423,8 +404,8 @@ async def test_update_unexisting_user_with_authentication(
         "password_check": settings.TEST_USER_PWD,
         "role": "bucheron"
     }
-    access_token = get_fastapi_token
-    response = get_fastapi_client.put(
+    access_token = fastapi_token
+    response = fastapi_client.put(
         "/api/v1/users/55555555/",
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
@@ -433,7 +414,7 @@ async def test_update_unexisting_user_with_authentication(
 
 
 @pytest.mark.asyncio
-async def test_update_user_with_authentication_with_disabling_true(get_fastapi_client, get_fastapi_token):
+async def test_update_user_with_authentication_with_disabling_true(fastapi_client, fastapi_token):
     """
     Description: test update_user id 2 with unexisting role as legitimate user.
     """
@@ -445,8 +426,8 @@ async def test_update_user_with_authentication_with_disabling_true(get_fastapi_c
         "role": "user",
         "disabled": True
     }
-    access_token = get_fastapi_token
-    response = get_fastapi_client.put(
+    access_token = fastapi_token
+    response = fastapi_client.put(
         "/api/v1/users/2/",
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
@@ -457,8 +438,8 @@ async def test_update_user_with_authentication_with_disabling_true(get_fastapi_c
 
 @pytest.mark.asyncio
 async def test_update_user_with_authentication_being_unlegetimate_user(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test update_user id 3 as unlegitimate user.
@@ -470,8 +451,8 @@ async def test_update_user_with_authentication_being_unlegetimate_user(
         "password_check": settings.TEST_USER_PWD,
         "role": "user"
     }
-    access_token = get_fastapi_token
-    response = get_fastapi_client.put(
+    access_token = fastapi_token
+    response = fastapi_client.put(
         "/api/v1/users/3/",
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
@@ -482,21 +463,21 @@ async def test_update_user_with_authentication_being_unlegetimate_user(
 
 @pytest.mark.asyncio
 async def test_partial_update_forbidden_user_with_authentication(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test partial update_user id 3 route with FastAPI TestClient with token.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {"email": "donald.duck@localhost.fr"}
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    access_token = get_fastapi_token
-    response = get_fastapi_client.patch(
+    access_token = fastapi_token
+    response = fastapi_client.patch(
         "/api/v1/users/3/",
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
@@ -506,125 +487,125 @@ async def test_partial_update_forbidden_user_with_authentication(
 
 @pytest.mark.asyncio
 async def test_partial_update_user_with_authentication_with_valid_datas(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test partial update_user id 2 with valid datas.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {"email": "donald.duck@localhost.fr"}
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
+    response = fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
 async def test_partial_update_user_with_authentication_with_existing_email(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test partial update_user id 2 with already existing email.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {"email": "donald.duck@localhost.fr"}
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
+    response = fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
     assert response.status_code == 401
     assert b'{"detail":"Email utilisateur donald.duck@localhost.fr existe d\xc3\xa9j\xc3\xa0."}' in response.content
 
 
 @pytest.mark.asyncio
 async def test_partial_update_user_with_authentication_with_username(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test partial update_user id 2 with already existing username.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {"username": "donald"}
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
+    response = fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
     assert response.status_code == 401
     assert b'{"detail":"Nom utilisateur donald existe d\xc3\xa9j\xc3\xa0."}' in response.content
 
 
 @pytest.mark.asyncio
 async def test_partial_update_user_with_authentication_with_forbidden_role(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test partial update_user id 2 with forbidden role.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {"role": "admin"}
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
+    response = fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
     assert response.status_code == 401
     assert b'{"detail":"Affecter role admin autoris\xc3\xa9 aux seuls admins."}' in response.content
 
 
 @pytest.mark.asyncio
-async def test_partial_update_user_with_authentication_with_unexisting_role(get_fastapi_client, get_fastapi_token):
+async def test_partial_update_user_with_authentication_with_unexisting_role(fastapi_client, fastapi_token):
     """
     Description: test partial update_user id 2 with unexisting role route with FastAPI TestClient with token.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {"role": "bucheron"}
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
+    response = fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_partial_update_unexisting_user_with_authentication_with_valid_datas(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test partial update_user id 55555555 route with FastAPI TestClient with token.
     User does not exist.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {"email": "donald.duck@localhost.fr"}
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
-    response = get_fastapi_client.patch("/api/v1/users/55555555/", headers=headers, json=json)
+    response = fastapi_client.patch("/api/v1/users/55555555/", headers=headers, json=json)
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_view_user_without_authentication(get_fastapi_client):
+async def test_view_user_without_authentication(fastapi_client):
     """
     Description: test view_user id 2 route with FastAPI TestClient without token.
     """
-    response = get_fastapi_client.get(
+    response = fastapi_client.get(
         "/api/v1/users/2/",
         headers={"Authorization": "Bearer bebopalula"}
     )
@@ -632,268 +613,28 @@ async def test_view_user_without_authentication(get_fastapi_client):
 
 
 @pytest.mark.asyncio
-async def test_get_user_books(get_fastapi_client, get_fastapi_token):
+async def test_get_user_books(fastapi_client, fastapi_token):
     """
     Description:
     Ensure that we can get any user book's diffusion.
     """
     user_id = 2
-    response = get_fastapi_client.get(
+    response = fastapi_client.get(
         f"/api/v1/users/{user_id}/books/",
-        headers={"Authorization": f"Bearer {get_fastapi_token}"}
+        headers={"Authorization": f"Bearer {fastapi_token}"}
     )
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
-async def test_get_invalid_user_books(get_fastapi_client, get_fastapi_token):
+async def test_get_invalid_user_books(fastapi_client, fastapi_token):
     """
     Description:
     Ensure that we can get any invalid user diffusion.
     """
     user_id = 2555
-    response = get_fastapi_client.get(
+    response = fastapi_client.get(
         f"/api/v1/users/{user_id}/books/",
-        headers={"Authorization": f"Bearer {get_fastapi_token}"}
+        headers={"Authorization": f"Bearer {fastapi_token}"}
     )
     assert response.status_code == 404
-
-
-# @pytest.mark.asyncio
-# async def test_update_user_password_being_admin(get_fastapi_client, get_fastapi_token_for_admin):
-#     """
-#     Description: test update user password being admin.
-#     """
-#     access_token = get_fastapi_token_for_admin
-#     headers = {
-#         "Authorization": f"Bearer {access_token}",
-#         "accept": "application/json",
-#         "Content-Type": "application/json",
-#     }
-#     json = {
-#         "current_password": settings.TEST_USER_PWD,
-#         "new_password": f"{settings.TEST_USER_PWD}123",
-#         "new_password_check": f"{settings.TEST_USER_PWD}123",
-#     }
-#     response = get_fastapi_client.put(
-#         "/api/v1/users/2/password/",
-#         headers=headers,
-#         json=json
-#     )
-#     assert response.status_code == 200
-
-
-@pytest.mark.asyncio
-async def test_update_user_password_with_wrong_method(get_fastapi_client, get_fastapi_token):
-    """
-    Description: test update user password with post method.
-    """
-    access_token = get_fastapi_token
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "accept": "application/json",
-        "Content-Type": "application/json",
-    }
-    json = {
-        "current_password": settings.TEST_USER_PWD,
-        "new_password": f"{settings.TEST_USER_PWD}123",
-        "new_password_check": f"{settings.TEST_USER_PWD}123",
-    }
-    response = get_fastapi_client.post(
-        "/api/v1/users/2/password/",
-        headers=headers,
-        json=json
-    )
-    assert response.status_code == 405
-
-
-# @pytest.mark.asyncio
-# async def test_update_user_password_being_legitimate_user(get_fastapi_client, get_fastapi_token):
-#     """
-#     Description: test update user password being the legitimate user.
-#     """
-#     access_token = get_fastapi_token
-#     headers = {
-#         "Authorization": f"Bearer {access_token}",
-#         "accept": "application/json",
-#         "Content-Type": "application/json",
-#     }
-#     json = {
-#         "current_password": f"{settings.TEST_USER_PWD}123",
-#         "new_password": f"{settings.TEST_USER_PWD}456",
-#         "new_password_check": f"{settings.TEST_USER_PWD}456",
-#     }
-#     response = get_fastapi_client.put(
-#         "/api/v1/users/2/password/",
-#         headers=headers,
-#         json=json
-#     )
-#     assert response.status_code == 200
-
-
-@pytest.mark.asyncio
-async def test_update_unexisting_user_password(get_fastapi_client, get_fastapi_token):
-    """
-    Description: test update password for an unexisting user.
-    """
-    access_token = get_fastapi_token
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "accept": "application/json",
-        "Content-Type": "application/json",
-    }
-    json = {
-        "current_password": settings.TEST_USER_PWD,
-        "new_password": f"{settings.TEST_USER_PWD}123",
-        "new_password_check": f"{settings.TEST_USER_PWD}123",
-    }
-    response = get_fastapi_client.put(
-        "/api/v1/users/55555555/password/",
-        headers=headers,
-        json=json
-    )
-    assert response.status_code == 404
-
-
-# @pytest.mark.asyncio
-# async def test_update_user_mismatched_password_being_legitimate_user(get_fastapi_client, get_fastapi_token):
-#     """
-#     Description: test update user mismatched password being the legitimate user.
-#     """
-#     access_token = get_fastapi_token
-#     headers = {
-#         "Authorization": f"Bearer {access_token}",
-#         "accept": "application/json",
-#         "Content-Type": "application/json",
-#     }
-#     json = {
-#         "current_password": f"{settings.TEST_USER_PWD}456",
-#         "new_password": f"{settings.TEST_USER_PWD}123",
-#         "new_password_check": f"{settings.TEST_USER_PWD}987",
-#     }
-#     response = get_fastapi_client.put(
-#         "/api/v1/users/2/password/",
-#         headers=headers,
-#         json=json
-#     )
-#     assert response.status_code == 406
-
-
-@pytest.mark.asyncio
-async def test_update_user_password_without_being_legitimate_user(get_fastapi_client, get_fastapi_token):
-    """
-    Description: test update user password without being the legitimate user.
-    """
-    access_token = get_fastapi_token
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "accept": "application/json",
-        "Content-Type": "application/json",
-    }
-    json = {
-        "current_password": settings.TEST_USER_PWD,
-        "new_password": f"{settings.TEST_USER_PWD}123",
-        "new_password_check": f"{settings.TEST_USER_PWD}123",
-    }
-    response = get_fastapi_client.put(
-        "/api/v1/users/1/password/",
-        headers=headers,
-        json=json
-    )
-    assert response.status_code == 401
-
-
-@pytest.mark.asyncio
-async def test_update_user_password_with_blank_being_legitimate_user(get_fastapi_client, get_fastapi_token):
-    """
-    Description: test update user password with a blank string being the legitimate user.
-    """
-    access_token = get_fastapi_token
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "accept": "application/json",
-        "Content-Type": "application/json",
-    }
-    json = {
-        "current_password": settings.TEST_USER_PWD,
-        "new_password": "",
-        "new_password_check": f"{settings.TEST_USER_PWD}123",
-    }
-    response = get_fastapi_client.put(
-        "/api/v1/users/2/password/",
-        headers=headers,
-        json=json
-    )
-    assert response.status_code == 406
-
-
-@pytest.mark.asyncio
-async def test_update_user_password_check_with_blank_being_legitimate_user(get_fastapi_client, get_fastapi_token):
-    """
-    Description: test update user password with a blank string being the legitimate user.
-    """
-    access_token = get_fastapi_token
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "accept": "application/json",
-        "Content-Type": "application/json",
-    }
-    json = {
-        "current_password": settings.TEST_USER_PWD,
-        "new_password": f"{settings.TEST_USER_PWD}123",
-        "new_password_check": "",
-    }
-    response = get_fastapi_client.put(
-        "/api/v1/users/2/password/",
-        headers=headers,
-        json=json
-    )
-    assert response.status_code == 406
-
-
-@pytest.mark.asyncio
-async def test_update_user_password_with_uncomplex_being_legitimate_user(
-    get_fastapi_client,
-    get_fastapi_token
-):
-    """
-    Description: test update user password through FastAPI with password not enough complex.
-    """
-    access_token = get_fastapi_token
-    json = {
-        "current_password": settings.TEST_USER_PWD,
-        "new_password": settings.TEST_USER_PWD[:5],
-        "new_password_check": settings.TEST_USER_PWD[:5],
-    }
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "accept": "application/json",
-        "Content-Type": "application/json",
-    }
-
-    response = get_fastapi_client.put("/api/v1/users/2/password/", headers=headers, json=json)
-    assert response.status_code == 406
-
-
-# @pytest.mark.asyncio
-# async def test_update_user_password_with_wrong_current_password_being_legitimate_user(
-#     get_fastapi_client,
-#     get_fastapi_token
-# ):
-#     """
-#     Description: test update user password through FastAPI with wrong current password.
-#     """
-#     access_token = get_fastapi_token
-#     json = {
-#         "current_password": settings.TEST_USER_PWD,
-#         "new_password": settings.TEST_USER_PWD,
-#         "new_password_check": settings.TEST_USER_PWD,
-#     }
-#     headers = {
-#         "Authorization": f"Bearer {access_token}",
-#         "accept": "application/json",
-#         "Content-Type": "application/json",
-#     }
-#
-#     response = get_fastapi_client.put("/api/v1/users/2/password/", headers=headers, json=json)
-#     assert response.status_code == 401

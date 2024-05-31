@@ -1,6 +1,5 @@
 """The FastAPI routes for books categories"""
 
-
 from typing import Annotated
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
@@ -83,7 +82,7 @@ async def add_category_books(
     if current_user.id != 1:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Acces reserve au seul compte admin"
+            detail="Acces reserve au seul compte admin",
         )
     new_book_category = models.BookCategory(title=str(book_category.title).lower())
     check_book_category_fields(new_book_category)

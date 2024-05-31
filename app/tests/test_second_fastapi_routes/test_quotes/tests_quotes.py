@@ -8,7 +8,7 @@ import pytest
 
 @pytest.mark.asyncio
 async def test_get_quotes_without_authentication(
-    get_fastapi_client,
+    fastapi_client,
 ):
     """
     Description: test get quotes through FastAPI without authentication.
@@ -19,89 +19,89 @@ async def test_get_quotes_without_authentication(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.get("/api/v1/quotes/", headers=headers)
+    response = fastapi_client.get("/api/v1/quotes/", headers=headers)
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_get_quotes_as_standard_user(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test get quotes through FastAPI as standard user.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.get("/api/v1/quotes/", headers=headers)
+    response = fastapi_client.get("/api/v1/quotes/", headers=headers)
     assert response.status_code == 403
 
 
 @pytest.mark.asyncio
 async def test_get_quotes_as_admin(
-    get_fastapi_client,
-    get_fastapi_token_for_admin
+    fastapi_client,
+    fastapi_token_for_admin
 ):
     """
     Description: test get quotes through FastAPI as admin.
     """
-    access_token = get_fastapi_token_for_admin
+    access_token = fastapi_token_for_admin
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.get("/api/v1/quotes/", headers=headers)
+    response = fastapi_client.get("/api/v1/quotes/", headers=headers)
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
 async def test_get_a_quote_as_admin(
-    get_fastapi_client,
-    get_fastapi_token_for_admin
+    fastapi_client,
+    fastapi_token_for_admin
 ):
     """
     Description: test get a specific quote through FastAPI as admin.
     """
-    access_token = get_fastapi_token_for_admin
+    access_token = fastapi_token_for_admin
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.get("/api/v1/quotes/1/", headers=headers)
+    response = fastapi_client.get("/api/v1/quotes/1/", headers=headers)
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
 async def test_get_a_quote_as_standard_user(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test get a specific quote through FastAPI as standard user.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.get("/api/v1/quotes/1/", headers=headers)
+    response = fastapi_client.get("/api/v1/quotes/1/", headers=headers)
     assert response.status_code == 403
 
 
 @pytest.mark.asyncio
 async def test_add_quote_without_authentication(
-    get_fastapi_client
+    fastapi_client
 ):
     """
     Description: test add quote route with FastAPI TestClient without authentication.
@@ -117,19 +117,19 @@ async def test_add_quote_without_authentication(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/quotes/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/quotes/", headers=headers, json=json)
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_add_quote_as_standard_user(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test add quote route with FastAPI TestClient as standard user.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     json = {
         "author": "Bruce Lee",
         "book_title": "Be Water",
@@ -141,19 +141,19 @@ async def test_add_quote_as_standard_user(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/quotes/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/quotes/", headers=headers, json=json)
     assert response.status_code == 403
 
 
 @pytest.mark.asyncio
 async def test_add_quote_as_admin(
-    get_fastapi_client,
-    get_fastapi_token_for_admin
+    fastapi_client,
+    fastapi_token_for_admin
 ):
     """
     Description: test add quote route with FastAPI TestClient as admin.
     """
-    access_token = get_fastapi_token_for_admin
+    access_token = fastapi_token_for_admin
     json = {
         "author": "Bruce Lee",
         "book_title": "Be Water",
@@ -165,19 +165,19 @@ async def test_add_quote_as_admin(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/quotes/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/quotes/", headers=headers, json=json)
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
 async def test_add_empty_quote_as_admin(
-    get_fastapi_client,
-    get_fastapi_token_for_admin
+    fastapi_client,
+    fastapi_token_for_admin
 ):
     """
     Description: test add quote route with FastAPI TestClient as admin.
     """
-    access_token = get_fastapi_token_for_admin
+    access_token = fastapi_token_for_admin
     json = {
         "author": "",
         "book_title": "Be Water",
@@ -189,19 +189,19 @@ async def test_add_empty_quote_as_admin(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/quotes/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/quotes/", headers=headers, json=json)
     assert response.status_code == 422
 
 
 @pytest.mark.asyncio
 async def test_add_malformed_quote_as_admin(
-    get_fastapi_client,
-    get_fastapi_token_for_admin
+    fastapi_client,
+    fastapi_token_for_admin
 ):
     """
     Description: test add malformed quote route with FastAPI TestClient as admin.
     """
-    access_token = get_fastapi_token_for_admin
+    access_token = fastapi_token_for_admin
     json = {
         "book_title": "Be Water",
         "quote": "Be Water my friend"
@@ -212,62 +212,62 @@ async def test_add_malformed_quote_as_admin(
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.post("/api/v1/quotes/", headers=headers, json=json)
+    response = fastapi_client.post("/api/v1/quotes/", headers=headers, json=json)
     assert response.status_code == 422
 
 
 @pytest.mark.asyncio
 async def test_delete_quote_as_standard_user(
-    get_fastapi_client,
-    get_fastapi_token
+    fastapi_client,
+    fastapi_token
 ):
     """
     Description: test delete quote route with FastAPI TestClient as standard user.
     """
-    access_token = get_fastapi_token
+    access_token = fastapi_token
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.delete("/api/v1/quotes/4/", headers=headers)
+    response = fastapi_client.delete("/api/v1/quotes/4/", headers=headers)
     assert response.status_code == 403
 
 
 @pytest.mark.asyncio
 async def test_delete_quote_as_admin(
-    get_fastapi_client,
-    get_fastapi_token_for_admin
+    fastapi_client,
+    fastapi_token_for_admin
 ):
     """
     Description: test delete quote route with FastAPI TestClient as admin.
     """
-    access_token = get_fastapi_token_for_admin
+    access_token = fastapi_token_for_admin
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.delete("/api/v1/quotes/2/", headers=headers)
+    response = fastapi_client.delete("/api/v1/quotes/2/", headers=headers)
     assert response.status_code == 204
 
 
 @pytest.mark.asyncio
 async def test_delete_unexisting_quote_as_admin(
-    get_fastapi_client,
-    get_fastapi_token_for_admin
+    fastapi_client,
+    fastapi_token_for_admin
 ):
     """
     Description: test delete unexisting quote route with FastAPI TestClient as admin.
     """
-    access_token = get_fastapi_token_for_admin
+    access_token = fastapi_token_for_admin
     headers = {
         "Authorization": f"Bearer {access_token}",
         "accept": "application/json",
         "Content-Type": "application/json",
     }
 
-    response = get_fastapi_client.delete("/api/v1/quotes/55555/", headers=headers)
+    response = fastapi_client.delete("/api/v1/quotes/55555/", headers=headers)
     assert response.status_code == 404

@@ -90,9 +90,7 @@ def add_user():
     )
 
 
-@user_routes_blueprint.route(
-    "/user/<int:user_id>/delete/", methods=["GET", "POST"]
-)
+@user_routes_blueprint.route("/user/<int:user_id>/delete/", methods=["GET", "POST"])
 @login_required
 @admin_only
 def delete_user(user_id):

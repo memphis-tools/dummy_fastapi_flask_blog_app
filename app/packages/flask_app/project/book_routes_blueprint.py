@@ -210,9 +210,7 @@ def add_book():
     )
 
 
-@book_routes_blueprint.route(
-    "/book/<int:book_id>/delete/", methods=["GET", "POST"]
-)
+@book_routes_blueprint.route("/book/<int:book_id>/delete/", methods=["GET", "POST"])
 @login_required
 def delete_book(book_id):
     """
@@ -252,9 +250,7 @@ def delete_book(book_id):
     )
 
 
-@book_routes_blueprint.route(
-    "/book/<int:book_id>/update/", methods=["GET", "POST"]
-)
+@book_routes_blueprint.route("/book/<int:book_id>/update/", methods=["GET", "POST"])
 @login_required
 def update_book(book_id):
     """

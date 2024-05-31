@@ -203,9 +203,7 @@ def login():
             login_user(user)
             flash(f"Vous nous avez manqué {user} 🫶")
             logs_context = {"username": f"{username}"}
-            log_events.log_event(
-                "[+] Flask - Connexion à application.", logs_context
-            )
+            log_events.log_event("[+] Flask - Connexion à application.", logs_context)
             session.close()
             return redirect(url_for("index"))
 

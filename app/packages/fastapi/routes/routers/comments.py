@@ -1,6 +1,5 @@
 """The FastAPI routes for comments"""
 
-
 from typing import Annotated
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
@@ -119,7 +118,9 @@ async def view_book_comments(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Livre n'existe pas."
         )
-    comments = session.query(models.Comment).where(models.Comment.book_id == book_id).all()
+    comments = (
+        session.query(models.Comment).where(models.Comment.book_id == book_id).all()
+    )
     return comments
 
 
