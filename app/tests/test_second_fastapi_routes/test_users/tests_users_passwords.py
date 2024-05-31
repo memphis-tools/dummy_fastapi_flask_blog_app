@@ -30,30 +30,6 @@ def test_verify_password_hash():
 
 
 @pytest.mark.asyncio
-async def test_update_user_password_with_uncomplex_being_legitimate_user(
-    fastapi_client,
-    fastapi_token
-):
-    """
-    Description: test update user password through FastAPI with password not enough complex.
-    """
-    access_token = fastapi_token
-    json = {
-        "current_password": f"{settings.TEST_USER_PWD}",
-        "new_password": settings.TEST_USER_PWD[:5],
-        "new_password_check": settings.TEST_USER_PWD[:5],
-    }
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "accept": "application/json",
-        "Content-Type": "application/json",
-    }
-    response = fastapi_client.put("/api/v1/users/2/password/", headers=headers, json=json)
-    assert response.status_code == 401
-    assert b'{"detail":"Mot de passe trop simple, essayez de nouveau."}' in response.content
-
-
-@pytest.mark.asyncio
 async def test_update_user_password_being_admin(fastapi_client, fastapi_token_for_admin):
     """
     Description: test update user password being admin.
@@ -79,6 +55,30 @@ async def test_update_user_password_being_admin(fastapi_client, fastapi_token_fo
 
 
 @pytest.mark.asyncio
+async def test_update_user_password_with_uncomplex_being_legitimate_user(
+    fastapi_client,
+    fastapi_token
+):
+    """
+    Description: test update user password through FastAPI with password not enough complex.
+    """
+    access_token = fastapi_token
+    json = {
+        "current_password": f"{settings.TEST_USER_PWD}123",
+        "new_password": settings.TEST_USER_PWD[:5],
+        "new_password_check": settings.TEST_USER_PWD[:5],
+    }
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = fastapi_client.put("/api/v1/users/2/password/", headers=headers, json=json)
+    assert response.status_code == 401
+    assert b'{"detail":"Mot de passe trop simple, essayez de nouveau."}' in response.content
+
+
+@pytest.mark.asyncio
 async def test_update_user_password_with_wrong_method(fastapi_client, fastapi_token):
     """
     Description: test update user password with post method.
@@ -90,9 +90,9 @@ async def test_update_user_password_with_wrong_method(fastapi_client, fastapi_to
         "Content-Type": "application/json",
     }
     json = {
-        "current_password": settings.TEST_USER_PWD,
-        "new_password": f"{settings.TEST_USER_PWD}123",
-        "new_password_check": f"{settings.TEST_USER_PWD}123",
+        "current_password": f"{settings.TEST_USER_PWD}123",
+        "new_password": f"{settings.TEST_USER_PWD}456",
+        "new_password_check": f"{settings.TEST_USER_PWD}456",
     }
     response = fastapi_client.post(
         "/api/v1/users/2/password/",
