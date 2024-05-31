@@ -10,8 +10,9 @@ import jwt
 
 # Because of the current architecture, in order to run tests_users and tests_authentication
 # We set "noqa: F401" for the unused get_user dependencie.
+from .dependencies import get_user  # noqa: F401
+
 from .dependencies import (
-    get_user, # noqa: F401
     get_current_active_user,
     session,
     authenticate_user,
