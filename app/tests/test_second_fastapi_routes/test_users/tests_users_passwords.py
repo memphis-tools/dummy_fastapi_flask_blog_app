@@ -46,7 +46,7 @@ async def test_update_user_password_being_admin(fastapi_client, fastapi_token_fo
         "new_password_check": f"{settings.TEST_USER_PWD}123",
     }
     response = fastapi_client.put(
-        "/api/v1/users/2/password/",
+        "/api/v1/users/3/password/",
         headers=headers,
         json=json
     )
