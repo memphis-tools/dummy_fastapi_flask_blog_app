@@ -89,9 +89,7 @@ def add_quote():
     )
 
 
-@quote_routes_blueprint.route(
-    "/quotes/<int:quote_id>/delete/", methods=["GET", "POST"]
-)
+@quote_routes_blueprint.route("/quotes/<int:quote_id>/delete/", methods=["GET", "POST"])
 @login_required
 @admin_only
 def delete_quote(quote_id):

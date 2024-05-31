@@ -1,6 +1,5 @@
 """The FastAPI routes"""
 
-
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -13,13 +12,13 @@ from .dependencies import (
     session,
     authenticate_user,
     SECRET_KEY,
-    ALGORITHM
+    ALGORITHM,
 )
 from app.packages import handle_passwords, log_events
 from app.packages.database.models import models
 from app.packages.fastapi.models.fastapi_models import (
-NewUserInDBModel,
-Token,
+    NewUserInDBModel,
+    Token,
 )
 
 # Because of the current architecture, in order to run tests_users and tests_authentication
@@ -45,10 +44,7 @@ protected_routes = [
 ]
 
 for router in protected_routes:
-    app.include_router(
-        router,
-        dependencies=[Depends(get_current_active_user)]
-    )
+    app.include_router(router, dependencies=[Depends(get_current_active_user)])
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):

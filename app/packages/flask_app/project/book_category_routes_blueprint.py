@@ -136,9 +136,7 @@ def manage_books_categories():
     )
 
 
-@book_category_routes_blueprint.route(
-    "/book/categories/add/", methods=["GET", "POST"]
-)
+@book_category_routes_blueprint.route("/book/categories/add/", methods=["GET", "POST"])
 @login_required
 @admin_only
 def add_book_category():
