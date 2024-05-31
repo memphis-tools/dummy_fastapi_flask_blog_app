@@ -5,7 +5,7 @@ Notice that by default we already add dummies data through the application utils
 
 from datetime import timedelta
 import pytest
-# from fastapi import HTTPException
+
 from app.packages import settings
 from app.packages.fastapi.models import fastapi_models
 from app.packages.fastapi.routes import routes_and_authentication

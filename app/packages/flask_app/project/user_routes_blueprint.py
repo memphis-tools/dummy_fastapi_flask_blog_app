@@ -102,7 +102,6 @@ def delete_user(user_id):
     user_to_delete = session.get(User, user_id)
     if user_id == 1:
         session.close()
-        flash("Le compte admin ne peut pas etre supprime", "error")
         return abort(403)
     if form.validate_on_submit():
         logs_context = {
@@ -161,7 +160,7 @@ def update_password():
             session.commit()
             flash(f"Mot de passe mis a jour {current_user} 💪")
             session.close()
-            return redirect(url_for("index"))
+        return redirect(url_for("index"))
     return render_template(
         "update_password.html",
         form=form,

@@ -50,7 +50,6 @@ async def test_update_user_password_being_admin(fastapi_client, fastapi_token_fo
         headers=headers,
         json=json
     )
-    print(f"DEBUG SIR: {response.content}")
     assert response.status_code == 200
 
 
@@ -123,7 +122,6 @@ async def test_update_user_password_being_legitimate_user(fastapi_client, fastap
         headers=headers,
         json=json
     )
-    print(f"DEBUG SIR: {response.content}")
     assert response.status_code == 200
 
 
@@ -148,7 +146,6 @@ async def test_update_user_mismatched_password_being_legitimate_user(fastapi_cli
         headers=headers,
         json=json
     )
-    print(f"DEBUG SIR: {response.content}")
     assert response.status_code == 406
 
 
