@@ -333,7 +333,7 @@ def update_book(book_id):
             year_of_publication=year_of_publication,
             book_picture_name=filename,
             publication_date=publication_date,
-            user_id=book.user_id,
+            user_id=a_book.user_id,
         )
         if book_picture_filename != filename:
             if filename != "":
