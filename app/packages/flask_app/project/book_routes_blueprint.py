@@ -260,7 +260,7 @@ def update_book(book_id):
         .options(joinedload(Book.starred))
         .first()
     )
-    if not book:
+    if not a_book:
         flash("Livre non trouvé", "error")
         session.close()
         return redirect(url_for("book_routes_blueprint.books"))
