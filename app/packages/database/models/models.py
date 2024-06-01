@@ -290,4 +290,8 @@ class User(BASE, UserMixin):
         }
 
     def get_id(self):
+        """
+        Description:
+        A specific method for an user instance which returns the id.
+        """
         return self.id
