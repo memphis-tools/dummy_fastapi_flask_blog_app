@@ -1,4 +1,4 @@
-FROM python:3.13.0b1-slim
+FROM python:3.12.3-slim-bookworm
 
 # create directory for the dummy-operator user
 RUN mkdir -p /home/dummy-operator
