@@ -1,4 +1,4 @@
-FROM python:3.13.0b1-slim
+FROM python:3.12.3-slim-bookworm
 
 WORKDIR /code
 ENV PYTHONDONTWRITEBYTECODE 1
