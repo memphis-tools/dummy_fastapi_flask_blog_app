@@ -1,4 +1,4 @@
-FROM python:3.11-slim-buster
+FROM python:3.13.0b1-slim
 
 WORKDIR /code
 ENV PYTHONDONTWRITEBYTECODE 1
