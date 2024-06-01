@@ -12,7 +12,7 @@
 ![Screenshot](https://img.shields.io/badge/coveralls--blue?logo=coveralls&logoColor=yellow)
 [![Coverage Status](https://coveralls.io/repos/gitlab/memphis-tools/dummy_fastapi_flask_blog_app/badge.svg?branch=HEAD)](https://coveralls.io/gitlab/memphis-tools/dummy_fastapi_flask_blog_app?branch=HEAD)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/5aa0869a8f5a4835a74f84ba0088f69e)](https://app.codacy.com/gh/memphis-tools/dummy_fastapi_flask_blog_app/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![Known Vulnerabilities](https://snyk.io/test/github/memphis-tools/dummy_fastapi_flask_blog_app/badge.svg)]
+![Known Vulnerabilities](https://snyk.io/test/github/memphis-tools/dummy_fastapi_flask_blog_app/badge.svg)
 
 # DUMMY APP FOR LEARNING PURPOSES
 **This is dummy blog application.**
