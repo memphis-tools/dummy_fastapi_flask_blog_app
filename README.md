@@ -12,6 +12,7 @@
 ![Screenshot](https://img.shields.io/badge/coveralls--blue?logo=coveralls&logoColor=yellow)
 [![Coverage Status](https://coveralls.io/repos/gitlab/memphis-tools/dummy_fastapi_flask_blog_app/badge.svg?branch=HEAD)](https://coveralls.io/gitlab/memphis-tools/dummy_fastapi_flask_blog_app?branch=HEAD)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/5aa0869a8f5a4835a74f84ba0088f69e)](https://app.codacy.com/gh/memphis-tools/dummy_fastapi_flask_blog_app/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Known Vulnerabilities](https://snyk.io/test/github/memphis-tools/dummy_fastapi_flask_blog_app/badge.svg)]
 
 # DUMMY APP FOR LEARNING PURPOSES
 **This is dummy blog application.**
@@ -95,6 +96,10 @@ Vault
 
 Lynis (for the virtual machine, droplet, hardening)
 
+Codacy
+
+Snyk
+
 ## HOW TO SET IT, HOW IT WORKS
 
   Notice: if you use VisualCode remember that you can preview the markdown from VisualCode by running: Ctrl+Shift+V
@@ -103,9 +108,9 @@ Lynis (for the virtual machine, droplet, hardening)
 
   The FastAPI app is the main one, and executes the database initialization at boot.
 
-  Github Action workflows are used. If you want the GitGuardian check, you must set the secret.
+  Github Action workflows are used. You must set secrets (tokens which allow the exchanges).
 
-  ![Screenshot](illustrations/github_secret_gitguardian.png)
+  ![Screenshot](illustrations/github_secrets.png)
 
 ### POSTGRESQL PREQUISITES FOR LOCAL USAGE
 --------------------------
@@ -173,7 +178,7 @@ Lynis (for the virtual machine, droplet, hardening)
 
     Nginx (as reverse proxy), Uvicorn (for FastAPI), Gunicorn (for Flask), Postgresql and Grafana.
 
-    At the project root folder, touch (create) an ".envrc.docker.local".
+    At the project root folder, touch (create) an **".envrc.docker.local"**.
 
     Notice that this file is the one used for local deployment with local-docker-compose.yml.
 
