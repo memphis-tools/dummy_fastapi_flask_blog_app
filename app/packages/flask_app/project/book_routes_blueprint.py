@@ -20,7 +20,6 @@ from werkzeug.utils import secure_filename
 from app.packages import log_events, settings
 from app.packages.database.commands import session_commands
 from app.packages.database.models.models import (
-    User,
     Book,
     BookCategory,
     Comment,
@@ -157,7 +156,6 @@ def add_book():
             )
         year_of_publication = form.year_of_publication.data
         book_picture = form.photo.data
-        uploaded_file = request.files["photo"]
         filename = secure_filename(book_picture.filename)
         new_book = Book(
             title=title,
@@ -187,7 +185,6 @@ def add_book():
                 session.add(new_book)
                 session.commit()
                 session.refresh(new_book)
-                user = session.get(User, new_book.user_id)
                 session.commit()
                 logs_context = {
                     "current_user": f"{current_user.username}",
@@ -219,7 +216,6 @@ def delete_book(book_id):
     session = session_commands.get_a_database_session()
     form = forms.DeleteInstanceForm()
     book_to_delete = session.get(Book, book_id)
-    user = session.get(User, book_to_delete.user_id)
     if current_user.id != book_to_delete.user_id and current_user.role != "admin":
         logs_context = {
             "current_user": f"{current_user.username}",
@@ -257,7 +253,7 @@ def update_book(book_id):
     Description: the update book Flask route.
     """
     session = session_commands.get_a_database_session()
-    book = (
+    a_book = (
         session.query(Book)
         .filter(Book.id.in_([book_id]))
         .options(joinedload(Book.book_comments))
@@ -269,15 +265,15 @@ def update_book(book_id):
         session.close()
         return redirect(url_for("book_routes_blueprint.books"))
 
-    if current_user.id != book.user_id and current_user.role != "admin":
+    if current_user.id != a_book.user_id and current_user.role != "admin":
         session.close()
         return abort(403)
-    book_picture_filename = book.book_picture_name
+    book_picture_filename = a_book.book_picture_name
     books_categories_query = session.query(BookCategory).all()
     books_categories = [(i.id, i.title) for i in books_categories_query]
     edit_form = forms.UpdateBookForm(
         books_categories=books_categories,
-        book=book,
+        book=a_book,
     )
     if edit_form.validate_on_submit():
         form = request.form.to_dict()
@@ -285,23 +281,23 @@ def update_book(book_id):
         if "title" in form:
             title = form["title"]
         else:
-            title = book.title
+            title = a_book.title
         if "summary" in form:
             summary = form["summary"]
         else:
-            summary = book.summary
+            summary = a_book.summary
         if "content" in form:
             content = form["content"]
         else:
-            content = book.content
+            content = a_book.content
         if "author" in form:
             author = form["author"]
         else:
-            author = book.author
+            author = a_book.author
         if "year_of_publication" in form:
             year_of_publication = int(form["year_of_publication"])
         else:
-            year_of_publication = book.year_of_publication
+            year_of_publication = a_book.year_of_publication
         if "categories" in form:
             category_id_from_form = int(form["categories"])
             try:
@@ -327,7 +323,7 @@ def update_book(book_id):
             filename = secure_filename(uploaded_file.filename)
         else:
             filename = book_picture_filename
-        publication_date = book.publication_date
+        publication_date = a_book.publication_date
         updated_book = Book(
             title=title,
             summary=summary,
@@ -384,6 +380,6 @@ def update_book(book_id):
     return render_template(
         "update_book.html",
         form=edit_form,
-        book=book,
+        book=a_book,
         is_authenticated=current_user.is_authenticated,
     )
