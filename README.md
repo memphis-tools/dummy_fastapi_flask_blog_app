@@ -283,7 +283,15 @@ You do not need to create a python virtualenv.
 
 ### HOW CHECK PEP'S RECOMMENDED SYNTAX
 --------------------------------------
-      pip install black pylint flake8-html
+      pip install black pylint flake8-html bandit
+
+  You can use black to format code:
+
+      black app/packages/
+
+      black app/tests/
+
+  You can check for a flake8's lint:
 
       python -m flake8 --format html --htmldir flake8_html_report/
 
@@ -291,16 +299,13 @@ You do not need to create a python virtualenv.
 
       flake8 app/ --max-line-length=127 --count --statistics
 
-  You can use black to format code
-
-      black app/packages/
-
-      black app/tests/
-
-  You can check the lint score
+  You can check the lint score:
 
       pylint app/
 
+  You can check for common security issues in Python code:
+
+      python -m bandit -r app/
 
 ### HOW RUN IT IN PRODUCTION
 ----------------------------
