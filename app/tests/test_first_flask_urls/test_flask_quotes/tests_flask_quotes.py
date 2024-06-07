@@ -3,6 +3,9 @@ All the tests functions for the quotes urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
+from app.packages.database.commands import session_commands
+from app.packages.database.models.models import Quote
+
 
 def test_flask_get_quotes_without_authentication(client):
     """
@@ -54,6 +57,16 @@ def test_get_quotes_as_admin(client, access_session_as_admin):
     assert response.status_code == 200
 
 
+def test_get_quotes_from_database_as_admin():
+    """
+    Description: check if we can request the database in order to get all quotes as admin.
+    """
+    session = session_commands.get_a_database_session()
+    quotes = session.query(Quote).all()
+    session.close()
+    assert len(quotes) == 3
+
+
 def test_get_a_quote_as_a_admin(client, access_session_as_admin):
     """
     Description: check if we can get a quote as admin.
@@ -63,6 +76,16 @@ def test_get_a_quote_as_a_admin(client, access_session_as_admin):
         "/quotes/1/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 200
+
+
+def test_get_a_quote_from_database_as_admin():
+    """
+    Description: check if we can request the database in order to get a quote as admin.
+    """
+    session = session_commands.get_a_database_session()
+    quote_to_view = session.get(Quote, 1)
+    session.close()
+    assert isinstance(quote_to_view, Quote)
 
 
 def test_get_an_unexisting_quote_as_a_admin(

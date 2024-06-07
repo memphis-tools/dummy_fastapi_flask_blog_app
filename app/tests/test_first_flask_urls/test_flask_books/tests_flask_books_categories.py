@@ -3,6 +3,7 @@ All the tests functions for the books categories urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
+from app.packages.database.commands import session_commands
 from app.packages.database.models.models import BookCategory
 from app.packages.flask_app.project.__init__ import format_book_category
 from app.packages.flask_app.project.book_category_routes_blueprint import check_book_category_fields
@@ -51,6 +52,16 @@ def test_get_books_categories(client, access_session):
     response = client.get("/books/categories/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
     assert b'DUMMY BLOG - LES LIVRES PAR CATEGORIES' in response.data
+
+
+def test_get_books_categories_from_database_as_admin():
+    """
+    Description: check if we can request the database in order to get all quotes as admin.
+    """
+    session = session_commands.get_a_database_session()
+    categories = session.query(BookCategory).all()
+    session.close()
+    assert len(categories) == 8
 
 
 def test_get_valid_category_books(client, access_session):
