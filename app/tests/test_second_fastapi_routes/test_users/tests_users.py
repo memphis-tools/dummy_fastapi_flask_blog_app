@@ -75,6 +75,7 @@ async def test_get_current_disabled_user():
     user_found = await get_current_user(access_token)
     assert isinstance(user, fastapi_models.UserInDB)
     active_user = await get_current_active_user(user)
+    assert isinstance(active_user, fastapi_models.UserModel)
 
 
 @pytest.mark.asyncio
