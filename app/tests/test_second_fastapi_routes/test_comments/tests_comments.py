@@ -238,7 +238,6 @@ async def test_post_comment_without_being_authenticated(fastapi_client, fastapi_
     """
     Description: test add comment to book id 2 without being authenticated.
     """
-    access_token = fastapi_token
     json = {"text": "such a great book sir"}
     headers = {
         "Authorization": "Bearer DummyToken",
