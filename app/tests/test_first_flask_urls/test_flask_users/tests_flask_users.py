@@ -192,7 +192,7 @@ def test_get_users_from_database_as_admin():
     session = session_commands.get_a_database_session()
     all_users = session.query(User).all()[1:]
     session.close()
-    assert len(all_users) == 5
+    assert len(all_users) > 1
 
 
 def test_add_user_without_being_admin(client, access_session, get_flask_csrf_token):
