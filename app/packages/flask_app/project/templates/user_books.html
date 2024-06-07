@@ -28,15 +28,15 @@
     </div>
     {% if total_books > per_page %}
         <div class="pagination_block d-flex flex-row justify-content-center gap-3">
-            <a href="{{ url_for('book_routes_blueprint.books', page=1) }}">Premiers</a>
+            <a href="{{ url_for('user_routes_blueprint.user_books', user_id=user_id, page=1) }}">Premiers</a>
             {% if page > 1 %}
-                <a href="{{ url_for('book_routes_blueprint.books', page=page-1) }}">Précédents</a>
+                <a href="{{ url_for('user_routes_blueprint.user_books', user_id=user_id, page=page-1) }}">Précédents</a>
             {% endif %}
             Page {{ page }} sur {{ total_pages }}
             {% if page < total_pages %}
-                <a href="{{ url_for('book_routes_blueprint.books', page=page+1) }}">Prochains</a>
+                <a href="{{ url_for('user_routes_blueprint.user_books', user_id=user_id, page=page+1) }}">Prochains</a>
             {% endif %}
-            <a href="{{ url_for('book_routes_blueprint.books', page=total_pages) }}">Derniers</a>
+            <a href="{{ url_for('user_routes_blueprint.user_books', user_id=user_id, page=total_pages) }}">Derniers</a>
         </div>
     {% endif %}
 </div>

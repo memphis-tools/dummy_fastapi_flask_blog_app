@@ -3,7 +3,8 @@ All the tests functions for the users urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-
+from app.packages.database.commands import session_commands
+from app.packages.database.models.models import User
 from app.packages import settings
 
 
@@ -181,6 +182,17 @@ def test_get_users_being_admin(client, access_session_as_admin):
     headers = {"Cookie": f"session={access_session_as_admin}"}
     response = client.get("/users/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
+
+
+def test_get_users_from_database_as_admin():
+    """
+    Description: check if we can request the database in order to get all users as admin.
+    Notice that we set dummies datas to be test. We exclude admin user from request.
+    """
+    session = session_commands.get_a_database_session()
+    all_users = session.query(User).all()[1:]
+    session.close()
+    assert len(all_users) > 1
 
 
 def test_add_user_without_being_admin(client, access_session, get_flask_csrf_token):
