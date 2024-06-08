@@ -118,7 +118,7 @@ def access_session(client, get_flask_csrf_token):
     }
     response = client.post("http://localhost/login/", data=data)
     session = response.headers.pop('Set-Cookie')
-    return session
+    yield session
 
 
 @pytest.fixture
