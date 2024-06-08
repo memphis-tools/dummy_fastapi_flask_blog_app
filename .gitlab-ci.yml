@@ -39,7 +39,7 @@ unit_tests_development_branch:
     SCOPE: "local_test"
     ADMIN_LOGIN: "admin"
     ADMIN_PASSWORD: "$TEST_USER_PWD"
-    ADMIN_EMAIL: "admin@whatever.fr"
+    ADMIN_EMAIL: "admin@localhost.fr"
     POSTGRES_HOST: "postgres"
     POSTGRES_USER: "postgres"
     POSTGRES_PASSWORD: "$POSTGRES_PASSWORD"
