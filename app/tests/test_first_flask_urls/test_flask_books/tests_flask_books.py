@@ -236,8 +236,9 @@ def test_flask_update_book_being_authenticated_as_admin(
     response = client.get(url, headers={"Cookie": f"session={access_session_as_admin}"})
     print("GET response headers:", response.headers)
     soup = BeautifulSoup(response.text, 'html.parser')
-    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
     print("GET soup:", soup)
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+    
     print("GET csrf_token:", csrf_token)
     # soup = BeautifulSoup(client.get(url).text, 'html.parser')
     # csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
