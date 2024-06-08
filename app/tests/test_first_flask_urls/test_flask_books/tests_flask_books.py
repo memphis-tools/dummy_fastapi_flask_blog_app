@@ -232,16 +232,8 @@ def test_flask_update_book_being_authenticated_as_admin(
     Description: check if we can update a book being admin.
     """
     url = "http://localhost/book/2/update/"
-    # GET request to fetch the CSRF token
-    response = client.get(url, headers={"Cookie": f"session={access_session_as_admin}"})
-    print("GET response headers:", response.headers)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    print("GET soup:", soup)
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
     csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
-    
-    print("GET csrf_token:", csrf_token)
-    # soup = BeautifulSoup(client.get(url).text, 'html.parser')
-    # csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
 
     book_form = {
         "title": "This is a dummy title sir",
@@ -259,9 +251,6 @@ def test_flask_update_book_being_authenticated_as_admin(
         data=book_form,
         follow_redirects=True,
     )
-    print("POST response headers:", response.headers)
-    # print("POST response cookies:", response.cookies)
-    print("POST response data:", response.data)
     assert response.status_code == 200
     assert b"[+] Flask - Mise \xc3\xa0 jour livre." in response.data
 
