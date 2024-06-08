@@ -155,7 +155,7 @@ async def test_update_comment_with_authentication_with_forbidden_user(fastapi_cl
     access_token = fastapi_token
     response = fastapi_client.put(
         "/api/v1/books/comments/6/",
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=headers,
         json=json
     )
     assert response.status_code == 401
@@ -282,7 +282,7 @@ async def test_delete_comment_with_authentication_with_forbidden_user(fastapi_cl
 
     response = fastapi_client.delete(
         "/api/v1/books/6/comments/6/",
-        headers={"Authorization": f"Bearer {access_token}"}
+        headers=headers
     )
     assert response.status_code == 401
 
@@ -300,13 +300,13 @@ async def test_delete_comment_with_authentication(fastapi_client, fastapi_token)
     }
     response = fastapi_client.delete(
         "/api/v1/books/6/comments/7/",
-        headers={"Authorization": f"Bearer {access_token}"}
+        headers=headers
     )
     assert response.status_code == 204
 
 
 @pytest.mark.asyncio
-async def test_delete_comment_without_authentication(fastapi_client, fastapi_token):
+async def test_delete_comment_without_authentication(fastapi_client):
     """
     Description: test delete_comments id 7 without being authenticated
     """
@@ -333,7 +333,7 @@ async def test_delete_comment_with_authentication_with_unexisting_book(fastapi_c
     }
     response = fastapi_client.delete(
         "/api/v1/books/55555555/comments/7/",
-        headers={"Authorization": f"Bearer {access_token}"}
+        headers=headers
     )
     assert response.status_code == 404
 
@@ -350,7 +350,7 @@ async def test_delete_comment_with_authentication_with_unbind_book(fastapi_clien
     }
     response = fastapi_client.delete(
         "/api/v1/books/2/comments/5/",
-        headers={"Authorization": f"Bearer {access_token}"}
+        headers=headers
     )
     assert response.status_code == 401
 

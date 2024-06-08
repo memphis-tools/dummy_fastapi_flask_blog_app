@@ -7,6 +7,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 from werkzeug.security import generate_password_hash
 import jwt
 
+from app.packages import handle_passwords, log_events
+from app.packages.database.models import models
+from app.packages.fastapi.models.fastapi_models import (
+    NewUserInDBModel,
+    Token,
+)
 from .dependencies import (
     get_current_active_user,
     session,
@@ -14,12 +20,7 @@ from .dependencies import (
     SECRET_KEY,
     ALGORITHM,
 )
-from app.packages import handle_passwords, log_events
-from app.packages.database.models import models
-from app.packages.fastapi.models.fastapi_models import (
-    NewUserInDBModel,
-    Token,
-)
+
 
 # Because of the current architecture, in order to run tests_users and tests_authentication
 # We set "noqa: F401" for the unused get_user dependencie.

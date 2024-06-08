@@ -100,6 +100,8 @@ Codacy
 
 Snyk
 
+TabNine
+
 ## HOW TO SET IT, HOW IT WORKS
 
   Notice: if you use VisualCode remember that you can preview the markdown from VisualCode by running: Ctrl+Shift+V
@@ -162,7 +164,7 @@ Snyk
         ADMIN_LOGIN="admin"
         ADMIN_PASSWORD="@pplepie94"
         ADMIN_EMAIL="admin@localhost.fr"
-        TEST_USER_PWD="@DummyPassword94"
+        TEST_USER_PWD="@pplepie94"
         SECRET_KEY="YourSUperSecretKey123oclock"
         FLASK_APP=project/__init__.py
         FLASK_DEBUG=1
@@ -193,7 +195,7 @@ Snyk
         export ADMIN_LOGIN="admin"
         export ADMIN_PASSWORD="@pplepie94"
         export ADMIN_EMAIL="admin@localhost.fr"
-        export TEST_USER_PWD="@DummyPassword94"
+        export TEST_USER_PWD="@pplepie94"
         export SECRET_KEY="YourSUperSecretKey123oclock"
         export FLASK_APP=project/__init__.py
         export FLASK_DEBUG=1
@@ -402,9 +404,9 @@ If you need to debug from the virtual machine, at the project root folder:
         export POSTGRES_PORT="5432"
         export POSTGRES_HOST="db"
         export ADMIN_LOGIN="admin"
-        export ADMIN_PASSWORD="yourAdminDesiredPassword"
+        export ADMIN_PASSWORD="@pplepie94"
         export ADMIN_EMAIL="admin@localhost.fr"
-        export TEST_USER_PWD="aDummyPassword"
+        export TEST_USER_PWD="@pplepie94"
         export SECRET_KEY="YourSUperSecretKey123oclock"
         export FLASK_APP=project/__init__.py
         export FLASK_DEBUG=0

@@ -68,11 +68,6 @@ async def test_get_current_disabled_user():
     """
     username = "louloute"
     user = get_user(username)
-    access_token_expires = timedelta(minutes=routes_and_authentication.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = routes_and_authentication.create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
-    )
-    user_found = await get_current_user(access_token)
     assert isinstance(user, fastapi_models.UserInDB)
     active_user = await get_current_active_user(user)
     assert isinstance(active_user, fastapi_models.UserModel)
@@ -186,7 +181,7 @@ async def test_delete_user_without_being_admin(fastapi_client, fastapi_token):
     }
     response = fastapi_client.delete(
         "/api/v1/users/3/",
-        headers={"Authorization": f"Bearer {access_token}"}
+        headers=headers
     )
     assert response.status_code == 401
 
@@ -203,7 +198,7 @@ async def test_delete_user_being_admin(fastapi_client, fastapi_token_for_admin):
     }
     response = fastapi_client.delete(
         "/api/v1/users/5/",
-        headers={"Authorization": f"Bearer {access_token}"}
+        headers=headers
     )
     assert response.status_code == 204
 
@@ -220,7 +215,7 @@ async def test_delete_unexisting_user_being_admin(fastapi_client, fastapi_token_
     }
     response = fastapi_client.delete(
         "/api/v1/users/55555555/",
-        headers={"Authorization": f"Bearer {access_token}"}
+        headers=headers
     )
     assert response.status_code == 404
 
@@ -480,7 +475,7 @@ async def test_partial_update_forbidden_user_with_authentication(
     access_token = fastapi_token
     response = fastapi_client.patch(
         "/api/v1/users/3/",
-        headers={"Authorization": f"Bearer {access_token}"},
+        headers=headers,
         json=json
     )
     assert response.status_code == 401
