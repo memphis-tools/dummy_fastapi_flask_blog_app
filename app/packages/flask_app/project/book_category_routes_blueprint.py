@@ -29,11 +29,7 @@ def check_book_category_fields(category):
     Description: vérifier que l'utilisateur renseigne la catégorie correctement.
     """
     session = session_commands.get_a_database_session()
-    if any(
-        [
-            str(category.title).lower() == "string",
-        ]
-    ):
+    if str(category.title).lower() == "string":
         session.close()
         error = "Saisie invalide, mot clef string non utilisable."
         return error
@@ -159,8 +155,10 @@ def add_book_category():
             log_events.log_event("[+] Flask - Ajout catégorie livre.", logs_context)
             session.add(new_category)
             session.commit()
-        flash("Categorie invalide", "error")
-        session.close()
+            flash(f"Ajout catégorie {str(title).lower()}", "info")
+        else:
+            flash(category_is_valid, "error")
+            session.close()
         return redirect(
             url_for("book_category_routes_blueprint.manage_books_categories")
         )
@@ -236,7 +234,7 @@ def update_book_category(category_id):
             updated_category.get_json_for_update()
         )
         book_category_is_valid = check_book_category_fields(updated_category)
-        if book_category_is_valid is True:
+        if str(title).lower() != "string":
             logs_context = {
                 "current_user": f"{current_user.username}",
                 "updated_category_old": category_to_update.title,
@@ -247,11 +245,12 @@ def update_book_category(category_id):
             )
             session.commit()
             session.close()
+            flash("[+] Flask - Mise à jour catégorie livre.", "info")
             return redirect(
                 url_for("book_category_routes_blueprint.manage_books_categories")
             )
 
-        flash(book_category_is_valid, "error")
+        flash("Saisie invalide, mot clef string non utilisable.", "error")
         session.close()
         return redirect(url_for("index"))
     return render_template(

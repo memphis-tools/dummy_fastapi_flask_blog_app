@@ -1,5 +1,8 @@
 [run]
 branch = True
+source = app
+
+[report]
 omit = app/tests/conftest.py, \
   app/tests/*, \
   app/packages/__init__.py, \
@@ -14,3 +17,6 @@ omit = app/tests/conftest.py, \
   app/packages/logtail_handler.py, \
   app/__init__.py, \
   app/packages/log_events.py
+
+[xml]
+output = coverage.xml

@@ -81,7 +81,7 @@ def test_post_flask_register_route(client, get_flask_csrf_token):
         follow_redirects=True,
     )
     assert response.status_code == 200
-    # assert b"Bienvenue fafa vous pouvez vous connecter" in response.data
+    assert b"Bienvenue fafa vous pouvez vous connecter" in response.data
 
 
 def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_token):
@@ -104,7 +104,7 @@ def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_to
         follow_redirects=True,
     )
     assert response.status_code == 200
-    # assert b"Email existe deja en base" in response.data
+    assert b"Email existe deja en base" in response.data
 
 
 def test_post_flask_register_route_with_passwords_mismatch(
@@ -129,7 +129,7 @@ def test_post_flask_register_route_with_passwords_mismatch(
         follow_redirects=True,
     )
     assert response.status_code == 200
-    # assert b"Mots de passe ne correspondent pas" in response.data
+    assert b"Mots de passe ne correspondent pas" in response.data
 
 
 def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_token):
@@ -152,7 +152,7 @@ def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_tok
         follow_redirects=False,
     )
     assert response.status_code == 200
-    # assert b"Nom utilisateur existe deja, veuillez le modifier" in response.data
+    assert b"Nom utilisateur existe deja, veuillez le modifier" in response.data
 
 
 def test_post_flask_register_route_with_invalid_data(client):

@@ -3,7 +3,6 @@ All the tests functions for the books urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-
 from pathlib import Path
 from werkzeug.datastructures import FileStorage
 from bs4 import BeautifulSoup
@@ -31,7 +30,7 @@ def test_flask_get_a_book_without_authentication_following_redirect(client):
 
 
 def test_flask_post_add_book_with_authentication(
-    client, access_session, get_flask_csrf_token
+    client, access_session
 ):
     """
     Description: check if we can add a book being authenticated and without following redirect.
@@ -39,6 +38,11 @@ def test_flask_post_add_book_with_authentication(
     # get the resources folder in the tests folder
     # rb flag means "Open in binary mode (read/write using byte data)" - https://realpython.com/read-write-files-python/
     resources = Path(__file__).parent
+
+    url = "http://localhost/books/add/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+
     headers = {
         "Content-Type": "multipart/form-data",
         "Cookie": f"session={access_session}",
@@ -48,15 +52,16 @@ def test_flask_post_add_book_with_authentication(
         "summary": "This is a dummy summary sir",
         "content": "This is a dummy content sir",
         "author": "Dummy Sapiens",
-        "book_picture": (resources / "photo_pexels.com_by_inga_seliverstova.jpg").open(
+        "categories": "2",
+        "year_of_publication": "1999",
+        "photo": (resources / "photo_pexels.com_by_inga_seliverstova.jpg").open(
             "rb"
         ),
-        "csrf_token": get_flask_csrf_token,
+        "csrf_token": csrf_token,
     }
-
-    url = "http://localhost/books/add/"
     response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
     assert response.status_code == 200
+    assert b"[+] Flask - Ajout livre." in response.data
 
 
 def test_flask_post_add_book_without_authentication(client, get_flask_csrf_token):
@@ -138,16 +143,20 @@ def test_flask_post_books(client):
 
 
 def test_flask_update_book_being_authenticated(
-    client, access_session, get_flask_csrf_token
+    client, access_session
 ):
     """
     Description: check if we can update a book.
     """
 
+    url = "http://localhost/book/1/update/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+
     book_form = {
         "title": "This is a dummy title sir",
         "categories": "1",
-        "csrf_token": get_flask_csrf_token,
+        "csrf_token": csrf_token,
     }
 
     headers = {
@@ -161,6 +170,7 @@ def test_flask_update_book_being_authenticated(
         follow_redirects=True,
     )
     assert response.status_code == 200
+    assert b"[+] Flask - Mise \xc3\xa0 jour livre." in response.data
 
 
 def test_flask_update_book_being_authenticated_without_book_id(
@@ -216,16 +226,19 @@ def test_flask_update_book_being_authenticated_without_being_publisher(
 
 
 def test_flask_update_book_being_authenticated_as_admin(
-    client, access_session_as_admin, get_flask_csrf_token
+    client, access_session_as_admin
 ):
     """
     Description: check if we can update a book being admin.
     """
+    url = "http://localhost/book/2/update/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
 
     book_form = {
         "title": "This is a dummy title sir",
         "categories": "1",
-        "csrf_token": get_flask_csrf_token,
+        "csrf_token": csrf_token,
     }
 
     headers = {
@@ -239,6 +252,7 @@ def test_flask_update_book_being_authenticated_as_admin(
         follow_redirects=True,
     )
     assert response.status_code == 200
+    assert b"[+] Flask - Mise \xc3\xa0 jour livre." in response.data
 
 
 def test_flask_update_unexisting_book_being_authenticated_as_admin(
@@ -264,7 +278,7 @@ def test_flask_update_unexisting_book_being_authenticated_as_admin(
         data=book_form,
         follow_redirects=True,
     )
-    # assert b"Livre non trouv" in response.data
+    assert b"Livre non trouv" in response.data
     assert response.status_code == 200
 
 
@@ -330,7 +344,6 @@ def test_flask_post_delete_book_being_authenticated_without_being_the_publisher(
 
 def test_flask_post_delete_book_being_authenticated_being_the_publisher(
     client, access_session,
-    get_flask_csrf_token,
     get_session,
     mock_function_delete_book,
 ):
@@ -339,11 +352,15 @@ def test_flask_post_delete_book_being_authenticated_being_the_publisher(
     See utils.py to discover all dummy datas set.
     Here 1 book published by user id 2 (the one which has the 'get_session') has already been deleted (tests_routes.py)
     """
+    url = "http://localhost/book/8/delete/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
         "Cookie": f"session={access_session}",
     }
-    data = {"csrf_token": get_flask_csrf_token}
+    data = {"csrf_token": csrf_token}
     book = get_session.get(Book, 8)
     user = get_session.query(User).filter(
         User.id == book.user_id
@@ -351,7 +368,7 @@ def test_flask_post_delete_book_being_authenticated_being_the_publisher(
         joinedload(User.books)
     ).one()
     current_user_total_publications = len(user.books)
-    assert current_user_total_publications == 3
+    assert current_user_total_publications == 4
 
     response = client.post(
         "http://localhost/book/8/delete/",
@@ -366,8 +383,7 @@ def test_flask_post_delete_book_being_authenticated_being_the_publisher(
 
 def test_add_book_check_book_fields(
     client,
-    access_session,
-    get_flask_csrf_token
+    access_session
 ):
     """
     Description: check if we can add a book with 'string' keyword as content.
@@ -375,6 +391,11 @@ def test_add_book_check_book_fields(
     # get the resources folder in the tests folder
     # rb flag means "Open in binary mode (read/write using byte data)" - https://realpython.com/read-write-files-python/
     resources = Path(__file__).parent
+
+    url = "http://localhost/books/add/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+
     headers = {
         "Content-Type": "multipart/form-data",
         "Cookie": f"session={access_session}",
@@ -391,7 +412,7 @@ def test_add_book_check_book_fields(
             filename="photo_pexels.com_by_inga_seliverstova.jpg",
             content_type="image/jpeg",
         ),
-        "csrf_token": get_flask_csrf_token,
+        "csrf_token": csrf_token,
     }
     response = client.post(
         "/books/add/",

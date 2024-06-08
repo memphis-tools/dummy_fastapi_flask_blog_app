@@ -234,7 +234,7 @@ async def test_post_comment_with_authentication_with_valid_datas(
 
 
 @pytest.mark.asyncio
-async def test_post_comment_without_being_authenticated(fastapi_client, fastapi_token):
+async def test_post_comment_without_being_authenticated(fastapi_client):
     """
     Description: test add comment to book id 2 without being authenticated.
     """

@@ -74,9 +74,9 @@ def get_test_token():
 
 
 @pytest.fixture
-def flask_app():
+def app():
     """
-    Description: get the project Flask app in order for tests to run.
+    Description: Provides the project Flask app for tests to run.
     """
     flask_app = project.app
     flask_app.config.update(
@@ -86,17 +86,18 @@ def flask_app():
 
 
 @pytest.fixture
-def client(flask_app):
+def client(app):
     """
-    Description: get a client of the project Flask app in order for tests to run.
+    Description: Provides a client of the project Flask app for tests to run.
     """
-    return flask_app.test_client()
+    with app.test_client() as client:
+        yield client
 
 
 @pytest.fixture
 def get_flask_csrf_token(client):
     """
-    Description: get a csrf_token from Flask app in order for tests to run.
+    Description: Provides a csrf_token from Flask app for tests to run.
     """
     url = "http://localhost/register/"
     soup = BeautifulSoup(client.get(url).text, 'html.parser')
@@ -117,13 +118,13 @@ def access_session(client, get_flask_csrf_token):
     }
     response = client.post("http://localhost/login/", data=data)
     session = response.headers.pop('Set-Cookie')
-    return session
+    yield session
 
 
 @pytest.fixture
 def access_session_as_admin(client, get_flask_csrf_token):
     """
-    Description: fixture offers a Flask session cookie for the admin user.
+    Description: Provides a Flask session cookie for the admin user.
     """
     data = {
         "login": "admin",
@@ -133,7 +134,7 @@ def access_session_as_admin(client, get_flask_csrf_token):
     }
     response = client.post("http://localhost/login/", data=data)
     session = response.headers.pop('Set-Cookie')
-    return session
+    yield session
 
 
 @pytest.fixture

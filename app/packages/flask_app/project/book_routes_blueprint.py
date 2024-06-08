@@ -191,6 +191,7 @@ def add_book():
                     "book_title": new_book.title,
                 }
                 log_events.log_event("[+] Flask - Ajout livre.", logs_context)
+                flash("[+] Flask - Ajout livre.", "info")
                 session.close()
                 return redirect(url_for("book_routes_blueprint.books"))
         else:
@@ -246,6 +247,22 @@ def delete_book(book_id):
     )
 
 
+def get_book_by_id(book_id):
+    """
+    Description: retrieve a book by its ID.
+    """
+    session = session_commands.get_a_database_session()
+    book = (
+        session.query(Book)
+        .filter(Book.id == book_id)
+        .options(joinedload(Book.book_comments))
+        .options(joinedload(Book.starred))
+        .first()
+    )
+    session.close()
+    return book
+
+
 @book_routes_blueprint.route("/book/<int:book_id>/update/", methods=["GET", "POST"])
 @login_required
 def update_book(book_id):
@@ -253,13 +270,7 @@ def update_book(book_id):
     Description: the update book Flask route.
     """
     session = session_commands.get_a_database_session()
-    a_book = (
-        session.query(Book)
-        .filter(Book.id.in_([book_id]))
-        .options(joinedload(Book.book_comments))
-        .options(joinedload(Book.starred))
-        .first()
-    )
+    a_book = get_book_by_id(book_id)
     if not a_book:
         flash("Livre non trouvé", "error")
         session.close()
@@ -368,6 +379,7 @@ def update_book(book_id):
                 "book_title": updated_book.title,
             }
             log_events.log_event("[+] Flask - Mise à jour livre.", logs_context)
+            flash("[+] Flask - Mise à jour livre.", "info")
             return redirect(url_for("book_routes_blueprint.book", book_id=book_id))
 
         flash("Erreur avec image illustration", "error")
