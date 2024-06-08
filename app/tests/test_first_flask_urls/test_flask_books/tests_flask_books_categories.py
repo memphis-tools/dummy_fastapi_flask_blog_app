@@ -179,6 +179,7 @@ def test_delete_unexisting_book_category_being_admin(
     """
     url = "/book/categories/2/delete/"
     soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    print(f"DEBUG SIR soup: {soup}")
     csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
     data = {
         "csrf_token": csrf_token,
