@@ -3,7 +3,6 @@ All the tests functions for the books categories urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-import requests
 from bs4 import BeautifulSoup
 
 from app.packages.database.commands import session_commands
