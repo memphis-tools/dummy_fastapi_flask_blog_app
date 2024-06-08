@@ -3,6 +3,7 @@ All the tests functions for the books categories urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
+import requests
 from bs4 import BeautifulSoup
 
 from app.packages.database.commands import session_commands
@@ -90,17 +91,13 @@ def test_get_unexisting_category_books(client, access_session_as_admin):
     assert b'Categorie id 55555 inexistante' in response.data
 
 
-def test_get_invalid_category_books(client, access_session_as_admin):
+def test_get_invalid_category_books(client, access_session_as_admin, get_flask_csrf_token):
     """
     Description: check if we can get all the books from an invalid category.
     """
-    url = "http://localhost/book/categories/add/"
-    soup = BeautifulSoup(client.get(url).text, 'html.parser')
-    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
-
     data = {
         "title": "string",
-        "csrf_token": csrf_token,
+        "csrf_token": get_flask_csrf_token,
     }
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -175,14 +172,16 @@ def test_delete_valid_book_category_being_admin(client, access_session_as_admin,
 
 def test_delete_unexisting_book_category_being_admin(
     client,
-    access_session_as_admin,
-    get_flask_csrf_token
+    access_session_as_admin
 ):
     """
     Description: check if we can delete an unexisting book category being admin.
     """
+    url = "/book/categories/2/delete/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
     data = {
-        "csrf_token": get_flask_csrf_token,
+        "csrf_token": csrf_token,
     }
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
