@@ -247,6 +247,22 @@ def delete_book(book_id):
     )
 
 
+def get_book_by_id(book_id):
+    """
+    Description: retrieve a book by its ID.
+    """
+    session = session_commands.get_a_database_session()
+    book = (
+        session.query(Book)
+        .filter(Book.id == book_id)
+        .options(joinedload(Book.book_comments))
+        .options(joinedload(Book.starred))
+        .first()
+    )
+    session.close()
+    return book
+
+
 @book_routes_blueprint.route("/book/<int:book_id>/update/", methods=["GET", "POST"])
 @login_required
 def update_book(book_id):
@@ -254,13 +270,7 @@ def update_book(book_id):
     Description: the update book Flask route.
     """
     session = session_commands.get_a_database_session()
-    a_book = (
-        session.query(Book)
-        .filter(Book.id.in_([book_id]))
-        .options(joinedload(Book.book_comments))
-        .options(joinedload(Book.starred))
-        .first()
-    )
+    a_book = get_book_by_id(book_id)
     if not a_book:
         flash("Livre non trouvé", "error")
         session.close()
