@@ -175,14 +175,17 @@ def test_delete_valid_book_category_being_admin(client, access_session_as_admin,
 
 def test_delete_unexisting_book_category_being_admin(
     client,
-    access_session_as_admin,
-    get_flask_csrf_token
+    access_session_as_admin
 ):
     """
     Description: check if we can delete an unexisting book category being admin.
     """
+    url = "http://localhost/book/categories/555555/delete/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+
     data = {
-        "csrf_token": get_flask_csrf_token,
+        "csrf_token": csrf_token,
     }
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -194,6 +197,7 @@ def test_delete_unexisting_book_category_being_admin(
         data=data,
         follow_redirects=True
     )
+    print(f"DEBUG SIR response DATA: {response.data}")
     assert response.status_code == 404
 
 
