@@ -3,6 +3,8 @@ All the tests functions for the books categories urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
+from bs4 import BeautifulSoup
+
 from app.packages.database.commands import session_commands
 from app.packages.database.models.models import BookCategory
 from app.packages.flask_app.project.__init__ import format_book_category
@@ -88,13 +90,17 @@ def test_get_unexisting_category_books(client, access_session_as_admin):
     assert b'Categorie id 55555 inexistante' in response.data
 
 
-def test_get_invalid_category_books(client, access_session_as_admin, get_flask_csrf_token):
+def test_get_invalid_category_books(client, access_session_as_admin):
     """
     Description: check if we can get all the books from an invalid category.
     """
+    url = "http://localhost/book/categories/add/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+
     data = {
         "title": "string",
-        "csrf_token": get_flask_csrf_token,
+        "csrf_token": csrf_token,
     }
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -102,7 +108,7 @@ def test_get_invalid_category_books(client, access_session_as_admin, get_flask_c
     }
     response = client.post("/book/categories/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
-    # assert b'Categorie invalide' in response.data
+    assert b'Saisie invalide, mot clef string non utilisable.' in response.data
 
 
 def test_get_manage_books_categories_without_being_admin(client, access_session):
@@ -188,8 +194,7 @@ def test_delete_unexisting_book_category_being_admin(
         data=data,
         follow_redirects=True
     )
-    # assert response.status_code == 404
-    # assert b'Categorie livre non trouvee' in response.data
+    assert response.status_code == 404
 
 
 def test_update_valid_book_category_without_being_admin(client, access_session, get_flask_csrf_token):
@@ -213,13 +218,17 @@ def test_update_valid_book_category_without_being_admin(client, access_session, 
     assert response.status_code == 403
 
 
-def test_update_valid_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+def test_update_valid_book_category_being_admin(client, access_session_as_admin):
     """
     Description: check if we can update a valid book category being admin.
     """
+    url = "http://localhost/book/categories/3/update/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+
     data = {
         "title": "politique",
-        "csrf_token": get_flask_csrf_token,
+        "csrf_token": csrf_token,
     }
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -232,6 +241,7 @@ def test_update_valid_book_category_being_admin(client, access_session_as_admin,
         follow_redirects=True
     )
     assert response.status_code == 200
+    assert b"[+] Flask - Mise \xc3\xa0 jour cat\xc3\xa9gorie livre." in response.data
 
 
 def test_format_book_category():
@@ -263,13 +273,17 @@ def test_add_book_category_without_being_admin(client, access_session, get_flask
     assert response.status_code == 403
 
 
-def test_add_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+def test_add_book_category_being_admin(client, access_session_as_admin):
     """
     Description: check if we can add a book category being admin.
     """
+    url = "http://localhost/book/categories/add/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+
     data = {
         "title": "CUISINE",
-        "csrf_token": get_flask_csrf_token,
+        "csrf_token": csrf_token,
     }
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -282,15 +296,20 @@ def test_add_book_category_being_admin(client, access_session_as_admin, get_flas
         follow_redirects=True
     )
     assert response.status_code == 200
+    assert b'Ajout cat\xc3\xa9gorie cuisine' in response.data
 
 
-def test_add_existing_book_category_being_admin(client, access_session_as_admin, get_flask_csrf_token):
+def test_add_existing_book_category_being_admin(client, access_session_as_admin):
     """
     Description: check if we can add an existing book category being admin.
     """
+    url = "http://localhost/book/categories/add/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+
     data = {
         "title": "POLITIQUE",
-        "csrf_token": get_flask_csrf_token,
+        "csrf_token": csrf_token,
     }
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -303,7 +322,7 @@ def test_add_existing_book_category_being_admin(client, access_session_as_admin,
         follow_redirects=True
     )
     assert response.status_code == 200
-    # assert b'Saisie invalide, categorie existe deja' in response.data
+    assert b'Saisie invalide, categorie existe deja' in response.data
 
 
 def test_update_unexisting_book_category_being_admin(
@@ -328,5 +347,4 @@ def test_update_unexisting_book_category_being_admin(
         data=data,
         follow_redirects=True
     )
-    # assert response.status_code == 404
-    # assert b'Categorie livre non trouvee' in response.data
+    assert response.status_code == 404

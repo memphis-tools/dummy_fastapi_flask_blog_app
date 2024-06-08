@@ -191,6 +191,7 @@ def add_book():
                     "book_title": new_book.title,
                 }
                 log_events.log_event("[+] Flask - Ajout livre.", logs_context)
+                flash("[+] Flask - Ajout livre.", "info")
                 session.close()
                 return redirect(url_for("book_routes_blueprint.books"))
         else:
@@ -368,6 +369,7 @@ def update_book(book_id):
                 "book_title": updated_book.title,
             }
             log_events.log_event("[+] Flask - Mise à jour livre.", logs_context)
+            flash("[+] Flask - Mise à jour livre.", "info")
             return redirect(url_for("book_routes_blueprint.book", book_id=book_id))
 
         flash("Erreur avec image illustration", "error")

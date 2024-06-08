@@ -106,7 +106,7 @@ def test_get_an_unexisting_quote_as_a_admin(
         data=data,
         follow_redirects=True
     )
-    # assert response.status_code == 404
+    assert response.status_code == 404
 
 
 def test_get_any_valid_quotes_for_deleting_as_admin(client, access_session_as_admin):
@@ -145,7 +145,7 @@ def test_add_a_valid_quote_as_admin(
         follow_redirects=True
     )
     assert response.status_code == 200
-    # assert b'Ajout citation' in response.data
+    assert b'Ajout citation' in response.data
 
 
 def test_add_an_invalid_quote_as_admin(
@@ -243,4 +243,4 @@ def test_flask_delete_unexisting_quote_with_authentication_as_admin(
         data=data,
         follow_redirects=True,
     )
-    # assert response.status_code == 404
+    assert response.status_code == 404
