@@ -194,6 +194,7 @@ def test_delete_unexisting_book_category_being_admin(
         data=data,
         follow_redirects=True
     )
+    print(f"DEBUG SIR: {response.data}")
     assert response.status_code == 404
 
 
