@@ -24,7 +24,7 @@ def get_session():
 
 
 @pytest.fixture
-def fastapi_client(get_session):
+def fastapi_client():
     """
     Description: fixture offers a Flask TestClient
     """
