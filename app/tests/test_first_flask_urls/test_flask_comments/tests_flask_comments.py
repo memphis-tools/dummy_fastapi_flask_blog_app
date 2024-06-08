@@ -223,3 +223,4 @@ def test_flask_post_update_comment_as_admin(
         follow_redirects=True,
     )
     assert response.status_code == 200
+    assert b"Commentaire mis a jour" in response.data
