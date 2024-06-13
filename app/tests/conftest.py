@@ -28,8 +28,8 @@ def fastapi_client():
     """
     Description: fixture offers a Flask TestClient
     """
-    with TestClient(routes_and_authentication.app) as client:
-        yield client
+    with TestClient(routes_and_authentication.app) as a_fastapi_client:
+        yield a_fastapi_client
 
 
 @pytest.fixture
