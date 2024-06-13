@@ -81,7 +81,7 @@ def too_large(e):
     """
     Description: custom error message when uploaded image size is too big.
     """
-    return "Taille fichier excède la limite prévue", 413
+    return f"Taille fichier excède la limite prévue {e}", 413
 
 
 @app.template_filter()
