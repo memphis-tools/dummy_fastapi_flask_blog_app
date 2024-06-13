@@ -8,9 +8,12 @@ from app.packages import settings
 from app.packages.database.models import models
 
 
-def call_dummy_setup(session):
+def call_dummy_setup_for_users(session):
     """
-    Description: populate database with dummy datas
+    Description: populate database with dummy users datas.
+
+    Args:
+        session -- engine's session to query postgresql database
     """
     dummy_users_list = set_dummies_users()
     for user in dummy_users_list:
@@ -20,6 +23,14 @@ def call_dummy_setup(session):
         except Exception:
             print(f"[+] User {user.username} already exists sir, nothing to do.")
 
+
+def call_dummy_setup_for_books(session):
+    """
+    Description: populate database with dummy books datas.
+
+    Args:
+        session -- engine's session to query postgresql database
+    """
     dummy_books_list = set_dummies_books()
     for book in dummy_books_list:
         try:
@@ -28,6 +39,14 @@ def call_dummy_setup(session):
         except Exception:
             print(f"[+] Book {book.title} already exists sir, nothing to do.")
 
+
+def call_dummy_setup_for_comments(session):
+    """
+    Description: populate database with dummy comments datas.
+
+    Args:
+        session -- engine's session to query postgresql database
+    """
     dummy_comments_list = set_dummies_comments()
     for comment in dummy_comments_list:
         try:
@@ -36,6 +55,14 @@ def call_dummy_setup(session):
         except Exception:
             print("[+] Comment already exists sir, nothing to do.")
 
+
+def call_dummy_setup_for_starred_books(session):
+    """
+    Description: populate database with dummy starred books datas.
+
+    Args:
+        session -- engine's session to query postgresql database
+    """
     dummy_starred_list = set_dummies_starred()
     for starred in dummy_starred_list:
         try:
@@ -44,6 +71,14 @@ def call_dummy_setup(session):
         except Exception:
             print("[+] Starred already exists sir, nothing to do.")
 
+
+def call_dummy_setup_for_quotes(session):
+    """
+    Description: populate database with dummy quotes datas.
+
+    Args:
+        session -- engine's session to query postgresql database
+    """
     dummy_quotes_list = set_dummies_quotes()
     for quote in dummy_quotes_list:
         try:
@@ -51,6 +86,19 @@ def call_dummy_setup(session):
             session.commit()
         except Exception:
             print("[+] Quote already exists sir, nothing to do.")
+
+
+def call_dummy_setup(session):
+    """_summary_
+
+    Args:
+        session -- engine's session to query postgresql database
+    """
+    call_dummy_setup_for_users(session)
+    call_dummy_setup_for_books(session)
+    call_dummy_setup_for_comments(session)
+    call_dummy_setup_for_starred_books(session)
+    call_dummy_setup_for_quotes(session)
 
 
 def set_a_hash_password(password):

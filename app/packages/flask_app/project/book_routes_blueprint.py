@@ -252,7 +252,7 @@ def get_book_by_id(book_id):
     Description: retrieve a book by its ID.
     """
     session = session_commands.get_a_database_session()
-    book = (
+    query = (
         session.query(Book)
         .filter(Book.id == book_id)
         .options(joinedload(Book.book_comments))
@@ -260,7 +260,7 @@ def get_book_by_id(book_id):
         .first()
     )
     session.close()
-    return book
+    return query
 
 
 @book_routes_blueprint.route("/book/<int:book_id>/update/", methods=["GET", "POST"])
@@ -288,7 +288,6 @@ def update_book(book_id):
     )
     if edit_form.validate_on_submit():
         form = request.form.to_dict()
-        form_file = request.files.to_dict
         if "title" in form:
             title = form["title"]
         else:

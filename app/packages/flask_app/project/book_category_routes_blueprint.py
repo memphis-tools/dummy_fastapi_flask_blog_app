@@ -52,8 +52,8 @@ def categories():
     """
     session = session_commands.get_a_database_session()
     categories_list = []
-    categories = session.query(BookCategory).order_by(BookCategory.id).all()
-    for category in categories:
+    categories_query = session.query(BookCategory).order_by(BookCategory.id).all()
+    for category in categories_query:
         category_id = category.id
         category_books_query = session.query(Book).filter(
             Book.category.in_(
@@ -123,11 +123,11 @@ def manage_books_categories():
     Description: a manage view to get books categories Flask route.
     """
     session = session_commands.get_a_database_session()
-    categories = session.query(BookCategory).all()
+    categories_query = session.query(BookCategory).all()
     session.close()
     return render_template(
         "books_categories.html",
-        categories=categories,
+        categories=categories_query,
         is_authenticated=current_user.is_authenticated,
     )
 
@@ -233,7 +233,6 @@ def update_book_category(category_id):
         session.query(BookCategory).where(BookCategory.id == category_id).update(
             updated_category.get_json_for_update()
         )
-        book_category_is_valid = check_book_category_fields(updated_category)
         if str(title).lower() != "string":
             logs_context = {
                 "current_user": f"{current_user.username}",
