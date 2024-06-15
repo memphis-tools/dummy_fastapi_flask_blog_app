@@ -33,7 +33,7 @@ from .routers import books_categories, books, comments, quotes, users
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 app: FastAPI = FastAPI(
     title="DUMMY-OPS API",
-    docs_url="/api/v1/docs/",
+    docs_url=None,
     openapi_url="/api/v1/openapi.json",
     swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
@@ -70,7 +70,8 @@ def get_password_hash(password):
 
 @app.get("/docs", response_class=HTMLResponse)
 async def custom_swagger_ui(request: Request):
-   return templates.TemplateResponse("custom_swagger_ui.html", {"request": request})
+    """custom fastapi /docs page to include the consentmanager script"""
+    return templates.TemplateResponse("custom_swagger_ui.html", {"request": request})
 
 
 @app.post("/api/v1/token/", tags=["DEFAULT"])
