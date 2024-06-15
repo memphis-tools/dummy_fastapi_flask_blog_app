@@ -33,11 +33,11 @@ from .routers import books_categories, books, comments, quotes, users
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 app: FastAPI = FastAPI(
     title="DUMMY-OPS API",
-    docs_url="/api/v1/docs/",
+    docs_url=None,
     openapi_url="/api/v1/openapi.json",
     swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="app/packages/fastapi/routes/templates")
 
 protected_routes = [
     books_categories.router,
@@ -68,9 +68,10 @@ def get_password_hash(password):
     return generate_password_hash(password, "pbkdf2:sha256", salt_length=8)
 
 
-@app.get("/docs", response_class=HTMLResponse)
+@app.get("/api/v1/docs", response_class=HTMLResponse)
 async def custom_swagger_ui(request: Request):
-   return templates.TemplateResponse("custom_swagger_ui.html", {"request": request})
+    """custom fastapi /docs page to include the consentmanager script"""
+    return templates.TemplateResponse(request, "custom_swagger_ui.html", {"openapi_url": app.openapi_url})
 
 
 @app.post("/api/v1/token/", tags=["DEFAULT"])
