@@ -2,8 +2,10 @@
 
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Request
+from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.templating import Jinja2Templates
 from werkzeug.security import generate_password_hash
 import jwt
 
@@ -35,6 +37,7 @@ app: FastAPI = FastAPI(
     openapi_url="/api/v1/openapi.json",
     swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
+templates = Jinja2Templates(directory="templates")
 
 protected_routes = [
     books_categories.router,
@@ -63,6 +66,11 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 def get_password_hash(password):
     """get hash from password"""
     return generate_password_hash(password, "pbkdf2:sha256", salt_length=8)
+
+
+@app.get("/docs", response_class=HTMLResponse)
+async def custom_swagger_ui(request: Request):
+   return templates.TemplateResponse("custom_swagger_ui.html", {"request": request})
 
 
 @app.post("/api/v1/token/", tags=["DEFAULT"])
