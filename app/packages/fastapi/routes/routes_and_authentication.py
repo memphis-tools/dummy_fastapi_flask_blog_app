@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.templating import Jinja2Templates
 from werkzeug.security import generate_password_hash
 import jwt
 
