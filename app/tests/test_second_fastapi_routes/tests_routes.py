@@ -18,6 +18,7 @@ def test_docs_uri(fastapi_client):
     Description: test a get docs url.
     """
     response = fastapi_client.get("/api/v1/docs")
+    assert b'DUMMY-OPS API' in response.content
     assert response.status_code == 200
 
 
