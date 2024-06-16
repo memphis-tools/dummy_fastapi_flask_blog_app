@@ -6,6 +6,12 @@ from fastapi import Depends, FastAPI, HTTPException, status, Request
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
+from fastapi.openapi.docs import (
+    get_redoc_html,
+    get_swagger_ui_html,
+    get_swagger_ui_oauth2_redirect_html,
+)
+from fastapi.staticfiles import StaticFiles
 from werkzeug.security import generate_password_hash
 import jwt
 
@@ -34,10 +40,12 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 app: FastAPI = FastAPI(
     title="DUMMY-OPS API",
     docs_url=None,
+    redoc_url=None,
     openapi_url="/api/v1/openapi.json",
     swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
-templates = Jinja2Templates(directory="app/packages/fastapi/routes/templates")
+app.mount("/app/packages/fastapi/static", StaticFiles(directory="app/packages/fastapi/static"), name="static")
+templates = Jinja2Templates(directory="/app/packages/fastapi/routes/templates")
 
 protected_routes = [
     books_categories.router,
@@ -68,10 +76,35 @@ def get_password_hash(password):
     return generate_password_hash(password, "pbkdf2:sha256", salt_length=8)
 
 
-@app.get("/api/v1/docs", response_class=HTMLResponse)
-async def custom_swagger_ui(request: Request):
-    """custom fastapi /docs page to include the consentmanager script"""
-    return templates.TemplateResponse(request, "custom_swagger_ui.html", {"openapi_url": app.openapi_url})
+@app.get("/api/v1/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - Swagger UI",
+        oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
+        swagger_js_url="static/swagger-ui-bundle.js",
+        swagger_css_url="static/swagger-ui.css",
+    )
+
+
+@app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)
+async def swagger_ui_redirect():
+    return get_swagger_ui_oauth2_redirect_html()
+
+
+@app.get("/api/v1/redoc", include_in_schema=False)
+async def redoc_html():
+    return get_redoc_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - ReDoc",
+        redoc_js_url="static/redoc.standalone.js",
+    )
+
+
+@app.get("/api/v1/swagger-ui-init.js", response_class=HTMLResponse)
+async def swagger_ui_init_js():
+    """Serve the custom Swagger UI initialization script"""
+    return get_swagger_ui_html(openapi_url="/api/v1/openapi.json", title="DUMMY-OPS API", swagger_ui_parameters={"defaultModelsExpandDepth": -1})
 
 
 @app.post("/api/v1/token/", tags=["DEFAULT"])
