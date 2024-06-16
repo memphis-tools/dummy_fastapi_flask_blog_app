@@ -9,14 +9,14 @@
 <body>
    <div id="swagger-ui"></div>
    <!-- Swagger UI bundle -->
-   <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
-   <!-- Swagger UI standalone preset -->
-   <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
-   <!-- Init -->
+    <script src="../static/swagger-ui-bundle.js"></script>
+    <!-- Swagger UI standalone preset -->
+    <script src="../static/swagger-ui-standalone-preset.js"></script>
+    <!-- Init -->
    <script>
        window.onload = function() {
            const ui = SwaggerUIBundle({
-               url: "{{ openapi_url }}",
+               url: "{{ app.openapi_url }}",
                dom_id: '#swagger-ui',
                deepLinking: true,
                presets: [
