@@ -15,12 +15,26 @@ app = routes_and_authentication.app
 
 def test_docs_uri(fastapi_client):
     """
-    Description: test a get docs url.
+    Description: test an existing get /docs uri.
     """
     response = fastapi_client.get("/api/v1/docs")
     assert b'DUMMY-OPS API' in response.content
     assert response.status_code == 200
+    
+def test_docs_unexnistant_uri(fastapi_client):
+    """
+    Description: test an unexisting get /docs uri.
+    """
+    response = fastapi_client.get("/../../docs")
+    assert response.status_code == 404
 
+def test_docs_uri(fastapi_client):
+    """
+    Description: test an existing get /redoc uri.
+    """
+    response = fastapi_client.get("/api/v1/redoc")
+    assert b'DUMMY-OPS API' in response.content
+    assert response.status_code == 200
 
 @pytest.mark.asyncio
 async def test_views_without_authentication(fastapi_client):
