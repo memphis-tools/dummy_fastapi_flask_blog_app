@@ -44,8 +44,9 @@ app: FastAPI = FastAPI(
     openapi_url="/api/v1/openapi.json",
     swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
-app.mount("/app/packages/fastapi/static", StaticFiles(directory="app/packages/fastapi/static"), name="static")
-templates = Jinja2Templates(directory="/app/packages/fastapi/routes/templates")
+app.mount("/static", StaticFiles(directory="app/packages/fastapi/static"), name="static")
+templates = Jinja2Templates(directory="app/packages/fastapi/routes/templates")
+
 
 protected_routes = [
     books_categories.router,
@@ -76,16 +77,13 @@ def get_password_hash(password):
     return generate_password_hash(password, "pbkdf2:sha256", salt_length=8)
 
 
-@app.get("/api/v1/docs", include_in_schema=False)
-async def custom_swagger_ui_html():
-    return get_swagger_ui_html(
-        openapi_url=app.openapi_url,
-        title=app.title + " - Swagger UI",
-        oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
-        swagger_js_url="static/swagger-ui-bundle.js",
-        swagger_css_url="static/swagger-ui.css",
+@app.get("/api/v1/docs", include_in_schema=False, response_class=HTMLResponse)
+async def custom_swagger_ui_html(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "custom_swagger_ui.html",
+        {"title": "DUMMY-OPS API", "swagger_static_prefix": "/static", "openapi_url": app.openapi_url}
     )
-
 
 @app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)
 async def swagger_ui_redirect():
@@ -96,15 +94,19 @@ async def swagger_ui_redirect():
 async def redoc_html():
     return get_redoc_html(
         openapi_url=app.openapi_url,
-        title=app.title + " - ReDoc",
-        redoc_js_url="static/redoc.standalone.js",
+        title="DUMMY-OPS API - ReDoc",
+        redoc_js_url="/static/redoc.standalone.js",
     )
 
 
 @app.get("/api/v1/swagger-ui-init.js", response_class=HTMLResponse)
 async def swagger_ui_init_js():
     """Serve the custom Swagger UI initialization script"""
-    return get_swagger_ui_html(openapi_url="/api/v1/openapi.json", title="DUMMY-OPS API", swagger_ui_parameters={"defaultModelsExpandDepth": -1})
+    return get_swagger_ui_html(
+        openapi_url="/api/v1/openapi.json",
+        title="DUMMY-OPS API",
+        swagger_ui_parameters={"defaultModelsExpandDepth": -1}
+    )
 
 
 @app.post("/api/v1/token/", tags=["DEFAULT"])

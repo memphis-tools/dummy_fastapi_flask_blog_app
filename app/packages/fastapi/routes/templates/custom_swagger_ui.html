@@ -1,36 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <title>API documentation</title>
-   <!-- consentmanager script -->
-   <script type="text/javascript" data-cmp-ab="1" src="https://cdn.consentmanager.net/delivery/autoblocking/ee8ec9aa91a5b.js" data-cmp-host="b.delivery.consentmanager.net" data-cmp-cdn="cdn.consentmanager.net" data-cmp-codesrc="0"></script>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <!-- consentmanager script -->
+    <script type="text/javascript" data-cmp-ab="1" src="https://cdn.consentmanager.net/delivery/autoblocking/ee8ec9aa91a5b.js" data-cmp-host="b.delivery.consentmanager.net" data-cmp-cdn="cdn.consentmanager.net" data-cmp-codesrc="0"></script>
 </head>
 <body>
-   <div id="swagger-ui"></div>
-   <!-- Swagger UI bundle -->
-    <script src="../static/swagger-ui-bundle.js"></script>
+    <div id="swagger-ui"></div>
+    <!-- Swagger UI bundle -->
+    <script src="{{ swagger_static_prefix }}/swagger-ui-bundle.js"></script>
     <!-- Swagger UI standalone preset -->
-    <script src="../static/swagger-ui-standalone-preset.js"></script>
+    <script src="{{ swagger_static_prefix }}/swagger-ui-standalone-preset.js"></script>
     <!-- Init -->
-   <script>
-       window.onload = function() {
-           const ui = SwaggerUIBundle({
-               url: "{{ app.openapi_url }}",
-               dom_id: '#swagger-ui',
-               deepLinking: true,
-               presets: [
-                   SwaggerUIBundle.presets.apis,
-                   SwaggerUIStandalonePreset
-               ],
-               plugins: [
-                   SwaggerUIBundle.plugins.DownloadUrl
-               ],
-               layout: "BaseLayout"
-           });
+    <script>
+        window.onload = function() {
+            const ui = SwaggerUIBundle({
+                url: "{{ openapi_url }}",
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "BaseLayout"
+            });
 
-           window.ui = ui;
-       }
-   </script>
+            window.ui = ui;
+        }
+    </script>
 </body>
 </html>
