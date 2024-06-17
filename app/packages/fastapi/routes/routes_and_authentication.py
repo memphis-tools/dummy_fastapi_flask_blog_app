@@ -8,7 +8,6 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from fastapi.openapi.docs import (
     get_redoc_html,
-    get_swagger_ui_html,
     get_swagger_ui_oauth2_redirect_html,
 )
 from fastapi.staticfiles import StaticFiles
@@ -79,19 +78,23 @@ def get_password_hash(password):
 
 @app.get("/api/v1/docs", include_in_schema=False, response_class=HTMLResponse)
 async def custom_swagger_ui_html(request: Request):
+    """get a custom /docs uri"""
     return templates.TemplateResponse(
         request,
         "custom_swagger_ui.html",
         {"title": "DUMMY-OPS API", "swagger_static_prefix": "/api/v1/static", "openapi_url": app.openapi_url}
     )
 
+
 @app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)
 async def swagger_ui_redirect():
+    """used for custom /docs uri"""
     return get_swagger_ui_oauth2_redirect_html()
 
 
 @app.get("/api/v1/redoc", include_in_schema=False)
 async def redoc_html():
+    """get a custom /redoc uri"""
     return get_redoc_html(
         openapi_url=app.openapi_url,
         title="DUMMY-OPS API - ReDoc",
