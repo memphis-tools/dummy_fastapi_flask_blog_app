@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>{{ title }}</title>
     <!-- consentmanager script -->
     <script type="text/javascript" data-cmp-ab="1" src="https://cdn.consentmanager.net/delivery/autoblocking/ee8ec9aa91a5b.js" data-cmp-host="b.delivery.consentmanager.net" data-cmp-cdn="cdn.consentmanager.net" data-cmp-codesrc="0"></script>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link href="{{ swagger_static_prefix }}/swagger-ui.css" rel="stylesheet">
 </head>
 <body>
     <div id="swagger-ui"></div>
@@ -26,7 +27,8 @@
                 plugins: [
                     SwaggerUIBundle.plugins.DownloadUrl
                 ],
-                layout: "BaseLayout"
+                layout: "BaseLayout",
+                defaultModelsExpandDepth: -1 
             });
 
             window.ui = ui;
