@@ -55,8 +55,14 @@ def view_all_instances(session, instance):
 
 
 def view_all_user_books(session, user_id):
-    """view all books from an user_id """
-    user_books_query = session.query(models.Book).filter(models.Book.user_id.in_([user_id,]))
+    """view all books from an user_id"""
+    user_books_query = session.query(models.Book).filter(
+        models.Book.user_id.in_(
+            [
+                user_id,
+            ]
+        )
+    )
     user_books = user_books_query.all()
     user_books_list = []
     for instance in user_books:
@@ -65,8 +71,14 @@ def view_all_user_books(session, user_id):
 
 
 def view_all_user_comments(session, user_id):
-    """view all books from an user_id """
-    user_comments_query = session.query(models.Comment).filter(models.Comment.author_id.in_([user_id,]))
+    """view all books from an user_id"""
+    user_comments_query = session.query(models.Comment).filter(
+        models.Comment.author_id.in_(
+            [
+                user_id,
+            ]
+        )
+    )
     user_comments = user_comments_query.all()
     user_comments_list = []
     for instance in user_comments:
@@ -75,19 +87,39 @@ def view_all_user_comments(session, user_id):
 
 
 def view_all_categories_instances(session):
-    """view all categories instances """
+    """view all categories instances"""
     categories_query = session.query(models.BookCategory).all()
     categories_list = []
     for category in categories_query:
-        total_category_books = session.query(models.Book).filter(
-            models.Book.category.in_([category.id,])
-        ).count()
-        categories_list.append({"id": category.id, "name": category.title, "total_books": total_category_books})
+        total_category_books = (
+            session.query(models.Book)
+            .filter(
+                models.Book.category.in_(
+                    [
+                        category.id,
+                    ]
+                )
+            )
+            .count()
+        )
+        categories_list.append(
+            {
+                "id": category.id,
+                "name": category.title,
+                "total_books": total_category_books,
+            }
+        )
     return categories_list
 
 
 def view_all_category_books(session, category_id):
-    """view all books from a category filter by category_id """
-    categories_query = session.query(models.Book).filter(models.Book.category.in_([category_id,]))
+    """view all books from a category filter by category_id"""
+    categories_query = session.query(models.Book).filter(
+        models.Book.category.in_(
+            [
+                category_id,
+            ]
+        )
+    )
     category_books = categories_query.all()
     return category_books

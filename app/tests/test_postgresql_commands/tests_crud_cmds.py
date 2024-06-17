@@ -53,8 +53,8 @@ def test_get_instance(get_session):
     """ Description: test get_instance"""
     session = get_session
     instance = models.User
-    id = 2
-    instance = database_crud_commands.get_instance(session, instance, id)
+    user_id = 2
+    instance = database_crud_commands.get_instance(session, instance, user_id)
     assert isinstance(instance, models.User)
     assert instance.username == "donald"
 
