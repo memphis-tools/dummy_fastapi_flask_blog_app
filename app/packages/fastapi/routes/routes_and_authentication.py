@@ -44,7 +44,7 @@ app: FastAPI = FastAPI(
     openapi_url="/api/v1/openapi.json",
     swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
-app.mount("/static", StaticFiles(directory="app/packages/fastapi/static"), name="static")
+app.mount("/api/v1/static", StaticFiles(directory="app/packages/fastapi/static"), name="static")
 templates = Jinja2Templates(directory="app/packages/fastapi/routes/templates")
 
 
@@ -82,7 +82,7 @@ async def custom_swagger_ui_html(request: Request):
     return templates.TemplateResponse(
         request,
         "custom_swagger_ui.html",
-        {"title": "DUMMY-OPS API", "swagger_static_prefix": "/static", "openapi_url": app.openapi_url}
+        {"title": "DUMMY-OPS API", "swagger_static_prefix": "/api/v1/static", "openapi_url": app.openapi_url}
     )
 
 @app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)
@@ -95,17 +95,7 @@ async def redoc_html():
     return get_redoc_html(
         openapi_url=app.openapi_url,
         title="DUMMY-OPS API - ReDoc",
-        redoc_js_url="/static/redoc.standalone.js",
-    )
-
-
-@app.get("/api/v1/swagger-ui-init.js", response_class=HTMLResponse)
-async def swagger_ui_init_js():
-    """Serve the custom Swagger UI initialization script"""
-    return get_swagger_ui_html(
-        openapi_url="/api/v1/openapi.json",
-        title="DUMMY-OPS API",
-        swagger_ui_parameters={"defaultModelsExpandDepth": -1}
+        redoc_js_url="/api/v1/static/redoc.standalone.js",
     )
 
 
