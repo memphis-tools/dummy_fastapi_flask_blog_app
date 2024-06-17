@@ -3,16 +3,30 @@
     <head>
       <!--  consentmanager automatic mode script -->
       <script type="text/javascript" data-cmp-ab="1" src="https://cdn.consentmanager.net/delivery/autoblocking/ee8ec9aa91a5b.js" data-cmp-host="b.delivery.consentmanager.net" data-cmp-cdn="cdn.consentmanager.net" data-cmp-codesrc="0"></script>
-      <!-- Google Analytics -->
-      <!-- Google tag (gtag.js) -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=GT-KVM4QCBS"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
 
-        gtag('config', 'GT-KVM4QCBS');
-      </script>
+      <!-- Google Analytics - Initial script load blocked until consent is given -->
+    <script>
+        function loadGoogleAnalytics() {
+            var script = document.createElement('script');
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=GT-KVM4QCBS';
+            script.async = true;
+            document.head.appendChild(script);
+
+            script.onload = function() {
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'GT-KVM4QCBS');
+            };
+        }
+
+        // Callback for consentmanager
+        function consentManagerCallback(consentData) {
+            if (consentData && consentData.consents && consentData.consents['analytics']) {
+                loadGoogleAnalytics();
+            }
+        }
+    </script>
 
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scaler=false" />
@@ -147,5 +161,16 @@
           <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
           <script src="{{ url_for('static', filename='js/all.js') }}"></script>
           <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+          <script>
+              // Listen for consent changes
+              window.addEventListener('consentManagerReady', function() {
+                  consentManager.getConsentData(consentManagerCallback);
+              });
+
+              // Check consent status when the CMP script loads
+              if (typeof consentManager !== 'undefined') {
+                  consentManager.getConsentData(consentManagerCallback);
+              }
+          </script>
     </body>
 </html>
