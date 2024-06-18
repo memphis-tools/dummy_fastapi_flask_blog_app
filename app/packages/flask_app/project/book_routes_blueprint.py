@@ -263,6 +263,96 @@ def get_book_by_id(book_id):
     return query
 
 
+def is_authorized_to_edit(book):
+    return current_user.id == book.user_id or current_user.role == "admin"
+
+
+def get_books_categories(session):
+    books_categories_query = session.query(BookCategory).all()
+    return [(i.id, i.title) for i in books_categories_query]
+
+
+def get_updated_fields(form, book):
+    return {
+        "title": form["title"] if "title" in form else book.title,
+        "summary": form["summary"] if "summary" in form else book.summary,
+        "content": form["content"] if "content" in form else book.content,
+        "author": form["author"] if "author" in form else book.author,
+        "year_of_publication": int(form["year_of_publication"]) if "year_of_publication" in form else book.year_of_publication
+    }
+
+
+def get_category_id(form, session, edit_form):
+    if "categories" not in form:
+        return None
+    category_id_from_form = int(form["categories"])
+    try:
+        return session.query(BookCategory).filter(BookCategory.id == category_id_from_form).first().id
+    except Exception:
+        flash("Saisie invalide, categorie livre non prevue.", "error")
+        return None
+
+
+def render_invalid_category_response(edit_form):
+    return render_template("update_book.html", form=edit_form, is_authenticated=current_user.is_authenticated)
+
+
+def handle_book_picture(edit_form, book_picture_filename):
+    try:
+        book_picture = edit_form["photo"]
+        uploaded_file = request.files["photo"]
+        filename = secure_filename(uploaded_file.filename)
+        return filename
+    except Exception:
+        return book_picture_filename
+
+
+def create_updated_book(a_book, updated_fields, category_id, filename):
+    return Book(
+        title=updated_fields["title"],
+        summary=updated_fields["summary"],
+        content=updated_fields["content"],
+        author=updated_fields["author"],
+        category=category_id,
+        year_of_publication=updated_fields["year_of_publication"],
+        book_picture_name=filename,
+        publication_date=a_book.publication_date,
+        user_id=a_book.user_id,
+    )
+
+
+def log_book_update(updated_book):
+    logs_context = {"current_user": f"{current_user.username}", "book_title": updated_book.title}
+    log_events.log_event("[+] Flask - Mise à jour livre.", logs_context)
+
+
+def save_updated_book(session, book_id, updated_book, book_picture_filename, filename):
+    if book_picture_filename != filename:
+        handle_file_upload_and_removal(filename, book_picture_filename)
+    session.query(Book).where(Book.id == book_id).update(updated_book.get_json_for_update())
+    if check_book_fields(updated_book):
+        session.commit()
+        session.close()
+        log_book_update(updated_book)
+        flash("[+] Flask - Mise à jour livre.", "info")
+    else:
+        flash("Erreur avec image illustration", "error")
+        session.close()
+
+
+def handle_file_upload_and_removal(filename, book_picture_filename):
+    if filename and filename != "dummy_blank_book.png":
+        file_ext = os.path.splitext(filename)[1]
+        if file_ext not in settings.UPLOAD_EXTENSIONS:
+            abort(400, "Image invalide")
+        if os.getenv("SCOPE") == "production":
+            uploaded_file.save(os.path.join(settings.INSTANCE_PATH, "staticfiles/img", filename))
+            try:
+                os.remove(os.path.join(settings.INSTANCE_PATH, "staticfiles/img", book_picture_filename))
+            except FileNotFoundError:
+                pass
+
+
 @book_routes_blueprint.route("/book/<int:book_id>/update/", methods=["GET", "POST"])
 @login_required
 def update_book(book_id):
@@ -276,121 +366,38 @@ def update_book(book_id):
         session.close()
         return redirect(url_for("book_routes_blueprint.books"))
 
-    if current_user.id != a_book.user_id and current_user.role != "admin":
+    if not is_authorized_to_edit(a_book):
         session.close()
         return abort(403)
+
     book_picture_filename = a_book.book_picture_name
-    books_categories_query = session.query(BookCategory).all()
-    books_categories = [(i.id, i.title) for i in books_categories_query]
-    edit_form = forms.UpdateBookForm(
-        books_categories=books_categories,
-        book=a_book,
-    )
+    books_categories = get_books_categories(session)
+    edit_form = forms.UpdateBookForm(books_categories=books_categories, book=a_book)
+
     if edit_form.validate_on_submit():
         form = request.form.to_dict()
-        if "title" in form:
-            title = form["title"]
-        else:
-            title = a_book.title
-        if "summary" in form:
-            summary = form["summary"]
-        else:
-            summary = a_book.summary
-        if "content" in form:
-            content = form["content"]
-        else:
-            content = a_book.content
-        if "author" in form:
-            author = form["author"]
-        else:
-            author = a_book.author
-        if "year_of_publication" in form:
-            year_of_publication = int(form["year_of_publication"])
-        else:
-            year_of_publication = a_book.year_of_publication
-        if "categories" in form:
-            category_id_from_form = int(form["categories"])
-            try:
-                category_id = (
-                    session.query(BookCategory)
-                    .filter(BookCategory.id == category_id_from_form)
-                    .first()
-                    .id
-                )
-            except Exception:
-                flash("Saisie invalide, categorie livre non prevue.", "error")
-                return render_template(
-                    "update_book.html",
-                    form=edit_form,
-                    is_authenticated=current_user.is_authenticated,
-                )
-        try:
-            book_picture = edit_form["photo"]
-            uploaded_file = request.files["photo"]
-        except Exception:
-            book_picture = None
-        if book_picture is not None:
-            filename = secure_filename(uploaded_file.filename)
-        else:
-            filename = book_picture_filename
-        publication_date = a_book.publication_date
-        updated_book = Book(
-            title=title,
-            summary=summary,
-            content=content,
-            author=author,
-            category=category_id,
-            year_of_publication=year_of_publication,
-            book_picture_name=filename,
-            publication_date=publication_date,
-            user_id=a_book.user_id,
-        )
-        if book_picture_filename != filename:
-            if filename != "":
-                file_ext = os.path.splitext(filename)[1]
-                if file_ext not in settings.UPLOAD_EXTENSIONS:
-                    return "Image invalide", 400
-                if os.getenv("SCOPE") == "production":
-                    uploaded_file.save(
-                        os.path.join(
-                            settings.INSTANCE_PATH, "staticfiles/img", filename
-                        )
-                    )
-                    try:
-                        os.remove(
-                            f"{settings.INSTANCE_PATH}staticfiles/img/{book_picture_filename}"
-                        )
-                    except FileNotFoundError:
-                        pass
-                else:
-                    updated_book.book_picture_name = "dummy_blank_book.png"
-            else:
-                updated_book.book_picture_name = book_picture_filename
-        session.query(Book).where(Book.id == book_id).update(
-            updated_book.get_json_for_update()
-        )
-        book_is_valid = check_book_fields(updated_book)
-        if book_is_valid is True:
-            session.commit()
-            session.close()
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "book_title": updated_book.title,
-            }
-            log_events.log_event("[+] Flask - Mise à jour livre.", logs_context)
-            flash("[+] Flask - Mise à jour livre.", "info")
-            return redirect(url_for("book_routes_blueprint.book", book_id=book_id))
+        updated_fields = get_updated_fields(form, a_book)
 
-        flash("Erreur avec image illustration", "error")
-        session.close()
-        return render_template(
-            "update_book.html",
-            form=edit_form,
-            is_authenticated=current_user.is_authenticated,
-        )
+        category_id = get_category_id(form, session, edit_form)
+        if category_id is None:
+            return render_invalid_category_response(edit_form)
+
+        filename = handle_book_picture(edit_form, book_picture_filename)
+        if filename is None:
+            return render_template(
+                "update_book.html",
+                form=edit_form,
+                is_authenticated=current_user.is_authenticated
+            )
+
+        updated_book = create_updated_book(a_book, updated_fields, category_id, filename)
+        save_updated_book(session, book_id, updated_book, book_picture_filename, filename)
+
+        return redirect(url_for("book_routes_blueprint.book", book_id=book_id))
+
     return render_template(
         "update_book.html",
         form=edit_form,
         book=a_book,
-        is_authenticated=current_user.is_authenticated,
+        is_authenticated=current_user.is_authenticated
     )
