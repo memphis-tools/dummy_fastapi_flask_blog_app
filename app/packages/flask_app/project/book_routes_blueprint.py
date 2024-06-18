@@ -277,6 +277,7 @@ def get_books_categories(session):
 
 
 def get_updated_fields(form, a_book):
+    """return news values for the updated book, as dict"""
     return {
         "title": form["title"] if "title" in form else a_book.title,
         "summary": form["summary"] if "summary" in form else a_book.summary,
@@ -312,13 +313,13 @@ def render_invalid_category_response(edit_form):
 
 
 def handle_book_picture(edit_form, book_picture_filename):
-    """return the book illustration image name if set. Else use the old one"""
+    """Return the book illustration image name if set. Else use the old one."""
     try:
         uploaded_file = request.files["photo"]
         filename = secure_filename(uploaded_file.filename)
-        return filename
+        return uploaded_file, filename
     except Exception:
-        return book_picture_filename
+        return None, book_picture_filename
 
 
 def create_updated_book(a_book, updated_fields, category_id, filename):
@@ -342,10 +343,10 @@ def log_book_update(updated_book):
     log_events.log_event("[+] Flask - Mise à jour livre.", logs_context)
 
 
-def save_updated_book(session, book_id, updated_book, book_picture_filename, filename):
+def save_updated_book(session, book_id, updated_book, book_picture_filename, filename, uploaded_file):
     """save the updated book if all datas validated"""
     if book_picture_filename != filename:
-        handle_file_upload_and_removal(filename, book_picture_filename)
+        handle_file_upload_and_removal(filename, book_picture_filename, uploaded_file)
     session.query(Book).where(Book.id == book_id).update(updated_book.get_json_for_update())
     if check_book_fields(updated_book):
         session.commit()
@@ -394,11 +395,11 @@ def update_book(book_id):
         form = request.form.to_dict()
         updated_fields = get_updated_fields(form, a_book)
 
-        category_id = get_category_id(form, session, edit_form)
+        category_id = get_category_id(form, session)
         if category_id is None:
             return render_invalid_category_response(edit_form)
 
-        filename = handle_book_picture(edit_form, book_picture_filename)
+        uploaded_file, filename = handle_book_picture(edit_form, book_picture_filename)
         if filename is None:
             return render_template(
                 "update_book.html",
@@ -407,7 +408,7 @@ def update_book(book_id):
             )
 
         updated_book = create_updated_book(a_book, updated_fields, category_id, filename)
-        save_updated_book(session, book_id, updated_book, book_picture_filename, filename)
+        save_updated_book(session, book_id, updated_book, book_picture_filename, filename, uploaded_file)
 
         return redirect(url_for("book_routes_blueprint.book", book_id=book_id))
 
