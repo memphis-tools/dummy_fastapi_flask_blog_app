@@ -348,7 +348,7 @@ def save_updated_book(session, book_id, updated_book, book_picture_filename, fil
         session.close()
 
 
-def handle_file_upload_and_removal(filename, book_picture_filename):
+def handle_file_upload_and_removal(filename, book_picture_filename, uploaded_file):
     if filename and filename != "dummy_blank_book.png":
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in settings.UPLOAD_EXTENSIONS:
