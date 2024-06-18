@@ -263,30 +263,35 @@ def get_book_by_id(book_id):
     return query
 
 
-def is_authorized_to_edit(book):
-    return current_user.id == book.user_id or current_user.role == "admin"
+def is_authorized_to_edit(a_book):
+    """return True if current user can update the book"""
+    return current_user.id == a_book.user_id or current_user.role == "admin"
 
 
 def get_books_categories(session):
+    """
+    Description: get all books categories. Return a list of tupple.
+    """
     books_categories_query = session.query(BookCategory).all()
     return [(i.id, i.title) for i in books_categories_query]
 
 
-def get_updated_fields(form, book):
+def get_updated_fields(form, a_book):
     return {
-        "title": form["title"] if "title" in form else book.title,
-        "summary": form["summary"] if "summary" in form else book.summary,
-        "content": form["content"] if "content" in form else book.content,
-        "author": form["author"] if "author" in form else book.author,
+        "title": form["title"] if "title" in form else a_book.title,
+        "summary": form["summary"] if "summary" in form else a_book.summary,
+        "content": form["content"] if "content" in form else a_book.content,
+        "author": form["author"] if "author" in form else a_book.author,
         "year_of_publication": (
             int(form["year_of_publication"])
             if "year_of_publication" in form
-            else book.year_of_publication
+            else a_book.year_of_publication
         )
     }
 
 
-def get_category_id(form, session, edit_form):
+def get_category_id(form, session):
+    """return a book category instance if id exists"""
     if "categories" not in form:
         return None
     category_id_from_form = int(form["categories"])
@@ -298,6 +303,7 @@ def get_category_id(form, session, edit_form):
 
 
 def render_invalid_category_response(edit_form):
+    """return the update book template if book category does not exist"""
     return render_template(
         "update_book.html",
         form=edit_form,
@@ -306,8 +312,8 @@ def render_invalid_category_response(edit_form):
 
 
 def handle_book_picture(edit_form, book_picture_filename):
+    """return the book illustration image name if set. Else use the old one"""
     try:
-        book_picture = edit_form["photo"]
         uploaded_file = request.files["photo"]
         filename = secure_filename(uploaded_file.filename)
         return filename
@@ -316,6 +322,7 @@ def handle_book_picture(edit_form, book_picture_filename):
 
 
 def create_updated_book(a_book, updated_fields, category_id, filename):
+    """set the new book values when book updated"""
     return Book(
         title=updated_fields["title"],
         summary=updated_fields["summary"],
@@ -330,11 +337,13 @@ def create_updated_book(a_book, updated_fields, category_id, filename):
 
 
 def log_book_update(updated_book):
+    """call the logger to send logs"""
     logs_context = {"current_user": f"{current_user.username}", "book_title": updated_book.title}
     log_events.log_event("[+] Flask - Mise à jour livre.", logs_context)
 
 
 def save_updated_book(session, book_id, updated_book, book_picture_filename, filename):
+    """save the updated book if all datas validated"""
     if book_picture_filename != filename:
         handle_file_upload_and_removal(filename, book_picture_filename)
     session.query(Book).where(Book.id == book_id).update(updated_book.get_json_for_update())
@@ -349,6 +358,7 @@ def save_updated_book(session, book_id, updated_book, book_picture_filename, fil
 
 
 def handle_file_upload_and_removal(filename, book_picture_filename, uploaded_file):
+    """check if image file is valid"""
     if filename and filename != "dummy_blank_book.png":
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in settings.UPLOAD_EXTENSIONS:
@@ -364,9 +374,7 @@ def handle_file_upload_and_removal(filename, book_picture_filename, uploaded_fil
 @book_routes_blueprint.route("/book/<int:book_id>/update/", methods=["GET", "POST"])
 @login_required
 def update_book(book_id):
-    """
-    Description: the update book Flask route.
-    """
+    """the update book Flask route."""
     session = session_commands.get_a_database_session()
     a_book = get_book_by_id(book_id)
     if not a_book:
