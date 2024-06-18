@@ -345,8 +345,8 @@ def log_book_update(updated_book):
 
 def save_updated_book(session, book_id, updated_book, book_picture_filename, file_data):
     """save the updated book if all datas validated"""
-    if book_picture_filename != filename:
-        handle_file_upload_and_removal(filename, book_picture_filename, uploaded_file)
+    if book_picture_filename != file_data.filename:
+        handle_file_upload_and_removal(file_data.filename, book_picture_filename, file_data.uploaded_file)
     session.query(Book).where(Book.id == book_id).update(updated_book.get_json_for_update())
     if check_book_fields(updated_book):
         session.commit()
