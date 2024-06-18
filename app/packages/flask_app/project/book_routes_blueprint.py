@@ -278,7 +278,11 @@ def get_updated_fields(form, book):
         "summary": form["summary"] if "summary" in form else book.summary,
         "content": form["content"] if "content" in form else book.content,
         "author": form["author"] if "author" in form else book.author,
-        "year_of_publication": int(form["year_of_publication"]) if "year_of_publication" in form else book.year_of_publication
+        "year_of_publication": (
+            int(form["year_of_publication"])
+            if "year_of_publication" in form
+            else book.year_of_publication
+        )
     }
 
 
@@ -294,7 +298,11 @@ def get_category_id(form, session, edit_form):
 
 
 def render_invalid_category_response(edit_form):
-    return render_template("update_book.html", form=edit_form, is_authenticated=current_user.is_authenticated)
+    return render_template(
+        "update_book.html",
+        form=edit_form,
+        is_authenticated=current_user.is_authenticated
+    )
 
 
 def handle_book_picture(edit_form, book_picture_filename):
