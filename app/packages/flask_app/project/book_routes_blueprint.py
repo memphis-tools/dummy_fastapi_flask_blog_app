@@ -372,6 +372,13 @@ def handle_file_upload_and_removal(filename, book_picture_filename, uploaded_fil
                 pass
 
 
+class FileData:
+    """a dummy class to handle parameters for save_updated_book function"""
+    def __init__(self, filename, uploaded_file):
+        self.filename = filename
+        self.uploaded_file = uploaded_file
+
+
 @book_routes_blueprint.route("/book/<int:book_id>/update/", methods=["GET", "POST"])
 @login_required
 def update_book(book_id):
