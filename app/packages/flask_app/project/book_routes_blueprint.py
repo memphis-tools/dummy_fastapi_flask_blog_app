@@ -312,7 +312,7 @@ def render_invalid_category_response(edit_form):
     )
 
 
-def handle_book_picture(edit_form, book_picture_filename):
+def handle_book_picture(book_picture_filename):
     """Return the book illustration image name if set. Else use the old one."""
     try:
         uploaded_file = request.files["photo"]
@@ -343,10 +343,10 @@ def log_book_update(updated_book):
     log_events.log_event("[+] Flask - Mise à jour livre.", logs_context)
 
 
-def save_updated_book(session, book_id, updated_book, book_picture_filename, filename, uploaded_file):
+def save_updated_book(session, book_id, updated_book, book_picture_filename, file_data):
     """save the updated book if all datas validated"""
-    if book_picture_filename != filename:
-        handle_file_upload_and_removal(filename, book_picture_filename, uploaded_file)
+    if book_picture_filename != file_data.filename:
+        handle_file_upload_and_removal(file_data.filename, book_picture_filename, file_data.uploaded_file)
     session.query(Book).where(Book.id == book_id).update(updated_book.get_json_for_update())
     if check_book_fields(updated_book):
         session.commit()
@@ -370,6 +370,13 @@ def handle_file_upload_and_removal(filename, book_picture_filename, uploaded_fil
                 os.remove(os.path.join(settings.INSTANCE_PATH, "staticfiles/img", book_picture_filename))
             except FileNotFoundError:
                 pass
+
+
+class FileData:
+    """a dummy class to handle parameters for save_updated_book function"""
+    def __init__(self, filename, uploaded_file):
+        self.filename = filename
+        self.uploaded_file = uploaded_file
 
 
 @book_routes_blueprint.route("/book/<int:book_id>/update/", methods=["GET", "POST"])
@@ -399,7 +406,7 @@ def update_book(book_id):
         if category_id is None:
             return render_invalid_category_response(edit_form)
 
-        uploaded_file, filename = handle_book_picture(edit_form, book_picture_filename)
+        uploaded_file, filename = handle_book_picture(book_picture_filename)
         if filename is None:
             return render_template(
                 "update_book.html",
@@ -408,7 +415,8 @@ def update_book(book_id):
             )
 
         updated_book = create_updated_book(a_book, updated_fields, category_id, filename)
-        save_updated_book(session, book_id, updated_book, book_picture_filename, filename, uploaded_file)
+        file_data = FileData(filename, uploaded_file)
+        save_updated_book(session, book_id, updated_book, book_picture_filename, file_data)
 
         return redirect(url_for("book_routes_blueprint.book", book_id=book_id))
 
