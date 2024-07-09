@@ -99,3 +99,4 @@ WebTest>=3.0.0
 Werkzeug>=3.0.3
 WSGIProxy2>=0.5.1
 zope.interface>=6.2
+setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
