@@ -174,6 +174,7 @@ TabNine
         LOGGING_DEVEL="DEBUG"
         COVERALLS_REPO_TOKEN="yourCoverallsToken"
         BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
+        RECAPTCHA_SECRET_KEY="yourGoogleRecaptchaSecretKey"
 
 
   - For a local docker execution, you will have 5 services:
@@ -205,6 +206,7 @@ TabNine
         export LOGGING_DEVEL="DEBUG"
         export COVERALLS_REPO_TOKEN="yourCoverallsToken"
         export BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
+        export RECAPTCHA_SECRET_KEY="yourGoogleRecaptchaSecretKey"
 
 
 ### HOW RUN IT LOCALLY
