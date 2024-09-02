@@ -5,6 +5,7 @@ anykeystore>=0.2
 asyncio>=3.4.3
 attrs>=23.2.0
 AuthEncoding>=5.0
+bandit>=1.7.9
 beautifulsoup4>=4.12.3
 bs4>=0.0.2
 BTrees>=5.2
