@@ -1,12 +1,14 @@
 """ The Flask app definition.Notice we do not use the app factory pattern """
 
 import os
+import requests
 from flask import (
     Flask,
     url_for,
     render_template,
     flash,
     redirect,
+    request
 )
 
 from flask_bootstrap import Bootstrap
@@ -237,6 +239,26 @@ def register():
     session = session_commands.get_a_database_session()
     form = forms.RegisterForm()
     if form.validate_on_submit():
+        HCAPTCHA_VERIFY_URL = "https://api.hcaptcha.com/siteverify"
+        # Retrieve hCaptcha token from form data
+        hcaptcha_response = request.form.get('h-captcha-response')
+
+        # Verify the hCaptcha response
+        data = {
+            'secret': os.getenv("HCAPTCHA_SECRET_KEY"),
+            'response': hcaptcha_response
+        }
+        verification_response = requests.post(HCAPTCHA_VERIFY_URL, data=data)
+        verification_result = verification_response.json()
+        if not verification_result.get('success'):
+            flash("Echec vérification hCaptcha, essayez de nouveau.", "error")
+            session.close()
+            return render_template(
+                "register.html",
+                form=form,
+                is_authenticated=current_user.is_authenticated,
+            )
+
         if not handle_passwords.check_password(form.password.data):
             flash("Mot de passe trop simple, essayez de nouveau.", "error")
             session.close()
