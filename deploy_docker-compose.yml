@@ -37,7 +37,8 @@ services:
       - TEST_USER_PWD
       - SECRET_KEY
       - BETTERSTACK_SOURCE_TOKEN
-      - HCAPTCHA_SECRET_KEY
+      - HCAPTCHA_SITE_KEY
+      - HCAPTCHA_SITE_SECRET
     networks:
       - app-network
     depends_on:

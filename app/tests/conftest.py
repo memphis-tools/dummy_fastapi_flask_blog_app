@@ -74,14 +74,16 @@ def get_test_token():
 
 
 @pytest.fixture
-def app():
+def app(mocker):
     """
     Description: Provides the project Flask app for tests to run.
     """
     flask_app = project.app
     flask_app.config.update(
-        {"TESTING": True, "WTF_CSRF_ENABLED": True, "LOGIN_DISABLED": False, "DEBUG": True}
+        {"TESTING": True, "WTF_CSRF_ENABLED": True, "LOGIN_DISABLED": False, "DEBUG": True, "HCAPTCHA_ENABLED": False}
     )
+    # Mock hcaptcha.verify to always return True
+    mocker.patch('app.packages.flask_app.project.hcaptcha.verify', return_value=True)
     yield flask_app
 
 
@@ -90,6 +92,7 @@ def client(app):
     """
     Description: Provides a client of the project Flask app for tests to run.
     """
+
     with app.test_client() as client:
         yield client
 
