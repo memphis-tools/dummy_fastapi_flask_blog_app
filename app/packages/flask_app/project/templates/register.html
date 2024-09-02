@@ -9,15 +9,15 @@
   <h1>DUMMY BLOG - S'ENREGISTRER</h1>
   <div class="d-flex flex-column justify-content-center align-items-center">
     <div class="d-flex flex-column justify-content-center w-50">
-      <form class="form" action="" method="post">
+      <form class="form" action="" method="post" id="registration-form" onsubmit="onSubmit(event)">
         {{ form.csrf_token }}
         <label for="login">{{ form.login.label }}</label>{{ form.login }}
         <label for="password">{{ form.password.label }}</label>{{ form.password }}
         <label for="password_check">{{ form.password_check.label }}</label>{{ form.password_check }}
         <label for="email">{{ form.email.label }}</label>{{ form.email }}
-        <!-- Google reCAPTCHA widget -->
-        <div class="g-recaptcha" data-sitekey="6LfWlzQqAAAAAI7w5OtgeqFjasQsK7jtvEGQyOba"></div>
-        <button type="submit" class="btn btn-primary" name="button">S'INSCRIRE</button>
+        <!-- Hidden field for reCAPTCHA response token -->
+        <input type="hidden" id="recaptcha-response" name="g-recaptcha-response">
+        <button type="submit" class="btn btn-primary g-recaptcha" name="button" data-sitekey="6LeFsDQqAAAAAFtUwDD8wIwy64F19HMsSbl96qg5" data-callback="onSubmit" data-action="submit">S'INSCRIRE</button>
       </form>
     </div>
   </div>
