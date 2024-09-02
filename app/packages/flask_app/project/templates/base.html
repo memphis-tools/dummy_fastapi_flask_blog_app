@@ -42,6 +42,9 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
         <!-- Custom css -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        <!-- Reduce the amount of time that it takes to deliver the resources used by reCAPTCHA -->
+        <link rel="preconnect" href="https://www.google.com">
+        <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     </head>
     <body>
         <header>
@@ -161,7 +164,14 @@
           <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
           <script src="{{ url_for('static', filename='js/all.js') }}"></script>
           <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-          <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+          <!--  Google reCAPTCHA v3 setup -->
+          <script src="https://www.google.com/recaptcha/api.js"></script>
+          <script>
+           function onSubmit(token) {
+             document.getElementById("registration-form").submit();
+           }
+         </script>
+         <!-- Consent manager setup -->
           <script>
               // Listen for consent changes
               window.addEventListener('consentManagerReady', function() {
