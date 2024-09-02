@@ -7,6 +7,7 @@ from flask import (
     render_template,
     flash,
     redirect,
+    request,
 )
 
 from flask_bootstrap import Bootstrap
@@ -29,7 +30,7 @@ from .book_routes_blueprint import book_routes_blueprint
 from .book_category_routes_blueprint import book_category_routes_blueprint
 from .comment_routes_blueprint import comment_routes_blueprint
 from .quote_routes_blueprint import quote_routes_blueprint
-from .shared_functions_and_decorators import get_random_books_ids
+from .shared_functions_and_decorators import get_random_books_ids, validate_google_recaptcha
 from . import forms
 
 
@@ -237,41 +238,45 @@ def register():
     session = session_commands.get_a_database_session()
     form = forms.RegisterForm()
     if form.validate_on_submit():
-        if not handle_passwords.check_password(form.password.data):
-            flash("Mot de passe trop simple, essayez de nouveau.", "error")
-            session.close()
-            return render_template(
-                "register.html",
-                form=form,
-                is_authenticated=current_user.is_authenticated,
-            )
-        username = str(form.login.data).lower()
-        hashed_password = generate_password_hash(
-            form.password.data, "pbkdf2:sha256", salt_length=8
-        )
-        email = str(form.email.data).lower()
-        user = session.query(User).filter_by(username=username).first()
-        user_email = session.query(User).filter_by(email=email).first()
-
-        if user_email:
-            flash("Email existe deja en base", "error")
-        elif form.password.data != form.password_check.data:
-            flash("Mots de passe ne correspondent pas", "error")
-        else:
-            if not user:
-                new_user = User(
-                    username=username, hashed_password=hashed_password, email=email
-                )
-                session.add(new_user)
-                session.commit()
-                flash(f"Bienvenue {username} vous pouvez vous connecter", "info")
-                logs_context = {"username": f"{username}", "email": f"{email}"}
-                log_events.log_event(
-                    "[+] Flask - Création compte utilisateur.", logs_context
-                )
+        # Verify reCAPTCHA
+        recaptcha_response = request.form.get("g-recaptcha-response")
+        is_user_human = validate_google_recaptcha(form, session, recaptcha_response)
+        if is_user_human:
+            if not handle_passwords.check_password(form.password.data):
+                flash("Mot de passe trop simple, essayez de nouveau.", "error")
                 session.close()
-                return redirect(url_for("login"))
-            flash("Nom utilisateur existe deja, veuillez le modifier", "error")
+                return render_template(
+                    "register.html",
+                    form=form,
+                    is_authenticated=current_user.is_authenticated,
+                )
+            username = str(form.login.data).lower()
+            hashed_password = generate_password_hash(
+                form.password.data, "pbkdf2:sha256", salt_length=8
+            )
+            email = str(form.email.data).lower()
+            user = session.query(User).filter_by(username=username).first()
+            user_email = session.query(User).filter_by(email=email).first()
+
+            if user_email:
+                flash("Email existe deja en base", "error")
+            elif form.password.data != form.password_check.data:
+                flash("Mots de passe ne correspondent pas", "error")
+            else:
+                if not user:
+                    new_user = User(
+                        username=username, hashed_password=hashed_password, email=email
+                    )
+                    session.add(new_user)
+                    session.commit()
+                    flash(f"Bienvenue {username} vous pouvez vous connecter", "info")
+                    logs_context = {"username": f"{username}", "email": f"{email}"}
+                    log_events.log_event(
+                        "[+] Flask - Création compte utilisateur.", logs_context
+                    )
+                    session.close()
+                    return redirect(url_for("login"))
+                flash("Nom utilisateur existe deja, veuillez le modifier", "error")
     session.close()
     return render_template(
         "register.html", form=form, is_authenticated=current_user.is_authenticated
