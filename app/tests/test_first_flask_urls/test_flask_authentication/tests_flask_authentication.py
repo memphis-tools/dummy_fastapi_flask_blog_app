@@ -3,7 +3,7 @@ All the tests functions for the authentication urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-
+import pytest
 from app.packages import settings
 
 
@@ -84,7 +84,7 @@ def test_post_flask_register_route(client, get_flask_csrf_token):
     assert b"Bienvenue fafa vous pouvez vous connecter" in response.data
 
 
-def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_token):
+def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_token, mocker):
     """
     Description: check if we can register new user with an already existing email
     """
@@ -95,6 +95,14 @@ def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_to
         "password_check": settings.TEST_USER_PWD,
         "csrf_token": get_flask_csrf_token,
     }
+
+    # Mock the requests.post to simulate the reCAPTCHA validation
+    mock_post = mocker.patch('requests.post')
+
+    # Configure the mock to return a response with `success: True`
+    mock_response = mocker.MagicMock()
+    mock_response.json.return_value = {'success': True}
+    mock_post.return_value = mock_response
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     response = client.post(
@@ -108,7 +116,7 @@ def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_to
 
 
 def test_post_flask_register_route_with_passwords_mismatch(
-    client, get_flask_csrf_token
+    client, get_flask_csrf_token, mocker
 ):
     """
     Description: check if we can register new user with mismatched passwords
@@ -121,6 +129,14 @@ def test_post_flask_register_route_with_passwords_mismatch(
         "csrf_token": get_flask_csrf_token,
     }
 
+    # Mock the requests.post to simulate the reCAPTCHA validation
+    mock_post = mocker.patch('requests.post')
+
+    # Configure the mock to return a response with `success: True`
+    mock_response = mocker.MagicMock()
+    mock_response.json.return_value = {'success': True}
+    mock_post.return_value = mock_response
+
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     response = client.post(
         "http://localhost/register/",
@@ -132,7 +148,7 @@ def test_post_flask_register_route_with_passwords_mismatch(
     assert b"Mots de passe ne correspondent pas" in response.data
 
 
-def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_token):
+def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_token, mocker):
     """
     Description: check if we can register new user with an already existing username
     """
@@ -142,7 +158,16 @@ def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_tok
         "password": settings.TEST_USER_PWD,
         "password_check": settings.TEST_USER_PWD,
         "csrf_token": get_flask_csrf_token,
+        "g-recaptcha-response": "dummy-response",
     }
+
+    # Mock the requests.post to simulate the reCAPTCHA validation
+    mock_post = mocker.patch('requests.post')
+
+    # Configure the mock to return a response with `success: True`
+    mock_response = mocker.MagicMock()
+    mock_response.json.return_value = {'success': True}
+    mock_post.return_value = mock_response
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     response = client.post(
