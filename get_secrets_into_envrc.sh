@@ -9,5 +9,5 @@ echo "export ADMIN_LOGIN=\"$(vault kv get -address=$1 -field=ADMIN_LOGIN kv/dumm
 echo "export ADMIN_EMAIL=\"$(vault kv get -address=$1 -field=ADMIN_EMAIL kv/dummy_vault)\"" >> /home/dummy_user/envrc
 echo "export ADMIN_PASSWORD=\"$(vault kv get -address=$1 -field=ADMIN_PASSWORD kv/dummy_vault)\"" >> /home/dummy_user/envrc
 echo "export BETTERSTACK_SOURCE_TOKEN=\"$(vault kv get -address=$1 -field=BETTERSTACK_SOURCE_TOKEN kv/dummy_vault)\"" >> /home/dummy_user/envrc
-echo "export RECAPTCHA_SECRET_KEY=\"$(vault kv get -address=$1 -field=RECAPTCHA_SECRET_KEY kv/dummy_vault)\"" >> /home/dummy_user/envrc
+echo "export HCAPTCHA_SITE_SECRET=\"$(vault kv get -address=$1 -field=HCAPTCHA_SITE_SECRET kv/dummy_vault)\"" >> /home/dummy_user/envrc
 unset VAULT_TOKEN

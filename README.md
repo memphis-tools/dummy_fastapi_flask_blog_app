@@ -174,7 +174,8 @@ TabNine
         LOGGING_DEVEL="DEBUG"
         COVERALLS_REPO_TOKEN="yourCoverallsToken"
         BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
-        RECAPTCHA_SECRET_KEY="yourGoogleRecaptchaSecretKey"
+        HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
+        HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
 
 
   - For a local docker execution, you will have 5 services:
@@ -206,8 +207,8 @@ TabNine
         export LOGGING_DEVEL="DEBUG"
         export COVERALLS_REPO_TOKEN="yourCoverallsToken"
         export BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
-        export RECAPTCHA_SECRET_KEY="yourGoogleRecaptchaSecretKey"
-
+        export HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
+        export HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
 
 ### HOW RUN IT LOCALLY
 ----------------------------------------------
@@ -459,6 +460,10 @@ https://flask-resize.readthedocs.io/index.html
 For Flask template custom filters i used:
 
 https://stackoverflow.com/questions/4830535/how-do-i-format-a-date-in-jinja2
+
+For Flask hCaptcha i used:
+
+https://github.com/KnugiHK/flask-hcaptcha
 
 For FastAPI, the ci-cd i used:
 

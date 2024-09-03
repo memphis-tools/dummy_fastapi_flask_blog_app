@@ -90,6 +90,7 @@ def client(app):
     """
     Description: Provides a client of the project Flask app for tests to run.
     """
+
     with app.test_client() as client:
         yield client
 
@@ -145,3 +146,13 @@ def mock_function_delete_book(mocker):
     """
     mocker.patch("app.packages.flask_app.project.book_routes_blueprint.delete_book", return_value=True)
     mocker.patch("os.remove")
+
+
+@pytest.fixture
+def mock_captcha_validation(mocker):
+    mock_hcaptcha_response = {
+        "success": True,
+        "challenge_ts": "2024-09-03T10:00:00.000000Z",
+        "hostname": "dummy-ops.dev"
+    }
+    mocker.patch('requests.post', return_value=mocker.MagicMock(status_code=200, json=lambda: mock_hcaptcha_response))

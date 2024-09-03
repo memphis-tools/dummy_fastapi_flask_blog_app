@@ -164,22 +164,9 @@
           <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
           <script src="{{ url_for('static', filename='js/all.js') }}"></script>
           <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-          <script src="https://www.google.com/recaptcha/api.js?render=6LeFsDQqAAAAAFtUwDD8wIwy64F19HMsSbl96qg5"></script>
-          <script>
-            function onSubmit(event) {
-              event.preventDefault(); // Prevent the form from submitting immediately
-
-              grecaptcha.ready(function() {
-                grecaptcha.execute();
-              });
-            }
-
-            function onCaptchaResponse(token) {
-              document.getElementById("recaptcha-response").value = token;
-              document.getElementById("registration-form").submit(); // Submit the form
-            }
-          </script>
-
+          <!-- hCaptcha -->
+          <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+          <!-- Consentmanager -->
           <script>
               // Listen for consent changes
               window.addEventListener('consentManagerReady', function() {

@@ -1,6 +1,7 @@
 """ The Flask app definition.Notice we do not use the app factory pattern """
 
 import os
+import requests
 from flask import (
     Flask,
     url_for,
@@ -238,12 +239,65 @@ def register():
     session = session_commands.get_a_database_session()
     form = forms.RegisterForm()
     if form.validate_on_submit():
-        # Verify reCAPTCHA
-        recaptcha_response = request.form.get("g-recaptcha-response")
-        is_user_human = validate_google_recaptcha(form, session, recaptcha_response)
-        if is_user_human:
-            if not handle_passwords.check_password(form.password.data):
-                flash("Mot de passe trop simple, essayez de nouveau.", "error")
+        # Retrieve hCaptcha response token from the form data
+        hcaptcha_response = request.form.get('h-captcha-response')
+        if not hcaptcha_response:
+            flash("Veuillez valider le captcha.", "error")
+            return render_template("register.html", form=form)
+
+        # hCaptcha verification
+        hcaptcha_secret_key = app.config["HCAPTCHA_SITE_SECRET"]
+        verify_url = app.config["HCAPTCHA_VERIFY_URL"]
+        payload = {
+            "secret": hcaptcha_secret_key,
+            "response": hcaptcha_response
+        }
+
+        # Make POST request to hCaptcha API
+        response = requests.post(verify_url, data=payload)
+        response_json = response.json()
+
+        if not response_json.get('success'):
+            flash("Echec vérification hCaptcha, essayez de nouveau.", "error")
+            session.close()
+            return render_template(
+                "register.html",
+                form=form,
+                is_authenticated=current_user.is_authenticated,
+            )
+
+        if not handle_passwords.check_password(form.password.data):
+            flash("Mot de passe trop simple, essayez de nouveau.", "error")
+            session.close()
+            return render_template(
+                "register.html",
+                form=form,
+                is_authenticated=current_user.is_authenticated,
+            )
+        username = str(form.login.data).lower()
+        hashed_password = generate_password_hash(
+            form.password.data, "pbkdf2:sha256", salt_length=8
+        )
+        email = str(form.email.data).lower()
+        user = session.query(User).filter_by(username=username).first()
+        user_email = session.query(User).filter_by(email=email).first()
+
+        if user_email:
+            flash("Email existe deja en base", "error")
+        elif form.password.data != form.password_check.data:
+            flash("Mots de passe ne correspondent pas", "error")
+        else:
+            if not user:
+                new_user = User(
+                    username=username, hashed_password=hashed_password, email=email
+                )
+                session.add(new_user)
+                session.commit()
+                flash(f"Bienvenue {username} vous pouvez vous connecter", "info")
+                logs_context = {"username": f"{username}", "email": f"{email}"}
+                log_events.log_event(
+                    "[+] Flask - Création compte utilisateur.", logs_context
+                )
                 session.close()
                 return render_template(
                     "register.html",

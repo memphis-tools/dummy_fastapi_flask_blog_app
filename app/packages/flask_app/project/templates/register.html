@@ -15,9 +15,8 @@
         <label for="password">{{ form.password.label }}</label>{{ form.password }}
         <label for="password_check">{{ form.password_check.label }}</label>{{ form.password_check }}
         <label for="email">{{ form.email.label }}</label>{{ form.email }}
-        <!-- Hidden field for reCAPTCHA response token -->
-        <input type="hidden" id="recaptcha-response" name="g-recaptcha-response">
-        <button type="submit" class="btn btn-primary g-recaptcha" name="button" data-sitekey="6LeFsDQqAAAAAFtUwDD8wIwy64F19HMsSbl96qg5" data-callback="onSubmit" data-action="submit">S'INSCRIRE</button>
+        <div class="h-captcha" data-sitekey="17f83c14-e1c2-483e-9240-32963c28f9f4"></div>
+        <button type="submit" class="btn btn-primary" name="button">S'INSCRIRE</button>
       </form>
     </div>
   </div>
