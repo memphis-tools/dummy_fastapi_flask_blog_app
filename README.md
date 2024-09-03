@@ -219,7 +219,7 @@ Clone the repository
 
     `cd dummy_fastapi_flask_blog_app`
 
-You do not need to create a python virtualenv.
+You do not need to create a python virtualenv. 
 
   - Example (for Linux):
 
