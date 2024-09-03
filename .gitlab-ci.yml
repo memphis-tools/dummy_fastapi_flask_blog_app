@@ -189,6 +189,7 @@ deploy:
         echo 'export LOCAL_EMAIL_LOGS_FILE=\"$LOCAL_EMAIL_LOGS_FILE\"' >> /home/dummy_user/envrc &&
         echo 'export LOGGING_DEVEL=\"$LOGGING_DEVEL\"' >> /home/dummy_user/envrc &&
         echo 'export TEST_USER_PWD=\"$TEST_USER_PWD\"' >> /home/dummy_user/envrc &&
+        echo 'export HCAPTCHA_SITE_KEY=\"$HCAPTCHA_SITE_KEY\"' >> /home/dummy_user/envrc &&
         bash get_secrets_into_envrc.sh $VAULT_ADDR $VAULT_ID_TOKEN &&
         source /home/dummy_user/envrc &&
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_init_certbot_$GIT_COMMIT &&
