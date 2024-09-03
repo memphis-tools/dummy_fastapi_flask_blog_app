@@ -419,6 +419,8 @@ If you need to debug from the virtual machine, at the project root folder:
         export LOGGING_DEVEL="DEBUG"
         export COVERALLS_REPO_TOKEN="yourCoverallsToken"
         export BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
+        export HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
+        export HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
 
 
   - run the docker-compose like this (you have to build if you have not download images):
