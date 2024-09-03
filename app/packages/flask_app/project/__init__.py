@@ -12,7 +12,6 @@ from flask import (
 )
 
 from flask_bootstrap import Bootstrap
-from flask_hcaptcha import hCaptcha
 from flask_login import (
     LoginManager,
     login_user,
@@ -51,7 +50,6 @@ app.register_blueprint(quote_routes_blueprint)
 
 bootstrap = Bootstrap(app)
 csrf = CSRFProtect(app)
-hcaptcha = hCaptcha(app)
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = "/"
@@ -241,7 +239,25 @@ def register():
     session = session_commands.get_a_database_session()
     form = forms.RegisterForm()
     if form.validate_on_submit():
-        if not hcaptcha.verify():
+        # Retrieve hCaptcha response token from the form data
+        hcaptcha_response = request.form.get('h-captcha-response')
+        if not hcaptcha_response:
+            flash("Veuillez valider le captcha.", "error")
+            return render_template("register.html", form=form)
+
+        # hCaptcha verification
+        hcaptcha_secret_key = app.config["HCAPTCHA_SITE_SECRET"]
+        verify_url = app.config["HCAPTCHA_VERIFY_URL"]
+        payload = {
+            "secret": hcaptcha_secret_key,
+            "response": hcaptcha_response
+        }
+
+        # Make POST request to hCaptcha API
+        response = requests.post(verify_url, data=payload)
+        response_json = response.json()
+
+        if not response_json.get('success'):
             flash("Echec vérification hCaptcha, essayez de nouveau.", "error")
             session.close()
             return render_template(

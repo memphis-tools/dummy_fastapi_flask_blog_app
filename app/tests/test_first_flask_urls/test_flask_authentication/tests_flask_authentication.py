@@ -3,8 +3,6 @@ All the tests functions for the authentication urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-import pytest
-from flask_hcaptcha import hCaptcha
 from app.packages import settings
 
 
@@ -62,7 +60,7 @@ def test_flask_register_route(client):
     assert response.status_code == 200
 
 
-def test_post_flask_register_route(app, client, get_flask_csrf_token, mocker):
+def test_post_flask_register_route(app, client, get_flask_csrf_token, mock_captcha_validation):
     """
     Description: check if we can register new user
     """
@@ -86,7 +84,7 @@ def test_post_flask_register_route(app, client, get_flask_csrf_token, mocker):
     assert b"Bienvenue fafa vous pouvez vous connecter" in response.data
 
 
-def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_token):
+def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_token, mock_captcha_validation):
     """
     Description: check if we can register new user with an already existing email
     """
@@ -96,6 +94,7 @@ def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_to
         "password": settings.TEST_USER_PWD,
         "password_check": settings.TEST_USER_PWD,
         "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
     }
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -110,7 +109,7 @@ def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_to
 
 
 def test_post_flask_register_route_with_passwords_mismatch(
-    client, get_flask_csrf_token
+    client, get_flask_csrf_token, mock_captcha_validation
 ):
     """
     Description: check if we can register new user with mismatched passwords
@@ -121,6 +120,7 @@ def test_post_flask_register_route_with_passwords_mismatch(
         "password": settings.TEST_USER_PWD,
         "password_check": "dummypassword",
         "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
     }
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -134,7 +134,7 @@ def test_post_flask_register_route_with_passwords_mismatch(
     assert b"Mots de passe ne correspondent pas" in response.data
 
 
-def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_token):
+def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_token, mock_captcha_validation):
     """
     Description: check if we can register new user with an already existing username
     """
@@ -144,6 +144,7 @@ def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_tok
         "password": settings.TEST_USER_PWD,
         "password_check": settings.TEST_USER_PWD,
         "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
     }
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}

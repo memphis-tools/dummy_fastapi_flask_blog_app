@@ -74,16 +74,14 @@ def get_test_token():
 
 
 @pytest.fixture
-def app(mocker):
+def app():
     """
     Description: Provides the project Flask app for tests to run.
     """
     flask_app = project.app
     flask_app.config.update(
-        {"TESTING": True, "WTF_CSRF_ENABLED": True, "LOGIN_DISABLED": False, "DEBUG": True, "HCAPTCHA_ENABLED": False}
+        {"TESTING": True, "WTF_CSRF_ENABLED": True, "LOGIN_DISABLED": False, "DEBUG": True}
     )
-    # Mock hcaptcha.verify to always return True
-    mocker.patch('app.packages.flask_app.project.hcaptcha.verify', return_value=True)
     yield flask_app
 
 
@@ -148,3 +146,16 @@ def mock_function_delete_book(mocker):
     """
     mocker.patch("app.packages.flask_app.project.book_routes_blueprint.delete_book", return_value=True)
     mocker.patch("os.remove")
+
+
+@pytest.fixture
+def mock_captcha_validation(mocker):
+    # Define the mock response data
+    mock_hcaptcha_response = {
+        "success": True,
+        "challenge_ts": "2024-09-03T12:04:36.000000Z",
+        "hostname": "dummy-ops.dev"
+    }
+
+    # Mock the requests.post call to return the mock response
+    mocker.patch('requests.post', return_value=mocker.MagicMock(status_code=200, json=lambda: mock_hcaptcha_response))
