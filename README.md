@@ -102,6 +102,10 @@ Snyk
 
 TabNine
 
+hcaptcha
+
+Google Analytics
+
 ## HOW TO SET IT, HOW IT WORKS
 
   Notice: if you use VisualCode remember that you can preview the markdown from VisualCode by running: Ctrl+Shift+V
