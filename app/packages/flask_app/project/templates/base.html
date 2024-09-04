@@ -4,44 +4,17 @@
       <!-- ConsentManager Script -->
       <script type="text/javascript" data-cmp-ab="1" src="https://cdn.consentmanager.net/delivery/autoblocking/ee8ec9aa91a5b.js" data-cmp-host="b.delivery.consentmanager.net" data-cmp-cdn="cdn.consentmanager.net" data-cmp-codesrc="0"></script>
 
+      <!-- Google Analytics Script (Using ConsentManager.net Approach) -->
+      <script type="text/plain" class="cmplazyload" data-cmp-vendor="s26">
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-      <!-- Google Analytics: Load script but do not activate tracking until consent -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=GT-KVM4QCBS"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-
-        // Block GA by default until consent is given
-        gtag('consent', 'default', {
-            'ad_storage': 'denied',
-            'ad_user_data': 'denied',
-            'ad_personalization': 'denied',
-            'analytics_storage': 'denied',
-            'regions': []
-        });
-
-        function activateGoogleAnalytics() {
-            gtag('consent', 'update', {
-                'ad_storage': 'granted',
-                'ad_user_data': 'granted',
-                'ad_personalization': 'granted',
-                'analytics_storage': 'granted'
-            });
-            gtag('js', new Date());
-            gtag('config', 'GT-KVM4QCBS');
-        }
-
-        // Callback for consentmanager to check consent and activate GA
-        function consentManagerCallback(consentData) {
-            console.log('Consent Data:', consentData);
-            if (consentData && consentData.consents && consentData.consents['analytics']) {
-                console.log('Consent granted for Analytics.');
-                activateGoogleAnalytics();
-            } else {
-                console.log('Consent not granted for Analytics.');
-            }
-        }
-        </script>
+          ga('create', 'GT-KVM4QCBS', 'dummy-ops.dev');
+          ga('set', 'anonymizeIp', true);
+          ga('send', 'pageview');
+      </script>
 
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scaler=false" />
@@ -181,14 +154,23 @@
           <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
           <!-- hCaptcha -->
           <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-          <!-- ConsentManager Event Listeners -->
+          <!-- Consent Manager Script Initialization and Consent Handling -->
           <script>
               // Listen for consent changes
               window.addEventListener('consentManagerReady', function() {
                   console.log('Consent Manager Ready event fired.');
                   if (typeof consentManager !== 'undefined') {
                       console.log('Consent Manager is defined.');
-                      consentManager.getConsentData(consentManagerCallback);
+                      consentManager.getConsentData(function(consentData) {
+                          console.log('Consent Data:', consentData);
+                          if (consentData && consentData.consents && consentData.consents['analytics']) {
+                              console.log('Consent granted for Analytics.');
+                              // ConsentManager.net will handle loading Google Analytics if consent is granted
+                          } else {
+                              console.log('Consent not granted for Analytics.');
+                              // Google Analytics will not be loaded as consent was not granted
+                          }
+                      });
                   } else {
                       console.log('Consent Manager is not defined.');
                   }
@@ -197,7 +179,16 @@
               // Check consent status when the CMP script loads
               if (typeof consentManager !== 'undefined') {
                   console.log('Consent Manager is defined on page load.');
-                  consentManager.getConsentData(consentManagerCallback);
+                  consentManager.getConsentData(function(consentData) {
+                      console.log('Consent Data:', consentData);
+                      if (consentData && consentData.consents && consentData.consents['analytics']) {
+                          console.log('Consent granted for Analytics.');
+                          // ConsentManager.net will handle loading Google Analytics if consent is granted
+                      } else {
+                          console.log('Consent not granted for Analytics.');
+                          // Google Analytics will not be loaded as consent was not granted
+                      }
+                  });
               } else {
                   console.log('Consent Manager is not defined on page load.');
               }
