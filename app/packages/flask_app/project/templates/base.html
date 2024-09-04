@@ -1,27 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
     <head>
-      <!-- ConsentManager Script -->
-      <script type="text/javascript" data-cmp-ab="1" src="https://cdn.consentmanager.net/delivery/autoblocking/ee8ec9aa91a5b.js" data-cmp-host="b.delivery.consentmanager.net" data-cmp-cdn="cdn.consentmanager.net" data-cmp-codesrc="0"></script>
+        <!-- ConsentManager Script -->
+        <script type="text/javascript" data-cmp-ab="1" src="https://cdn.consentmanager.net/delivery/autoblocking/ee8ec9aa91a5b.js" data-cmp-host="b.delivery.consentmanager.net" data-cmp-cdn="cdn.consentmanager.net" data-cmp-codesrc="0"></script>
 
-      <!-- Debug log to ensure script loads -->
-      <script>
-        window.onload = function() {
-          console.log('ConsentManager.net script loaded');
-        };
-      </script>
+        <!-- Google Analytics Script (Using ConsentManager.net Approach) -->
+        <script type="text/plain" class="cmplazyload" data-cmp-vendor="s26">
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-      <!-- Google Analytics Script (Using ConsentManager.net Approach) -->
-      <script type="text/plain" class="cmplazyload" data-cmp-vendor="s26">
-          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-          ga('create', 'GT-KVM4QCBS', 'dummy-ops.dev');
-          ga('set', 'anonymizeIp', true);
-          ga('send', 'pageview');
-      </script>
+            ga('create', 'GT-KVM4QCBS', 'dummy-ops.dev');
+            ga('set', 'anonymizeIp', true);
+            ga('send', 'pageview');
+        </script>
 
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scaler=false" />
@@ -161,29 +154,5 @@
           <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
           <!-- hCaptcha -->
           <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-
-          <!-- Consent Handling Script -->
-          <script>
-            function checkConsentManager() {
-              if (typeof consentManager !== 'undefined') {
-                console.log('Consent Manager is defined.');
-                consentManager.getConsentData(function(consentData) {
-                  console.log('Consent Data:', consentData);
-                  if (consentData && consentData.consents && consentData.consents['analytics']) {
-                    console.log('Consent granted for Analytics.');
-                  } else {
-                    console.log('Consent not granted for Analytics.');
-                  }
-                });
-              } else {
-                console.log('Consent Manager is not defined.');
-                setTimeout(checkConsentManager, 1000); // Retry after 1 second
-              }
-            }
-
-            window.addEventListener('load', function() {
-              checkConsentManager(); // Start checking after page load
-            });
-          </script>
     </body>
 </html>
