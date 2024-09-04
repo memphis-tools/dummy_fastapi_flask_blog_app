@@ -4,6 +4,13 @@
       <!-- ConsentManager Script -->
       <script type="text/javascript" data-cmp-ab="1" src="https://cdn.consentmanager.net/delivery/autoblocking/ee8ec9aa91a5b.js" data-cmp-host="b.delivery.consentmanager.net" data-cmp-cdn="cdn.consentmanager.net" data-cmp-codesrc="0"></script>
 
+      <!-- Debug log to ensure script loads -->
+      <script>
+        window.onload = function() {
+          console.log('ConsentManager.net script loaded');
+        };
+      </script>
+
       <!-- Google Analytics Script (Using ConsentManager.net Approach) -->
       <script type="text/plain" class="cmplazyload" data-cmp-vendor="s26">
           (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -154,44 +161,29 @@
           <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
           <!-- hCaptcha -->
           <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-          <!-- Consent Manager Script Initialization and Consent Handling -->
-          <script>
-              // Listen for consent changes
-              window.addEventListener('consentManagerReady', function() {
-                  console.log('Consent Manager Ready event fired.');
-                  if (typeof consentManager !== 'undefined') {
-                      console.log('Consent Manager is defined.');
-                      consentManager.getConsentData(function(consentData) {
-                          console.log('Consent Data:', consentData);
-                          if (consentData && consentData.consents && consentData.consents['analytics']) {
-                              console.log('Consent granted for Analytics.');
-                              // ConsentManager.net will handle loading Google Analytics if consent is granted
-                          } else {
-                              console.log('Consent not granted for Analytics.');
-                              // Google Analytics will not be loaded as consent was not granted
-                          }
-                      });
-                  } else {
-                      console.log('Consent Manager is not defined.');
-                  }
-              });
 
-              // Check consent status when the CMP script loads
+          <!-- Consent Handling Script -->
+          <script>
+            function checkConsentManager() {
               if (typeof consentManager !== 'undefined') {
-                  console.log('Consent Manager is defined on page load.');
-                  consentManager.getConsentData(function(consentData) {
-                      console.log('Consent Data:', consentData);
-                      if (consentData && consentData.consents && consentData.consents['analytics']) {
-                          console.log('Consent granted for Analytics.');
-                          // ConsentManager.net will handle loading Google Analytics if consent is granted
-                      } else {
-                          console.log('Consent not granted for Analytics.');
-                          // Google Analytics will not be loaded as consent was not granted
-                      }
-                  });
+                console.log('Consent Manager is defined.');
+                consentManager.getConsentData(function(consentData) {
+                  console.log('Consent Data:', consentData);
+                  if (consentData && consentData.consents && consentData.consents['analytics']) {
+                    console.log('Consent granted for Analytics.');
+                  } else {
+                    console.log('Consent not granted for Analytics.');
+                  }
+                });
               } else {
-                  console.log('Consent Manager is not defined on page load.');
+                console.log('Consent Manager is not defined.');
+                setTimeout(checkConsentManager, 1000); // Retry after 1 second
               }
+            }
+
+            window.addEventListener('load', function() {
+              checkConsentManager(); // Start checking after page load
+            });
           </script>
     </body>
 </html>
