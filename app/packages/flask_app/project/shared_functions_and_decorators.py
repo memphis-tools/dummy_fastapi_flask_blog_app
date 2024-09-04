@@ -1,10 +1,9 @@
 """ All the methods needed to be call from different blueprints """
 
-import os
+
 import random
-import requests
 from functools import wraps
-from flask import abort, flash, render_template, request
+from flask import abort, request
 from flask_login import current_user
 
 from app.packages import settings
@@ -113,27 +112,4 @@ def check_book_fields(book):
     if not isinstance(book.year_of_publication, int):
         error = "Saisie invalide, annee publication livre doit etre un entier."
         return error
-    return True
-
-
-def validate_google_recaptcha(form, session, recaptcha_response):
-    """
-    Description: vérifier que l'utilisateur est humain avec un google recaptcha.
-    """
-
-    data = {
-        "secret": os.getenv("RECAPTCHA_SECRET_KEY"),
-        "response": recaptcha_response
-    }
-    recaptcha_request = requests.post("https://www.google.com/recaptcha/api/siteverify", data=data)
-    result = recaptcha_request.json()
-
-    if not result.get('success'):
-        flash("Echec de la vérification du Captcha, essayez de nouveau", "error")
-        session.close()
-        return render_template(
-            "register.html",
-            form=form,
-            is_authenticated=current_user.is_authenticated,
-        )
     return True

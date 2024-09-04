@@ -31,7 +31,7 @@ from .book_routes_blueprint import book_routes_blueprint
 from .book_category_routes_blueprint import book_category_routes_blueprint
 from .comment_routes_blueprint import comment_routes_blueprint
 from .quote_routes_blueprint import quote_routes_blueprint
-from .shared_functions_and_decorators import get_random_books_ids, validate_google_recaptcha
+from .shared_functions_and_decorators import get_random_books_ids
 from . import forms
 
 
