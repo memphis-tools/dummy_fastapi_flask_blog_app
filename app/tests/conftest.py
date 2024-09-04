@@ -107,7 +107,7 @@ def get_flask_csrf_token(client):
 
 
 @pytest.fixture
-def access_session(client, get_flask_csrf_token):
+def access_session(client, get_flask_csrf_token, mock_captcha_validation):
     """
     Description: fixture offers a Flask session cookie for a standard user.
     """
@@ -115,7 +115,8 @@ def access_session(client, get_flask_csrf_token):
         "login": "donald",
         "password": settings.TEST_USER_PWD,
         "email": "donald@localhost.fr",
-        "csrf_token": get_flask_csrf_token
+        "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
     }
     response = client.post("http://localhost/login/", data=data)
     session = response.headers.pop('Set-Cookie')
@@ -123,7 +124,7 @@ def access_session(client, get_flask_csrf_token):
 
 
 @pytest.fixture
-def access_session_as_admin(client, get_flask_csrf_token):
+def access_session_as_admin(client, get_flask_csrf_token, mock_captcha_validation):
     """
     Description: Provides a Flask session cookie for the admin user.
     """
@@ -131,7 +132,8 @@ def access_session_as_admin(client, get_flask_csrf_token):
         "login": "admin",
         "password": settings.TEST_USER_PWD,
         "email": "admin@localhost.fr",
-        "csrf_token": get_flask_csrf_token
+        "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
     }
     response = client.post("http://localhost/login/", data=data)
     session = response.headers.pop('Set-Cookie')
