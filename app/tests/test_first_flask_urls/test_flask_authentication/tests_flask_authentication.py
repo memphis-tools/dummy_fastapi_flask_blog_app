@@ -173,7 +173,7 @@ def test_post_flask_register_route_with_invalid_data(client):
     assert response.status_code == 400
 
 
-def test_flask_login_with_valid_credentials(client, get_flask_csrf_token):
+def test_flask_login_with_valid_credentials(client, get_flask_csrf_token, mock_captcha_validation):
     """
     Description: check the login
     """
@@ -185,6 +185,7 @@ def test_flask_login_with_valid_credentials(client, get_flask_csrf_token):
         "email": "daisy@localhost.fr",
         "password": settings.TEST_USER_PWD,
         "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
     }
     response = client.post(
         "/login/",
@@ -196,7 +197,7 @@ def test_flask_login_with_valid_credentials(client, get_flask_csrf_token):
     assert b"Vous nous avez manq" in response.data
 
 
-def test_flask_login_with_invalid_login(client, get_flask_csrf_token):
+def test_flask_login_with_invalid_login(client, get_flask_csrf_token, mock_captcha_validation):
     """
     Description: check the login with invalid login
     """
@@ -208,6 +209,7 @@ def test_flask_login_with_invalid_login(client, get_flask_csrf_token):
         "email": "donald@localhost.fr",
         "password": settings.TEST_USER_PWD,
         "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
     }
     response = client.post(
         "/login/",
@@ -219,7 +221,7 @@ def test_flask_login_with_invalid_login(client, get_flask_csrf_token):
     assert b"Identifiants invalides" in response.data
 
 
-def test_flask_login_with_invalid_email(client, get_flask_csrf_token):
+def test_flask_login_with_invalid_email(client, get_flask_csrf_token, mock_captcha_validation):
     """
     Description: check the login with invalid email
     """
@@ -231,6 +233,7 @@ def test_flask_login_with_invalid_email(client, get_flask_csrf_token):
         "email": "tintin@localhost.fr",
         "password": settings.TEST_USER_PWD,
         "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
     }
     response = client.post(
         "/login/",
@@ -242,7 +245,7 @@ def test_flask_login_with_invalid_email(client, get_flask_csrf_token):
     assert b"Identifiants invalides" in response.data
 
 
-def test_flask_login_with_invalid_password(client, get_flask_csrf_token):
+def test_flask_login_with_invalid_password(client, get_flask_csrf_token, mock_captcha_validation):
     """
     Description: check the login with invalid password
     """
@@ -254,6 +257,7 @@ def test_flask_login_with_invalid_password(client, get_flask_csrf_token):
         "email": "daisy@localhost.fr",
         "password": "bebopalula",
         "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
     }
     response = client.post(
         "/login/",
