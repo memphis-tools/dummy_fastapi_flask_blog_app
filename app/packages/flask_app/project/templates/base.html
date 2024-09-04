@@ -4,39 +4,44 @@
       <!-- ConsentManager Script -->
       <script type="text/javascript" data-cmp-ab="1" src="https://cdn.consentmanager.net/delivery/autoblocking/ee8ec9aa91a5b.js" data-cmp-host="b.delivery.consentmanager.net" data-cmp-cdn="cdn.consentmanager.net" data-cmp-codesrc="0"></script>
 
+
       <!-- Google Analytics: Load script but do not activate tracking until consent -->
       <script async src="https://www.googletagmanager.com/gtag/js?id=GT-KVM4QCBS"></script>
       <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
 
-          // Do not activate GA until consent is given
-          gtag('consent', 'default', {
-              'ad_storage': 'denied',
-              'analytics_storage': 'denied'
-          });
+        // Block GA by default until consent is given
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'regions': []
+        });
 
-          // Function to activate GA tracking after consent
-          function activateGoogleAnalytics() {
-              gtag('consent', 'update', {
-                  'ad_storage': 'granted',
-                  'analytics_storage': 'granted'
-              });
-              gtag('js', new Date());
-              gtag('config', 'GT-KVM4QCBS');
-          }
+        function activateGoogleAnalytics() {
+            gtag('consent', 'update', {
+                'ad_storage': 'granted',
+                'ad_user_data': 'granted',
+                'ad_personalization': 'granted',
+                'analytics_storage': 'granted'
+            });
+            gtag('js', new Date());
+            gtag('config', 'GT-KVM4QCBS');
+        }
 
-          // Callback for consentmanager to check consent and activate GA
-          function consentManagerCallback(consentData) {
-              console.log('Consent Data:', consentData);
-              if (consentData && consentData.consents && consentData.consents['analytics']) {
-                  console.log('Consent granted for Analytics.');
-                  activateGoogleAnalytics(); // Activate GA if consent is given
-              } else {
-                  console.log('Consent not granted for Analytics.');
-              }
-          }
-      </script>
+        // Callback for consentmanager to check consent and activate GA
+        function consentManagerCallback(consentData) {
+            console.log('Consent Data:', consentData);
+            if (consentData && consentData.consents && consentData.consents['analytics']) {
+                console.log('Consent granted for Analytics.');
+                activateGoogleAnalytics();
+            } else {
+                console.log('Consent not granted for Analytics.');
+            }
+        }
+        </script>
 
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scaler=false" />
@@ -176,21 +181,25 @@
           <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
           <!-- hCaptcha -->
           <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-          <!-- Consent management for google analytics -->
+          <!-- ConsentManager Event Listeners -->
           <script>
               // Listen for consent changes
               window.addEventListener('consentManagerReady', function() {
                   console.log('Consent Manager Ready event fired.');
                   if (typeof consentManager !== 'undefined') {
+                      console.log('Consent Manager is defined.');
                       consentManager.getConsentData(consentManagerCallback);
+                  } else {
+                      console.log('Consent Manager is not defined.');
                   }
               });
 
               // Check consent status when the CMP script loads
               if (typeof consentManager !== 'undefined') {
+                  console.log('Consent Manager is defined on page load.');
                   consentManager.getConsentData(consentManagerCallback);
               } else {
-                  console.log('Consent Manager is not defined.');
+                  console.log('Consent Manager is not defined on page load.');
               }
           </script>
     </body>
