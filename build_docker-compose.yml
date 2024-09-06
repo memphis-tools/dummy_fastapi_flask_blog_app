@@ -5,53 +5,23 @@ services:
     build:
       context: .
       dockerfile: ./nginx/Dockerfile
-    ports:
-      - 80:80
-      - 443:443
-    networks:
-      - app-network
-    volumes:
-      - ./nginx/conf:/etc/nginx/conf.d
 
   flask_front:
     build:
       context: .
       dockerfile: ./gunicorn_flask/Dockerfile
-    command: gunicorn --bind 0.0.0.0:8001 app.packages.flask_app.manage:app
-    expose:
-      - 8001
-    volumes:
-      - static_volume:/home/dummy-operator/flask/staticfiles
 
   fastapi:
     build:
       context: .
       dockerfile: ./uvicorn_fastapi/Dockerfile
-    expose:
-      - 8000
 
   redis:
     build:
       context: .
       dockerfile: ./redis/Dockerfile
-    expose:
-      - 6379
-    volumes:
-      - redis_data:/data
 
   celery:
     build:
       context: .
       dockerfile: ./app/packages/celery_client_and_worker/celery_worker.Dockerfile
-    expose:
-      - 5555
-    volumes:
-      - static_volume:/home/dummy-operator/staticfiles
-
-volumes:
-  static_volume:
-  redis_data:
-
-networks:
-  app-network:
-    driver: bridge
