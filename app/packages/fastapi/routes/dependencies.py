@@ -6,13 +6,23 @@ from werkzeug.security import check_password_hash
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from app.packages.database.models import models
-from app.packages.database.commands import session_commands
-from app.packages.fastapi.models.fastapi_models import (
-    UserModel,
-    UserInDB,
-    TokenData,
-)
+
+try:
+    from database.models import models
+    from database.commands import session_commands
+    from app.fastapi.models.fastapi_models import (
+        UserModel,
+        UserInDB,
+        TokenData,
+    )
+except ModuleNotFoundError:
+    from app.packages.database.models import models
+    from app.packages.database.commands import session_commands
+    from app.packages.fastapi.models.fastapi_models import (
+        UserModel,
+        UserInDB,
+        TokenData,
+    )
 
 
 # tokenUrl leads to the URI "/api/v1/token"

@@ -1,6 +1,10 @@
 """ check password againt a policy """
 
-from app.packages import settings
+
+try:
+    import settings
+except ModuleNotFoundError:
+    from app.packages import settings
 
 
 def check_digit(plain_text_password):

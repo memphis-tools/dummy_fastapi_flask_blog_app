@@ -4,8 +4,12 @@
 from typing import List
 from werkzeug.security import generate_password_hash
 
-from app.packages import settings
-from app.packages.database.models import models
+try:
+    import settings
+    from database.models import models
+except ModuleNotFoundError:
+    from app.packages import settings
+    from app.packages.database.models import models
 
 
 def call_dummy_setup_for_users(session):

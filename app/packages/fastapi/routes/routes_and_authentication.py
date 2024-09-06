@@ -14,12 +14,22 @@ from fastapi.staticfiles import StaticFiles
 from werkzeug.security import generate_password_hash
 import jwt
 
-from app.packages import handle_passwords, log_events
-from app.packages.database.models import models
-from app.packages.fastapi.models.fastapi_models import (
-    NewUserInDBModel,
-    Token,
-)
+try:
+    import handle_passwords
+    import log_events
+    from database.models import models
+    from app.fastapi.models.fastapi_models import (
+        NewUserInDBModel,
+        Token,
+    )
+except ModuleNotFoundError:
+    from app.packages import handle_passwords, log_events
+    from app.packages.database.models import models
+    from app.packages.fastapi.models.fastapi_models import (
+        NewUserInDBModel,
+        Token,
+    )
+
 from .dependencies import (
     get_current_active_user,
     session,
@@ -43,9 +53,12 @@ app: FastAPI = FastAPI(
     openapi_url="/api/v1/openapi.json",
     swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
-app.mount("/api/v1/static", StaticFiles(directory="app/packages/fastapi/static"), name="static")
-templates = Jinja2Templates(directory="app/packages/fastapi/routes/templates")
-
+try:
+    app.mount("/api/v1/static", StaticFiles(directory="app/fastapi/static"), name="static")
+    templates = Jinja2Templates(directory="app/fastapi/routes/templates")
+except RuntimeError:
+    app.mount("/api/v1/static", StaticFiles(directory="app/packages/fastapi/static"), name="static")
+    templates = Jinja2Templates(directory="app/packages/fastapi/routes/templates")
 
 protected_routes = [
     books_categories.router,

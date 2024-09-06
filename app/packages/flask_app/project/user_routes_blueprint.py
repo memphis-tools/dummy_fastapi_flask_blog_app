@@ -15,9 +15,15 @@ from flask_login import (
 from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from app.packages import handle_passwords, log_events
-from app.packages.database.commands import session_commands
-from app.packages.database.models.models import Book, User, Starred
+try:
+    import handle_passwords
+    import log_events
+    from database.commands import session_commands
+    from database.models.models import Book, User, Starred
+except ModuleNotFoundError:
+    from app.packages import handle_passwords, log_events
+    from app.packages.database.commands import session_commands
+    from app.packages.database.models.models import Book, User, Starred
 from . import forms
 from .shared_functions_and_decorators import admin_only, return_pagination
 

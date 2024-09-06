@@ -3,8 +3,11 @@ Log production events
 """
 
 import os
-from . import logtail_handler
 
+try:
+    import logtail_handler
+except ModuleNotFoundError:
+    from app.packages import logtail_handler
 
 LOGGER = logtail_handler.logger
 

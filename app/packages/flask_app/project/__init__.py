@@ -22,9 +22,16 @@ from flask_wtf import CSRFProtect
 from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from app.packages import handle_passwords, log_events, settings
-from app.packages.database.commands import session_commands
-from app.packages.database.models.models import Book, User, BookCategory
+try:
+    import handle_passwords
+    import log_events
+    import settings
+    from database.commands import session_commands
+    from database.models.models import Book, User, BookCategory
+except ModuleNotFoundError:
+    from app.packages import handle_passwords, log_events, settings
+    from app.packages.database.commands import session_commands
+    from app.packages.database.models.models import Book, User, BookCategory
 from .user_routes_blueprint import user_routes_blueprint
 from .stat_routes_blueprint import stat_routes_blueprint
 from .book_routes_blueprint import book_routes_blueprint

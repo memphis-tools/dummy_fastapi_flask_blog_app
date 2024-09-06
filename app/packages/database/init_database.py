@@ -6,8 +6,13 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 from sqlalchemy_utils import create_database, database_exists
 
-from app.packages import utils, settings
-from app.packages.database.models import models
+try:
+    import utils
+    import settings
+    from database.models import models
+except ModuleNotFoundError:
+    from app.packages import utils, settings
+    from app.packages.database.models import models
 
 
 def get_engine(

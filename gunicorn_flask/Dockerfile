@@ -11,6 +11,8 @@ ENV HOME=/home/dummy-operator
 ENV APP_HOME=/home/dummy-operator/flask
 RUN mkdir $APP_HOME; \
     mkdir /var/log/gunicorn; \
+    mkdir -p $APP_HOME/flask_app; \
+    mkdir -p $APP_HOME/database; \
     mkdir -p $APP_HOME/staticfiles/{css,js,img};
 
 WORKDIR $APP_HOME
@@ -30,8 +32,14 @@ RUN touch /var/log/gunicorn/flask.logs
 COPY ./app/packages/flask_app/requirements.txt .
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-# copy project
-COPY . $APP_HOME
+# copy Flask project
+COPY /app/packages/flask_app $APP_HOME/flask_app
+COPY /app/packages/database $APP_HOME/database
+COPY /app/packages/handle_passwords.py $APP_HOME/
+COPY /app/packages/log_events.py $APP_HOME/
+COPY /app/packages/logtail_handler.py $APP_HOME/
+COPY /app/packages/settings.py $APP_HOME/
+COPY /app/packages/utils.py $APP_HOME/
 
 EXPOSE 8001
 
