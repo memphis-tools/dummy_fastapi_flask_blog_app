@@ -30,8 +30,27 @@ services:
     expose:
       - 8000
 
+  redis:
+    build:
+      context: .
+      dockerfile: ./redis/Dockerfile
+    expose:
+      - 6379
+    volumes:
+      - redis_data:/data
+
+  celery:
+    build:
+      context: .
+      dockerfile: ./app/packages/celery_client_and_worker/celery_worker.Dockerfile
+    expose:
+      - 5555
+    volumes:
+      - static_volume:/home/dummy-operator/staticfiles
+
 volumes:
   static_volume:
+  redis_data:
 
 networks:
   app-network:

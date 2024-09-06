@@ -13,8 +13,12 @@ from flask_login import (
 )
 from sqlalchemy import func
 
-from app.packages.database.commands import session_commands
-from app.packages.database.models.models import Book, BookCategory, User
+try:
+    from database.commands import session_commands
+    from database.models.models import Book, BookCategory, User
+except ModuleNotFoundError:
+    from app.packages.database.commands import session_commands
+    from app.packages.database.models.models import Book, BookCategory, User
 from .shared_functions_and_decorators import get_pie_colors
 
 stat_routes_blueprint = Blueprint("stat_routes_blueprint", __name__)

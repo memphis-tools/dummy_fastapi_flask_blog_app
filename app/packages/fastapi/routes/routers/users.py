@@ -5,15 +5,28 @@ from werkzeug.security import generate_password_hash
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 
-from app.packages import handle_passwords, log_events
-from app.packages.database.commands import database_crud_commands
-from app.packages.database.models import models
-from app.packages.fastapi.models.fastapi_models import (
-    UserModel,
-    UpdateUserModel,
-    UpdateUserPasswordInDB,
-    NewUserInDBModel,
-)
+try:
+    import handle_passwords
+    import log_events
+    from database.commands import database_crud_commands
+    from database.models import models
+    from app.fastapi.models.fastapi_models import (
+        UserModel,
+        UpdateUserModel,
+        UpdateUserPasswordInDB,
+        NewUserInDBModel,
+    )
+except ModuleNotFoundError:
+    from app.packages import handle_passwords, log_events
+    from app.packages.database.commands import database_crud_commands
+    from app.packages.database.models import models
+    from app.packages.fastapi.models.fastapi_models import (
+        UserModel,
+        UpdateUserModel,
+        UpdateUserPasswordInDB,
+        NewUserInDBModel,
+    )
+
 from ..dependencies import get_current_active_user, session, authenticate_user
 
 router = APIRouter()

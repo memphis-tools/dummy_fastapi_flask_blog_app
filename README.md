@@ -7,6 +7,8 @@
 ![Screenshot](https://img.shields.io/badge/gitlab-ci:cd-blue?logo=gitlab&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/terraform--blue?logo=hashicorp&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/vault--blue?logo=hashicorp&logoColor=yellow)
+![Screenshot](https://img.shields.io/badge/celery-5.4.0-blue?logo=celery&logoColor=yellow)
+![Screenshot](https://img.shields.io/badge/rabbitmq-3-blue?logo=rabbitmq&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/digitalocean--black?logo=digitalocean&logoColor=yellow&color=blue)
 ![Screenshot](https://img.shields.io/badge/betterstack--blue)
 ![Screenshot](https://img.shields.io/badge/coveralls--blue?logo=coveralls&logoColor=yellow)
@@ -63,6 +65,8 @@ POSTGRES_PASSWORD in the Gitlab settings stands for the default Postgresql's Doc
 
 By convenience, and because we do not want to use multiple virtual machines (droplets) the Vault is recreated at each new deployment into production.
 
+Celery and RabbitMQ are set to be able to send mail through Twilio SendGrid, as asynchrinous tasks.
+
 So remember it's just a dummy project.
 
 In this example the envrc file concatenates all the vars. Any sys-admin has access to all needed credentials used by the application.
@@ -94,6 +98,14 @@ Certbot
 
 Vault
 
+RabbitMQ
+
+Celery
+
+Redis
+
+Twilio SendGrid
+
 Lynis (for the virtual machine, droplet, hardening)
 
 Codacy
@@ -117,6 +129,22 @@ Google Analytics
   Github Action workflows are used. You must set secrets (tokens which allow the exchanges).
 
   ![Screenshot](illustrations/github_secrets.png)
+
+  Celery workers use a default configuration.
+
+  Rabbitmq is setup with this default configuration (we just set a specific user, password and vhost).
+
+  We have a celery worker's cluster.
+
+  Celery uses 2 types of exchanges: fanout and direct.
+
+  The first one is a broadcast, which spread a task execution order, only 1 worker will execute the task.
+
+  The second one is for the celery worker to return message result to the rabbitmq queue.
+
+        rabbitmqctl list_queues -p donald_vhost name messages
+
+        rabbitmqctl list_bindings -p donald_vhost
 
 ### POSTGRESQL PREQUISITES FOR LOCAL USAGE
 --------------------------
@@ -180,6 +208,16 @@ Google Analytics
         BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
         HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
         HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
+        RABBITMQ_DEFAULT_USER="your_rabbitmq_user"
+        RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
+        RABBITMQ_DEFAULT_VHOST="your rabbitmq vhost"
+        ERLANG_COOKIE_NAME="SuperCookie"
+        CELERY_BROKER_URL="pyamqp://$RABBITMQ_DEFAULT_USER:$RABBITMQ_DEFAULT_PASS@rabbitmq:5672/$RABBITMQ_DEFAULT_VHOST"
+        CELERY_RESULT_BACKEND="your redis url"
+        SENDGRID_API_KEY="your sendgrid api key"
+        TIMEZONE="Europe/Paris"
+        PDF_FOLDER_PATH="/home/dummy-operator/staticfiles"
+        PDF_FILE_NAME="dummy_books"
 
 
   - For a local docker execution, you will have 5 services:
@@ -213,6 +251,16 @@ Google Analytics
         export BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
         export HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
         export HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
+        export RABBITMQ_DEFAULT_USER="your_rabbitmq_user"
+        export RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
+        export RABBITMQ_DEFAULT_VHOST="your rabbitmq vhost"
+        export ERLANG_COOKIE_NAME="SuperCookie"
+        export CELERY_BROKER_URL="pyamqp://$RABBITMQ_DEFAULT_USER:$RABBITMQ_DEFAULT_PASS@rabbitmq:5672/$RABBITMQ_DEFAULT_VHOST"
+        export CELERY_RESULT_BACKEND="your redis url"
+        export SENDGRID_API_KEY="your sendgrid api key"
+        export TIMEZONE="Europe/Paris"
+        export PDF_FOLDER_PATH="/home/dummy-operator/staticfiles"
+        export PDF_FILE_NAME="dummy_books"
 
 ### HOW RUN IT LOCALLY
 ----------------------------------------------
@@ -425,6 +473,16 @@ If you need to debug from the virtual machine, at the project root folder:
         export BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
         export HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
         export HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
+        export RABBITMQ_DEFAULT_USER="your_rabbitmq_user"
+        export RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
+        export RABBITMQ_DEFAULT_VHOST="your_rabbitmq_vhost"
+        export ERLANG_COOKIE_NAME="SuperCookie"
+        export CELERY_BROKER_URL="pyamqp://$RABBITMQ_DEFAULT_USER:$RABBITMQ_DEFAULT_PASS@rabbitmq:5672/$RABBITMQ_DEFAULT_VHOST"
+        export CELERY_RESULT_BACKEND="your redis url"
+        export SENDGRID_API_KEY="your sendgrid api key"
+        export TIMEZONE="Europe/Paris"
+        export PDF_FOLDER_PATH="/home/dummy-operator/staticfiles"
+        export PDF_FILE_NAME="dummy_books"
 
 
   - run the docker-compose like this (you have to build if you have not download images):
@@ -434,6 +492,18 @@ If you need to debug from the virtual machine, at the project root folder:
       docker-compose -f deploy_init-certbot-docker-compose.yml down
 
       docker-compose --env-file ./.envrc.docker -f docker-compose.yml up -d --build
+
+  - to see rabbitmq queue (once you get into the container)
+
+      rabbitmqctl list_queues -p your_rabbitmq_user name messages
+
+      rabbitmqctl list_bindings -p your_rabbitmq_vhost
+
+  - to see the history of tasks executed by celery workers (once you get into the container)
+
+      KEYS *
+
+      GET <key>
 
 ### HARDENING
 
@@ -552,3 +622,7 @@ https://docs.gitlab.com/ee/ci/variables/
 For the Docker-Hub registry credentials:
 
 https://docs.gitlab.com/ee/user/packages/container_registry/authenticate_with_container_registry.html
+
+For Celery, RabbitMQ and Redis is used:
+
+https://github.com/memphis-tools/dummy_flask_rabbitmq_celery/blob/main/start_application.sh

@@ -13,9 +13,14 @@ from flask_login import (
     login_required,
 )
 
-from app.packages import log_events
-from app.packages.database.commands import session_commands
-from app.packages.database.models.models import Comment, Book
+try:
+    import log_events
+    from database.commands import session_commands
+    from database.models.models import Comment, Book
+except ModuleNotFoundError:
+    from app.packages import log_events
+    from app.packages.database.commands import session_commands
+    from app.packages.database.models.models import Comment, Book
 from . import forms
 
 comment_routes_blueprint = Blueprint("comment_routes_blueprint", __name__)

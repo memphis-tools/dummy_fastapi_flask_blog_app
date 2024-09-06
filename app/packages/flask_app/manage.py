@@ -6,7 +6,7 @@ Through the app/packages/flask_app/project/__init__.py file.
 
 from flask.cli import FlaskGroup
 
-from app.packages.flask_app.project import app
+from flask_app.project import app
 
 cli = FlaskGroup(app)
 
