@@ -12,9 +12,15 @@ from flask_login import (
     current_user,
     login_required,
 )
-from app.packages import log_events
-from app.packages.database.commands import session_commands
-from app.packages.database.models.models import Quote
+
+try:
+    import log_events
+    from database.commands import session_commands
+    from database.models.models import Quote
+except ModuleNotFoundError:
+    from app.packages import log_events
+    from app.packages.database.commands import session_commands
+    from app.packages.database.models.models import Quote
 from . import forms
 from .shared_functions_and_decorators import admin_only
 

@@ -33,7 +33,7 @@ class Starred(BASE):
 
     def get_json(self):
         """
-        Description: get a starred instance as a json dict during general application execution.
+        Description: get a starred instance as a JSON dict during general application execution.
         """
         return {
             "id": self.id,
@@ -62,7 +62,7 @@ class Quote(BASE):
 
     def get_json(self):
         """
-        Description: get a quote instance as a json dict during general application execution.
+        Description: get a quote instance as a JSON dict during general application execution.
         """
         return {
             "id": self.id,
@@ -96,7 +96,7 @@ class Comment(BASE):
 
     def get_json(self):
         """
-        Description: get a comment instance as a json dict during general application execution.
+        Description: get a comment instance as a JSON dict during general application execution.
         """
         return {
             "id": self.id,
@@ -109,7 +109,7 @@ class Comment(BASE):
     def get_json_for_update(self):
         """
         Description:
-        Get a comment instance as a json dict without id (when we list them from FastAPI)
+        Get a comment instance as a JSON dict without id (when we list them from FastAPI)
         """
         return {
             "text": self.text,
@@ -133,7 +133,7 @@ class BookCategory(BASE):
 
     def get_json(self):
         """
-        Description: get a category book instance as a json dict during general application execution.
+        Description: get a category book instance as a JSON dict during general application execution.
         """
         return {
             "id": self.id,
@@ -143,7 +143,7 @@ class BookCategory(BASE):
     def get_json_for_update(self):
         """
         Description:
-        Get a category book instance as a json dict without id (when we list them from FastAPI)
+        Get a category book instance as a JSON dict without id (when we list them from FastAPI)
         """
         return {
             "title": self.title,
@@ -182,7 +182,7 @@ class Book(BASE):
 
     def get_json(self):
         """
-        Description: get a book instance as a json dict during general application execution.
+        Description: get a book instance as a JSON dict during general application execution.
         """
         return {
             "id": self.id,
@@ -201,7 +201,7 @@ class Book(BASE):
     def get_json_for_update(self):
         """
         Description:
-        Get a book instance as a json dict without id (when we list them from FastAPI)
+        Get a book instance as a JSON dict without id (when we list them from FastAPI)
         """
         return {
             "title": self.title,
@@ -209,6 +209,27 @@ class Book(BASE):
             "summary": self.summary,
             "content": self.content,
             "category": self.category,
+            "year_of_publication": self.year_of_publication,
+            "publication_date": self.publication_date,
+            "book_picture_name": self.book_picture_name,
+            "user_id": self.user_id,
+        }
+
+    def get_json_for_pdf(self, session) -> dict:
+        """
+        Description:
+        Get a book instance as a JSON dict for PDF generation, including the category name.
+        """
+        # Fetch the category name based on the category ID
+        category = session.query(BookCategory).filter_by(id=self.category).first()
+        category_name = category.title if category else "Unknown"  # Default to "Unknown" if no category found
+
+        return {
+            "title": self.title,
+            "author": self.author,
+            "summary": self.summary,
+            "content": self.content,
+            "category": category_name,
             "year_of_publication": self.year_of_publication,
             "publication_date": self.publication_date,
             "book_picture_name": self.book_picture_name,
@@ -253,7 +274,7 @@ class User(BASE, UserMixin):
 
     def get_json(self):
         """
-        Description: get an user instance as a json dict during general application execution.
+        Description: get an user instance as a JSON dict during general application execution.
         """
         return {
             "id": self.id,
@@ -266,7 +287,7 @@ class User(BASE, UserMixin):
     def get_restricted_json(self):
         """
         Description:
-        Get an user instance as a json dict without hashed passwords (when we list them from FastAPI)
+        Get an user instance as a JSON dict without hashed passwords (when we list them from FastAPI)
         """
         return {
             "id": self.id,
@@ -280,7 +301,7 @@ class User(BASE, UserMixin):
     def get_json_for_update(self):
         """
         Description:
-        Get a user instance as a json dict without id (when we list them from FastAPI)
+        Get a user instance as a JSON dict without id (when we list them from FastAPI)
         """
         return {
             "username": self.username,

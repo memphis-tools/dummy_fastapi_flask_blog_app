@@ -4,7 +4,7 @@ This is a dummy fastapi application using a database.
 
 import uvicorn
 
-from app.packages.fastapi.routes import routes_and_authentication
+from app.fastapi.routes import routes_and_authentication
 
 
 app = routes_and_authentication.app

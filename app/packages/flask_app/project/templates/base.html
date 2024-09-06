@@ -56,6 +56,7 @@
                                         <li><a class="dropdown-item" href="{{ url_for('user_routes_blueprint.user_starred', user_id=current_user.id) }}">VOIR VOS FAVORIS</a></li>
                                         <li><a class="dropdown-item" href="{{ url_for('user_routes_blueprint.user_books', user_id=current_user.id) }}">VOIR VOS LIVRES</a></li>
                                         <li><a class="dropdown-item" href="{{ url_for('book_routes_blueprint.add_book') }}">AJOUTER UN LIVRE</a></li>
+                                        <li><a class="dropdown-item" href="{{ url_for('book_routes_blueprint.mail_books') }}">TELECHARGER LES LIVRES</a></li>
                                     {% endif %}
                                     {% if current_user.role == "admin" %}
                                       <li class="nav-item">

@@ -1,6 +1,7 @@
 """ The Book blueprint routes """
 
 import os
+from celery import Celery
 from flask import (
     Blueprint,
     url_for,
@@ -17,14 +18,25 @@ from flask_login import (
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 
-from app.packages import log_events, settings
-from app.packages.database.commands import session_commands
-from app.packages.database.models.models import (
-    Book,
-    BookCategory,
-    Comment,
-    Starred,
-)
+try:
+    import log_events
+    import settings
+    from database.commands import session_commands
+    from database.models.models import (
+        Book,
+        BookCategory,
+        Comment,
+        Starred,
+    )
+except ModuleNotFoundError:
+    from app.packages import log_events, settings
+    from app.packages.database.commands import session_commands
+    from app.packages.database.models.models import (
+        Book,
+        BookCategory,
+        Comment,
+        Starred,
+    )
 from . import forms
 from .shared_functions_and_decorators import (
     return_pagination,
@@ -426,3 +438,15 @@ def update_book(book_id):
         book=a_book,
         is_authenticated=current_user.is_authenticated
     )
+
+
+@book_routes_blueprint.route("/books/download/")
+@login_required
+def mail_books():
+    """send books published by email as a pdf"""
+    celery_app = Celery(
+        broker=os.getenv("CELERY_BROKER_URL"),
+        backend=os.getenv("CELERY_RESULT_BACKEND")
+    )
+    celery_app.send_task("generate_pdf_and_send_email_task", args=(current_user.email,), retry=True)
+    return render_template("mail_movies.html")

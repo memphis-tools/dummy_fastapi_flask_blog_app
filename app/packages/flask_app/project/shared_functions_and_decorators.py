@@ -6,9 +6,14 @@ from functools import wraps
 from flask import abort, request
 from flask_login import current_user
 
-from app.packages import settings
-from app.packages.database.commands import session_commands
-from app.packages.database.models.models import Quote
+try:
+    import settings
+    from database.commands import session_commands
+    from database.models.models import Quote
+except ModuleNotFoundError:
+    from app.packages import settings
+    from app.packages.database.commands import session_commands
+    from app.packages.database.models.models import Quote
 
 
 def admin_only(f):
