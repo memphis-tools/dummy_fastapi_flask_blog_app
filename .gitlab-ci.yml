@@ -119,7 +119,7 @@ build_docker_images:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_TOKEN
   script:
-    - docker-compose -f build_docker-compose.yml build
+    - docker-compose -f build_docker-compose.yml build --no-cache
     - docker tag "dummy_fastapi_flask_blog_app-nginx" $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_$GIT_COMMIT
     - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_$GIT_COMMIT
     - docker tag "dummy_fastapi_flask_blog_app-fastapi:latest" $IMAGE_REPO:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT
