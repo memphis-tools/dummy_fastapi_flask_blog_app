@@ -27,8 +27,9 @@ services:
   - postgres:latest
 
 before_script:
-  - python -m pip install -r app/requirements.txt
+  - python -m pip install -r app/packages/fastapi/requirements.txt
   - python -m pip install -r app/packages/flask_app/requirements.txt
+  - python -m pip install -r app/packages/celery_client_and_worker/requirements.txt
 
 unit_tests_development_branch:
   stage: test_development_branch
