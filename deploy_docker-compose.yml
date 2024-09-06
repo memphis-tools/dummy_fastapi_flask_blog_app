@@ -101,12 +101,71 @@ services:
     networks:
       - app-network
 
+  redis:
+    image: memphistools/public_repo:dummy_fastapi_flask_blog_app-redis_$GIT_COMMIT
+    expose:
+      - 6379
+    volumes:
+      - redis_data:/data
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS
+      - RABBITMQ_DEFAULT_VHOST
+      - ERLANG_COOKIE_NAME
+      - NODENAME=rabbit@localhost
+      - RABBITMQ_DEFAULT_PERMISSIONS_REGEX=^.*$$
+    expose:
+      - 5672
+    depends_on:
+      - flask_front
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/conf.d/20-custom.conf
+      - rabbitmq_data:/var/lib/rabbitmq/
+    networks:
+      - app-network
+
+  celery:
+    image: memphistools/public_repo:dummy_fastapi_flask_blog_app-celery_$GIT_COMMIT
+    expose:
+      - 5555
+    environment:
+      - CELERY_BROKER_URL
+      - CELERY_RESULT_BACKEND
+      - TIMEZONE=$TIMEZONE
+      - SENDGRID_API_KEY
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_TEST_DB_NAME
+      - POSTGRES_PORT
+      - POSTGRES_HOST
+      - PDF_FOLDER_PATH
+      - PDF_FILE_NAME
+    volumes:
+      - static_volume:/home/dummy-operator/staticfiles
+    depends_on:
+      - redis
+      - rabbitmq
+      - flask_front
+    networks:
+      - app-network
+
 volumes:
   postgres_data:
   static_volume:
   certbot-etc:
   certbot-var:
   web-root:
+  rabbitmq_data:
+  redis_data:
 
 networks:
   app-network:

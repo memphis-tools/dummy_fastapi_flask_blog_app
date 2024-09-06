@@ -31,6 +31,9 @@ HCAPTCHA_SITE_KEY = os.getenv("HCAPTCHA_SITE_KEY")
 HCAPTCHA_SITE_SECRET = os.getenv("HCAPTCHA_SITE_SECRET")
 HCAPTCHA_ENABLED = True
 
+CELERY_BROKER_URL = "pyamqp://dummy_ops_admin:@pplepie94@rabbitmq:5672/dummy_ops_admin_vhost"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+
 MAX_CONTENT_LENGTH = 1024 * 1024 * 5
 
 EMAIL_SERVER = os.getenv("EMAIL_SERVER")

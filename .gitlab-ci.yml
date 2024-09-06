@@ -125,6 +125,10 @@ build_docker_images:
     - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT
     - docker tag "dummy_fastapi_flask_blog_app-flask_front:latest" $IMAGE_REPO:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT
     - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT
+    - docker tag "dummy_fastapi_flask_blog_app-redis" $IMAGE_REPO:dummy_fastapi_flask_blog_app-redis_$GIT_COMMIT
+    - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-redis_$GIT_COMMIT
+    - docker tag "dummy_fastapi_flask_blog_app-celery" $IMAGE_REPO:dummy_fastapi_flask_blog_app-celery_$GIT_COMMIT
+    - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-celery_$GIT_COMMIT
 
 deploy_init:
   stage: deploy_init_vault
@@ -196,6 +200,8 @@ deploy:
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_$GIT_COMMIT &&
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT &&
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT &&
+        docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-celery_$GIT_COMMIT &&
+        docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-redis_$GIT_COMMIT &&
         docker pull certbot/certbot:latest &&
         docker-compose -f deploy_vault_docker-compose.yml down &&
         docker-compose -f deploy_init-certbot-docker-compose.yml up -d  --build &&

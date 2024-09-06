@@ -4,14 +4,24 @@ from typing import Annotated
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 
-from app.packages import log_events
-from app.packages.database.commands import database_crud_commands
-from app.packages.database.models import models
-from app.packages.fastapi.models.fastapi_models import (
-    UserModel,
-    NewBookModel,
-    UpdateBookModel,
-)
+try:
+    import log_events
+    from database.commands import database_crud_commands
+    from database.models import models
+    from app.fastapi.models.fastapi_models import (
+        UserModel,
+        NewBookModel,
+        UpdateBookModel,
+    )
+except ModuleNotFoundError:
+    from app.packages import log_events
+    from app.packages.database.commands import database_crud_commands
+    from app.packages.database.models import models
+    from app.packages.fastapi.models.fastapi_models import (
+        UserModel,
+        NewBookModel,
+        UpdateBookModel,
+    )
 from ..dependencies import get_current_active_user, session
 
 router = APIRouter()

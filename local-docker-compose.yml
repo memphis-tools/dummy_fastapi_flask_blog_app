@@ -19,7 +19,7 @@ services:
     build:
       context: .
       dockerfile: ./gunicorn_flask/Dockerfile
-    command: gunicorn --bind 0.0.0.0:8001 app.packages.flask_app.manage:app
+    command: gunicorn --bind 0.0.0.0:8001 flask_app.manage:app
     expose:
       - 8001
     environment:
@@ -38,6 +38,8 @@ services:
       - BETTERSTACK_SOURCE_TOKEN
       - HCAPTCHA_SITE_KEY
       - HCAPTCHA_SITE_SECRET
+      - CELERY_BROKER_URL=$CELERY_BROKER_URL
+      - CELERY_RESULT_BACKEND=$CELERY_RESULT_BACKEND
     networks:
       - app-network
     depends_on:
@@ -91,9 +93,72 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
+  redis:
+    build:
+      context: .
+      dockerfile: ./redis/Dockerfile
+    expose:
+      - 6379
+    volumes:
+      - redis_data:/data
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
+      - RABBITMQ_DEFAULT_VHOST=$RABBITMQ_DEFAULT_VHOST
+      - NODENAME=rabbit@localhost
+      - RABBITMQ_DEFAULT_PERMISSIONS_REGEX=^.*$$
+      - ERLANG_COOKIE_NAME="erlang_cookie"
+    expose:
+      - 5672
+    depends_on:
+      - flask_front
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/conf.d/20-custom.conf
+      - rabbitmq_data:/var/lib/rabbitmq/
+    networks:
+      - app-network
+
+  celery:
+    build:
+      context: .
+      dockerfile: ./app/packages/celery_client_and_worker/celery_worker.Dockerfile
+    expose:
+      - 5555
+    environment:
+      - CELERY_BROKER_URL=$CELERY_BROKER_URL
+      - CELERY_RESULT_BACKEND=$CELERY_RESULT_BACKEND
+      - TIMEZONE=$TIMEZONE
+      - SENDGRID_API_KEY
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_TEST_DB_NAME
+      - POSTGRES_PORT
+      - POSTGRES_HOST
+      - PDF_FOLDER_PATH
+      - PDF_FILE_NAME
+    volumes:
+      - static_volume:/home/dummy-operator/staticfiles
+    depends_on:
+      - redis
+      - rabbitmq
+      - flask_front
+    networks:
+      - app-network
+
 volumes:
   postgres_data:
   static_volume:
+  rabbitmq_data:
+  redis_data:
 
 networks:
   app-network:

@@ -14,9 +14,14 @@ from flask_login import (
 )
 from sqlalchemy.orm import joinedload
 
-from app.packages import log_events
-from app.packages.database.commands import session_commands
-from app.packages.database.models.models import Book, BookCategory
+try:
+    import log_events
+    from database.commands import session_commands
+    from database.models.models import Book, BookCategory
+except ModuleNotFoundError:
+    from app.packages import log_events
+    from app.packages.database.commands import session_commands
+    from app.packages.database.models.models import Book, BookCategory
 from . import forms
 from .shared_functions_and_decorators import admin_only, return_pagination
 
