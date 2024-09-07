@@ -21,6 +21,11 @@ services:
       context: .
       dockerfile: ./redis/Dockerfile
 
+  rabbitmq:
+    build:
+      context: .
+      dockerfile: ./rabbitmq/Dockerfile
+
   celery:
     build:
       context: .

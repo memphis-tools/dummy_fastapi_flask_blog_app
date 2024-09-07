@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: ./nginx/local-Dockerfile
+    container_name: nginx
     ports:
       - 80:80
       - 443:443
@@ -19,6 +20,7 @@ services:
     build:
       context: .
       dockerfile: ./gunicorn_flask/Dockerfile
+    container_name: flask
     command: gunicorn --bind 0.0.0.0:8001 flask_app.manage:app
     expose:
       - 8001
@@ -51,6 +53,7 @@ services:
     build:
       context: .
       dockerfile: ./uvicorn_fastapi/Dockerfile
+    container_name: fastapi
     expose:
       - 8000
     environment:
@@ -75,6 +78,7 @@ services:
 
   db:
     image: postgres:15.0-alpine
+    container_name: db
     expose:
       - 5432
     environment:
@@ -97,6 +101,7 @@ services:
     build:
       context: .
       dockerfile: ./redis/Dockerfile
+    container_name: redis
     expose:
       - 6379
     volumes:
@@ -108,7 +113,10 @@ services:
       - app-network
 
   rabbitmq:
-    image: rabbitmq:3-management
+    build:
+      context: .
+      dockerfile: ./rabbitmq/Dockerfile
+    container_name: rabbitmq
     environment:
       - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
       - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
@@ -130,6 +138,7 @@ services:
     build:
       context: .
       dockerfile: ./app/packages/celery_client_and_worker/celery_worker.Dockerfile
+    container_name: celery
     expose:
       - 5555
     environment:
