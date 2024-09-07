@@ -28,4 +28,4 @@ COPY ./app/packages/settings.py $HOME
 RUN chown -R dummy-operator:dummy-operator $HOME
 EXPOSE 5555
 USER dummy-operator
-CMD ["celery", "-A", "celery_app", "worker", "-l", "INFO"]
+CMD ["celery", "-A", "celery_app", "worker", "-l", "info"]

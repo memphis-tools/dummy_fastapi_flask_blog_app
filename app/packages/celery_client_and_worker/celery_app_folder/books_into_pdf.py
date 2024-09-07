@@ -86,7 +86,7 @@ def draw_book_details(c, book, x, y, width, image_size):
         y -= 15
 
     # Book description
-    description_text = f"DESCRIPTION: {book['content']}"
+    description_text = f"DESCRIPTION: {book['summary']}"
 
     # Dynamically calculate and draw multiline description
     y = draw_multiline_text(c, description_text, x, y, width - 100)

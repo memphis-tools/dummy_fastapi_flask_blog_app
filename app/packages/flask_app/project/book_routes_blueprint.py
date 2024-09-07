@@ -449,4 +449,4 @@ def mail_books():
         backend=os.getenv("CELERY_RESULT_BACKEND")
     )
     celery_app.send_task("generate_pdf_and_send_email_task", args=(current_user.email,), retry=True)
-    return render_template("mail_movies.html")
+    return render_template("mail_books.html")

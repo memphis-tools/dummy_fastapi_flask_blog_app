@@ -130,6 +130,8 @@ build_docker_images:
     - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-redis_$GIT_COMMIT
     - docker tag "dummy_fastapi_flask_blog_app-celery" $IMAGE_REPO:dummy_fastapi_flask_blog_app-celery_$GIT_COMMIT
     - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-celery_$GIT_COMMIT
+    - docker tag "dummy_fastapi_flask_blog_app-rabbitmq" $IMAGE_REPO:dummy_fastapi_flask_blog_app-rabbitmq_$GIT_COMMIT
+    - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-rabbitmq_$GIT_COMMIT
 
 deploy_init:
   stage: deploy_init_vault
@@ -195,6 +197,12 @@ deploy:
         echo 'export LOGGING_DEVEL=\"$LOGGING_DEVEL\"' >> /home/dummy_user/envrc &&
         echo 'export TEST_USER_PWD=\"$TEST_USER_PWD\"' >> /home/dummy_user/envrc &&
         echo 'export HCAPTCHA_SITE_KEY=\"$HCAPTCHA_SITE_KEY\"' >> /home/dummy_user/envrc &&
+        echo 'export TIMEZONE=\"$TIMEZONE\"' >> /home/dummy_user/envrc &&
+        echo 'export CELERY_RESULT_BACKEND=\"$CELERY_RESULT_BACKEND\"' >> /home/dummy_user/envrc &&
+        echo 'export PDF_FOLDER_PATH=\"$PDF_FOLDER_PATH\"' >> /home/dummy_user/envrc &&
+        echo 'export PDF_FILE_NAME=\"$PDF_FILE_NAME\"' >> /home/dummy_user/envrc &&
+        echo 'export RABBITMQ_DEFAULT_USER=\"$RABBITMQ_DEFAULT_USER\"' >> /home/dummy_user/envrc &&
+        echo 'export RABBITMQ_DEFAULT_VHOST=\"$RABBITMQ_DEFAULT_VHOST\"' >> /home/dummy_user/envrc &&
         bash get_secrets_into_envrc.sh $VAULT_ADDR $VAULT_ID_TOKEN &&
         source /home/dummy_user/envrc &&
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_init_certbot_$GIT_COMMIT &&
@@ -203,6 +211,7 @@ deploy:
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT &&
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-celery_$GIT_COMMIT &&
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-redis_$GIT_COMMIT &&
+        docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-rabbitmq_$GIT_COMMIT &&
         docker pull certbot/certbot:latest &&
         docker-compose -f deploy_vault_docker-compose.yml down &&
         docker-compose -f deploy_init-certbot-docker-compose.yml up -d  --build &&
