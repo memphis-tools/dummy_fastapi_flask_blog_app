@@ -53,7 +53,7 @@ def send_email(recipient, pdf_file_path):
     # Send the email
     SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
     try:
-        sg = SendGridAPIClient(os.environ.get(''))
-        response = sg.send(message)
-    except Exception as e:
+        sg = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
+        sg.send(message)
+    except Exception:
         return {"status": "failure", "message": "Mail sending failed"}

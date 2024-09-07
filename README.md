@@ -194,7 +194,7 @@ Google Analytics
         POSTGRES_PORT="5432"
         POSTGRES_HOST="0.0.0.0"
         ADMIN_LOGIN="admin"
-        ADMIN_PASSWORD="@pplepie94"
+        ADMIN_PASSWORD="@pplepie94" #notice this is not the real password
         ADMIN_EMAIL="admin@localhost.fr"
         TEST_USER_PWD="@pplepie94"
         SECRET_KEY="YourSUperSecretKey123oclock"
@@ -237,7 +237,7 @@ Google Analytics
         export POSTGRES_PORT="5432"
         export POSTGRES_HOST="db"
         export ADMIN_LOGIN="admin"
-        export ADMIN_PASSWORD="@pplepie94"
+        export ADMIN_PASSWORD="@pplepie94" #notice this is not the real password
         export ADMIN_EMAIL="admin@localhost.fr"
         export TEST_USER_PWD="@pplepie94"
         export SECRET_KEY="YourSUperSecretKey123oclock"
@@ -459,7 +459,7 @@ If you need to debug from the virtual machine, at the project root folder:
         export POSTGRES_PORT="5432"
         export POSTGRES_HOST="db"
         export ADMIN_LOGIN="admin"
-        export ADMIN_PASSWORD="@pplepie94"
+        export ADMIN_PASSWORD="@pplepie94" #notice this is not the real password
         export ADMIN_EMAIL="admin@localhost.fr"
         export TEST_USER_PWD="@pplepie94"
         export SECRET_KEY="YourSUperSecretKey123oclock"
@@ -501,9 +501,13 @@ If you need to debug from the virtual machine, at the project root folder:
 
   - to see the history of tasks executed by celery workers (once you get into the container)
 
-      KEYS *
+      redis-cli KEYS *
 
-      GET <key>
+      redis-cli GET <key>
+
+      to reset the redis database: redis-cli FLUSHDB
+
+      to remove sepecific task: redis-cli DEL celery-task-meta-<task_id>
 
 ### HARDENING
 
