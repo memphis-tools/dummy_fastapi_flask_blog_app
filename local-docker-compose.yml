@@ -40,8 +40,8 @@ services:
       - BETTERSTACK_SOURCE_TOKEN
       - HCAPTCHA_SITE_KEY
       - HCAPTCHA_SITE_SECRET
-      - CELERY_BROKER_URL=$CELERY_BROKER_URL
-      - CELERY_RESULT_BACKEND=$CELERY_RESULT_BACKEND
+      - CELERY_BROKER_URL
+      - CELERY_RESULT_BACKEND
     networks:
       - app-network
     depends_on:
@@ -70,6 +70,8 @@ services:
       - TEST_USER_PWD
       - SECRET_KEY
       - BETTERSTACK_SOURCE_TOKEN
+      - CELERY_BROKER_URL
+      - CELERY_RESULT_BACKEND
     networks:
       - app-network
     depends_on:

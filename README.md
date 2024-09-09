@@ -216,7 +216,7 @@ Google Analytics
         CELERY_RESULT_BACKEND="your redis url"
         SENDGRID_API_KEY="your sendgrid api key"
         TIMEZONE="Europe/Paris"
-        PDF_FOLDER_PATH="/home/dummy-operator/staticfiles"
+        PDF_FOLDER_PATH="/tmp"
         PDF_FILE_NAME="dummy_books"
 
 
@@ -259,7 +259,7 @@ Google Analytics
         export CELERY_RESULT_BACKEND="your redis url"
         export SENDGRID_API_KEY="your sendgrid api key"
         export TIMEZONE="Europe/Paris"
-        export PDF_FOLDER_PATH="/home/dummy-operator/staticfiles"
+        export PDF_FOLDER_PATH="/tmp"
         export PDF_FILE_NAME="dummy_books"
 
 ### HOW RUN IT LOCALLY
@@ -481,7 +481,7 @@ If you need to debug from the virtual machine, at the project root folder:
         export CELERY_RESULT_BACKEND="your redis url"
         export SENDGRID_API_KEY="your sendgrid api key"
         export TIMEZONE="Europe/Paris"
-        export PDF_FOLDER_PATH="/home/dummy-operator/staticfiles"
+        export PDF_FOLDER_PATH="/tmp"
         export PDF_FILE_NAME="dummy_books"
 
 

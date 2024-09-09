@@ -24,3 +24,4 @@ cov_html
 htmlcov
 test_api.py
 lint.txt
+.scannerwork
