@@ -131,7 +131,6 @@ services:
     depends_on:
       - flask_front
     volumes:
-      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/conf.d/20-custom.conf
       - rabbitmq_data:/var/lib/rabbitmq/
     networks:
       - app-network
