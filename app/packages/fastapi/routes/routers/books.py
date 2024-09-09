@@ -1,12 +1,14 @@
 """The FastAPI routes for books"""
 
+import os
 from typing import Annotated
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
+from celery import Celery
 
 try:
     import log_events
-    from database.commands import database_crud_commands
+    from database.commands import database_crud_commands, session_commands
     from database.models import models
     from app.fastapi.models.fastapi_models import (
         UserModel,
@@ -15,7 +17,7 @@ try:
     )
 except ModuleNotFoundError:
     from app.packages import log_events
-    from app.packages.database.commands import database_crud_commands
+    from app.packages.database.commands import database_crud_commands, session_commands
     from app.packages.database.models import models
     from app.packages.fastapi.models.fastapi_models import (
         UserModel,
@@ -61,6 +63,33 @@ async def view_books(
     """
     books = database_crud_commands.view_all_instances(session, models.Book)
     return books
+
+
+def get_user_email(user_id:int):
+    """ get_user_email returns the user email """
+    session = session_commands.get_a_database_session()
+    user = session.query(models.User).filter(models.User.id == user_id).first()
+    session.close()
+    return user.email
+
+
+@router.get("/api/v1/books/download/", tags=["BOOKS"])
+async def download_books(
+    current_user: Annotated[UserModel, Depends(get_current_active_user)]
+):
+    """
+    download_books triggers a Celery task which consist to email the user with published books as a pdf file.
+    """
+
+    user_email = get_user_email(current_user.id)
+    celery_app = Celery(
+        broker=os.getenv("CELERY_BROKER_URL"),
+        backend=os.getenv("CELERY_RESULT_BACKEND")
+    )
+    celery_app.send_task("generate_pdf_and_send_email_task", args=(user_email,), retry=True)
+    return {
+        "detail": f"Demande reçue, vous allez recevoir par email à {user_email} les livres publiés."
+    }
 
 
 @router.get("/api/v1/books/{book_id}/", tags=["BOOKS"])
