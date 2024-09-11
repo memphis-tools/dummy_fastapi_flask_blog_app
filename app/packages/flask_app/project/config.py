@@ -35,7 +35,3 @@ CELERY_BROKER_URL = "pyamqp://dummy_ops_admin:@pplepie94@rabbitmq:5672/dummy_ops
 CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 
 MAX_CONTENT_LENGTH = 1024 * 1024 * 5
-
-EMAIL_SERVER = os.getenv("EMAIL_SERVER")
-LOCAL_EMAIL_LOGS_FILE = os.getenv("LOCAL_EMAIL_LOGS_FILE")
-LOGGING_LEVEL = os.getenv("LOGGING_LEVEL")

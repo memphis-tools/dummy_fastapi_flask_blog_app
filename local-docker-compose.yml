@@ -42,6 +42,7 @@ services:
       - HCAPTCHA_SITE_SECRET
       - CELERY_BROKER_URL
       - CELERY_RESULT_BACKEND
+      - SENDGRID_API_KEY
     networks:
       - app-network
     depends_on:
