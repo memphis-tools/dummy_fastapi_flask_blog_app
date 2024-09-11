@@ -2,6 +2,8 @@
 
 import os
 import requests
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 from flask import (
     Flask,
     url_for,
@@ -163,24 +165,62 @@ def contact():
     """
     form = forms.ContactForm()
     if form.validate_on_submit():
-        name = form.name.data
-        email = form.email.data
-        message = form.message.data
-        debug_level = os.getenv("LOGGING_LEVEL")
-        if os.getenv("EMAIL_SERVER") == "localhost":
-            file_path = os.getenv("LOCAL_EMAIL_LOGS_FILE")
-            with open(file_path, "a", encoding="utf-8") as fd:
-                fd.write(f"{debug_level}: MAIL FROM {email}| aka {name}: {message}\n")
+        # Retrieve hCaptcha response token from the form data
+        hcaptcha_response = request.form.get('h-captcha-response')
+        if not hcaptcha_response:
+            flash("Veuillez valider le captcha.", "error")
+            return render_template("contact.html", form=form)
+
+        # hCaptcha verification
+        hcaptcha_secret_key = app.config["HCAPTCHA_SITE_SECRET"]
+        verify_url = app.config["HCAPTCHA_VERIFY_URL"]
+        payload = {
+            "secret": hcaptcha_secret_key,
+            "response": hcaptcha_response
+        }
+
+        # Make POST request to hCaptcha API
+        response = requests.post(verify_url, data=payload)
+        response_json = response.json()
+
+        if not response_json.get('success'):
+            flash("Echec vérification hCaptcha, essayez de nouveau.", "error")
             return render_template(
-                "mail_sent.html",
-                name=name,
+                "contact.html",
+                form=form,
                 is_authenticated=current_user.is_authenticated,
             )
-        return render_template(
-            "mail_not_sent.html",
-            name=name,
-            is_authenticated=current_user.is_authenticated,
+        username = form.name.data
+        email = form.email.data
+        message = form.message.data
+
+        message = Mail(
+            from_email="no-reply@dummy-ops.dev",
+            to_emails=f"{os.getenv('ADMIN_EMAIL')}",
+            subject="Dummy-ops contact",
+            html_content=f"{username} with email {email} sent this message: {message}"
         )
+
+        SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+        try:
+            sg = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
+            sg.send(message)
+            return render_template(
+                "mail_sent.html",
+                name=username,
+                is_authenticated=current_user.is_authenticated,
+            )
+        except Exception as e:
+            logs_context = {"username": f"{username}", "email": f"{email}"}
+            log_events.log_event(
+                f"[+] Flask - Echec envoi email: {e}", logs_context
+            )
+            print(f"DEBUG EMAIL NOT SENT SIR: {e}")
+            return render_template(
+                "mail_not_sent.html",
+                name=username,
+                is_authenticated=current_user.is_authenticated,
+            )
     return render_template(
         "contact.html", form=form, is_authenticated=current_user.is_authenticated
     )

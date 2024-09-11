@@ -192,9 +192,6 @@ deploy:
         echo 'export FLASK_APP=\"$FLASK_APP\"' >> /home/dummy_user/envrc &&
         echo 'export FLASK_DEBUG=\"$FLASK_DEBUG\"' >> /home/dummy_user/envrc &&
         echo 'export APP_FOLDER=\"$APP_FOLDER\"' >> /home/dummy_user/envrc &&
-        echo 'export EMAIL_SERVER=\"$EMAIL_SERVER\"' >> /home/dummy_user/envrc &&
-        echo 'export LOCAL_EMAIL_LOGS_FILE=\"$LOCAL_EMAIL_LOGS_FILE\"' >> /home/dummy_user/envrc &&
-        echo 'export LOGGING_DEVEL=\"$LOGGING_DEVEL\"' >> /home/dummy_user/envrc &&
         echo 'export TEST_USER_PWD=\"$TEST_USER_PWD\"' >> /home/dummy_user/envrc &&
         echo 'export HCAPTCHA_SITE_KEY=\"$HCAPTCHA_SITE_KEY\"' >> /home/dummy_user/envrc &&
         echo 'export TIMEZONE=\"$TIMEZONE\"' >> /home/dummy_user/envrc &&

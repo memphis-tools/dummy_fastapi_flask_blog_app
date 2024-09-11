@@ -214,10 +214,10 @@ class ContactForm(FlaskForm):
     Description: the contact FlaskForm form.
     """
 
-    name = StringField("NOM", validators=[DataRequired()])
-    email = EmailField("EMAIL", validators=[DataRequired()])
+    name = StringField("NOM", validators=[DataRequired(), Length(min=3, max=80)])
+    email = EmailField("EMAIL", validators=[DataRequired(), Email()])
     message = TextAreaField(
-        "MESSAGE", validators=[DataRequired(), Length(min=3, max=1800)]
+        "MESSAGE", validators=[DataRequired(), Length(min=3, max=500)]
     )
 
 
