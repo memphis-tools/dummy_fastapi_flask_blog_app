@@ -48,6 +48,7 @@ pytest-mock>=3.14.0
 python-dateutil>=2.9.0.post0
 python-dotenv>=1.0.1
 redis>=5.0.6
+sendgrid>=6.11.0
 setuptools>=70.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
 SQLAlchemy>=2.0.27
 SQLAlchemy-Utils>=0.41.1
