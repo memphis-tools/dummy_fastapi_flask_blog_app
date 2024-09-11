@@ -25,17 +25,17 @@ Application is simultaneously served as a Flask and a FastAPI front-end. Postgre
 
 Certbot and Nginx handle the HTTPS. A Vault adds sensitive datas into "the envrc" of the application.
 
-Each of these services run on Docker.  
+Celery and RabbitMQ are set to be able to send mail through Twilio SendGrid, as asynchrinous tasks.
 
-The FrontEnd is based on a startbootstrap's template (https://startbootstrap.com/).
+Redis lists Celery's tasks executions.
 
-Focus is more on technologies and how bind it for a project. This is the aim.
+Each of these services run on Docker. To avoid excessive spending only 1 virtual machine is used.
+
+**Focus is more on technologies and how bind it for a project. This is the aim.**
 
 Do not pay much attention to the HTML-CSS-JS part.
 
-Deployment is done on a small VirtualMachine so there may be a lack of performances.
-
-**Look at GitHub issues to see what has to be done, what should be update.**
+**Look at GitHub issues to see what has to be done, what should be updated.**
 
 If the dummy example application is up you will find it at:
 
@@ -65,17 +65,15 @@ POSTGRES_PASSWORD in the Gitlab settings stands for the default Postgresql's Doc
 
 By convenience, and because we do not want to use multiple virtual machines (droplets) the Vault is recreated at each new deployment into production.
 
-Celery and RabbitMQ are set to be able to send mail through Twilio SendGrid, as asynchrinous tasks.
-
 So remember it's just a dummy project.
 
-In this example the envrc file concatenates all the vars. Any sys-admin has access to all needed credentials used by the application.
+In this example the .envrc file concatenates all the vars. Any sys-admin has access to all needed credentials used by the application.
 
-**A default virtual machine with 1vcpu and 1gb RAM seems to be not enough. You can face a lack of performances (502 errors from Nginx, TimeoutError during ci-cd chain)**
+Actually for the local execution we stands with an ".env" file whereas we use a "envrc" while app runs in production.
 
-  ![Screenshot](illustrations/digital_ocean_droplet_size.png)
+Docker compose files and/or illustrated commands could used the old syntax.
 
-  ![Screenshot](illustrations/digital_ocean_droplet_vcpu.png)
+**A default virtual machine with 1vcpu and 2gb RAM is needed**
 
 ## TECHNOLOGIES
 Python 3.11 and later
@@ -88,7 +86,7 @@ Uvicorn (for FastAPI)
 
 Nginx
 
-Docker (docker-compose), DockerHub
+Docker (docker compose), DockerHub, Docker Scout
 
 Gitlab (the CI/CD chain is engaged throuh the Gitlab repo)
 
@@ -114,9 +112,9 @@ Snyk
 
 TabNine
 
-hcaptcha
+hCaptcha
 
-Google Analytics
+Cloudflare
 
 ## HOW TO SET IT, HOW IT WORKS
 
@@ -130,21 +128,31 @@ Google Analytics
 
   ![Screenshot](illustrations/github_secrets.png)
 
-  Celery workers use a default configuration.
+  Celery worker use a default configuration.
 
-  Rabbitmq is setup with this default configuration (we just set a specific user, password and vhost).
-
-  We have a celery worker's cluster.
+  Rabbitmq is setup with a default configuration (we just set a specific user, password and vhost).
 
   Celery uses 2 types of exchanges: fanout and direct.
 
-  The first one is a broadcast, which spread a task execution order, only 1 worker will execute the task.
+  The first one is a broadcast, which spread a task execution order.
 
   The second one is for the celery worker to return message result to the rabbitmq queue.
 
-        rabbitmqctl list_queues -p donald_vhost name messages
+        rabbitmqctl list_queues -p your_rabbitmq_vhost name messages
 
-        rabbitmqctl list_bindings -p donald_vhost
+        rabbitmqctl list_bindings -p your_rabbitmq_vhost
+
+  Cloudflare even with a free subscription offers a basic protection against bots:
+
+  ![Screenshot](illustrations/cloudflare_security_events.png)
+
+  **Codacy and Snyk** already display updates to be done. You can also see from **Sonarqube** that there's much to be done:
+
+  ![Screenshot](illustrations/sonarqube_stats.png)
+
+  Also **Zed Attack Proxy (ZAP)** raises warnings and alerts:
+
+  ![Screenshot](illustrations/zap_stats.png)
 
 ### POSTGRESQL PREQUISITES FOR LOCAL USAGE
 --------------------------
@@ -152,7 +160,7 @@ Google Analytics
 
         sudo systemctl start postgresql
 
-  - Password must match the POSTGRES_PASSWORD defined in the .envrc.local file. So you may have to update it.
+  - Password must match the POSTGRES_PASSWORD defined in the .envrc.* files. So you may have to update it.
 
         [postgres@sanjurolab ~]$ psql
         psql (15.1)
@@ -208,7 +216,7 @@ Google Analytics
         HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
         RABBITMQ_DEFAULT_USER="your_rabbitmq_user"
         RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
-        RABBITMQ_DEFAULT_VHOST="your rabbitmq vhost"
+        RABBITMQ_DEFAULT_VHOST="your_rabbitmq_vhost"
         ERLANG_COOKIE_NAME="SuperCookie"
         CELERY_BROKER_URL="pyamqp://$RABBITMQ_DEFAULT_USER:$RABBITMQ_DEFAULT_PASS@rabbitmq:5672/$RABBITMQ_DEFAULT_VHOST"
         CELERY_RESULT_BACKEND="your redis url"
@@ -218,11 +226,9 @@ Google Analytics
         PDF_FILE_NAME="dummy_books"
 
 
-  - For a local docker execution, you will have 5 services:
+  - For a local docker execution:
 
-    Nginx (as reverse proxy), Uvicorn (for FastAPI), Gunicorn (for Flask), Postgresql and Grafana.
-
-    At the project root folder, touch (create) an **".envrc.docker.local"**.
+    At the project root folder, touch (create) an **".env"**.
 
     Notice that this file is the one used for local deployment with local-docker-compose.yml.
 
@@ -249,7 +255,7 @@ Google Analytics
         export HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
         export RABBITMQ_DEFAULT_USER="your_rabbitmq_user"
         export RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
-        export RABBITMQ_DEFAULT_VHOST="your rabbitmq vhost"
+        export RABBITMQ_DEFAULT_VHOST="your_rabbitmq_vhost"
         export ERLANG_COOKIE_NAME="SuperCookie"
         export CELERY_BROKER_URL="pyamqp://$RABBITMQ_DEFAULT_USER:$RABBITMQ_DEFAULT_PASS@rabbitmq:5672/$RABBITMQ_DEFAULT_VHOST"
         export CELERY_RESULT_BACKEND="your redis url"
@@ -271,7 +277,7 @@ You do not need to create a python virtualenv.
 
   - Example (for Linux):
 
-      docker-compose --env-file ./.envrc.docker.local -f local-docker-compose.yml up -d --build
+      docker-compose -f local-docker-compose.yml up -d --build
 
       docker-compose ps
 
@@ -303,7 +309,7 @@ You do not need to create a python virtualenv.
 
   To run test for a local execution (ensure postgresql service is started):
 
-      python -m venv env
+      python -m venv venv
 
       source venv/bin/activate
 
@@ -422,13 +428,30 @@ You do not need to create a python virtualenv.
 
   - Do not remove the "dummy_user_certbot-etc" volume because certbot will store the https cert in it.
 
-  - For the production docker execution, you will have 5 services:
-
-    Nginx (as reverse proxy), Uvicorn (for FastAPI), Gunicorn (for Flask), Postgresql, and certbot.
+  - For the production docker execution:
 
     As we use the gitlab-ci we have to set these settings in the Gitlab project.
 
     Remember to add a blank line at the end of SSH_PRIVATE_KEY declaration.
+
+    The passwords vars are used for the tests steps. They are not the ones in the vault.
+
+        CELERY_RESULT_BACKEND
+        CI_REGISTRY_TOKEN
+        CI_REGISTRY_USER
+        CODACY_PROJECT_TOKEN
+        COVERALLS_REPO_TOKEN
+        HCAPTCHA_SITE_KEY
+        HOST_IP
+        PDF_FILE_NAME
+        PDF_FOLDER_PATH
+        POSTGRES_PASSWORD
+        RABBITMQ_DEFAULT_USER
+        RABBITMQ_DEFAULT_VHOST
+        SSH_PASSPHRASE
+        SSH_PRIVATE_KEY
+        TEST_USER_PWD
+        TIMEZONE
 
     ![Screenshot](illustrations/dummy_fastapi_gitlab_settings.png)
 
@@ -481,11 +504,13 @@ If you need to debug from the virtual machine, at the project root folder:
 
   - run the docker-compose like this (you have to build if you have not download images):
 
+      source envrc
+
       docker-compose -f deploy_init-certbot-docker-compose.yml up -d  --build
 
       docker-compose -f deploy_init-certbot-docker-compose.yml down
 
-      docker-compose --env-file ./.envrc.docker -f docker-compose.yml up -d --build
+      docker-compose -f docker-compose.yml up -d --build
 
   - to see rabbitmq queue (once you get into the container)
 
