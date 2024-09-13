@@ -1,18 +1,15 @@
 variables:
   GIT_COMMIT: $CI_COMMIT_SHORT_SHA
+  APP_FOLDER: "/home/dummy-operator/flask"
+  FLASK_APP: "project/__init__.py"
+  FLASK_DEBUG: 0
+  HOST_USER: "dummy_user"
   IMAGE_REPO: $CI_REGISTRY_USER/public_repo
   POSTGRES_USER: "postgres"
   POSTGRES_PASSWORD: $POSTGRES_PASSWORD
   POSTGRES_PORT: "5432"
-  FLASK_APP: "project/__init__.py"
-  FLASK_DEBUG: 0
-  APP_FOLDER: "/home/dummy-operator/flask"
-  HOST_USER: "dummy_user"
-  LOGGING_LEVEL: "DEBUG"
   POSTGRES_PRODUCTION_DB_NAME: "dummy_blog"
   POSTGRES_TEST_DB_NAME: "test_dummy_blog"
-  EMAIL_SERVER: "localhost"
-  LOCAL_EMAIL_LOGS_FILE: "/var/log/gunicorn/flask.logs"
 
 stages:
   - test_development_branch
@@ -103,7 +100,7 @@ build_init_certbot_images:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_TOKEN
   script:
-    - docker-compose -f build_init-certbot-docker-compose.yml build
+    - docker compose -f build_init-certbot-docker-compose.yml build
     - docker tag "dummy_fastapi_flask_blog_app-nginx_init_certbot" $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_init_certbot_$GIT_COMMIT
     - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_init_certbot_$GIT_COMMIT
 
