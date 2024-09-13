@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   nginx_init_certbot:
     image: memphistools/public_repo:dummy_fastapi_flask_blog_app-nginx_init_certbot_$GIT_COMMIT
