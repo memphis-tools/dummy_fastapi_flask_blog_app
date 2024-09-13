@@ -1,8 +1,6 @@
 """ various settings options to be used during application execution """
 
 import os
-from dotenv import load_dotenv
-
 
 INSTANCE_PATH = "/home/dummy-operator/flask/"
 

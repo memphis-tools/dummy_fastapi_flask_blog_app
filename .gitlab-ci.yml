@@ -94,9 +94,9 @@ build_init_certbot_images:
   stage: build_init_certbot
   only:
     - master
-  image: docker:24.0.9
+  image: docker:latest
   services:
-    - docker:24.0.9-dind
+    - docker:latest-dind
   variables:
     SCOPE: "production"
     GIT_COMMIT: $CI_COMMIT_SHORT_SHA
@@ -111,15 +111,15 @@ build_docker_images:
   stage: build
   only:
     - master
-  image: docker:24.0.9
+  image: docker:latest
   services:
-    - docker:24.0.9-dind
+    - docker:latest-dind
   variables:
     SCOPE: "production"
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_TOKEN
   script:
-    - docker-compose -f build_docker-compose.yml build --no-cache
+    - docker compose -f build_docker-images.yml build --no-cache
     - docker tag "dummy_fastapi_flask_blog_app-nginx" $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_$GIT_COMMIT
     - docker push $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_$GIT_COMMIT
     - docker tag "dummy_fastapi_flask_blog_app-fastapi:latest" $IMAGE_REPO:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT
@@ -148,13 +148,12 @@ deploy_init:
     - scp -o StrictHostKeyChecking=no deploy_vault_docker-compose.yml $HOST_USER@$HOST_IP:/home/$HOST_USER/
     - scp -o StrictHostKeyChecking=no deploy_docker-compose.yml $HOST_USER@$HOST_IP:/home/$HOST_USER/
     - ssh -o StrictHostKeyChecking=no $HOST_USER@$HOST_IP "
-        docker-compose -f deploy_docker-compose.yml down ;
-        docker-compose -f deploy_vault_docker-compose.yml down ;
+        docker swarm leave --force ;
         docker image prune --force ;
         docker volume rm dummy_user_vault-data --force ;
         docker network prune --force ;
         docker image ls -q | xargs docker image rm ;
-        docker-compose -f deploy_vault_docker-compose.yml up -d --build ;
+        docker compose -f deploy_vault_docker-compose.yml up -d --build ;
         sleep 5;
         echo '[+] vault built, we start it, create the secrets and unseal it' &&
         docker exec vault bash vault/scripts/build_it_up.sh &&
@@ -181,27 +180,28 @@ deploy:
     VAULT_ADDR: https://dummy-ops.dev:8200
   script:
     - scp -o StrictHostKeyChecking=no deploy_init-certbot-docker-compose.yml $HOST_USER@$HOST_IP:/home/$HOST_USER/
-    - scp -o StrictHostKeyChecking=no get_secrets_into_envrc.sh $HOST_USER@$HOST_IP:/home/$HOST_USER/
+    - scp -o StrictHostKeyChecking=no set_docker_secrets.sh $HOST_USER@$HOST_IP:/home/$HOST_USER/
     - ssh -o StrictHostKeyChecking=no $HOST_USER@$HOST_IP "
-        echo 'export SCOPE=\"$SCOPE\"' > /home/dummy_user/envrc &&
-        echo 'export GIT_COMMIT=\"$GIT_COMMIT\"' >> /home/dummy_user/envrc &&
-        echo 'export POSTGRES_USER=\"$POSTGRES_USER\"' >> /home/dummy_user/envrc &&
-        echo 'export POSTGRES_PRODUCTION_DB_NAME=\"$POSTGRES_PRODUCTION_DB_NAME\"' >> /home/dummy_user/envrc &&
-        echo 'export POSTGRES_PORT=\"$POSTGRES_PORT\"' >> /home/dummy_user/envrc &&
-        echo 'export POSTGRES_HOST=\"$POSTGRES_HOST\"' >> /home/dummy_user/envrc &&
-        echo 'export FLASK_APP=\"$FLASK_APP\"' >> /home/dummy_user/envrc &&
-        echo 'export FLASK_DEBUG=\"$FLASK_DEBUG\"' >> /home/dummy_user/envrc &&
-        echo 'export APP_FOLDER=\"$APP_FOLDER\"' >> /home/dummy_user/envrc &&
-        echo 'export TEST_USER_PWD=\"$TEST_USER_PWD\"' >> /home/dummy_user/envrc &&
-        echo 'export HCAPTCHA_SITE_KEY=\"$HCAPTCHA_SITE_KEY\"' >> /home/dummy_user/envrc &&
-        echo 'export TIMEZONE=\"$TIMEZONE\"' >> /home/dummy_user/envrc &&
-        echo 'export CELERY_RESULT_BACKEND=\"$CELERY_RESULT_BACKEND\"' >> /home/dummy_user/envrc &&
-        echo 'export PDF_FOLDER_PATH=\"$PDF_FOLDER_PATH\"' >> /home/dummy_user/envrc &&
-        echo 'export PDF_FILE_NAME=\"$PDF_FILE_NAME\"' >> /home/dummy_user/envrc &&
-        echo 'export RABBITMQ_DEFAULT_USER=\"$RABBITMQ_DEFAULT_USER\"' >> /home/dummy_user/envrc &&
-        echo 'export RABBITMQ_DEFAULT_VHOST=\"$RABBITMQ_DEFAULT_VHOST\"' >> /home/dummy_user/envrc &&
-        bash get_secrets_into_envrc.sh $VAULT_ADDR $VAULT_ID_TOKEN &&
-        source /home/dummy_user/envrc &&
+        echo 'export APP_FOLDER=\"$APP_FOLDER\"' >> /home/dummy_user/.env &&
+        echo 'export CELERY_RESULT_BACKEND=\"$CELERY_RESULT_BACKEND\"' >> /home/dummy_user/.env &&
+        echo 'export GIT_COMMIT=\"$GIT_COMMIT\"' >> /home/dummy_user/.env &&
+        echo 'export FLASK_APP=\"$FLASK_APP\"' >> /home/dummy_user/.env &&
+        echo 'export FLASK_DEBUG=\"$FLASK_DEBUG\"' >> /home/dummy_user/.env &&
+        echo 'export HCAPTCHA_SITE_KEY=\"$HCAPTCHA_SITE_KEY\"' >> /home/dummy_user/.env &&
+        echo 'export PDF_FOLDER_PATH=\"$PDF_FOLDER_PATH\"' >> /home/dummy_user/.env &&
+        echo 'export PDF_FILE_NAME=\"$PDF_FILE_NAME\"' >> /home/dummy_user/.env &&
+        echo 'export POSTGRES_USER=\"$POSTGRES_USER\"' >> /home/dummy_user/.env &&
+        echo 'export POSTGRES_PRODUCTION_DB_NAME=\"$POSTGRES_PRODUCTION_DB_NAME\"' >> /home/dummy_user/.env &&
+        echo 'export POSTGRES_PORT=\"$POSTGRES_PORT\"' >> /home/dummy_user/.env &&
+        echo 'export POSTGRES_HOST=\"$POSTGRES_HOST\"' >> /home/dummy_user/.env &&
+        echo 'export RABBITMQ_DEFAULT_USER=\"$RABBITMQ_DEFAULT_USER\"' >> /home/dummy_user/.env &&
+        echo 'export RABBITMQ_DEFAULT_VHOST=\"$RABBITMQ_DEFAULT_VHOST\"' >> /home/dummy_user/.env &&
+        echo 'export SCOPE=\"$SCOPE\"' > /home/dummy_user/.env &&
+        echo 'export HOST_IP=\"$SWARM_IP\"' > /home/dummy_user/.env &&
+        echo 'export TEST_USER_PWD=\"$TEST_USER_PWD\"' >> /home/dummy_user/.env &&
+        echo 'export TIMEZONE=\"$TIMEZONE\"' >> /home/dummy_user/.env &&
+        bash set_docker_secrets.sh $VAULT_ADDR $VAULT_ID_TOKEN &&
+        source /home/dummy_user/.env &&
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_init_certbot_$GIT_COMMIT &&
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_$GIT_COMMIT &&
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT &&
@@ -210,7 +210,7 @@ deploy:
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-redis_$GIT_COMMIT &&
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-rabbitmq_$GIT_COMMIT &&
         docker pull certbot/certbot:latest &&
-        docker-compose -f deploy_vault_docker-compose.yml down &&
-        docker-compose -f deploy_init-certbot-docker-compose.yml up -d  --build &&
-        docker-compose -f deploy_init-certbot-docker-compose.yml down &&
-        docker-compose --env-file ./envrc -f deploy_docker-compose.yml up -d "
+        docker compose -f deploy_vault_docker-compose.yml down &&
+        docker compose -f deploy_init-certbot-docker-compose.yml up -d  --build &&
+        docker compose -f deploy_init-certbot-docker-compose.yml down &&
+        docker stack deploy --detach -c deploy_docker-stack.yml dummy_flask_fastapi_stack "
