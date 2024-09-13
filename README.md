@@ -23,13 +23,15 @@ The project is mirored from <a href="https://gitlab.com/memphis-tools/dummy_fast
 
 Application is simultaneously served as a Flask and a FastAPI front-end. Postgresql the database and Nginx as reverse proxy.
 
-Certbot and Nginx handle the HTTPS. A Vault adds sensitive datas into "the envrc" of the application.
+Certbot and Nginx handle the HTTPS.
 
 Celery and RabbitMQ are set to be able to send mail through Twilio SendGrid, as asynchrinous tasks.
 
 Redis lists Celery's tasks executions.
 
 Each of these services run on Docker. To avoid excessive spending only 1 virtual machine is used.
+
+Also the Gitlab subscription is the free default one.
 
 **Focus is more on technologies and how bind it for a project. This is the aim.**
 
@@ -51,27 +53,19 @@ The Vault here has a simple jwt authentication method. Idea is just to a avoid t
 
 Purpose is that we do not want a project user, be able to echo the vars through the gitlab-ci.yml.
 
-We put ourselves in the situation where "project users /developers" won't be able to connect to the virtual machine.
-
-Consideration is that a sys-admin will be the only one which deploy the virtual machine through Terraform.
-
-Also he should be the only one allowed to connect on the virtual machine.
-
-None the less there are still sensitive datas in Gitlab ci-cd settings.
-
 The SSH_PRIVATE_KEY is protected with a SSH passphrase. So the private key can be display in logs, but not the passphrase.
 
 POSTGRES_PASSWORD in the Gitlab settings stands for the default Postgresql's Docker image password. This password is only used during unit_tests step.
 
 By convenience, and because we do not want to use multiple virtual machines (droplets) the Vault is recreated at each new deployment into production.
 
-So remember it's just a dummy project.
+Vault service is used to set sensitive datas as Docker swarm secrets. The service is shutdown before the swarm stack deployment.
 
-In this example the .envrc file concatenates all the vars. Any sys-admin has access to all needed credentials used by the application.
+So currently the Docker swarm is run by a "dummy_user"; he can exec into containers and so see the docker secrets.
 
-Actually for the local execution we stands with an ".env" file whereas we use a "envrc" while app runs in production.
+Next step will be to have a Vault service always running so no secrets could be see within containers.
 
-Docker compose files and/or illustrated commands could used the old syntax.
+Remember it's just a dummy project.
 
 **A default virtual machine with 1vcpu and 2gb RAM is needed**
 
@@ -106,13 +100,13 @@ Twilio SendGrid
 
 Lynis (for the virtual machine, droplet, hardening)
 
+hCaptcha
+
 Codacy
 
 Snyk
 
 TabNine
-
-hCaptcha
 
 Cloudflare
 
@@ -171,7 +165,7 @@ Cloudflare
         Enter it again:
 
 
-### EXECUTION PREQUISITES
+### LOCAL EXECUTION PREQUISITES
 -------------------------
   You will need a SECRET_KEY var in able to run the application.
 
@@ -183,11 +177,11 @@ Cloudflare
 
     openssl rand -hex 32
 
-  - For a single local usage (no reverse proxy).
+  - For a local docker execution:
 
-    At the project root folder, touch (create) a ".envrc.local" file.
+    At the project root folder, touch (create) a **".env"** file.
 
-    Pay attention to this filename, required by "app/packages/settings.py" (line 6:DOTENV_NAME = ".envrc.local").
+    Notice that this file is the one used for local deployment with local-docker-stack.yml.
 
     The admin user is an application's admin. Not a Postgresql role. The engine use the default postgres user.
 
@@ -195,74 +189,35 @@ Cloudflare
 
     Set something like this:
 
-        SCOPE="local_test"
+        ADMIN_LOGIN="admin"
+        ADMIN_PASSWORD="@pplepie94" #notice this is not the real password
+        ADMIN_EMAIL="admin@localhost.fr" #use a real email
+        APP_FOLDER=/home/dummy-operator/flask
+        BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
+        CELERY_BROKER_URL="pyamqp://$RABBITMQ_DEFAULT_USER:$RABBITMQ_DEFAULT_PASS@rabbitmq:5672/$RABBITMQ_DEFAULT_VHOST"
+        CELERY_RESULT_BACKEND="your redis url"
+        COVERALLS_REPO_TOKEN="yourCoverallsToken"
+        ERLANG_COOKIE_NAME="SuperCookie"
+        FLASK_APP=project/__init__.py
+        FLASK_DEBUG=1
+        HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
+        HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
+        LOGGING_DEVEL="DEBUG"
+        PDF_FOLDER_PATH="/tmp"
+        PDF_FILE_NAME="dummy_books"
         POSTGRES_USER="postgres"
         POSTGRES_PASSWORD="postgres"
         POSTGRES_TEST_DB_NAME="test_dummy_blog"
         POSTGRES_PORT="5432"
         POSTGRES_HOST="0.0.0.0"
-        ADMIN_LOGIN="admin"
-        ADMIN_PASSWORD="@pplepie94" #notice this is not the real password
-        ADMIN_EMAIL="admin@localhost.fr" #use a real email
-        TEST_USER_PWD="@pplepie94"
-        SECRET_KEY="YourSUperSecretKey123oclock"
-        FLASK_APP=project/__init__.py
-        FLASK_DEBUG=1
-        APP_FOLDER=/home/dummy-operator/flask
-        LOGGING_DEVEL="DEBUG"
-        COVERALLS_REPO_TOKEN="yourCoverallsToken"
-        BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
-        HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
-        HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
         RABBITMQ_DEFAULT_USER="your_rabbitmq_user"
         RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
         RABBITMQ_DEFAULT_VHOST="your_rabbitmq_vhost"
-        ERLANG_COOKIE_NAME="SuperCookie"
-        CELERY_BROKER_URL="pyamqp://$RABBITMQ_DEFAULT_USER:$RABBITMQ_DEFAULT_PASS@rabbitmq:5672/$RABBITMQ_DEFAULT_VHOST"
-        CELERY_RESULT_BACKEND="your redis url"
+        SECRET_KEY="YourSUperSecretKey123oclock"
+        SCOPE="local_test"
         SENDGRID_API_KEY="your sendgrid api key"
+        TEST_USER_PWD="@pplepie94"
         TIMEZONE="Europe/Paris"
-        PDF_FOLDER_PATH="/tmp"
-        PDF_FILE_NAME="dummy_books"
-
-
-  - For a local docker execution:
-
-    At the project root folder, touch (create) an **".env"**.
-
-    Notice that this file is the one used for local deployment with local-docker-compose.yml.
-
-    Set something like this (respect the scope):
-
-        export SCOPE="local_test"
-        export POSTGRES_USER="postgres"
-        export POSTGRES_PASSWORD="yourPostgresDesiredPassword"
-        export POSTGRES_TEST_DB_NAME="test_dummy_blog"
-        export POSTGRES_PORT="5432"
-        export POSTGRES_HOST="db"
-        export ADMIN_LOGIN="admin"
-        export ADMIN_PASSWORD="@pplepie94" #notice this is not the real password
-        export ADMIN_EMAIL="admin@localhost.fr" #use a real email
-        export TEST_USER_PWD="@pplepie94"
-        export SECRET_KEY="YourSUperSecretKey123oclock"
-        export FLASK_APP=project/__init__.py
-        export FLASK_DEBUG=1
-        export APP_FOLDER=/home/dummy-operator/flask
-        export LOGGING_DEVEL="DEBUG"
-        export COVERALLS_REPO_TOKEN="yourCoverallsToken"
-        export BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
-        export HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
-        export HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
-        export RABBITMQ_DEFAULT_USER="your_rabbitmq_user"
-        export RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
-        export RABBITMQ_DEFAULT_VHOST="your_rabbitmq_vhost"
-        export ERLANG_COOKIE_NAME="SuperCookie"
-        export CELERY_BROKER_URL="pyamqp://$RABBITMQ_DEFAULT_USER:$RABBITMQ_DEFAULT_PASS@rabbitmq:5672/$RABBITMQ_DEFAULT_VHOST"
-        export CELERY_RESULT_BACKEND="your redis url"
-        export SENDGRID_API_KEY="your sendgrid api key"
-        export TIMEZONE="Europe/Paris"
-        export PDF_FOLDER_PATH="/tmp"
-        export PDF_FILE_NAME="dummy_books"
 
 ### HOW RUN IT LOCALLY
 ----------------------------------------------
@@ -277,13 +232,11 @@ You do not need to create a python virtualenv.
 
   - Example (for Linux):
 
-      docker-compose -f local-docker-compose.yml up -d --build
+      ./local_stack_deployment.sh
 
-      docker-compose ps
+      docker service ls
 
-      docker ps -a --format 'Image: "{{ .Names }} \nPorts: "{{ .Ports }}"\nStatus: {{ .Status }}\n'
-
-      docker-compose -f local-docker-compose.yml down
+      docker swarm leave --force
 
   - Flask front-end will be reachable at:
 
@@ -295,7 +248,7 @@ You do not need to create a python virtualenv.
 
     As we run locally, there is a default test database set with some dummies data (see app/packages/utils.py).
 
-    You will be able to login with following (example) credentials: donald / applepie94.
+    You will be able to login with following (example) credentials: donald / applepie94 / donald@localhost.fr.
 
     You can set some default variables in "app/packages/settings.py".
 
@@ -307,25 +260,29 @@ You do not need to create a python virtualenv.
 
   Avoid to change tests order (particulary about the session cookie in tests_flask_urls).
 
-  To run test for a local execution (ensure postgresql service is started):
+  To run test for a local execution (**ensure postgresql service is started, and the .env file created**):
 
       python -m venv venv
 
       source venv/bin/activate
 
+      source .env
+
       pip install -U pip
 
-      pip install -r app/requirements.txt
+      pip install -r app/packages/celery_client_and_worker/requirements.txt
 
-      pip install -r app/flask_app/requirements.txt
+      pip install -r app/packages/fastapi/requirements.txt
 
-      python -m coverage run -m pytest -vs
+      pip install -r app/packages/flask_app/requirements.txt
+
+      python -m coverage run -m pytest -vs app/
 
       python -m coverage report
 
   To create a friendly html report in a cov_html folder:
 
-      python -m coverage run -m pytest --cov-report html:cov_html --cov=.
+      python -m coverage html -d cov_html
 
   90 should be the minimum relevent score.
 
@@ -351,10 +308,6 @@ You do not need to create a python virtualenv.
       black app/tests/
 
   You can check for a flake8's lint:
-
-      python -m flake8 --format html --htmldir flake8_html_report/
-
-      or
 
       flake8 app/ --max-line-length=127 --count --statistics
 
@@ -459,58 +412,8 @@ You do not need to create a python virtualenv.
 
     ![Screenshot](illustrations/betterstack_dummyops_logs.png)
 
-
-### HOW DEBUG IT IN PRODUCTION
+### USEFUL COMMANDS
 ------------------------------
-If you need to debug from the virtual machine, at the project root folder:
-
-  - touch (create) an "envrc" and source it.
-
-    ADMIN_EMAIL is used by certbot. It's also used to create an application admin account in database.
-
-    POSTGRES_HOST is the name of docker-compose service.
-
-        export GIT_COMMIT="theLatestSHACommit"
-        export SCOPE="production"
-        export POSTGRES_USER="postgres"
-        export POSTGRES_PASSWORD="yourPostgresDesiredPassword"
-        export POSTGRES_PRODUCTION_DB_NAME="dummy_blog"
-        export POSTGRES_PORT="5432"
-        export POSTGRES_HOST="db"
-        export ADMIN_LOGIN="admin"
-        export ADMIN_PASSWORD="@pplepie94" #notice this is not the real password
-        export ADMIN_EMAIL="admin@localhost.fr" #use a real email
-        export TEST_USER_PWD="@pplepie94"
-        export SECRET_KEY="YourSUperSecretKey123oclock"
-        export FLASK_APP=project/__init__.py
-        export FLASK_DEBUG=0
-        export APP_FOLDER=/home/dummy-operator/flask
-        export LOGGING_DEVEL="DEBUG"
-        export COVERALLS_REPO_TOKEN="yourCoverallsToken"
-        export BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
-        export HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
-        export HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
-        export RABBITMQ_DEFAULT_USER="your_rabbitmq_user"
-        export RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
-        export RABBITMQ_DEFAULT_VHOST="your_rabbitmq_vhost"
-        export ERLANG_COOKIE_NAME="SuperCookie"
-        export CELERY_BROKER_URL="pyamqp://$RABBITMQ_DEFAULT_USER:$RABBITMQ_DEFAULT_PASS@rabbitmq:5672/$RABBITMQ_DEFAULT_VHOST"
-        export CELERY_RESULT_BACKEND="your redis url"
-        export SENDGRID_API_KEY="your sendgrid api key"
-        export TIMEZONE="Europe/Paris"
-        export PDF_FOLDER_PATH="/tmp"
-        export PDF_FILE_NAME="dummy_books"
-
-
-  - run the docker-compose like this (you have to build if you have not download images):
-
-      source envrc
-
-      docker-compose -f deploy_init-certbot-docker-compose.yml up -d  --build
-
-      docker-compose -f deploy_init-certbot-docker-compose.yml down
-
-      docker-compose -f docker-compose.yml up -d --build
 
   - to see rabbitmq queue (once you get into the container)
 
@@ -534,7 +437,7 @@ If you need to debug from the virtual machine, at the project root folder:
 
   80 is a minimum relevent score.
 
-### USEFULL LINKS
+### USEFUL LINKS
 -----------------
 To run Flask behind Gunicorn and Nginx i used the following link:
 

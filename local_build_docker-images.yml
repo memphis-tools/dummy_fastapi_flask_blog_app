@@ -1,0 +1,36 @@
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    image: dummy_fastapi_flask_blog_app-nginx
+
+  flask_front:
+    build:
+      context: .
+      dockerfile: ./gunicorn_flask/Dockerfile
+    image: dummy_fastapi_flask_blog_app-flask_front
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: ./uvicorn_fastapi/Dockerfile
+    image: dummy_fastapi_flask_blog_app-fastapi
+
+  redis:
+    build:
+      context: .
+      dockerfile: ./redis/Dockerfile
+    image: dummy_fastapi_flask_blog_app-redis
+
+  rabbitmq:
+    build:
+      context: .
+      dockerfile: ./rabbitmq/Dockerfile
+    image: dummy_fastapi_flask_blog_app-rabbitmq
+
+  celery:
+    build:
+      context: .
+      dockerfile: ./app/packages/celery_client_and_worker/celery_worker.Dockerfile
+    image: dummy_fastapi_flask_blog_app-celery

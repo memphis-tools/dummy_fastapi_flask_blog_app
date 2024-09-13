@@ -65,7 +65,7 @@ async def view_books(
     return books
 
 
-def get_user_email(user_id:int):
+def get_user_email(user_id: int):
     """ get_user_email returns the user email """
     session = session_commands.get_a_database_session()
     user = session.query(models.User).filter(models.User.id == user_id).first()

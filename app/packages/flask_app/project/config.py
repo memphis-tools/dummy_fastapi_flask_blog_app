@@ -26,9 +26,20 @@ SQLALCHEMY_DATABASE_URI = (
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 REMEMBER_COOKIE_DURATION = datetime.timedelta(days=1)
 
+
+def get_secret(path):
+    """Read and return the content of the secret file."""
+    try:
+        with open(path) as f:
+            return f.read().strip()
+    except IOError as e:
+        print(f"Error reading secret from {path}: {e}")
+        return None
+
+
 HCAPTCHA_VERIFY_URL = "https://api.hcaptcha.com/siteverify"
 HCAPTCHA_SITE_KEY = os.getenv("HCAPTCHA_SITE_KEY")
-HCAPTCHA_SITE_SECRET = os.getenv("HCAPTCHA_SITE_SECRET")
+HCAPTCHA_SITE_SECRET = get_secret("/run/secrets/HCAPTCHA_SITE_SECRET")
 HCAPTCHA_ENABLED = True
 
 CELERY_BROKER_URL = "pyamqp://dummy_ops_admin:@pplepie94@rabbitmq:5672/dummy_ops_admin_vhost"

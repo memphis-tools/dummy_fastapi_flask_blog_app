@@ -1,0 +1,248 @@
+services:
+  nginx:
+    image: memphistools/public_repo:dummy_fastapi_flask_blog_app-nginx_$GIT_COMMIT
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - fastapi
+      - flask_front
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+    volumes:
+      - web-root:/var/www/html
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - /etc/ssl/dhparam/dhparam.pem:/etc/ssl/dhparam/dhparam.pem
+      - static_volume:/home/dummy-operator/flask/staticfiles
+
+  flask_front:
+    image: memphistools/public_repo:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT
+    command: gunicorn --bind 0.0.0.0:8001 flask_app.manage:app
+    expose:
+      - 8001
+    environment:
+      - ADMIN_EMAIL=/run/secrets/ADMIN_EMAIL
+      - ADMIN_LOGIN=/run/secrets/ADMIN_LOGIN
+      - ADMIN_PASSWORD=/run/secrets/ADMIN_PASSWORD
+      - BETTERSTACK_SOURCE_TOKEN=/run/secrets/BETTERSTACK_SOURCE_TOKEN
+      - CELERY_BROKER_URL=/run/secrets/CELERY_BROKER_URL
+      - CELERY_RESULT_BACKEND
+      - HCAPTCHA_SITE_KEY
+      - HCAPTCHA_SITE_SECRET=/run/secrets/HCAPTCHA_SITE_SECRET
+      - POSTGRES_HOST
+      - POSTGRES_PASSWORD=/run/secrets/POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_TEST_DB_NAME
+      - POSTGRES_USER
+      - SCOPE
+      - SECRET_KEY=/run/secrets/SECRET_KEY
+      - SENDGRID_API_KEY=/run/secrets/SENDGRID_API_KEY
+      - TEST_USER_PWD
+    secrets:
+      - ADMIN_EMAIL
+      - ADMIN_LOGIN
+      - ADMIN_PASSWORD
+      - BETTERSTACK_SOURCE_TOKEN
+      - CELERY_BROKER_URL
+      - HCAPTCHA_SITE_SECRET
+      - POSTGRES_PASSWORD
+      - SECRET_KEY
+      - SENDGRID_API_KEY
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+    depends_on:
+      - fastapi
+    volumes:
+      - static_volume:/home/dummy-operator/flask/staticfiles
+
+  fastapi:
+    image: memphistools/public_repo:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT
+    expose:
+      - 8000
+    environment:
+      - ADMIN_EMAIL=/run/secrets/ADMIN_EMAIL
+      - ADMIN_LOGIN=/run/secrets/ADMIN_LOGIN
+      - ADMIN_PASSWORD=/run/secrets/ADMIN_PASSWORD
+      - BETTERSTACK_SOURCE_TOKEN=/run/secrets/BETTERSTACK_SOURCE_TOKEN
+      - CELERY_BROKER_URL=/run/secrets/CELERY_BROKER_URL
+      - CELERY_RESULT_BACKEND
+      - POSTGRES_HOST
+      - POSTGRES_PASSWORD=/run/secrets/POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_TEST_DB_NAME
+      - POSTGRES_USER
+      - SCOPE
+      - SECRET_KEY=/run/secrets/SECRET_KEY
+      - TEST_USER_PWD
+    secrets:
+      - ADMIN_EMAIL
+      - ADMIN_LOGIN
+      - ADMIN_PASSWORD
+      - BETTERSTACK_SOURCE_TOKEN
+      - CELERY_BROKER_URL
+      - POSTGRES_PASSWORD
+      - SECRET_KEY
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15.0-alpine
+    expose:
+      - 5432
+    environment:
+      - ADMIN_EMAIL=/run/secrets/ADMIN_EMAIL
+      - ADMIN_LOGIN=/run/secrets/ADMIN_LOGIN
+      - ADMIN_PASSWORD=/run/secrets/ADMIN_PASSWORD
+      - POSTGRES_HOST
+      - POSTGRES_PASSWORD=/run/secrets/POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_TEST_DB_NAME
+      - POSTGRES_USER
+      - SCOPE
+    secrets:
+      - ADMIN_EMAIL
+      - ADMIN_LOGIN
+      - ADMIN_PASSWORD
+      - POSTGRES_PASSWORD
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - web-root:/var/www/html
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+    secrets:
+      - ADMIN_EMAIL
+    depends_on:
+      - nginx
+    command: certonly --webroot --webroot-path /var/www/html --email $ADMIN_EMAIL --agree-tos --no-eff-email --force-renewal -d dummy-ops.dev -d www.dummy-ops.dev
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+
+  redis:
+    image: memphistools/public_repo:dummy_fastapi_flask_blog_app-redis_$GIT_COMMIT
+    expose:
+      - 6379
+    volumes:
+      - redis_data:/data
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+
+  rabbitmq:
+    image: memphistools/public_repo:dummy_fastapi_flask_blog_app-rabbitmq_$GIT_COMMIT
+    environment:
+      - ERLANG_COOKIE_NAME=/run/secrets/ERLANG_COOKIE_NAME
+      - NODENAME
+      - RABBITMQ_DEFAULT_PASS=/run/secrets/RABBITMQ_DEFAULT_PASS
+      - RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_VHOST
+      - RABBITMQ_DEFAULT_PERMISSIONS_REGEX=^.*$$
+    secrets:
+      - ERLANG_COOKIE_NAME
+      - RABBITMQ_DEFAULT_PASS
+    expose:
+      - 5672
+    depends_on:
+      - flask_front
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+
+  celery:
+    image: memphistools/public_repo:dummy_fastapi_flask_blog_app-celery_$GIT_COMMIT
+    expose:
+      - 5555
+    environment:
+      - CELERY_BROKER_URL=/run/secrets/CELERY_BROKER_URL
+      - CELERY_RESULT_BACKEND
+      - PDF_FOLDER_PATH
+      - PDF_FILE_NAME
+      - POSTGRES_HOST
+      - POSTGRES_PASSWORD=/run/secrets/POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_TEST_DB_NAME
+      - POSTGRES_USER
+      - SENDGRID_API_KEY=/run/secrets/SENDGRID_API_KEY
+      - TIMEZONE
+    secrets:
+      - CELERY_BROKER_URL
+      - POSTGRES_PASSWORD
+      - SENDGRID_API_KEY
+    volumes:
+      - static_volume:/home/dummy-operator/staticfiles
+    depends_on:
+      - redis
+      - rabbitmq
+      - flask_front
+    networks:
+      - app-network
+    deploy:
+      replicas: 2
+
+volumes:
+  postgres_data:
+  static_volume:
+  certbot-etc:
+  certbot-var:
+  web-root:
+  rabbitmq_data:
+  redis_data:
+
+networks:
+  app-network:
+    driver: overlay
+
+secrets:
+  ADMIN_EMAIL:
+    external: true
+  ADMIN_LOGIN:
+    external: true
+  ADMIN_PASSWORD:
+    external: true
+  BETTERSTACK_SOURCE_TOKEN:
+    external: true
+  BETTERSTACK_TEAM_TOKEN:
+    external: true
+  CELERY_BROKER_URL:
+    external: true
+  ERLANG_COOKIE_NAME:
+    external: true
+  HCAPTCHA_SITE_SECRET:
+    external: true
+  POSTGRES_PASSWORD:
+    external: true
+  RABBITMQ_DEFAULT_PASS:
+    external: true
+  SECRET_KEY:
+    external: true
+  SENDGRID_API_KEY:
+    external: true
