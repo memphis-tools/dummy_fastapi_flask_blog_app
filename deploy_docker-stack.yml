@@ -123,6 +123,8 @@ services:
       - web-root:/var/www/html
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
+    environment:
+      - ADMIN_EMAIL=/run/secrets/ADMIN_EMAIL
     secrets:
       - ADMIN_EMAIL
     depends_on:

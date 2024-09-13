@@ -98,7 +98,7 @@ build_init_certbot_images:
     SCOPE: "production"
     GIT_COMMIT: $CI_COMMIT_SHORT_SHA
   before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_TOKEN
+    - echo $CI_REGISTRY_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin
   script:
     - docker compose -f build_init-certbot-docker-compose.yml build
     - docker tag "dummy_fastapi_flask_blog_app-nginx_init_certbot" $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_init_certbot_$GIT_COMMIT
@@ -114,7 +114,7 @@ build_docker_images:
   variables:
     SCOPE: "production"
   before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_TOKEN
+    - echo $CI_REGISTRY_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin
   script:
     - docker compose -f build_docker-images.yml build --no-cache
     - docker tag "dummy_fastapi_flask_blog_app-nginx" $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_$GIT_COMMIT
