@@ -96,7 +96,11 @@ build_init_certbot_images:
     - master
   image: docker:latest
   services:
+<<<<<<< HEAD
     - docker:dind
+=======
+    - docker:latest-dind
+>>>>>>> b1661339236705d5c54d0b4964c0c29087a3ea8a
   variables:
     SCOPE: "production"
     GIT_COMMIT: $CI_COMMIT_SHORT_SHA
@@ -113,7 +117,11 @@ build_docker_images:
     - master
   image: docker:latest
   services:
+<<<<<<< HEAD
     - docker:dind
+=======
+    - docker:latest-dind
+>>>>>>> b1661339236705d5c54d0b4964c0c29087a3ea8a
   variables:
     SCOPE: "production"
   before_script:
