@@ -214,8 +214,8 @@ Cloudflare
         export RABBITMQ_DEFAULT_VHOST="your_rabbitmq_vhost"
         export SECRET_KEY="YourSUperSecretKey123oclock"
         export SCOPE="local_test"
-        export SWARM_IP="your_ip"
         export SENDGRID_API_KEY="your sendgrid api key"
+        export SWARM_IP="your_ip"
         export TEST_USER_PWD="@pplepie94"
         export TIMEZONE="Europe/Paris"
 

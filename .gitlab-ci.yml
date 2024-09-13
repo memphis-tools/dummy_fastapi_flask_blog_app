@@ -143,7 +143,7 @@ deploy_init:
     - DISPLAY=0 SSH_ASKPASS=~/.ssh/tmp ssh-add $SSH_PRIVATE_KEY < /dev/null
   script:
     - scp -o StrictHostKeyChecking=no deploy_vault_docker-compose.yml $HOST_USER@$HOST_IP:/home/$HOST_USER/
-    - scp -o StrictHostKeyChecking=no deploy_docker-compose.yml $HOST_USER@$HOST_IP:/home/$HOST_USER/
+    - scp -o StrictHostKeyChecking=no deploy_docker-stack.yml $HOST_USER@$HOST_IP:/home/$HOST_USER/
     - ssh -o StrictHostKeyChecking=no $HOST_USER@$HOST_IP "
         docker swarm leave --force ;
         docker image prune --force ;
