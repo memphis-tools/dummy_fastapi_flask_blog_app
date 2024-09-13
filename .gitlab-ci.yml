@@ -197,6 +197,7 @@ deploy:
         echo 'export SWARM_IP=\"$HOST_IP\"' >> /home/dummy_user/.env &&
         echo 'export TEST_USER_PWD=\"$TEST_USER_PWD\"' >> /home/dummy_user/.env &&
         echo 'export TIMEZONE=\"$TIMEZONE\"' >> /home/dummy_user/.env &&
+        docker swarm init --advertise-addr=$HOST_IP &&
         bash set_docker_secrets.sh $VAULT_ADDR $VAULT_ID_TOKEN &&
         source /home/dummy_user/.env &&
         docker pull $IMAGE_REPO:dummy_fastapi_flask_blog_app-nginx_init_certbot_$GIT_COMMIT &&

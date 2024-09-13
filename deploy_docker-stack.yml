@@ -21,8 +21,6 @@ services:
   flask_front:
     image: memphistools/public_repo:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT
     command: gunicorn --bind 0.0.0.0:8001 flask_app.manage:app
-    expose:
-      - 8001
     environment:
       - ADMIN_EMAIL=/run/secrets/ADMIN_EMAIL
       - ADMIN_LOGIN=/run/secrets/ADMIN_LOGIN
@@ -63,8 +61,6 @@ services:
 
   fastapi:
     image: memphistools/public_repo:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT
-    expose:
-      - 8000
     environment:
       - ADMIN_EMAIL=/run/secrets/ADMIN_EMAIL
       - ADMIN_LOGIN=/run/secrets/ADMIN_LOGIN
@@ -98,8 +94,6 @@ services:
 
   db:
     image: postgres:15.0-alpine
-    expose:
-      - 5432
     environment:
       - ADMIN_EMAIL=/run/secrets/ADMIN_EMAIL
       - ADMIN_LOGIN=/run/secrets/ADMIN_LOGIN
@@ -141,8 +135,6 @@ services:
 
   redis:
     image: memphistools/public_repo:dummy_fastapi_flask_blog_app-redis_$GIT_COMMIT
-    expose:
-      - 6379
     volumes:
       - redis_data:/data
     depends_on:
@@ -165,8 +157,6 @@ services:
     secrets:
       - ERLANG_COOKIE_NAME
       - RABBITMQ_DEFAULT_PASS
-    expose:
-      - 5672
     depends_on:
       - flask_front
     volumes:
@@ -178,8 +168,6 @@ services:
 
   celery:
     image: memphistools/public_repo:dummy_fastapi_flask_blog_app-celery_$GIT_COMMIT
-    expose:
-      - 5555
     environment:
       - CELERY_BROKER_URL=/run/secrets/CELERY_BROKER_URL
       - CELERY_RESULT_BACKEND
