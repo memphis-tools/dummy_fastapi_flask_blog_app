@@ -1,4 +1,4 @@
-FROM python:slim-bookworm
+FROM python:3.11-slim-bookworm
 
 WORKDIR /code
 ENV APP_HOME=/code/app
