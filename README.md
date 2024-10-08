@@ -189,35 +189,35 @@ Cloudflare
 
     Set something like this:
 
-        ADMIN_LOGIN="admin"
-        ADMIN_PASSWORD="@pplepie94" #notice this is not the real password
-        ADMIN_EMAIL="admin@localhost.fr" #use a real email
-        APP_FOLDER=/home/dummy-operator/flask
-        BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
-        CELERY_BROKER_URL="pyamqp://$RABBITMQ_DEFAULT_USER:$RABBITMQ_DEFAULT_PASS@rabbitmq:5672/$RABBITMQ_DEFAULT_VHOST"
-        CELERY_RESULT_BACKEND="your redis url"
-        COVERALLS_REPO_TOKEN="yourCoverallsToken"
-        ERLANG_COOKIE_NAME="SuperCookie"
-        FLASK_APP=project/__init__.py
-        FLASK_DEBUG=1
-        HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
-        HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
-        LOGGING_DEVEL="DEBUG"
-        PDF_FOLDER_PATH="/tmp"
-        PDF_FILE_NAME="dummy_books"
-        POSTGRES_USER="postgres"
-        POSTGRES_PASSWORD="postgres"
-        POSTGRES_TEST_DB_NAME="test_dummy_blog"
-        POSTGRES_PORT="5432"
-        POSTGRES_HOST="0.0.0.0"
-        RABBITMQ_DEFAULT_USER="your_rabbitmq_user"
-        RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
-        RABBITMQ_DEFAULT_VHOST="your_rabbitmq_vhost"
-        SECRET_KEY="YourSUperSecretKey123oclock"
-        SCOPE="local_test"
-        SENDGRID_API_KEY="your sendgrid api key"
-        TEST_USER_PWD="@pplepie94"
-        TIMEZONE="Europe/Paris"
+        export ADMIN_LOGIN="admin"
+        export ADMIN_PASSWORD="@pplepie94" #notice this is not the real password
+        export ADMIN_EMAIL="admin@localhost.fr" #use a real email
+        export APP_FOLDER=/home/dummy-operator/flask
+        export BETTERSTACK_SOURCE_TOKEN="yourBetterstackToken"
+        export CELERY_BROKER_URL="pyamqp://$RABBITMQ_DEFAULT_USER:$RABBITMQ_DEFAULT_PASS@rabbitmq:5672/$RABBITMQ_DEFAULT_VHOST"
+        export CELERY_RESULT_BACKEND="your redis url"
+        export COVERALLS_REPO_TOKEN="yourCoverallsToken"
+        export ERLANG_COOKIE_NAME="SuperCookie"
+        export FLASK_APP=project/__init__.py
+        export FLASK_DEBUG=1
+        export HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
+        export HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
+        export PDF_FOLDER_PATH="/tmp"
+        export PDF_FILE_NAME="dummy_books"
+        export POSTGRES_USER="postgres"
+        export POSTGRES_PASSWORD="postgres"
+        export POSTGRES_TEST_DB_NAME="test_dummy_blog"
+        export POSTGRES_PORT="5432"
+        export POSTGRES_HOST="0.0.0.0"
+        export RABBITMQ_DEFAULT_USER="your_rabbitmq_user"
+        export RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
+        export RABBITMQ_DEFAULT_VHOST="your_rabbitmq_vhost"
+        export SECRET_KEY="YourSUperSecretKey123oclock"
+        export SCOPE="local_test"
+        export SENDGRID_API_KEY="your sendgrid api key"
+        export SWARM_IP="your_ip"
+        export TEST_USER_PWD="@pplepie94"
+        export TIMEZONE="Europe/Paris"
 
 ### HOW RUN IT LOCALLY
 ----------------------------------------------

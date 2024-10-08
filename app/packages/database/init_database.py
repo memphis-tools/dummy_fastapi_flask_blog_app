@@ -51,12 +51,14 @@ def get_a_database_session():
     """
     if os.getenv("SCOPE") == "production":
         db_name = os.getenv("POSTGRES_PRODUCTION_DB_NAME")
+        with open("/run/secrets/POSTGRES_PASSWORD", 'r') as f:
+            password = f.read().strip()
     else:
         db_name = os.getenv("POSTGRES_TEST_DB_NAME")
+        password = os.getenv("POSTGRES_PASSWORD")
     session = None
 
     username = os.getenv("POSTGRES_USER")
-    password = os.getenv("POSTGRES_PASSWORD")
     host = os.getenv("POSTGRES_HOST")
     port = os.getenv("POSTGRES_PORT")
     url = f"postgresql+psycopg://{username}:{password}@{host}:{port}/{db_name}"
@@ -72,10 +74,12 @@ def init_database():
     """
     if os.getenv("SCOPE") == "production":
         db_name = os.getenv("POSTGRES_PRODUCTION_DB_NAME")
+        with open("/run/secrets/POSTGRES_PASSWORD", 'r') as f:
+            password = f.read().strip()
     else:
         db_name = os.getenv("POSTGRES_TEST_DB_NAME")
+        password = os.getenv("POSTGRES_PASSWORD")
     username = os.getenv("POSTGRES_USER")
-    password = os.getenv("POSTGRES_PASSWORD")
     host = os.getenv("POSTGRES_HOST")
     port = os.getenv("POSTGRES_PORT")
     database_name = db_name
@@ -122,23 +126,44 @@ def create_application_admin_user_if_not_exist(session):
     Parameters:
     session -- engine's session to query postgresql database
     """
-    admin = (
-        session.query(models.User).filter_by(username=os.getenv("ADMIN_LOGIN")).scalar()
-    )
-    if admin is None:
-        admin_user = models.User(
-            username=os.getenv("ADMIN_LOGIN"),
-            email=os.getenv("ADMIN_EMAIL"),
-            hashed_password=utils.set_a_hash_password(os.getenv("ADMIN_PASSWORD")),
-            disabled=False,
-            role=models.Role.R1,
+    if os.getenv("SCOPE") == "production":
+        with open("/run/secrets/ADMIN_LOGIN", 'r') as f:
+            admin_login = f.read().strip()
+        with open("/run/secrets/ADMIN_EMAIL", 'r') as f:
+            admin_email = f.read().strip()
+        with open("/run/secrets/ADMIN_PASSWORD", 'r') as f:
+            admin_password = f.read().strip()
+        admin = (
+            session.query(models.User).filter_by(username=admin_login).scalar()
         )
-        session.add(admin_user)
-        session.commit()
+        if admin is None:
+            admin_user = models.User(
+                username=admin_login,
+                email=admin_email,
+                hashed_password=utils.set_a_hash_password(admin_password),
+                disabled=False,
+                role=models.Role.R1,
+            )
+            session.add(admin_user)
+            session.commit()
     else:
-        print(
-            f'[+] Application {os.getenv("ADMIN_LOGIN")} account already exists sir, nothing to do.'
+        admin = (
+            session.query(models.User).filter_by(username=os.getenv("ADMIN_LOGIN")).scalar()
         )
+        if admin is None:
+            admin_user = models.User(
+                username=os.getenv("ADMIN_LOGIN"),
+                email=os.getenv("ADMIN_EMAIL"),
+                hashed_password=utils.set_a_hash_password(os.getenv("ADMIN_PASSWORD")),
+                disabled=False,
+                role=models.Role.R1,
+            )
+            session.add(admin_user)
+            session.commit()
+        else:
+            print(
+                f'[+] Application {os.getenv("ADMIN_LOGIN")} account already exists sir, nothing to do.'
+            )
 
 
 def update_default_postgres_password(session):
@@ -148,7 +173,11 @@ def update_default_postgres_password(session):
     Parameters:
     session -- engine's session to query postgresql database
     """
-    updated_password = "'" + os.getenv("POSTGRES_PASSWORD") + "'"
+    if os.getenv("SCOPE") == "production":
+        with open("/run/secrets/POSTGRES_PASSWORD", 'r') as f:
+            updated_password = "'" + f.read().strip() + "'"
+    else:
+        updated_password = "'" + os.getenv("POSTGRES_PASSWORD") + "'"
     statement = f"ALTER USER {os.getenv('POSTGRES_USER')} WITH PASSWORD {updated_password};"
     session.execute(text(statement))
     print(f'[+] Default {os.getenv("POSTGRES_USER")} password updated sir.')

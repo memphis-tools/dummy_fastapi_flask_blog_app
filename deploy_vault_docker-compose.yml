@@ -3,6 +3,7 @@ services:
     build:
       context: ./vault
       dockerfile: Dockerfile
+    container_name: vault
     ports:
       - "8200:8200"
     cap_add:
