@@ -1,10 +1,11 @@
-FROM python:3.14.0a3-slim-bookworm
+FROM python:3.12-slim-bookworm
 
 WORKDIR /code
 ENV APP_HOME=/code/app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 COPY ./app/packages/fastapi/requirements.txt /code/requirements.txt
+
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 RUN mkdir -p /code/app/fastapi
 COPY ./app/packages/fastapi $APP_HOME/fastapi
