@@ -10,9 +10,9 @@ except ModuleNotFoundError:
 
 
 if os.getenv("SCOPE") == "production":
-    handler = LogtailHandler(source_token=f"{get_secret("/run/secrets/BETTERSTACK_SOURCE_TOKEN")}")
+    handler = LogtailHandler(source_token=f'{get_secret("/run/secrets/BETTERSTACK_SOURCE_TOKEN")}')
 else:
-    handler = LogtailHandler(source_token=f"{os.getenv("BETTERSTACK_SOURCE_TOKEN")}")
+    handler = LogtailHandler(source_token=f'{os.getenv("BETTERSTACK_SOURCE_TOKEN")}')
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logger.handlers = []
