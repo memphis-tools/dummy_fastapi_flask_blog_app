@@ -171,7 +171,7 @@ def update_default_postgres_password(session):
     session -- engine's session to query postgresql database
     """
     if os.getenv("SCOPE") == "production":
-        updated_password = get_secret("/run/secrets/POSTGRES_PASSWORD")
+        updated_password = "'" + get_secret("/run/secrets/POSTGRES_PASSWORD") + "'"
     else:
         updated_password = "'" + os.getenv("POSTGRES_PASSWORD") + "'"
     statement = f"ALTER USER {os.getenv('POSTGRES_USER')} WITH PASSWORD {updated_password};"

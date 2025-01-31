@@ -10,7 +10,6 @@ variables:
   POSTGRES_PORT: "5432"
   POSTGRES_PRODUCTION_DB_NAME: "dummy_blog"
   POSTGRES_TEST_DB_NAME: "test_dummy_blog"
-
 stages:
   - test_development_branch
   - report
@@ -32,7 +31,7 @@ unit_tests_development_branch:
   stage: test_development_branch
   only:
     - development
-  image: python:3.11.6
+  image: python:3.12.8
   variables:
     SCOPE: "local_test"
     ADMIN_LOGIN: "admin"
@@ -44,6 +43,7 @@ unit_tests_development_branch:
     TEST_USER_PWD: "$TEST_USER_PWD"
     SECRET_KEY: "dummy_secret_for_test_to_run"
     DATABASE_URL: "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_TEST_DB_NAME"
+    HCAPTCHA_SITE_SECRET: "dummy_secret_for_test_to_run"
   script:
     - echo "Running tests"
     - coverage run -m pytest
@@ -58,7 +58,7 @@ report:
   stage: report
   only:
     - development
-  image: python:3.11.6
+  image: python:3.12.8
   script:
     - python-codacy-coverage -r coverage.xml
   dependencies:
@@ -68,7 +68,7 @@ unit_tests_master_branch:
   stage: test_master_branch
   only:
     - master
-  image: python:3.11.6
+  image: python:3.12.8
   variables:
     SCOPE: "local_test"
     ADMIN_LOGIN: "admin"
@@ -80,6 +80,7 @@ unit_tests_master_branch:
     TEST_USER_PWD: $TEST_USER_PWD"
     SECRET_KEY: "dummy_secret_for_test_to_run"
     DATABASE_URL: "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_TEST_DB_NAME"
+    HCAPTCHA_SITE_SECRET: "dummy_secret_for_test_to_run"
   script:
     - echo "Running tests"
     - coverage run -m pytest -vs app/
@@ -197,6 +198,7 @@ deploy:
         echo 'export SWARM_IP=\"$HOST_IP\"' >> /home/dummy_user/.env &&
         echo 'export TEST_USER_PWD=\"$TEST_USER_PWD\"' >> /home/dummy_user/.env &&
         echo 'export TIMEZONE=\"$TIMEZONE\"' >> /home/dummy_user/.env &&
+        echo 'export CERTBOT_EMAIL=\"$CERTBOT_EMAIL\"' >> /home/dummy_user/.env &&
         docker swarm init --advertise-addr=$HOST_IP &&
         bash set_docker_secrets.sh $VAULT_ADDR $VAULT_ID_TOKEN &&
         source /home/dummy_user/.env &&

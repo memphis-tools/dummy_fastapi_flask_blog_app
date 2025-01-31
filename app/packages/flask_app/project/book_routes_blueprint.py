@@ -28,6 +28,7 @@ try:
         Comment,
         Starred,
     )
+    from utils import get_secret
 except ModuleNotFoundError:
     from app.packages import log_events, settings
     from app.packages.database.commands import session_commands
@@ -37,6 +38,7 @@ except ModuleNotFoundError:
         Comment,
         Starred,
     )
+    from app.packages.utils import get_secret
 from . import forms
 from .shared_functions_and_decorators import (
     return_pagination,
@@ -445,7 +447,7 @@ def update_book(book_id):
 def mail_books():
     """send books published by email as a pdf"""
     celery_app = Celery(
-        broker=app.config["CELERY_BROKER_URL"],
+        broker=get_secret("/run/secrets/CELERY_BROKER_URL"),
         backend=os.getenv("CELERY_RESULT_BACKEND")
     )
     celery_app.send_task("generate_pdf_and_send_email_task", args=(current_user.email,), retry=True)
