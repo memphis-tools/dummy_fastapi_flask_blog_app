@@ -12,6 +12,16 @@ except ModuleNotFoundError:
     from app.packages.database.models import models
 
 
+def get_secret(path):
+    """Read and return the content of the secret file."""
+    try:
+        with open(path) as f:
+            return f.read().strip()
+    except IOError as e:
+        print(f"Error reading secret from {path}: {e}")
+        return None
+
+
 def call_dummy_setup_for_users(session):
     """
     Description: populate database with dummy users datas.
