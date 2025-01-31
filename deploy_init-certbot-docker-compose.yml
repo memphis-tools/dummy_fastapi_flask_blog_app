@@ -12,6 +12,8 @@ services:
 
   certbot:
     image: certbot/certbot:latest
+    environment:
+      - ADMIN_EMAIL
     volumes:
       - web-root:/var/www/html
       - certbot-etc:/etc/letsencrypt
