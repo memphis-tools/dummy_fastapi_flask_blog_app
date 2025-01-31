@@ -10,9 +10,11 @@ try:
     import utils
     import settings
     from database.models import models
+    from utils import get_secret
 except ModuleNotFoundError:
     from app.packages import utils, settings
     from app.packages.database.models import models
+    from app.packages.utils import get_secret
 
 
 def get_engine(
@@ -51,8 +53,7 @@ def get_a_database_session():
     """
     if os.getenv("SCOPE") == "production":
         db_name = os.getenv("POSTGRES_PRODUCTION_DB_NAME")
-        with open("/run/secrets/POSTGRES_PASSWORD", 'r') as f:
-            password = f.read().strip()
+        password = get_secret("/run/secrets/POSTGRES_PASSWORD")
     else:
         db_name = os.getenv("POSTGRES_TEST_DB_NAME")
         password = os.getenv("POSTGRES_PASSWORD")
@@ -74,8 +75,7 @@ def init_database():
     """
     if os.getenv("SCOPE") == "production":
         db_name = os.getenv("POSTGRES_PRODUCTION_DB_NAME")
-        with open("/run/secrets/POSTGRES_PASSWORD", 'r') as f:
-            password = f.read().strip()
+        password = get_secret("/run/secrets/POSTGRES_PASSWORD")
     else:
         db_name = os.getenv("POSTGRES_TEST_DB_NAME")
         password = os.getenv("POSTGRES_PASSWORD")
@@ -127,12 +127,9 @@ def create_application_admin_user_if_not_exist(session):
     session -- engine's session to query postgresql database
     """
     if os.getenv("SCOPE") == "production":
-        with open("/run/secrets/ADMIN_LOGIN", 'r') as f:
-            admin_login = f.read().strip()
-        with open("/run/secrets/ADMIN_EMAIL", 'r') as f:
-            admin_email = f.read().strip()
-        with open("/run/secrets/ADMIN_PASSWORD", 'r') as f:
-            admin_password = f.read().strip()
+        admin_login = get_secret("/run/secrets/ADMIN_LOGIN")
+        admin_email = get_secret("/run/secrets/ADMIN_EMAIL")
+        admin_password = get_secret("/run/secrets/ADMIN_PASSWORD")
         admin = (
             session.query(models.User).filter_by(username=admin_login).scalar()
         )
@@ -174,8 +171,7 @@ def update_default_postgres_password(session):
     session -- engine's session to query postgresql database
     """
     if os.getenv("SCOPE") == "production":
-        with open("/run/secrets/POSTGRES_PASSWORD", 'r') as f:
-            updated_password = "'" + f.read().strip() + "'"
+        updated_password = get_secret("/run/secrets/POSTGRES_PASSWORD")
     else:
         updated_password = "'" + os.getenv("POSTGRES_PASSWORD") + "'"
     statement = f"ALTER USER {os.getenv('POSTGRES_USER')} WITH PASSWORD {updated_password};"
