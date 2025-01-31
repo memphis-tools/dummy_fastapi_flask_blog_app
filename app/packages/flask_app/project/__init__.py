@@ -198,7 +198,7 @@ def contact():
 
         message = Mail(
             from_email="no-reply@dummy-ops.dev",
-            to_emails=f"{app.config["ADMIN_EMAIL"]}",
+            to_emails=f'{app.config["ADMIN_EMAIL"]}',
             subject="Dummy-ops contact",
             html_content=f"{username} with email {email} sent this message: {message}"
         )
