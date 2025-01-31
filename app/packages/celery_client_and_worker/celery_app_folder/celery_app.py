@@ -3,10 +3,16 @@
 import os
 from celery import Celery
 
+try:
+    from utils import get_secret
+except ModuleNotFoundError:
+    from app.packages.utils import get_secret
+
+
 celery_app = Celery(
     name="project",
-    backend=os.getenv("CELERY_RESULT_BACKEND"),
-    broker=os.getenv("CELERY_BROKER_URL"),
+    backend=get_secret("/run/secrets/CELERY_RESULT_BACKEND"),
+    broker=get_secret("/run/secrets/CELERY_BROKER_URL"),
     timezone=os.getenv("TIMEZONE"),
     result_expires=604800,
     include=["tasks"],

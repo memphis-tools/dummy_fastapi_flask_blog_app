@@ -7,6 +7,10 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 
 from books_into_pdf import generate_a_pdf_to_consume
+try:
+    from utils import get_secret
+except ModuleNotFoundError:
+    from app.packages.utils import get_secret
 
 
 @celery_app.task(name="generate_pdf_and_send_email_task")
@@ -51,9 +55,9 @@ def send_email(recipient, pdf_file_path):
     # Add the attachment to the Mail object
     message.attachment = attached_file
     # Send the email
-    SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+    SENDGRID_API_KEY = get_secret("/run/secrets/SENDGRID_API_KEY")
     try:
-        sg = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
         sg.send(message)
     except Exception:
         return {"status": "failure", "message": "Mail sending failed"}

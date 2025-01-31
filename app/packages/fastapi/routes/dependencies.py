@@ -15,6 +15,7 @@ try:
         UserInDB,
         TokenData,
     )
+    from utils import get_secret
 except ModuleNotFoundError:
     from app.packages.database.models import models
     from app.packages.database.commands import session_commands
@@ -23,6 +24,7 @@ except ModuleNotFoundError:
         UserInDB,
         TokenData,
     )
+    from app.packages.utils import get_secret
 
 
 # tokenUrl leads to the URI "/api/v1/token"
@@ -30,7 +32,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/token")
 # session used by the FastAPI application
 session = session_commands.init_and_get_a_database_session()
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+if os.getenv("SCOPE") == "production":
+    SECRET_KEY = get_secret("/run/secrets/SECRET_KEY")
+else:
+    SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 
 
