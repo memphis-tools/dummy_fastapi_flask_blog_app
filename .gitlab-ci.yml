@@ -10,7 +10,6 @@ variables:
   POSTGRES_PORT: "5432"
   POSTGRES_PRODUCTION_DB_NAME: "dummy_blog"
   POSTGRES_TEST_DB_NAME: "test_dummy_blog"
-  HCAPTCHA_SITE_SECRET: "dummy_secret_for_test_to_run"
 stages:
   - test_development_branch
   - report
@@ -44,6 +43,7 @@ unit_tests_development_branch:
     TEST_USER_PWD: "$TEST_USER_PWD"
     SECRET_KEY: "dummy_secret_for_test_to_run"
     DATABASE_URL: "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_TEST_DB_NAME"
+    HCAPTCHA_SITE_SECRET: "dummy_secret_for_test_to_run"
   script:
     - echo "Running tests"
     - coverage run -m pytest
