@@ -10,7 +10,7 @@ variables:
   POSTGRES_PORT: "5432"
   POSTGRES_PRODUCTION_DB_NAME: "dummy_blog"
   POSTGRES_TEST_DB_NAME: "test_dummy_blog"
-
+  HCAPTCHA_SITE_SECRET: "dummy_secret_for_test_to_run"
 stages:
   - test_development_branch
   - report
@@ -32,7 +32,7 @@ unit_tests_development_branch:
   stage: test_development_branch
   only:
     - development
-  image: python:3.11.6
+  image: python:3.12.8
   variables:
     SCOPE: "local_test"
     ADMIN_LOGIN: "admin"
@@ -58,7 +58,7 @@ report:
   stage: report
   only:
     - development
-  image: python:3.11.6
+  image: python:3.12.8
   script:
     - python-codacy-coverage -r coverage.xml
   dependencies:
@@ -68,7 +68,7 @@ unit_tests_master_branch:
   stage: test_master_branch
   only:
     - master
-  image: python:3.11.6
+  image: python:3.12.8
   variables:
     SCOPE: "local_test"
     ADMIN_LOGIN: "admin"
