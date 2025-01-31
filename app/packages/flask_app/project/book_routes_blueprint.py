@@ -445,7 +445,7 @@ def update_book(book_id):
 def mail_books():
     """send books published by email as a pdf"""
     celery_app = Celery(
-        broker=os.getenv("CELERY_BROKER_URL"),
+        broker=app.config["CELERY_BROKER_URL"],
         backend=os.getenv("CELERY_RESULT_BACKEND")
     )
     celery_app.send_task("generate_pdf_and_send_email_task", args=(current_user.email,), retry=True)

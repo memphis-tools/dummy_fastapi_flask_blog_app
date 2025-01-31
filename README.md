@@ -187,7 +187,7 @@ Cloudflare
 
     The "dummy-operator" must match the one defined in the Gunicorn Dockerfile.
 
-    Set something like this:
+    Set something like this (notice POSTGRES_HOST refers to the postgresql service name):
 
         export ADMIN_LOGIN="admin"
         export ADMIN_PASSWORD="@pplepie94" #notice this is not the real password
@@ -208,7 +208,7 @@ Cloudflare
         export POSTGRES_PASSWORD="postgres"
         export POSTGRES_TEST_DB_NAME="test_dummy_blog"
         export POSTGRES_PORT="5432"
-        export POSTGRES_HOST="0.0.0.0"
+        export POSTGRES_HOST="db"
         export RABBITMQ_DEFAULT_USER="your_rabbitmq_user"
         export RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
         export RABBITMQ_DEFAULT_VHOST="your_rabbitmq_vhost"
@@ -275,6 +275,8 @@ You do not need to create a python virtualenv.
       pip install -r app/packages/fastapi/requirements.txt
 
       pip install -r app/packages/flask_app/requirements.txt
+
+      POSTGRES_HOST="your_local_ipv4"
 
       python -m coverage run -m pytest -vs app/
 

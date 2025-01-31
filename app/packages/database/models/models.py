@@ -81,7 +81,7 @@ class Comment(BASE):
     id = Column(Integer, primary_key=True, autoincrement=True)
     text = Column(String(500), nullable=False)
     publication_date = Column(
-        DateTime(timezone=True), default=datetime.datetime.utcnow()
+        DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC)
     )
     author_id = Column(Integer, ForeignKey("users_table.id"))
     book_id = Column(Integer, ForeignKey("books_table.id"))
@@ -165,7 +165,7 @@ class Book(BASE):
     year_of_publication = Column(Integer, nullable=True)
     book_picture_name = Column(String(250), nullable=False)
     publication_date = Column(
-        DateTime(timezone=True), default=datetime.datetime.utcnow()
+        DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC)
     )
     user_id = Column(Integer, ForeignKey("users_table.id"))
     user_books = relationship("User", back_populates="books")

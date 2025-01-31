@@ -30,10 +30,12 @@ try:
     import settings
     from database.commands import session_commands
     from database.models.models import Book, User, BookCategory
+    from utils import get_secret
 except ModuleNotFoundError:
     from app.packages import handle_passwords, log_events, settings
     from app.packages.database.commands import session_commands
     from app.packages.database.models.models import Book, User, BookCategory
+    from app.packages.utils import get_secret
 from .user_routes_blueprint import user_routes_blueprint
 from .stat_routes_blueprint import stat_routes_blueprint
 from .book_routes_blueprint import book_routes_blueprint
@@ -63,7 +65,7 @@ login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = "/"
 login_manager.session_protection = "strong"
-WTF_CSRF_SECRET_KEY = os.getenv("SECRET_KEY")
+WTF_CSRF_SECRET_KEY = app.config["SECRET_KEY"]
 MAX_BOOKS_ON_INDEX_PAGE = 3
 
 
@@ -196,14 +198,13 @@ def contact():
 
         message = Mail(
             from_email="no-reply@dummy-ops.dev",
-            to_emails=f"{os.getenv('ADMIN_EMAIL')}",
+            to_emails=f'{app.config["ADMIN_EMAIL"]}',
             subject="Dummy-ops contact",
             html_content=f"{username} with email {email} sent this message: {message}"
         )
 
-        SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
         try:
-            sg = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
+            sg = SendGridAPIClient(app.config["SENDGRID_API_KEY"])
             sg.send(message)
             return render_template(
                 "mail_sent.html",
