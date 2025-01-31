@@ -15,6 +15,7 @@ try:
         NewBookModel,
         UpdateBookModel,
     )
+    from utils import get_secret
 except ModuleNotFoundError:
     from app.packages import log_events
     from app.packages.database.commands import database_crud_commands, session_commands
@@ -24,6 +25,7 @@ except ModuleNotFoundError:
         NewBookModel,
         UpdateBookModel,
     )
+    from app.packages.utils import get_secret
 from ..dependencies import get_current_active_user, session
 
 router = APIRouter()
@@ -82,10 +84,16 @@ async def download_books(
     """
 
     user_email = get_user_email(current_user.id)
-    celery_app = Celery(
-        broker=os.getenv("CELERY_BROKER_URL"),
-        backend=os.getenv("CELERY_RESULT_BACKEND")
-    )
+    if os.getenv("SCOPE") == "production":
+        celery_app = Celery(
+            broker=get_secret("/run/secrets/CELERY_BROKER_URL"),
+            backend=os.getenv("CELERY_RESULT_BACKEND")
+        )
+    else:
+        celery_app = Celery(
+            broker=os.getenv("CELERY_BROKER_URL"),
+            backend=os.getenv("CELERY_RESULT_BACKEND")
+        )
     celery_app.send_task("generate_pdf_and_send_email_task", args=(user_email,), retry=True)
     return {
         "detail": f"Demande reçue, vous allez recevoir par email à {user_email} les livres publiés."
