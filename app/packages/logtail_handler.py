@@ -9,7 +9,7 @@ except ModuleNotFoundError:
     from app.packages.utils import get_secret
 
 
-if os.getenv("SCOPE") == "production":
+if os.getenv("SCOPE") == "production" or os.getenv("SCOPE") == "development":
     handler = LogtailHandler(source_token=f'{get_secret("/run/secrets/BETTERSTACK_SOURCE_TOKEN")}')
 else:
     handler = LogtailHandler(source_token=f'{os.getenv("BETTERSTACK_SOURCE_TOKEN")}')

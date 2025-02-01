@@ -28,7 +28,6 @@ echo "$ADMIN_PASSWORD" | docker secret create ADMIN_PASSWORD - &> /dev/null
 echo "$BETTERSTACK_SOURCE_TOKEN" | docker secret create BETTERSTACK_SOURCE_TOKEN - &> /dev/null
 echo "$BETTERSTACK_TEAM_TOKEN" | docker secret create BETTERSTACK_TEAM_TOKEN - &> /dev/null
 echo "$CELERY_BROKER_URL" | docker secret create CELERY_BROKER_URL - &> /dev/null
-echo "$ERLANG_COOKIE_NAME" | docker secret create ERLANG_COOKIE_NAME - &> /dev/null
 echo "$HCAPTCHA_SITE_SECRET" | docker secret create HCAPTCHA_SITE_SECRET - &> /dev/null
 echo "$POSTGRES_PASSWORD" | docker secret create POSTGRES_PASSWORD - &> /dev/null
 echo "$RABBITMQ_DEFAULT_PASS" | docker secret create RABBITMQ_DEFAULT_PASS - &> /dev/null
