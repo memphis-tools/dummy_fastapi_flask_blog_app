@@ -51,7 +51,7 @@ def get_a_database_session():
     """
     Description: return a postgresql engine's session.
     """
-    if os.getenv("SCOPE") == "production":
+    if os.getenv("SCOPE") == "production" or os.getenv("SCOPE") == "development":
         db_name = os.getenv("POSTGRES_PRODUCTION_DB_NAME")
         password = get_secret("/run/secrets/POSTGRES_PASSWORD")
     else:
@@ -73,7 +73,7 @@ def init_database():
     """
     Description: we get a session from a database.
     """
-    if os.getenv("SCOPE") == "production":
+    if os.getenv("SCOPE") == "production" or os.getenv("SCOPE") == "development":
         db_name = os.getenv("POSTGRES_PRODUCTION_DB_NAME")
         password = get_secret("/run/secrets/POSTGRES_PASSWORD")
     else:
@@ -126,42 +126,31 @@ def create_application_admin_user_if_not_exist(session):
     Parameters:
     session -- engine's session to query postgresql database
     """
-    if os.getenv("SCOPE") == "production":
+    if os.getenv("SCOPE") == "production" or os.getenv("SCOPE") == "development":
         admin_login = get_secret("/run/secrets/ADMIN_LOGIN")
         admin_email = get_secret("/run/secrets/ADMIN_EMAIL")
         admin_password = get_secret("/run/secrets/ADMIN_PASSWORD")
-        admin = (
-            session.query(models.User).filter_by(username=admin_login).scalar()
-        )
-        if admin is None:
-            admin_user = models.User(
-                username=admin_login,
-                email=admin_email,
-                hashed_password=utils.set_a_hash_password(admin_password),
-                disabled=False,
-                role=models.Role.R1,
-            )
-            session.add(admin_user)
-            session.commit()
     else:
-        admin = (
-            session.query(models.User).filter_by(username=os.getenv("ADMIN_LOGIN")).scalar()
+        admin_login = os.getenv("ADMIN_LOGIN")
+        admin_email = os.getenv("ADMIN_EMAIL")
+        admin_password = os.getenv("ADMIN_PASSWORD")
+    admin = (
+        session.query(models.User).filter_by(username=admin_login).scalar()
+    )
+    if admin is None:
+        admin_user = models.User(
+            username=admin_login,
+            email=admin_email,
+            hashed_password=utils.set_a_hash_password(admin_password),
+            disabled=False,
+            role=models.Role.R1,
         )
-        if admin is None:
-            admin_user = models.User(
-                username=os.getenv("ADMIN_LOGIN"),
-                email=os.getenv("ADMIN_EMAIL"),
-                hashed_password=utils.set_a_hash_password(os.getenv("ADMIN_PASSWORD")),
-                disabled=False,
-                role=models.Role.R1,
-            )
-            session.add(admin_user)
-            session.commit()
-        else:
-            print(
-                f'[+] Application {os.getenv("ADMIN_LOGIN")} account already exists sir, nothing to do.'
-            )
-
+        session.add(admin_user)
+        session.commit()
+    else:
+        print(
+            f'[+] Application {os.getenv("ADMIN_LOGIN")} account already exists sir, nothing to do.'
+        )
 
 def update_default_postgres_password(session):
     """
@@ -170,7 +159,7 @@ def update_default_postgres_password(session):
     Parameters:
     session -- engine's session to query postgresql database
     """
-    if os.getenv("SCOPE") == "production":
+    if os.getenv("SCOPE") == "production" or os.getenv("SCOPE") == "development":
         updated_password = "'" + get_secret("/run/secrets/POSTGRES_PASSWORD") + "'"
     else:
         updated_password = "'" + os.getenv("POSTGRES_PASSWORD") + "'"

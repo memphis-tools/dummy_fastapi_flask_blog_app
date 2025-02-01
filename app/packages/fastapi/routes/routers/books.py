@@ -84,16 +84,11 @@ async def download_books(
     """
 
     user_email = get_user_email(current_user.id)
-    if os.getenv("SCOPE") == "production":
-        celery_app = Celery(
-            broker=get_secret("/run/secrets/CELERY_BROKER_URL"),
-            backend=os.getenv("CELERY_RESULT_BACKEND")
-        )
-    else:
-        celery_app = Celery(
-            broker=os.getenv("CELERY_BROKER_URL"),
-            backend=os.getenv("CELERY_RESULT_BACKEND")
-        )
+    celery_app = Celery(
+        broker=get_secret("/run/secrets/CELERY_BROKER_URL"),
+        backend=os.getenv("CELERY_RESULT_BACKEND")
+    )
+
     celery_app.send_task("generate_pdf_and_send_email_task", args=(user_email,), retry=True)
     return {
         "detail": f"Demande reçue, vous allez recevoir par email à {user_email} les livres publiés."
