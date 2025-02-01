@@ -31,8 +31,7 @@ except ModuleNotFoundError:
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/token")
 # session used by the FastAPI application
 session = session_commands.init_and_get_a_database_session()
-
-if os.getenv("SCOPE") == "production":
+if os.getenv("SCOPE") == "production" or os.getenv("SCOPE") == "development":
     SECRET_KEY = get_secret("/run/secrets/SECRET_KEY")
 else:
     SECRET_KEY = os.getenv("SECRET_KEY")

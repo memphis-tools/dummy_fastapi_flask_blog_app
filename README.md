@@ -8,7 +8,7 @@
 ![Screenshot](https://img.shields.io/badge/terraform--blue?logo=hashicorp&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/vault--blue?logo=hashicorp&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/celery-5.4.0-blue?logo=celery&logoColor=yellow)
-![Screenshot](https://img.shields.io/badge/rabbitmq-3-blue?logo=rabbitmq&logoColor=yellow)
+![Screenshot](https://img.shields.io/badge/rabbitmq-4-blue?logo=rabbitmq&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/digitalocean--black?logo=digitalocean&logoColor=yellow&color=blue)
 ![Screenshot](https://img.shields.io/badge/betterstack--blue)
 ![Screenshot](https://img.shields.io/badge/coveralls--blue?logo=coveralls&logoColor=yellow)
@@ -114,6 +114,8 @@ Cloudflare
 
   Notice: if you use VisualCode remember that you can preview the markdown from VisualCode by running: Ctrl+Shift+V
 
+  Notice: currently the postgres password is the default one.
+
   There is no use of the create_app design pattern for Flask.
 
   The FastAPI app is the main one, and executes the database initialization at boot.
@@ -187,7 +189,7 @@ Cloudflare
 
     The "dummy-operator" must match the one defined in the Gunicorn Dockerfile.
 
-    Set something like this (notice POSTGRES_HOST refers to the postgresql service name):
+    Set something like this:
 
         export ADMIN_LOGIN="admin"
         export ADMIN_PASSWORD="@pplepie94" #notice this is not the real password
@@ -197,7 +199,6 @@ Cloudflare
         export CELERY_BROKER_URL="pyamqp://$RABBITMQ_DEFAULT_USER:$RABBITMQ_DEFAULT_PASS@rabbitmq:5672/$RABBITMQ_DEFAULT_VHOST"
         export CELERY_RESULT_BACKEND="your redis url"
         export COVERALLS_REPO_TOKEN="yourCoverallsToken"
-        export ERLANG_COOKIE_NAME="SuperCookie"
         export FLASK_APP=project/__init__.py
         export FLASK_DEBUG=1
         export HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
@@ -213,11 +214,19 @@ Cloudflare
         export RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
         export RABBITMQ_DEFAULT_VHOST="your_rabbitmq_vhost"
         export SECRET_KEY="YourSUperSecretKey123oclock"
-        export SCOPE="local_test"
+        export SCOPE="development"
         export SENDGRID_API_KEY="your sendgrid api key"
         export SWARM_IP="your_ip"
         export TEST_USER_PWD="@pplepie94"
         export TIMEZONE="Europe/Paris"
+
+    Notice:
+
+    POSTGRES_HOST refers to the postgresql service name
+
+    SCOPE: for a local execution you set "development".
+
+    Anything else than "production" or "development" allow tests to be run.
 
 ### HOW RUN IT LOCALLY
 ----------------------------------------------
@@ -275,6 +284,8 @@ You do not need to create a python virtualenv.
       pip install -r app/packages/fastapi/requirements.txt
 
       pip install -r app/packages/flask_app/requirements.txt
+
+      SCOPE="test"
 
       POSTGRES_HOST="your_local_ipv4"
 

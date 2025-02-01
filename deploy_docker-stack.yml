@@ -22,23 +22,14 @@ services:
     image: memphistools/public_repo:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT
     command: gunicorn --bind 0.0.0.0:8001 flask_app.manage:app
     environment:
-      - ADMIN_EMAIL=/run/secrets/ADMIN_EMAIL
-      - ADMIN_LOGIN=/run/secrets/ADMIN_LOGIN
-      - ADMIN_PASSWORD=/run/secrets/ADMIN_PASSWORD
-      - BETTERSTACK_SOURCE_TOKEN=/run/secrets/BETTERSTACK_SOURCE_TOKEN
-      - CELERY_BROKER_URL=/run/secrets/CELERY_BROKER_URL
       - CELERY_RESULT_BACKEND
       - HCAPTCHA_SITE_KEY
-      - HCAPTCHA_SITE_SECRET=/run/secrets/HCAPTCHA_SITE_SECRET
       - POSTGRES_HOST
-      - POSTGRES_PASSWORD=/run/secrets/POSTGRES_PASSWORD
       - POSTGRES_PORT
       - POSTGRES_PRODUCTION_DB_NAME
       - POSTGRES_TEST_DB_NAME
       - POSTGRES_USER
       - SCOPE
-      - SECRET_KEY=/run/secrets/SECRET_KEY
-      - SENDGRID_API_KEY=/run/secrets/SENDGRID_API_KEY
       - TEST_USER_PWD
     secrets:
       - ADMIN_EMAIL
@@ -62,20 +53,13 @@ services:
   fastapi:
     image: memphistools/public_repo:dummy_fastapi_flask_blog_app-fastapi_$GIT_COMMIT
     environment:
-      - ADMIN_EMAIL=/run/secrets/ADMIN_EMAIL
-      - ADMIN_LOGIN=/run/secrets/ADMIN_LOGIN
-      - ADMIN_PASSWORD=/run/secrets/ADMIN_PASSWORD
-      - BETTERSTACK_SOURCE_TOKEN=/run/secrets/BETTERSTACK_SOURCE_TOKEN
-      - CELERY_BROKER_URL=/run/secrets/CELERY_BROKER_URL
       - CELERY_RESULT_BACKEND
       - POSTGRES_HOST
-      - POSTGRES_PASSWORD=/run/secrets/POSTGRES_PASSWORD
       - POSTGRES_PORT
       - POSTGRES_PRODUCTION_DB_NAME
       - POSTGRES_TEST_DB_NAME
       - POSTGRES_USER
       - SCOPE
-      - SECRET_KEY=/run/secrets/SECRET_KEY
       - TEST_USER_PWD
     secrets:
       - ADMIN_EMAIL
@@ -95,11 +79,7 @@ services:
   db:
     image: postgres:15.0-alpine
     environment:
-      - ADMIN_EMAIL=/run/secrets/ADMIN_EMAIL
-      - ADMIN_LOGIN=/run/secrets/ADMIN_LOGIN
-      - ADMIN_PASSWORD=/run/secrets/ADMIN_PASSWORD
       - POSTGRES_HOST
-      - POSTGRES_PASSWORD=/run/secrets/POSTGRES_PASSWORD
       - POSTGRES_PORT
       - POSTGRES_PRODUCTION_DB_NAME
       - POSTGRES_TEST_DB_NAME
@@ -150,14 +130,11 @@ services:
   rabbitmq:
     image: memphistools/public_repo:dummy_fastapi_flask_blog_app-rabbitmq_$GIT_COMMIT
     environment:
-      - ERLANG_COOKIE_NAME=/run/secrets/ERLANG_COOKIE_NAME
       - NODENAME
-      - RABBITMQ_DEFAULT_PASS=/run/secrets/RABBITMQ_DEFAULT_PASS
       - RABBITMQ_DEFAULT_USER
       - RABBITMQ_DEFAULT_VHOST
       - RABBITMQ_DEFAULT_PERMISSIONS_REGEX=^.*$$
     secrets:
-      - ERLANG_COOKIE_NAME
       - RABBITMQ_DEFAULT_PASS
     depends_on:
       - flask_front
@@ -171,21 +148,12 @@ services:
   celery:
     image: memphistools/public_repo:dummy_fastapi_flask_blog_app-celery_$GIT_COMMIT
     environment:
-      - CELERY_BROKER_URL=/run/secrets/CELERY_BROKER_URL
       - CELERY_RESULT_BACKEND
       - PDF_FOLDER_PATH
       - PDF_FILE_NAME
-      - POSTGRES_HOST
-      - POSTGRES_PASSWORD=/run/secrets/POSTGRES_PASSWORD
-      - POSTGRES_PORT
-      - POSTGRES_PRODUCTION_DB_NAME
-      - POSTGRES_TEST_DB_NAME
-      - POSTGRES_USER
-      - SENDGRID_API_KEY=/run/secrets/SENDGRID_API_KEY
       - TIMEZONE
     secrets:
       - CELERY_BROKER_URL
-      - POSTGRES_PASSWORD
       - SENDGRID_API_KEY
     volumes:
       - static_volume:/home/dummy-operator/staticfiles
@@ -223,8 +191,6 @@ secrets:
   BETTERSTACK_TEAM_TOKEN:
     external: true
   CELERY_BROKER_URL:
-    external: true
-  ERLANG_COOKIE_NAME:
     external: true
   HCAPTCHA_SITE_SECRET:
     external: true

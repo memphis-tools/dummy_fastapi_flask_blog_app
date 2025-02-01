@@ -8,7 +8,6 @@ echo "$(vault kv get -address=$1 -field=ADMIN_LOGIN kv/dummy_vault)" | docker se
 echo "$(vault kv get -address=$1 -field=ADMIN_PASSWORD kv/dummy_vault)" | docker secret create ADMIN_PASSWORD - &> /dev/null
 echo "$(vault kv get -address=$1 -field=BETTERSTACK_SOURCE_TOKEN kv/dummy_vault)" | docker secret create BETTERSTACK_SOURCE_TOKEN - &> /dev/null
 echo "$(vault kv get -address=$1 -field=CELERY_BROKER_URL kv/dummy_vault)" | docker secret create CELERY_BROKER_URL - &> /dev/null
-echo "$(vault kv get -address=$1 -field=ERLANG_COOKIE_NAME kv/dummy_vault)" | docker secret create ERLANG_COOKIE_NAME - &> /dev/null
 echo "$(vault kv get -address=$1 -field=HCAPTCHA_SITE_SECRET kv/dummy_vault)" | docker secret create HCAPTCHA_SITE_SECRET - &> /dev/null
 echo "$(vault kv get -address=$1 -field=POSTGRES_PASSWORD kv/dummy_vault)" | docker secret create POSTGRES_PASSWORD - &> /dev/null
 echo "$(vault kv get -address=$1 -field=RABBITMQ_DEFAULT_PASS kv/dummy_vault)" | docker secret create RABBITMQ_DEFAULT_PASS - &> /dev/null
