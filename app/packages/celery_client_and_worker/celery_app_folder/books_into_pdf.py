@@ -22,7 +22,7 @@ DUMMY_IMAGE_PATH = "dummy-ops.png"
 
 
 def get_the_books_list_from_postgresql() -> list:
-    """Returns a list of books as dictionnaries, from a mongodb database"""
+    """Returns a list of books as dictionnaries, from a postgresql database"""
     session = session_commands.get_a_database_session()
     all_books = (
         session.query(Book)

@@ -11,7 +11,7 @@ except ModuleNotFoundError:
 
 celery_app = Celery(
     name="project",
-    backend=get_secret("/run/secrets/CELERY_RESULT_BACKEND"),
+    backend=os.getenv("CELERY_RESULT_BACKEND"),
     broker=get_secret("/run/secrets/CELERY_BROKER_URL"),
     timezone=os.getenv("TIMEZONE"),
     result_expires=604800,
