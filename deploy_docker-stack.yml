@@ -104,9 +104,7 @@ services:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
     environment:
-      - ADMIN_EMAIL=/run/secrets/ADMIN_EMAIL
-    secrets:
-      - ADMIN_EMAIL
+      - CERTBOT_EMAIL
     depends_on:
       - nginx
     command: certonly --webroot --webroot-path /var/www/html --email $ADMIN_EMAIL --agree-tos --no-eff-email --force-renewal -d dummy-ops.dev -d www.dummy-ops.dev
@@ -152,9 +150,20 @@ services:
       - PDF_FOLDER_PATH
       - PDF_FILE_NAME
       - TIMEZONE
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - POSTGRES_PRODUCTION_DB_NAME
+      - POSTGRES_TEST_DB_NAME
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - SCOPE
     secrets:
       - CELERY_BROKER_URL
       - SENDGRID_API_KEY
+      - POSTGRES_PASSWORD
+      - ADMIN_EMAIL
+      - ADMIN_LOGIN
+      - ADMIN_PASSWORD
     volumes:
       - static_volume:/home/dummy-operator/staticfiles
     depends_on:

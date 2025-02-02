@@ -1,4 +1,4 @@
-![Screenshot](https://img.shields.io/badge/python-v3.11-blue?logo=python&logoColor=yellow)
+![Screenshot](https://img.shields.io/badge/python-v3.12-blue?logo=python&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/fastapi--blue?logo=fastapi&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/flask--blue?logo=gitlab&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/sqlalchemy--blue?logo=fastapi&logoColor=yellow)
@@ -70,7 +70,7 @@ Remember it's just a dummy project.
 **A default virtual machine with 1vcpu and 2gb RAM is needed**
 
 ## TECHNOLOGIES
-Python 3.11 and later
+Python 3.12 and later
 
 Postgresql 15 (driver psycopg 3)
 
@@ -403,6 +403,7 @@ You do not need to create a python virtualenv.
     The passwords vars are used for the tests steps. They are not the ones in the vault.
 
         CELERY_RESULT_BACKEND
+        CERTBOT_EMAIL
         CI_REGISTRY_TOKEN
         CI_REGISTRY_USER
         CODACY_PROJECT_TOKEN
@@ -419,6 +420,10 @@ You do not need to create a python virtualenv.
         TEST_USER_PWD
         TIMEZONE
 
+    CERTBOT_EMAIL is set as Protected, Masked, Hidden and Expanded.
+
+    Notice: not all the necessary CI/CD variables are illustrated in the picture below.
+
     ![Screenshot](illustrations/dummy_fastapi_gitlab_settings.png)
 
     See logs on Betterstack.
@@ -429,6 +434,10 @@ You do not need to create a python virtualenv.
 ------------------------------
 
   - to see rabbitmq queue (once you get into the container)
+
+      rabbitmqctl list_users
+
+      rabbitmqctl list_vhosts
 
       rabbitmqctl list_queues -p your_rabbitmq_user name messages
 
