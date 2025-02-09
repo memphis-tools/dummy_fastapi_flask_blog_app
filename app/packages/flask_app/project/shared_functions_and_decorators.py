@@ -57,7 +57,7 @@ def return_random_quote():
     quotes = session.query(Quote).all()
     session.close()
     total_quotes_indexes = len(quotes) - 1
-    random_quote = quotes[random.randint(0, total_quotes_indexes)]
+    random_quote = quotes[random.randint(0, total_quotes_indexes)] if len(quotes) > 0 else ""
     return random_quote
 
 
