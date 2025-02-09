@@ -223,6 +223,7 @@ def user_books(user_id):
         per_page=per_page,
         total_pages=total_pages,
         user_name=user.username,
+        user_id=user.id,
         is_authenticated=current_user.is_authenticated,
     )
 

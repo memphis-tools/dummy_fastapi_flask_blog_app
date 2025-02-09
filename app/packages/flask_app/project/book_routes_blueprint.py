@@ -145,15 +145,14 @@ def add_book():
     Description: the add book Flask route.
     """
     session = session_commands.get_a_database_session()
-    books_categories_query = session.query(BookCategory).all()
-    books_categories = [(i.id, i.title) for i in books_categories_query]
+    books_categories = get_books_categories(session)
     form = forms.BookForm(books_categories=books_categories)
     if form.validate_on_submit():
         title = form.title.data
         summary = form.summary.data
         content = form.content.data
         author = form.author.data
-        category_id_from_form = int(form.categories.data[0])
+        category_id_from_form = int(form.categories.data)
         try:
             category_id = (
                 session.query(BookCategory)
@@ -162,7 +161,7 @@ def add_book():
                 .id
             )
         except Exception:
-            flash("Saisie invalide, categorie livre non prevue.", "error")
+            flash(f"Saisie invalide, categorie livre non prevue {category_id}.", "error")
             return render_template(
                 "add_book.html",
                 form=form,

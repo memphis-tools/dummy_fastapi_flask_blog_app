@@ -19,12 +19,25 @@
               <img src='{{ url_for("static", filename="img/" + book.book_picture_name) }}' align="middle" />
               <legend>Auteur: {{ book.author }}</legend>
               <div class="counters">
-                  <legend>Commentaires: {{ book.nb_comments }}</legend>
-                  <legend>Favoris: {{ book.nb_starred }}</legend>
+                  <legend>Commentaires: {{ book.book_comments | length }}</legend>
+                  <legend>Favoris: {{ book.starred | length }}</legend>
               </div>
           </div>
           <hr />
       {% endfor %}
     </div>
+    {% if total_books > per_page %}
+        <div class="pagination_block d-flex flex-row justify-content-center gap-3">
+            <a href="{{ url_for('user_routes_blueprint.user_books', user_id=user_id, page=1) }}">Premiers</a>
+            {% if page > 1 %}
+                <a href="{{ url_for('user_routes_blueprint.user_books', user_id=user_id, page=page-1) }}">Précédents</a>
+            {% endif %}
+            Page {{ page }} sur {{ total_pages }}
+            {% if page < total_pages %}
+                <a href="{{ url_for('user_routes_blueprint.user_books', user_id=user_id, page=page+1) }}">Prochains</a>
+            {% endif %}
+            <a href="{{ url_for('user_routes_blueprint.user_books', user_id=user_id, page=total_pages) }}">Derniers</a>
+        </div>
+    {% endif %}
 </div>
 {% endblock content %}
