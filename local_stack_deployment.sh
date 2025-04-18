@@ -37,4 +37,4 @@ echo -e "$GREEN[+] Docker swarm secrets created $RESET"
 
 echo -e "$WHITE[+] Deploying the swarm stack $RESET"
 docker stack deploy --detach -c local_docker-stack.yml dummy_flask_fastapi_stack &>/dev/null
-echo -e "$GREEN[+] [$RUNNING_ENV] The swarm stack is deployed $RESET"
+echo -e "$GREEN[+] [$SCOPE] The swarm stack is deployed $RESET"
