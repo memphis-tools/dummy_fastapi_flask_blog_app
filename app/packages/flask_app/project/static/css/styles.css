@@ -17,6 +17,17 @@ body {
   width: 100%;
 }
 
+.flaticon-logo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.flaticon-logo img {
+  width: 10%;
+}
+
 header {
   font-size: 0.9rem;
 }
@@ -140,6 +151,34 @@ input {
   justify-content: start;
   padding-bottom: 3%;
   padding-left: 5%;
+}
+
+.section_mooc {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.moocs_container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.mooc_container {
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.mooc_container img {
+  width: 100%;
+  height: auto;
+}
+
+.mooc_container .description {
+  margin-left: 10%;
 }
 
 .op-container {
