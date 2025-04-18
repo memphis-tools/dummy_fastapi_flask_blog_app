@@ -152,6 +152,7 @@ def create_application_admin_user_if_not_exist(session):
             f'[+] Application {os.getenv("ADMIN_LOGIN")} account already exists sir, nothing to do.'
         )
 
+
 def update_default_postgres_password(session):
     """
     Description: we update the postgres user password.
