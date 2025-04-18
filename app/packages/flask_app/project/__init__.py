@@ -1,6 +1,5 @@
 """ The Flask app definition.Notice we do not use the app factory pattern """
 
-import os
 import requests
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -30,12 +29,10 @@ try:
     import settings
     from database.commands import session_commands
     from database.models.models import Book, User, BookCategory
-    from utils import get_secret
 except ModuleNotFoundError:
     from app.packages import handle_passwords, log_events, settings
     from app.packages.database.commands import session_commands
     from app.packages.database.models.models import Book, User, BookCategory
-    from app.packages.utils import get_secret
 from .user_routes_blueprint import user_routes_blueprint
 from .stat_routes_blueprint import stat_routes_blueprint
 from .book_routes_blueprint import book_routes_blueprint
