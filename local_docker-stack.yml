@@ -28,6 +28,7 @@ services:
       - POSTGRES_USER
       - SCOPE
       - TEST_USER_PWD
+      - MPLCONFIGDIR
     secrets:
       - ADMIN_EMAIL
       - ADMIN_LOGIN
@@ -75,7 +76,7 @@ services:
     restart: always
 
   db:
-    image: postgres:15.0-alpine
+    image: postgres:17.5-alpine
     environment:
       - POSTGRES_HOST
       - POSTGRES_PORT
@@ -125,7 +126,7 @@ services:
       replicas: 1
 
   celery:
-    image: memphistools/public_repo:dummy_fastapi_flask_blog_app-celery_$GIT_COMMIT
+    image: dummy_fastapi_flask_blog_app-celery:latest
     environment:
       - CELERY_RESULT_BACKEND
       - PDF_FOLDER_PATH

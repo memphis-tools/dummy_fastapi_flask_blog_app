@@ -2,7 +2,7 @@
 ![Screenshot](https://img.shields.io/badge/fastapi--blue?logo=fastapi&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/flask--blue?logo=gitlab&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/sqlalchemy--blue?logo=fastapi&logoColor=yellow)
-![Screenshot](https://img.shields.io/badge/postgresql-v15-blue?logo=postgresql&logoColor=yellow)
+![Screenshot](https://img.shields.io/badge/postgresql-v17-blue?logo=postgresql&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/docker--blue?logo=docker&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/gitlab-ci:cd-blue?logo=gitlab&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/terraform--blue?logo=hashicorp&logoColor=yellow)
@@ -219,6 +219,7 @@ Cloudflare
         export SWARM_IP="your_ip"
         export TEST_USER_PWD="@pplepie94"
         export TIMEZONE="Europe/Paris"
+        export MPLCONFIGDIR=/tmp/matplotlib_config
 
     Notice:
 
