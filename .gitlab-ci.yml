@@ -198,6 +198,7 @@ deploy:
         echo 'export SWARM_IP=\"$HOST_IP\"' >> /home/dummy_user/.env &&
         echo 'export TEST_USER_PWD=\"$TEST_USER_PWD\"' >> /home/dummy_user/.env &&
         echo 'export TIMEZONE=\"$TIMEZONE\"' >> /home/dummy_user/.env &&
+        echo 'export MPLCONFIGDIR=\"$MPLCONFIGDIR\"' >> /home/dummy_user/.env &&
         echo 'export CERTBOT_EMAIL=\"$CERTBOT_EMAIL\"' >> /home/dummy_user/.env &&
         docker swarm init --advertise-addr=$HOST_IP &&
         bash set_docker_secrets.sh $VAULT_ADDR $VAULT_ID_TOKEN &&

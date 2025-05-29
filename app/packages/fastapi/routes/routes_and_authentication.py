@@ -52,6 +52,7 @@ app: FastAPI = FastAPI(
     redoc_url=None,
     openapi_url="/api/v1/openapi.json",
     swagger_ui_parameters={"defaultModelsExpandDepth": -1},
+    version="1.0.0",
 )
 try:
     app.mount("/api/v1/static", StaticFiles(directory="app/fastapi/static"), name="static")
