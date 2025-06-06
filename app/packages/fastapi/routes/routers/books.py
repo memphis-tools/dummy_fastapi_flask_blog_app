@@ -287,10 +287,7 @@ async def update_book(
             .id
         )
     except Exception:
-        logs_context = {
-            "username": f"{str(current_user.username).lower()}",
-            "book_title": new_book.title,
-        }
+        logs_context = {"username": f"{str(current_user.username).lower()}"}
         log_events.log_event(
             "[404] FastAPI - Utilisateur veut mettre à jour un livre avec catégorie inconnue.",
             logs_context,
