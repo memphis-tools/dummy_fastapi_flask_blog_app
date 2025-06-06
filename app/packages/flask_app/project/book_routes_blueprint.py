@@ -110,7 +110,7 @@ def book(book_id):
         "book_id": book_id,
         "book_title": a_book.title,
     }
-    log_events.log_event("[+] Flask - Consultation livre.", logs_context)
+    log_events.log_event("[200] Flask - Consultation livre.", logs_context)
 
     if form.validate_on_submit():
         new_comment = Comment(
@@ -120,7 +120,7 @@ def book(book_id):
             "current_user": f"{current_user.username}",
             "book_title": a_book.title,
         }
-        log_events.log_event("[+] Flask - Ajout commentaire.", logs_context)
+        log_events.log_event("[201] Flask - Ajout commentaire.", logs_context)
         session.add(new_comment)
         session.commit()
         session.close()
@@ -161,6 +161,10 @@ def add_book():
                 .id
             )
         except Exception:
+            logs_context = {
+                "current_user": f"{current_user.username}",
+            }
+            log_events.log_event("[404] Flask - Catégorie livre inconnue.", logs_context)
             flash(f"Saisie invalide, categorie livre non prevue {category_id}.", "error")
             return render_template(
                 "add_book.html",
@@ -185,6 +189,10 @@ def add_book():
             if filename != "":
                 file_ext = os.path.splitext(filename)[1]
                 if file_ext not in settings.UPLOAD_EXTENSIONS:
+                    logs_context = {
+                        "current_user": f"{current_user.username}",
+                    }
+                    log_events.log_event("[403] Flask - Format image non autorisé.", logs_context)
                     flash("Type image non accepté", "error")
                     return redirect(url_for("index"))
                 if os.getenv("SCOPE") == "production":
@@ -203,8 +211,8 @@ def add_book():
                     "current_user": f"{current_user.username}",
                     "book_title": new_book.title,
                 }
-                log_events.log_event("[+] Flask - Ajout livre.", logs_context)
-                flash("[+] Flask - Ajout livre.", "info")
+                log_events.log_event("[201] Flask - Ajout livre.", logs_context)
+                flash("Livre ajouté.", "info")
                 session.close()
                 return redirect(url_for("book_routes_blueprint.books"))
         else:
@@ -235,7 +243,7 @@ def delete_book(book_id):
             "current_user": f"{current_user.username}",
             "book_title": book_to_delete.title,
         }
-        log_events.log_event("[+] Flask - Suppression livre refusée.", logs_context)
+        log_events.log_event("[403] Flask - Suppression livre refusée.", logs_context)
         flash("Seul l'utilisateur ayant publié le livre peut le supprimer", "error")
         session.close()
         return abort(403)
@@ -247,7 +255,7 @@ def delete_book(book_id):
             "current_user": f"{current_user.username}",
             "book_title": book_to_delete.title,
         }
-        log_events.log_event("[+] Flask - Suppression livre.", logs_context)
+        log_events.log_event("[204] Flask - Suppression livre.", logs_context)
         session.commit()
         session.close()
         return redirect(url_for("book_routes_blueprint.books"))
@@ -353,7 +361,7 @@ def create_updated_book(a_book, updated_fields, category_id, filename):
 def log_book_update(updated_book):
     """call the logger to send logs"""
     logs_context = {"current_user": f"{current_user.username}", "book_title": updated_book.title}
-    log_events.log_event("[+] Flask - Mise à jour livre.", logs_context)
+    log_events.log_event("[200] Flask - Mise à jour livre.", logs_context)
 
 
 def save_updated_book(session, book_id, updated_book, book_picture_filename, file_data):
@@ -365,7 +373,7 @@ def save_updated_book(session, book_id, updated_book, book_picture_filename, fil
         session.commit()
         session.close()
         log_book_update(updated_book)
-        flash("[+] Flask - Mise à jour livre.", "info")
+        flash("Mise à jour livre.", "info")
     else:
         flash("Erreur avec image illustration", "error")
         session.close()
@@ -399,6 +407,10 @@ def update_book(book_id):
     session = session_commands.get_a_database_session()
     a_book = get_book_by_id(book_id)
     if not a_book:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event("[404] Flask - Mise à jour livre inconnu.", logs_context)
         flash("Livre non trouvé", "error")
         session.close()
         return redirect(url_for("book_routes_blueprint.books"))
@@ -450,4 +462,8 @@ def mail_books():
         backend=os.getenv("CELERY_RESULT_BACKEND")
     )
     celery_app.send_task("generate_pdf_and_send_email_task", args=(current_user.email,), retry=True)
+    logs_context = {
+        "current_user": f"{current_user.username}",
+    }
+    log_events.log_event("[200] Flask - Téléchargement des livres.", logs_context)
     return render_template("mail_books.html")

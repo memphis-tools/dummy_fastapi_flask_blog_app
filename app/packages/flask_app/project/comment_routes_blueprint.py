@@ -45,7 +45,7 @@ def delete_comment(comment_id):
             "comment": comment_to_delete.text,
         }
         log_events.log_event(
-            "[+] Flask - Suppression commentaire refusée.", logs_context
+            "[403] Flask - Suppression commentaire refusée.", logs_context
         )
         flash("Seul l'auteur du commentaire peut le supprimer", "error")
         session.close()
@@ -56,7 +56,7 @@ def delete_comment(comment_id):
             "book_title": book.title,
             "comment": comment_to_delete.text,
         }
-        log_events.log_event("[+] Flask - Suppression commentaire.", logs_context)
+        log_events.log_event("[204] Flask - Suppression commentaire.", logs_context)
         session.delete(comment_to_delete)
         session.commit()
         session.close()
@@ -92,7 +92,7 @@ def update_comment(comment_id):
             "old_comment": comment.text,
             "new_comment": edit_form.comment_text.data,
         }
-        log_events.log_event("[+] Flask - Mise à jour commentaire.", logs_context)
+        log_events.log_event("[200] Flask - Mise à jour commentaire.", logs_context)
         comment.text = edit_form.comment_text.data
         session.commit()
         flash("Commentaire mis a jour", "info")

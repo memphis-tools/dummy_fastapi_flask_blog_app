@@ -125,7 +125,7 @@ async def login_for_access_token(
     if not user:
         logs_context = {"username": f"{str(form_data.username).lower()}"}
         log_events.log_event(
-            "[+] FastAPI - Utilisateur inconnu cherche à obtenir un token.",
+            "[401] FastAPI - Utilisateur inconnu cherche à obtenir un token ou mot de passe erroné.",
             logs_context,
         )
         raise HTTPException(
@@ -145,22 +145,10 @@ async def register(user: NewUserInDBModel):
     """
     register new user.
     """
-    if any(
-        [
-            str(user.username) == "string",
-            str(user.email) == "string",
-            str(user.password) == "string",
-            str(user.password_check) == "string",
-        ]
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Saisie invalide, mot clef string non utilisable.",
-        )
     valid_password = handle_passwords.check_password(str(user.password))
     if not valid_password:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Mot de passe trop simple, essayez de nouveau.",
         )
     hashed_password = generate_password_hash(
@@ -172,20 +160,30 @@ async def register(user: NewUserInDBModel):
         .first()
     )
     if user_in_db:
+        logs_context = {"username": f"{str(user.username).lower()}"}
+        log_events.log_event(
+            "[400] FastAPI - Nom d'utilisateur déjà utilisé.",
+            logs_context,
+        )
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Nom utilisateur existe deja, veuillez le modifier",
         )
     user_email = (
         session.query(models.User).filter_by(email=str(user.email).lower()).first()
     )
     if user_email:
+        logs_context = {"email": f"{str(user.email).lower()}"}
+        log_events.log_event(
+            "[400] FastAPI - Email déjà utilisé.",
+            logs_context,
+        )
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Email existe deja en base"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Email existe deja en base"
         )
     if user.password != user.password_check:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Mots de passe ne correspondent pas",
         )
 
@@ -198,7 +196,7 @@ async def register(user: NewUserInDBModel):
         "username": f"{str(user.username).lower()}",
         "email": f"{str(user.email).lower()}",
     }
-    log_events.log_event("[+] FastAPI - Création compte utilisateur.", logs_context)
+    log_events.log_event("[201] FastAPI - Création compte utilisateur.", logs_context)
     session.add(new_user)
     session.commit()
     return new_user

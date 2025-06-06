@@ -45,13 +45,13 @@ def check_book_fields(book):
         ]
     ):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Saisie invalide, mot clef string non utilisable.",
         )
     if not isinstance(book.year_of_publication, int):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Saisie invalide, annee publication livre doit etre un entier.",
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Saisie invalide, année de publication livre doit etre un entier.",
         )
     return True
 
@@ -90,6 +90,8 @@ async def download_books(
     )
 
     celery_app.send_task("generate_pdf_and_send_email_task", args=(user_email,), retry=True)
+    logs_context = {"current_user": f"{current_user.username}"}
+    log_events.log_event("[200] FastAPI - Téléchargement des livres.", logs_context)
     return {
         "detail": f"Demande reçue, vous allez recevoir par email à {user_email} les livres publiés."
     }
@@ -109,11 +111,11 @@ async def view_book(
             "book_id": book_id,
             "book_title": book.title,
         }
-        log_events.log_event("[+] FastAPI - Consultation livre.", logs_context)
+        log_events.log_event("[200] FastAPI - Consultation livre.", logs_context)
         return book
 
     logs_context = {"current_user": f"{current_user.username}", "book_id": book_id}
-    log_events.log_event("[+] FastAPI - Consultation livre inconnu.", logs_context)
+    log_events.log_event("[404] FastAPI - Consultation livre inconnu.", logs_context)
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="FastAPI - Consultation livre inconnu.",
@@ -138,6 +140,11 @@ async def post_book(
             .id
         )
     except Exception:
+        logs_context = {"username": f"{str(current_user.username).lower()}"}
+        log_events.log_event(
+            "[404] FastAPI - Utilisateur veut ajouter un livre avec catégorie inconnue.",
+            logs_context,
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Saisie invalide, categorie livre non connue.",
@@ -156,7 +163,7 @@ async def post_book(
         "current_user": f"{current_user.username}",
         "book_title": new_book.title,
     }
-    log_events.log_event("[+] FastAPI - Ajout livre.", logs_context)
+    log_events.log_event("[200] FastAPI - Ajout livre.", logs_context)
     session.add(new_book)
     session.commit()
     session.refresh(new_book)
@@ -174,6 +181,11 @@ async def partial_update_book(
     """
     book = database_crud_commands.get_instance(session, models.Book, book_id)
     if not book:
+        logs_context = {"username": f"{str(current_user.username).lower()}"}
+        log_events.log_event(
+            "[404] FastAPI - Utilisateur veut mettre à jour partiellement un livre inconnu.",
+            logs_context,
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Livre avec id {book_id} inexistant.",
@@ -184,9 +196,9 @@ async def partial_update_book(
             "current_user": current_user.username,
             "book_title": book.title,
         }
-        log_events.log_event("[+] FastAPI - Book update refused.", logs_context)
+        log_events.log_event("[403] FastAPI - Mise à jour partielle d'un livre refusée.", logs_context)
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour le livre",
         )
 
@@ -207,6 +219,11 @@ async def partial_update_book(
                     .id
                 )
             except Exception:
+                logs_context = {"username": f"{str(current_user.username).lower()}"}
+                log_events.log_event(
+                    "[404] FastAPI - Utilisateur veut mettre à jour un livre avec catégorie inconnue.",
+                    logs_context,
+                )
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Saisie invalide, categorie livre non prevue.",
@@ -224,7 +241,7 @@ async def partial_update_book(
             "current_user": f"{current_user.username}",
             "book_title": book.title,
         }
-        log_events.log_event("[+] FastAPI - Mise à jour livre.", logs_context)
+        log_events.log_event("[200] FastAPI - Mise à jour livre.", logs_context)
         return book
 
 
@@ -239,6 +256,11 @@ async def update_book(
     """
     book = database_crud_commands.get_instance(session, models.Book, book_id)
     if not book:
+        logs_context = {"username": f"{str(current_user.username).lower()}"}
+        log_events.log_event(
+            "[404] FastAPI - Utilisateur veut mettre à jour un livre inconnu.",
+            logs_context,
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Livre avec id {book_id} inexistant.",
@@ -249,9 +271,9 @@ async def update_book(
             "current_user": current_user.username,
             "book_title": book.title,
         }
-        log_events.log_event("[+] FastAPI - Book update refused.", logs_context)
+        log_events.log_event("[403] FastAPI - Mise à jour livre refusée.", logs_context)
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour le livre",
         )
 
@@ -265,6 +287,14 @@ async def update_book(
             .id
         )
     except Exception:
+        logs_context = {
+            "username": f"{str(current_user.username).lower()}",
+            "book_title": new_book.title,
+        }
+        log_events.log_event(
+            "[404] FastAPI - Utilisateur veut mettre à jour un livre avec catégorie inconnue.",
+            logs_context,
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Saisie invalide, categorie livre non connue.",
@@ -284,7 +314,7 @@ async def update_book(
         "current_user": f"{current_user.username}",
         "book_title": new_book.title,
     }
-    log_events.log_event("[+] FastAPI - Ajout livre.", logs_context)
+    log_events.log_event("[200] FastAPI - Ajout livre.", logs_context)
     session.query(models.Book).where(models.Book.id == book_id).update(
         new_book.get_json_for_update()
     )
@@ -306,7 +336,7 @@ async def delete_book(
                 "current_user": f"{current_user.username}",
                 "book_title": book.title,
             }
-            log_events.log_event("[+] FastAPI - Suppression livre.", logs_context)
+            log_events.log_event("[204] FastAPI - Suppression livre.", logs_context)
             session.delete(book)
             session.commit()
             raise HTTPException(
@@ -317,11 +347,15 @@ async def delete_book(
             "current_user": f"{current_user.username}",
             "book_title": book.title,
         }
-        log_events.log_event("[+] FastAPI - Suppression livre refusée.", logs_context)
+        log_events.log_event("[403] FastAPI - Suppression livre refusée.", logs_context)
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent supprimer son livre.",
         )
+    logs_context = {
+        "current_user": f"{current_user.username}",
+    }
+    log_events.log_event("[404] FastAPI - Suppression livre inconnu.", logs_context)
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Livre avec id {book_id} inexistant.",

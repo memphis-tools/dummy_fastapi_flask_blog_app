@@ -31,7 +31,7 @@ def check_book_category_fields(category):
     """
     if str(category.title).lower() == "string":
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Saisie invalide, mot clef string non utilisable.",
         )
     category = (
@@ -41,8 +41,8 @@ def check_book_category_fields(category):
     )
     if category:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Saisie invalide, categorie existe deja.",
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Saisie invalide, categorie existe déjà.",
         )
 
 
@@ -71,6 +71,11 @@ async def view_category_books(
         session, category_id
     )
     if len(category_books) == 0:
+        logs_context = {"username": f"{str(current_user.username).lower()}"}
+        log_events.log_event(
+            "[404] FastAPI - Utilisateur cherche une catégorie inexistante.",
+            logs_context,
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Catégorie avec id {category_id} inexistante.",
@@ -90,7 +95,7 @@ async def add_category_books(
     """
     if current_user.id != 1:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Acces reserve au seul compte admin",
         )
     new_book_category = models.BookCategory(title=str(book_category.title).lower())
@@ -99,7 +104,7 @@ async def add_category_books(
         "current_user": f"{current_user.username}",
         "new_book_category": new_book_category.title,
     }
-    log_events.log_event("[+] FastAPI - Ajout catégorie livre.", logs_context)
+    log_events.log_event("[201] FastAPI - Ajout catégorie livre.", logs_context)
     session.add(new_book_category)
     session.commit()
     session.refresh(new_book_category)
@@ -117,13 +122,18 @@ async def update_book_category(
     """
     if current_user.id != 1:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Acces reserve au seul compte admin",
         )
     category = database_crud_commands.get_instance(
         session, models.BookCategory, category_id
     )
     if not category:
+        logs_context = {"username": f"{str(current_user.username).lower()}"}
+        log_events.log_event(
+            "[404] FastAPI - Utilisateur cherche à mettre à jour une catégorie inexistante.",
+            logs_context,
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Catégorie avec id {category_id} inexistante.",
@@ -135,7 +145,7 @@ async def update_book_category(
             "updated_category_old": category.title,
             "updated_category_new": str(book_category_updated.title).lower(),
         }
-        log_events.log_event("[+] FastAPI - Mise à jour catégorie livre.", logs_context)
+        log_events.log_event("[200] FastAPI - Mise à jour catégorie livre.", logs_context)
         category.title = str(book_category_updated.title).lower()
         session.query(models.BookCategory).where(
             models.BookCategory.id == category_id
@@ -154,14 +164,24 @@ async def delete_book_category(
     delete_book_category returns 204 if category deleted.
     """
     if current_user.id != 1:
+        logs_context = {"username": f"{str(current_user.username).lower()}"}
+        log_events.log_event(
+            "[403] FastAPI - Utilisateur non admin cherche à supprimer une catégorie.",
+            logs_context,
+        )
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Acces reserve au seul compte admin",
         )
     category = database_crud_commands.get_instance(
         session, models.BookCategory, category_id
     )
     if not category:
+        logs_context = {"username": f"{str(current_user.username).lower()}"}
+        log_events.log_event(
+            "[404] FastAPI - Utilisateur cherche à supprimer une catégorie inexistante.",
+            logs_context,
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="catégorie avec id {category_id} inexistante",
@@ -170,7 +190,7 @@ async def delete_book_category(
         "current_user": f"{current_user.username}",
         "category_to_delete": category.title,
     }
-    log_events.log_event("[+] FastAPI - Suppression catégorie livre.", logs_context)
+    log_events.log_event("[204] FastAPI - Suppression catégorie livre.", logs_context)
     session.delete(category)
     session.commit()
     raise HTTPException(

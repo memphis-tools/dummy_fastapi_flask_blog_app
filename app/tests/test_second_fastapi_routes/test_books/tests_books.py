@@ -87,7 +87,7 @@ async def test_update_book_with_authentication_with_forbidden_user(
         headers=headers,
         json=json
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -304,7 +304,7 @@ async def test_post_book_with_authentication_with_invalid_keyword_string(
         "Content-Type": "application/json",
     }
     response = fastapi_client.post("/api/v1/books/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -326,7 +326,7 @@ async def test_update_book_with_authentication_with_invalid_keyword_string(
         "Content-Type": "application/json",
     }
     response = fastapi_client.patch("/api/v1/books/1/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -344,7 +344,7 @@ async def test_delete_book_with_authentication_with_forbidden_user(
         "accept": "application/json"
     }
     response = fastapi_client.delete("/api/v1/books/2/", headers=headers)
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -467,7 +467,7 @@ async def test_full_update_book_with_authentication_with_forbidden_user(
         headers=headers,
         json=json
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -548,4 +548,4 @@ async def test_full_update_book_with_authentication_with_invalid_keyword_string(
         "Content-Type": "application/json",
     }
     response = fastapi_client.put("/api/v1/books/2/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 403
