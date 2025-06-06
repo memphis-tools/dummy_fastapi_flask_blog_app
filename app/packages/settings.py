@@ -26,6 +26,8 @@ FORBIDDEN_SPECIALCHARS_IN_PASSWORD = [
     "*",
     ":",
     ";",
+    "<",
+    ">"
 ]
 
 BOOKS_CATEGORIES = [

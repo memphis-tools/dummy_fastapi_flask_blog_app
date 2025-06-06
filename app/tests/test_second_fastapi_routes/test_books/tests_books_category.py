@@ -171,7 +171,7 @@ async def test_post_book_category_with_authentication_with_valid_datas(
         "Content-Type": "application/json",
     }
     response = fastapi_client.post("/api/v1/books/categories/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -226,16 +226,16 @@ async def test_post_existing_book_category_with_authentication_with_valid_datas(
         "Content-Type": "application/json",
     }
     response = fastapi_client.post("/api/v1/books/categories/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
-async def test_delete_book_category_with_authentication_with_valid_datas(
+async def test_delete_book_category_with_authentication_with_valid_datas_without_being_admin(
     fastapi_client,
     fastapi_token
 ):
     """
-    Description: test delete book category route with FastAPI TestClient with token.
+    Description: test delete book category route with FastAPI TestClient with token without being admin.
     """
     access_token = fastapi_token
     headers = {
@@ -244,7 +244,7 @@ async def test_delete_book_category_with_authentication_with_valid_datas(
         "Content-Type": "application/json",
     }
     response = fastapi_client.delete("/api/v1/books/categories/5/", headers=headers)
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -262,16 +262,16 @@ async def test_delete_unexisting_book_category_with_authentication_with_valid_da
         "Content-Type": "application/json",
     }
     response = fastapi_client.delete("/api/v1/books/categories/55555555/", headers=headers)
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
-async def test_update_book_category_with_authentication_with_valid_datas(
+async def test_update_book_category_with_authentication_with_valid_datas_without_being_admin(
     fastapi_client,
     fastapi_token
 ):
     """
-    Description: test update book category route with FastAPI TestClient with token.
+    Description: test update book category route with FastAPI TestClient with token without being admin.
     """
     access_token = fastapi_token
     json = {"title": "politiques"}
@@ -281,16 +281,16 @@ async def test_update_book_category_with_authentication_with_valid_datas(
         "Content-Type": "application/json",
     }
     response = fastapi_client.put("/api/v1/books/categories/1/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
-async def test_update_unexisting_book_category_with_authentication_with_valid_datas(
+async def test_update_unexisting_book_category_with_authentication_with_valid_datas_without_being_admin(
     fastapi_client,
     fastapi_token
 ):
     """
-    Description: test update an unexisting book category route with FastAPI TestClient with token.
+    Description: test update an unexisting book category route with FastAPI TestClient with token without being admin.
     """
     access_token = fastapi_token
     json = {"title": "politiques"}
@@ -300,7 +300,7 @@ async def test_update_unexisting_book_category_with_authentication_with_valid_da
         "Content-Type": "application/json",
     }
     response = fastapi_client.put("/api/v1/books/categories/55555555/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -405,7 +405,7 @@ async def test_post_existing_book_category_with_authentication_as_admin_with_val
         "Content-Type": "application/json",
     }
     response = fastapi_client.post("/api/v1/books/categories/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -491,7 +491,7 @@ async def test_delete_category_books(fastapi_client, fastapi_token):
     response = fastapi_client.delete(
         "/api/v1/books/categories/6/", headers={"Authorization": f"Bearer {fastapi_token}"}
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio

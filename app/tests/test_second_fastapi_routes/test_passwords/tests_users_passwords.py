@@ -97,7 +97,7 @@ async def test_update_user_password_with_uncomplex_being_legitimate_user(
         "Content-Type": "application/json",
     }
     response = fastapi_client.put("/api/v1/users/2/password/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 403
     assert b'{"detail":"Mot de passe trop simple, essayez de nouveau."}' in response.content
 
 
@@ -170,7 +170,7 @@ async def test_update_user_password_without_being_legitimate_user(fastapi_client
         headers=headers,
         json=json
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -242,7 +242,7 @@ async def test_update_user_password_with_wrong_current_password_being_legitimate
     }
 
     response = fastapi_client.put("/api/v1/users/2/password/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio

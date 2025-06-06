@@ -61,7 +61,7 @@ def test_flask_post_add_book_with_authentication(
     }
     response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
     assert response.status_code == 200
-    assert b"[+] Flask - Ajout livre." in response.data
+    assert b"Livre ajout\xc3\xa9." in response.data
 
 
 def test_flask_post_add_book_without_authentication(client, get_flask_csrf_token):
@@ -170,7 +170,7 @@ def test_flask_update_book_being_authenticated(
         follow_redirects=True,
     )
     assert response.status_code == 200
-    assert b"[+] Flask - Mise \xc3\xa0 jour livre." in response.data
+    assert b"Mise \xc3\xa0 jour livre." in response.data
 
 
 def test_flask_update_book_being_authenticated_without_book_id(
@@ -252,7 +252,7 @@ def test_flask_update_book_being_authenticated_as_admin(
         follow_redirects=True,
     )
     assert response.status_code == 200
-    assert b"[+] Flask - Mise \xc3\xa0 jour livre." in response.data
+    assert b"Mise \xc3\xa0 jour livre." in response.data
 
 
 def test_flask_update_unexisting_book_being_authenticated_as_admin(

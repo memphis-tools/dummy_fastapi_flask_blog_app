@@ -43,6 +43,12 @@ async def user_books(
     if user:
         books = database_crud_commands.view_all_user_books(session, user_id)
         return books
+    logs_context = {
+        "current_user": f"{current_user.username}",
+    }
+    log_events.log_event(
+        "[404] FastAPI - Recherche utilisateur inconnu.", logs_context
+    )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Aucun Utilisateur avec id {user_id} en base",
@@ -86,8 +92,16 @@ async def add_user(
             session.add(new_user)
             session.commit()
             return {"200": f"user {str(user.username).lower()} added"}
+        logs_context = {
+            "current_user": f"{current_user.username}",
+            "user_to_add": user.username,
+        }
+        log_events.log_event(
+            "[409] FastAPI - Utilisateur existe déjà.",
+            logs_context,
+        )
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Utilisateur existe deja"
+            status_code=status.HTTP_409_CONFLICT, detail="Utilisateur existe déjà"
         )
 
     logs_context = {
@@ -95,7 +109,7 @@ async def add_user(
         "user_to_add": user.username,
     }
     log_events.log_event(
-        "[+] FastAPI - Ajout utilisateur refusee, vous n'etes pas admin.",
+        "[401] FastAPI - Ajout utilisateur refusée, vous n'etes pas admin.",
         logs_context,
     )
     raise HTTPException(
@@ -146,7 +160,7 @@ async def partial_update_user(
                 )
                 if existing_user:
                     raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        status_code=status.HTTP_409_CONFLICT,
                         detail=f"Nom utilisateur {user_updated.username} existe déjà.",
                     )
             if user_updated.email is not None:
@@ -157,7 +171,7 @@ async def partial_update_user(
                 )
                 if existing_email:
                     raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        status_code=status.HTTP_409_CONFLICT,
                         detail=f"Email utilisateur {user.email} existe déjà.",
                     )
             logs_context = {
@@ -176,7 +190,7 @@ async def partial_update_user(
                     and not current_user.role == "admin"
                 ):
                     log_events.log_event(
-                        "[+] FastAPI - Mise a jour role utilisateur en admin refusee, vous n'etes pas admin.",
+                        "[401] FastAPI - Mise a jour role utilisateur en admin refusée, vous n'etes pas admin.",
                         logs_context,
                     )
                     raise HTTPException(
@@ -188,7 +202,7 @@ async def partial_update_user(
                 and not current_user.role == "admin"
             ):
                 log_events.log_event(
-                    "[+] FastAPI - Mise a jour utilisateur refusee, vous n'etes pas admin.",
+                    "[403] FastAPI - Mise a jour utilisateur refusée, vous n'etes pas admin.",
                     logs_context,
                 )
                 raise HTTPException(
@@ -215,7 +229,7 @@ async def partial_update_user(
             detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur",
         )
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
+        status_code=status.HTTP_401_UNAUTHORIZED,
         detail=f"Utilisateur avec id {user_id} inexistant.",
     )
 
@@ -239,7 +253,7 @@ async def update_user(
             )
             if existing_user:
                 raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    status_code=status.HTTP_409_CONFLICT,
                     detail=f"Nom utilisateur {user_updated.username} existe déjà.",
                 )
             existing_email = (
@@ -257,12 +271,12 @@ async def update_user(
             }
             if not valid_password:
                 raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    status_code=status.HTTP_403_FORBIDDEN,
                     detail="Mot de passe trop simple, essayez de nouveau.",
                 )
             if existing_email:
                 raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    status_code=status.HTTP_409_CONFLICT,
                     detail="Email existe déjà.",
                 )
             if user_updated.role is not None:
@@ -277,11 +291,11 @@ async def update_user(
                     and not current_user.role == "admin"
                 ):
                     log_events.log_event(
-                        "[+] FastAPI - Mise a jour utilisateur refusee, vous n'etes pas admin.",
+                        "[403] FastAPI - Mise a jour utilisateur refusée, vous n'etes pas admin.",
                         logs_context,
                     )
                     raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        status_code=status.HTTP_403_FORBIDDEN,
                         detail="Affecter role admin autorisé aux seuls admins.",
                     )
                 user.role = str(user_updated.role).lower()
@@ -291,11 +305,11 @@ async def update_user(
                     and not current_user.role == "admin"
                 ):
                     log_events.log_event(
-                        "[+] FastAPI - Mise a jour utilisateur refusee, vous n'etes pas admin.",
+                        "[403] FastAPI - Mise a jour utilisateur refusée, vous n'etes pas admin.",
                         logs_context,
                     )
                     raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        status_code=status.HTTP_403_FORBIDDEN,
                         detail="Désactiver utilisateur autorisé aux seuls admins.",
                     )
             else:
@@ -315,7 +329,7 @@ async def update_user(
             session.refresh(user)
             return user.get_json()
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur",
         )
     raise HTTPException(
@@ -345,7 +359,7 @@ async def update_user_password(
                     current_user.username, user_updated.current_password
                 ):
                     raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        status_code=status.HTTP_403_FORBIDDEN,
                         detail="Mot de passe actuel incorrect.",
                     )
                 if user_updated.new_password != user_updated.new_password_check:
@@ -358,7 +372,7 @@ async def update_user_password(
                 )
                 if not valid_password:
                     raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        status_code=status.HTTP_403_FORBIDDEN,
                         detail="Mot de passe trop simple, essayez de nouveau.",
                     )
                 user.hashed_password = generate_password_hash(
@@ -373,11 +387,22 @@ async def update_user_password(
                 status_code=status.HTTP_406_NOT_ACCEPTABLE,
                 detail="Mots de passe non renseignés",
             )
-
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event(
+            "[403] FastAPI - Mise à jour refusée à utilisateur non autorisé.", logs_context
+        )
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Seul l'utilisateur ou l'admin peuvent mettre à jour l'utilisateur",
         )
+    logs_context = {
+        "current_user": f"{current_user.username}",
+    }
+    log_events.log_event(
+        "[404] FastAPI - Mise à jour mot de passe d'un utilisateur inconnu.", logs_context
+    )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Utilisateur avec id {user_id} inexistant.",
@@ -396,6 +421,12 @@ async def view_user_comments(
     if user:
         comments = database_crud_commands.view_all_user_comments(session, user.id)
         return comments
+    logs_context = {
+        "current_user": f"{current_user.username}",
+    }
+    log_events.log_event(
+        "[404] FastAPI - Recherche commentaire d'un utilisateur inconnu.", logs_context
+    )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Utilisateur avec id {user_id} inexistant.",
@@ -433,10 +464,10 @@ async def delete_user(
         "user_to_delete": user.username,
     }
     log_events.log_event(
-        "[+] FastAPI - Suppression utilisateur refusée, utilisateur non admin.",
+        "[403] FastAPI - Suppression utilisateur refusée, utilisateur non admin.",
         logs_context,
     )
     raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
+        status_code=status.HTTP_403_FORBIDDEN,
         detail="Seul l'admin peut supprimer un utilisateur",
     )

@@ -87,7 +87,7 @@ def add_quote():
             "book_title": f"{book_title}",
             "quote": f"{quote}",
         }
-        log_events.log_event("[+] Flask - Ajout citation par admin.", logs_context)
+        log_events.log_event("[200] Flask - Ajout citation par admin.", logs_context)
         session.close()
         return redirect(url_for("book_routes_blueprint.books"))
     return render_template(
@@ -114,7 +114,7 @@ def delete_quote(quote_id):
             "quote_to_delete": quote_to_delete.author,
             "book_title": quote_to_delete.book_title,
         }
-        log_events.log_event("[+] Flask - Suppression citation.", logs_context)
+        log_events.log_event("[204] Flask - Suppression citation.", logs_context)
         session.delete(quote_to_delete)
         session.commit()
         session.close()

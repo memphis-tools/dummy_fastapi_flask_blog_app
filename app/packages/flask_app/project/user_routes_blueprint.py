@@ -85,7 +85,7 @@ def add_user():
                 flash(f"Creation utilisateur {username} faite", "info")
                 logs_context = {"username": f"{username}", "email": f"{email}"}
                 log_events.log_event(
-                    "[+] Flask - Création compte utilisateur par admin.", logs_context
+                    "[200] Flask - Création compte utilisateur par admin.", logs_context
                 )
                 session.close()
                 return redirect(url_for("login"))
@@ -107,6 +107,10 @@ def delete_user(user_id):
     form = forms.DeleteInstanceForm()
     user_to_delete = session.get(User, user_id)
     if user_id == 1:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event("[403] Flask - Suppression compte admin refusée.", logs_context)
         session.close()
         return abort(403)
     if form.validate_on_submit():
@@ -114,7 +118,7 @@ def delete_user(user_id):
             "current_user": f"{current_user.username}",
             "user_to_delete": user_to_delete.username,
         }
-        log_events.log_event("[+] Flask - Suppression utilisateur.", logs_context)
+        log_events.log_event("[204] Flask - Suppression utilisateur.", logs_context)
         session.delete(user_to_delete)
         session.commit()
         session.close()
@@ -164,6 +168,10 @@ def update_password():
                 updated_user.get_json_for_update()
             )
             session.commit()
+            logs_context = {
+                "current_user": f"{current_user.username}",
+            }
+            log_events.log_event("[200] Flask - Mot de passe mis à jour.", logs_context)
             flash(f"Mot de passe mis a jour {current_user} 💪")
             session.close()
         return redirect(url_for("index"))
@@ -183,6 +191,10 @@ def user_books(user_id):
     session = session_commands.get_a_database_session()
     user = session.get(User, user_id)
     if not user:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event("[404] Flask - Recherche livres utilisateur inconnu.", logs_context)
         flash(f"Utilisateur id {user_id} inexistant", "error")
         session.close()
         return redirect(url_for("index"))
@@ -239,6 +251,10 @@ def user_starred(user_id):
     session = session_commands.get_a_database_session()
     user = session.query(User).filter(User.id == user_id).first()
     if not user:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event("[404] Flask - Recherche livres favoris d'un utilisateur inconnu.", logs_context)
         flash(f"Utilisateur id {user_id} inexistant", "error")
         session.close()
         return redirect(url_for("index"))
@@ -293,6 +309,10 @@ def delete_starred_book(user_id, book_id):
         session.close()
         return redirect(url_for("index"))
     if not user_id == current_user.id:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event("[403] Flask - Utilisateur veut supprimer favoris d'un autre utilisateur.", logs_context)
         flash("Vous ne pouvez supprimer que vos favoris", "error")
         session.close()
         return redirect(url_for("index"))
@@ -301,7 +321,7 @@ def delete_starred_book(user_id, book_id):
             "current_user": f"{current_user.username}",
             "starred_book_deleted": starred_book_to_delete,
         }
-        log_events.log_event("[+] Flask - Suppression favori.", logs_context)
+        log_events.log_event("[204] Flask - Suppression favori.", logs_context)
         session.delete(starred_book_to_delete)
         session.commit()
         flash("Favori supprimé", "info")
@@ -350,6 +370,10 @@ def add_starred_book(user_id, book_id):
         )
 
     if not user_id == current_user.id:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event("[403] Flask - Utilisateur veut ajouter un favori pour un autre utilisateur.", logs_context)
         flash("Vous ne pouvez ajouter que vos favoris", "error")
         session.close()
         return redirect(url_for("index"))
@@ -357,6 +381,10 @@ def add_starred_book(user_id, book_id):
     if form.validate_on_submit():
         book = session.query(Book).filter(Book.id == book_id).first()
         if not book:
+            logs_context = {
+                "current_user": f"{current_user.username}",
+            }
+            log_events.log_event("[404] Flask - Ajout en favori d'un livre inconnu.", logs_context)
             flash("Livre inexistant", "error")
             session.close()
             return redirect(url_for("index"))
@@ -368,7 +396,7 @@ def add_starred_book(user_id, book_id):
             "current_user": f"{current_user.username}",
             "starred_book_added": book,
         }
-        log_events.log_event("[+] Flask - Ajout favori.", logs_context)
+        log_events.log_event("[200] Flask - Ajout favori.", logs_context)
         session.add(new_starred_book)
         session.commit()
         session.close()

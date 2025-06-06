@@ -183,7 +183,7 @@ async def test_delete_user_without_being_admin(fastapi_client, fastapi_token):
         "/api/v1/users/3/",
         headers=headers
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -306,7 +306,7 @@ async def test_update_user_with_authentication_with_existing_email(
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
     )
-    assert response.status_code == 401
+    assert response.status_code == 409
     assert b'{"detail":"Email existe d\xc3\xa9j\xc3\xa0."}' in response.content
 
 
@@ -331,7 +331,7 @@ async def test_update_user_with_authentication_with_existing_username(
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
     )
-    assert response.status_code == 401
+    assert response.status_code == 409
     assert b'{"detail":"Nom utilisateur daisylady existe d\xc3\xa9j\xc3\xa0."}' in response.content
 
 
@@ -356,7 +356,7 @@ async def test_update_user_with_authentication_with_forbidden_role(
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
     assert b'{"detail":"Affecter role admin autoris\xc3\xa9 aux seuls admins."}' in response.content
 
 
@@ -428,7 +428,7 @@ async def test_update_user_with_authentication_with_disabling_true(fastapi_clien
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
     assert b'{"detail":"D\xc3\xa9sactiver utilisateur autoris\xc3\xa9 aux seuls admins."}' in response.content
 
 
@@ -453,7 +453,7 @@ async def test_update_user_with_authentication_being_unlegetimate_user(
         headers={"Authorization": f"Bearer {access_token}"},
         json=json
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
     assert b'{"detail":"Seul l\'utilisateur ou l\'admin peuvent mettre \xc3\xa0 jour l\'utilisateur"}' in response.content
 
 
@@ -516,7 +516,7 @@ async def test_partial_update_user_with_authentication_with_existing_email(
         "Content-Type": "application/json",
     }
     response = fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 409
     assert b'{"detail":"Email utilisateur donald.duck@localhost.fr existe d\xc3\xa9j\xc3\xa0."}' in response.content
 
 
@@ -536,7 +536,7 @@ async def test_partial_update_user_with_authentication_with_username(
         "Content-Type": "application/json",
     }
     response = fastapi_client.patch("/api/v1/users/2/", headers=headers, json=json)
-    assert response.status_code == 401
+    assert response.status_code == 409
     assert b'{"detail":"Nom utilisateur donald existe d\xc3\xa9j\xc3\xa0."}' in response.content
 
 
@@ -593,7 +593,7 @@ async def test_partial_update_unexisting_user_with_authentication_with_valid_dat
         "Content-Type": "application/json",
     }
     response = fastapi_client.patch("/api/v1/users/55555555/", headers=headers, json=json)
-    assert response.status_code == 404
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio
