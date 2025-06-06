@@ -70,9 +70,14 @@ async def add_comment(
             "current_user": f"{current_user.username}",
             "book_title": updated_book.title,
         }
-        log_events.log_event("[+] FastAPI - Ajout commentaire.", logs_context)
+        log_events.log_event("[201] FastAPI - Ajout commentaire.", logs_context)
         return new_comment
 
+    logs_context = {
+        "current_user": f"{current_user.username}",
+        "book_title": updated_book.title,
+    }
+    log_events.log_event("[404] FastAPI - Ajout commentaire sur livre inconnu.", logs_context)
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Livre avec id {book_id} inexistant.",
@@ -96,7 +101,7 @@ async def update_comment(
                 "old_comment": comment.text,
                 "new_comment": comment_updated.text,
             }
-            log_events.log_event("[+] FastAPI - Mise à jour commentaire.", logs_context)
+            log_events.log_event("[200] FastAPI - Mise à jour commentaire.", logs_context)
             if comment_updated.text is not None:
                 comment.text = comment_updated.text
             session.query(models.Comment).where(models.Comment.id == comment_id).update(
@@ -105,10 +110,18 @@ async def update_comment(
             session.commit()
             session.refresh(comment)
             return comment
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event("[403] FastAPI - Mise à jour commentaire refusée.", logs_context)
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent mettre à jour un commentaire",
         )
+    logs_context = {
+        "current_user": f"{current_user.username}",
+    }
+    log_events.log_event("[404] FastAPI - Mise à jour commentaire inconnu.", logs_context)
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Commentaire avec id {comment_id} inexistant.",
@@ -125,6 +138,10 @@ async def view_book_comments(
     """
     book = database_crud_commands.get_instance(session, models.Book, book_id)
     if book is None:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event("[404] FastAPI - Recherche livre inconnu.", logs_context)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Livre n'existe pas."
         )
@@ -145,14 +162,23 @@ async def delete_comment(
     """
     updated_book = database_crud_commands.get_instance(session, models.Book, book_id)
     if updated_book is None:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event("[404] FastAPI - Suppression livre inconnu.", logs_context)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Livre n'existe pas."
         )
     comment = database_crud_commands.get_instance(session, models.Comment, comment_id)
     if comment:
         if comment.book_id != book_id:
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "book_title": updated_book.title,
+            }
+            log_events.log_event("[403] FastAPI - Mise à jour commentaire.", logs_context)
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
+                status_code=status.HTTP_403_FORBIDDEN,
                 detail="Commentaire non rattaché au livre.",
             )
         if current_user.id == comment.author_id:
@@ -161,7 +187,7 @@ async def delete_comment(
                 "book_title": updated_book.title,
                 "comment": comment.text,
             }
-            log_events.log_event("[+] FastAPI - Suppression commentaire.", logs_context)
+            log_events.log_event("[204] FastAPI - Suppression commentaire.", logs_context)
             session.delete(comment)
             session.commit()
             raise HTTPException(
@@ -174,12 +200,19 @@ async def delete_comment(
             "comment": comment.text,
         }
         log_events.log_event(
-            "[+] FastAPI - Suppression commentaire refusée.", logs_context
+            "[403] FastAPI - Suppression commentaire refusée.", logs_context
         )
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Seul l'utilisateur l'ayant publié ou l'admin peuvent supprimer son commentaire",
         )
+    logs_context = {
+        "current_user": f"{current_user.username}",
+        "book_title": updated_book.title,
+    }
+    log_events.log_event(
+        "[404] FastAPI - Suppression commentaire inconnu.", logs_context
+    )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Commentaire avec id {comment_id} inexistant.",

@@ -237,7 +237,7 @@ def test_update_valid_book_category_being_admin(client, access_session_as_admin)
         follow_redirects=True
     )
     assert response.status_code == 200
-    assert b"[+] Flask - Mise \xc3\xa0 jour cat\xc3\xa9gorie livre." in response.data
+    assert b"Mise \xc3\xa0 jour cat\xc3\xa9gorie livre" in response.data
 
 
 def test_format_book_category():

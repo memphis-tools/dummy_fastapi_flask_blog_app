@@ -40,7 +40,7 @@ async def get_quotes(
         "current_user": f"{current_user.username}",
     }
     log_events.log_event(
-        "[+] FastAPI - Consultation citations refusee, vous n'etes pas admin.",
+        "[403] FastAPI - Consultation citations refusée, vous n'etes pas admin.",
         logs_context,
     )
     raise HTTPException(
@@ -62,7 +62,7 @@ async def get_quote(
         "current_user": f"{current_user.username}",
     }
     log_events.log_event(
-        "[+] FastAPI - Consultation citation refusee, vous n'etes pas admin.",
+        "[403] FastAPI - Consultation citation refusée, vous n'etes pas admin.",
         logs_context,
     )
     raise HTTPException(
@@ -89,7 +89,7 @@ async def add_quote(
             "book_title": new_quote.book_title,
             "quote": new_quote.quote,
         }
-        log_events.log_event("[+] FastAPI - Ajout citation.", logs_context)
+        log_events.log_event("[201] FastAPI - Ajout citation.", logs_context)
         session.add(new_quote)
         session.commit()
         return new_quote
@@ -98,7 +98,7 @@ async def add_quote(
         "current_user": f"{current_user.username}",
     }
     log_events.log_event(
-        "[+] FastAPI - Ajout citation refusee, vous n'etes pas admin.",
+        "[403] FastAPI - Ajout citation refusée, vous n'etes pas admin.",
         logs_context,
     )
     raise HTTPException(
@@ -122,7 +122,7 @@ async def delete_quote(
                 "author": quote.author,
                 "book_title": quote.book_title,
             }
-            log_events.log_event("[+] FastAPI - Suppression citation.", logs_context)
+            log_events.log_event("[204] FastAPI - Suppression citation.", logs_context)
             session.delete(quote)
             session.commit()
             raise HTTPException(
@@ -138,7 +138,7 @@ async def delete_quote(
         "current_user": f"{current_user.username}",
     }
     log_events.log_event(
-        "[+] FastAPI - Suppression citation refusee, vous n'etes pas admin.",
+        "[403] FastAPI - Suppression citation refusée, vous n'etes pas admin.",
         logs_context,
     )
     raise HTTPException(

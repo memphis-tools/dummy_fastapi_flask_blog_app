@@ -23,10 +23,10 @@ def check_digit(plain_text_password):
 
 def check_special_chars(plain_text_password):
     """
-    Description: count special chars in a password.
+    Description: count special chars in a a plain text.
 
     Parameters:
-    plain_text_password -- str, a plain text password
+    plain_text_password -- str, a plain text
     """
     special_chars_count = 0
     forbidden_chars_count = 0
@@ -45,7 +45,7 @@ def check_special_chars(plain_text_password):
 
 def check_password(plain_text_password):
     """
-    Description: check if password respects the min and max length.
+    Description: check if password respects the policy.
     """
     if any(
         [

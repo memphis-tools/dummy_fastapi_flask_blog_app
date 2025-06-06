@@ -158,7 +158,7 @@ async def test_update_comment_with_authentication_with_forbidden_user(fastapi_cl
         headers=headers,
         json=json
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -284,7 +284,7 @@ async def test_delete_comment_with_authentication_with_forbidden_user(fastapi_cl
         "/api/v1/books/6/comments/6/",
         headers=headers
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -352,7 +352,7 @@ async def test_delete_comment_with_authentication_with_unbind_book(fastapi_clien
         "/api/v1/books/2/comments/5/",
         headers=headers
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
