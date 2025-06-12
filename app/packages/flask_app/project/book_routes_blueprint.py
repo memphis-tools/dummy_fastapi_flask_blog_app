@@ -88,27 +88,13 @@ def book(book_id):
     session = session_commands.get_a_database_session()
     delete_book_form = forms.DeleteInstanceForm()
     form = forms.CommentForm()
-    a_book = None
-    try:
-        a_book = (
-            session.query(Book)
-            .filter(Book.id == book_id)
-            .options(joinedload(Book.book_comments))
-            .options(joinedload(Book.starred))
-            .first()
-        )
-    except:
-        pass
-
-    if a_book is None:
-        logs_context = {
-            "current_user": f"{current_user.username}",
-            "book_id": book_id,
-        }
-        log_events.log_event("[404] Flask - Consultation livre inconnu.", logs_context)
-        flash(f"Livre id {book_id} inexistant", "error")
-        session.close()
-        abort(404)
+    a_book = (
+        session.query(Book)
+        .filter(Book.id == book_id)
+        .options(joinedload(Book.book_comments))
+        .options(joinedload(Book.starred))
+        .first()
+    )
 
     comments = session.query(Comment).filter_by(book_id=a_book.id).all()
 

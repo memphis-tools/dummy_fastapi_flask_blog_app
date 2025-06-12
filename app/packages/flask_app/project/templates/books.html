@@ -6,17 +6,17 @@
 <div class="container">
     <div class="section_intro">
       {% if random_quote != "" %}
-        <i>
-          <p>
-            "{{ random_quote.quote }}"
-          </p>
-          <p>
-              {{ random_quote.author }} - {{ random_quote.book_title }}
-          </p>
-        </i>
+      <i>
+        <p>
+          "{{ random_quote.quote }}"
+        </p>
+        <p>
+            {{ random_quote.author }} - {{ random_quote.book_title }}
+        </p>
+      </i>
       {% endif %}
     </div>
-    <h1>DUMMY OPS - LES LIVRES</h1>
+    <h1>DUMMY BLOG - LES LIVRES</h1>
     <div class="home-books-container">
       {% for book in books %}
           <div class="post-preview">

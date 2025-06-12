@@ -4,46 +4,35 @@
 
 {% block content %}
 <div class="container">
-    <h1>DUMMY OPS</h1>
-    <div class="index_introduction">
-        <div class="block_illustration">
-          <figure>
-              <img src='{{ url_for("static", filename="img/craiyon_a_software_production_cartoon.png" )}}' alt="a free public cartoon from craiyon ai">
-              <figcaption>credits: <a href="https://www.craiyon.com" target="_blank">www.craiyon.com</a></figcaption>
-          </figure>
-        </div>
-        <div class="block_description">
-            <p>
-              Micro-application web de type blog et portfolio, déployée chez un cloud provider:
-              <a href="https://www.digitalocean.com/?refcode=4f541e02cfe5&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge">DigitalOcean</a>
-            </p>
-            <p>Application dédiée à l'apprentissage, la répétition, présenter des travaux.</p>
-            <p>Le focus est mis sur les techniques et technologies à employer.</p>
-            <p>Le jeu de données par défaut correspond à des lectures, des <a href="/books">livres</a>.</p>
-        </div>
+    <div class="section_intro"></div>
+    <h1>DUMMY BLOG</h1>
+    <div class="d-flex flex-column m-5">
+        <p>Blog perso dédié à l'apprentissage, la répétition, présenter des travaux.</p>
+        <p>Un compte visiteur est disponible pour explorer ou exploiter librement l'application (sauf l'envoi de mail): visiteur / @pplepie94 / visiteur@localhost.fr</p>
+        <p>Mise en place d'une application web en Python sur un système Linux.</p>
+        <p>Le focus est mis sur les techniques et technologies à employer.</p>
+        <p>On a d'un côté une micro application interractive autour de lectures: le jeu de données correspond à mes lectures persos. Le visiteur peut utiliser un navigateur, ou faire des appels "API REST".</p>
+        <p>De l'autre côté vous retrouvez une présentation de mon lab qui fait appel à <a href="https://www.proxmox.com/en/">Proxmox</a>.</p>
+        <p>Usage du <a href="https://docs.docker.com/compose/" target="_blank">Docker Compose</a> afin de servir Nginx, Flask, FastAPI en frontend, appuyé sur Postgresql en backend.</p>
+        <p>Usage de <a href="https://www.hashicorp.com/products/vault" target="_blank">Hashicorp Vault</a> pour ne pas stocker certaines "variables sensibles" sur les dépôts git. Exemple la SECRET_KEY de Flask et FastAPI.</p>
+        <p>Noter que le dépôt Github est un mirroir du dépôt <a href="https://gitlab.com/memphis-tools/dummy_fastapi_flask_blog_app" target="_blank">Gitlab</a>.</p>
+        <p>Une chaine ci-cd est en place: tests, build, et publication si branche master. <a href="https://hub.docker.com/r/memphistools/public_repo" target="_blank">Dépôt Docker Hub public</a>.</p>
+        <p>La machine virtuelle a été créée chez <a href="https://www.digitalocean.com/?refcode=4f541e02cfe5&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge" target="_blank">DigitalOcean</a>.</p>
+        <p>Le provisionnement est effectué avec <a href="https://www.terraform.io/" target="_blank">Hashicorp Terraform</a>.</p>
+        <p>Le domaine a été réservé sur <a href="https://www.namecheap.com/" target="_blank">NameCheap</a>.</p>
+        <p>
+          La gestion du consement utilisateur pour la collecte de données <a href="https://www.consentmanager.fr/" target="_blank">ConsentManager</a>.
+          Du fait d'une souscription gratuite, l'affichage de l'écran de consentement disparait si le site est visité plus de 5000 fois en un mois.
+        </p>
+        <p>Usage de <a href="https://betterstack.com/logs" target="_blank">Betterstack</a> pour adresser des logs.</p>
+        <p>Usage de <a href="https://www.twilio.com" target="_blank">Twilio SendGrid</a> pour adresser des emails.</p>
+        <p>Usage de <a href="https://docs.celeryq.dev/en/stable/" target="_blank">Celery</a> et <a href="https://www.rabbitmq.com/" target="_blank">RabbitMQ</a> pour la gestion des envois de mail en processus asynchrones.</p>
+        <p>Usage de <a href="https://www.codacy.com/" target="_blank">Codacy</a> et <a href="https://snyk.io/" target="_blank">Snyk</a> pour la qualité du code et vérifier les vulnérabilités.</p>
+        <p>Usage de <a href="https://www.tabnine.com/" target="_blank">TabNine</a> pour aider à la mise en place des tests. Usage de l'extension sur IDE <a href="https://code.visualstudio.com/" target="_blank">VSCode</a></p>
     </div>
     <hr>
-    <div class="index_introduction">
-        <div class="block_description">
-            <p>Un compte visiteur est disponible pour explorer/exploiter librement (sauf l'envoi de mail):</p>
-            <p>visiteur / @pplepie94 / visiteur@localhost.fr</p>
-            <p>Le visiteur peut utiliser un navigateur, ou faire des appels "API REST".</p>
-        </div>
-        <div class="block_illustration">
-          <figure>
-              <img src='{{ url_for("static", filename="img/craiyon_a_software_production_behind_the_scene_cartoon.png" )}}' alt="a free public cartoon from craiyon ai">
-              <figcaption>credits: <a href="https://www.craiyon.com" target="_blank">www.craiyon.com</a></figcaption>
-          </figure>
-        </div>
-    </div>
-    <hr>
-    <div class="d-flex flex-row space-around m-3">
-        <p>En "A PROPOS", les options de prise de contact, et une présentation d'un lab perso (un cluster <a href="https://www.proxmox.com/en/">Proxmox <i class="fa-solid fa-server"></i></a>), mes travaux ..,</p>
-    </div>
-    <hr>
-    <h1>DUMMY OPS - LES LIVRES</h1>
+    <h1>DUMMY BLOG - LES LIVRES</h1>
     <div class="home-books-container">
-      <hr />
       {% for book in books %}
       <div class="post-preview">
         <p class="post-title m-0">{{ book.title }}</p>
@@ -62,33 +51,16 @@
             </div>
         </div>
       </div>
+      <hr />
       {% endfor %}
     </div>
     <div class="d-flex flex-column align-items-center justify-content-center mb-4 mt-1">
       {% if books|length > 0 %}
-          <a class="ops-btn btn btn-primary text-uppercase w-100" href="{{ url_for('book_routes_blueprint.books') }}">TOUS LES LIVRES</a>
+          <a class="btn btn-primary text-uppercase w-15" href="{{ url_for('book_routes_blueprint.books') }}">TOUS LES LIVRES</a>
       {% else %}
           <p>Aucuns livres pour le moment.</p>
-          <a class="ops-btn btn btn-primary text-uppercase" href="{{ url_for('book_routes_blueprint.add_book') }}">AJOUTER UN LIVRE</a>
+          <a class="btn btn-primary text-uppercase" href="{{ url_for('book_routes_blueprint.add_book') }}">AJOUTER UN LIVRE</a>
       {% endif %}
-    </div>
-    <hr>
-    <div class="dummy_ops_technos">
-        <h1>DUMMY OPS - LES TECHNOS</h1>
-        <p>Usage du <a href="https://docs.docker.com/compose/" target="_blank">Docker Compose</a> afin de servir Nginx, Flask, FastAPI en frontend, appuyé sur Postgresql en backend.</p>
-        <p>Usage de <a href="https://www.hashicorp.com/products/vault" target="_blank">Hashicorp Vault</a> pour ne pas stocker certaines "variables sensibles" sur les dépôts git. Exemple la SECRET_KEY de Flask et FastAPI.</p>
-        <p>Noter que le dépôt Github est un mirroir du dépôt <a href="https://gitlab.com/memphis-tools/dummy_fastapi_flask_blog_app" target="_blank">Gitlab</a>.</p>
-        <p>Une chaine ci-cd est en place: tests, build, et publication si branche master. <a href="https://hub.docker.com/r/memphistools/public_repo" target="_blank">Dépôt Docker Hub public</a>.</p>
-        <p>La machine virtuelle a été créée chez <a href="https://www.digitalocean.com/?refcode=4f541e02cfe5&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge" target="_blank">DigitalOcean</a>.</p>
-        <p>Le provisionnement est effectué avec <a href="https://www.terraform.io/" target="_blank">Hashicorp Terraform</a>.</p>
-        <p>Le domaine a été réservé sur <a href="https://www.namecheap.com/" target="_blank">NameCheap</a>.</p>
-        <p>La gestion du consement utilisateur pour la collecte de données <a href="https://www.consentmanager.fr/" target="_blank">ConsentManager</a>.</p>
-        <p>Usage de <a href="https://betterstack.com/logs" target="_blank">Betterstack</a> pour adresser des logs.</p>
-        <p>Usage de <a href="https://www.twilio.com" target="_blank">Twilio SendGrid</a> pour adresser des emails.</p>
-        <p>Usage de <a href="https://docs.celeryq.dev/en/stable/" target="_blank">Celery</a> et <a href="https://www.rabbitmq.com/" target="_blank">RabbitMQ</a> pour la gestion des envois de mail en processus asynchrones.</p>
-        <p>Usage de <a href="https://www.codacy.com/" target="_blank">Codacy</a> pour la qualité du code.</p>
-        <p>Usage de <a href="https://www.tabnine.com/" target="_blank">TabNine</a> pour aider à la mise en place des tests. Usage de l'extension sur IDE <a href="https://code.visualstudio.com/" target="_blank">VSCode</a></p>
-        <p>Usage de <a href="https://app.aikido.dev" target="_blank">Aikido Security</a> et <a href="https://snyk.io/" target="_blank">Snyk</a> pour vérifier les vulnérabilités.</p>
     </div>
 </div>
 {% endblock content %}
