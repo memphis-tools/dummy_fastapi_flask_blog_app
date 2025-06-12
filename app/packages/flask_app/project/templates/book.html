@@ -7,47 +7,51 @@
 <div class="container">
       <div class="section_intro"></div>
       <h1>DUMMY BLOG - LIVRE</h1>
+      <div class="d-flex w-100">
+          <a class="ops-btn btn btn-primary text-uppercase w-100" href="{{ url_for('book_routes_blueprint.books') }}">TOUS LES LIVRES</a>
+      </div>
       <!-- Post preview-->
-      <div class="post-preview w-100">
-          <h2 class="d-flex flex-column">Titre: {{ book.title }}</h2>
-          <h3 class="post-author d-flex flex-column">Auteur: {{ book.author }}</h3>
-          <h4 class="d-flex flex-column">Catégorie: {{ book.category|format_book_category() }}</h4>
-          <h4 class="d-flex flex-column">Année édition: {{ book.year_of_publication }}</h4>
-          <h4 class="d-flex flex-column">Sous-titre: {{ book.summary }}</h4>
+      <div class="post-preview w-100 m-2">
+          <p>Titre: {{ book.title }}</p>
+          <p class="post-author d-flex flex-column">Auteur: {{ book.author }}</p>
+          <p>Catégorie: {{ book.category|format_book_category() }}</p>
+          <p>Année édition: {{ book.year_of_publication }}</p>
+          <p>Sous-titre: {{ book.summary }}</p>
           <img style="width:200px;height:auto;" src='{{ url_for("static", filename="img/" + book.book_picture_name) }}' align="middle" />
-          <p class="post-publisher">
+          <p class="post-publisher w-100">
               Publié par <a href="{{ url_for('user_routes_blueprint.user_books', user_id=book.user_id) }}">{{ book.user_id|format_user() }}</a>
-              on {{ book.publication_date|format_datetime() }}
+              le {{ book.publication_date|format_datetime() }}
           </p>
+          <p>Description: {{ book.content }}</p>
+          {% if current_user.id == book.user_id or current_user.role == 'admin' %}
+            <div class="buttons_container">
+                <a class="ops-btn btn btn-primary ml-5 mr-5 mb-3" href="{{ url_for('book_routes_blueprint.delete_book', book_id=book.id)}}">SUPPRIMER LIVRE</a>
+                <a class="ops-btn btn btn-primary ml-5 mr-5 mb-3" href="{{ url_for('book_routes_blueprint.update_book', book_id=book.id)}}">METTRE A JOUR LIVRE</a>
+            </div>
+          {% endif %}
           <div class="counters">
               <p>Commentaires: {{ book.book_comments | length }}</p>
               <p>Favoris: {{ book.starred | length }}</p>
               <div class="d-flex flex-column justify-content-start">
-                {% if book.id in user_starred_books_id_list|map(attribute=0) %}
-                    <a class="btn btn-primary w-25" href="{{ url_for('user_routes_blueprint.delete_starred_book', book_id=book.id, user_id=current_user.id )}}">RETIRER DES FAVORIS</a>
-                {% else %}
-                    <a class="btn btn-primary w-25" href="{{ url_for('user_routes_blueprint.add_starred_book', book_id=book.id, user_id=current_user.id )}}">AJOUTER AUX FAVORIS</a>
-                {% endif %}
+                  {% if current_user.role != 'admin' %}
+                      {% if book.id in user_starred_books_id_list|map(attribute=0) %}
+                          <a class="ops-btn btn btn-primary ml-5 mr-5 mb-3" href="{{ url_for('user_routes_blueprint.delete_starred_book', book_id=book.id, user_id=current_user.id )}}">RETIRER DES FAVORIS</a>
+                      {% else %}
+                          <a class="ops-btn btn btn-primary ml-5 mr-5 mb-3" href="{{ url_for('user_routes_blueprint.add_starred_book', book_id=book.id, user_id=current_user.id )}}">AJOUTER AUX FAVORIS</a>
+                      {% endif %}
+                  {% endif %}
               </div>
           </div>
-          <p>{{ book.content }}</p>
-          {% if current_user.id == book.user_id or current_user.role == 'admin' %}
-            <div class="buttons_container">
-                <a class="btn btn-primary w-25" href="{{ url_for('book_routes_blueprint.delete_book', book_id=book.id)}}">Delete book</a>
-                <a class="btn btn-primary w-25" href="{{ url_for('book_routes_blueprint.update_book', book_id=book.id)}}">Update book</a>
-            </div>
-          {% endif %}
       </div>
       <!-- Divider-->
       <hr class="my-4" />
       <!-- Pager-->
-      <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="{{ url_for('book_routes_blueprint.books') }}">TOUS LES LIVRES</a></div>
 
       <!--  Comments Area -->
       <form class="form" action="" method="post">
-        {{ form.csrf_token }}
-        <label for="comment_text">{{ form.comment_text.label }}</label>{{ form.comment_text }}
-        <button type="submit" class="btn btn-primary" name="button">AJOUTER COMMENTAIRE</button>
+          {{ form.csrf_token }}
+          <label for="comment_text">{{ form.comment_text.label }}</label>{{ form.comment_text }}
+          <button type="submit" class="ops-btn btn btn-primary" name="button">AJOUTER COMMENTAIRE</button>
       </form>
       <div class="col-lg-8 col-md-10 mx-auto comments">
           <ul class="commentList">
@@ -57,8 +61,8 @@
                   <p class="comment_user">Utilisateur: {{ comment.author_id|format_user() }}</p>
                   <p class="comment">Commentaire: {{ comment }}</p>
                   {% if current_user.id == comment.author_id or current_user.role == 'admin' %}
-                      <a class="btn btn-primary" href="{{ url_for('comment_routes_blueprint.delete_comment', comment_id=comment.id)}}">Delete comment</a>
-                      <a class="btn btn-primary" href="{{ url_for('comment_routes_blueprint.update_comment', comment_id=comment.id)}}">Update comment</a>
+                      <a class="ops-btn btn btn-primary ml-5 mr-5 mb-3" href="{{ url_for('comment_routes_blueprint.delete_comment', comment_id=comment.id)}}">SUPPRIMER COMMENTAIRE</a>
+                      <a class="ops-btn btn btn-primary ml-5 mr-5 mb-3" href="{{ url_for('comment_routes_blueprint.update_comment', comment_id=comment.id)}}">METTRE A JOUR COMMENTAIRE</a>
                   {% endif %}
                 </div>
             </li>
