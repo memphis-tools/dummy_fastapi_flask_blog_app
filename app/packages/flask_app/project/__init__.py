@@ -82,6 +82,7 @@ def unauthorized():
     """
     Description: disable access to protected uri.
     """
+    log_events.log_event("[403] Flask - Utilisateur doit se connecter.")
     flash("Vous devez d'abord vous connecter", "error")
     return redirect(url_for("login"))
 
@@ -211,9 +212,8 @@ def contact():
         except Exception as e:
             logs_context = {"username": f"{username}", "email": f"{email}"}
             log_events.log_event(
-                f"[+] Flask - Echec envoi email: {e}", logs_context
+                f"[400] Flask - Echec envoi email: {e}", logs_context
             )
-            print(f"DEBUG EMAIL NOT SENT SIR: {e}")
             return render_template(
                 "mail_not_sent.html",
                 name=username,
@@ -251,14 +251,6 @@ def login():
         response = requests.post(verify_url, data=payload)
         response_json = response.json()
 
-        if not response_json.get('success'):
-            flash("Echec vérification hCaptcha, essayez de nouveau.", "error")
-            session.close()
-            return render_template(
-                "login.html",
-                form=form,
-                is_authenticated=current_user.is_authenticated,
-            )
         email = str(form.email.data).lower()
         username = str(form.login.data).lower()
         password = form.password.data
@@ -266,23 +258,36 @@ def login():
         if not user or user.email != email:
             logs_context = {"username": f"{username}", "email": f"{email}"}
             log_events.log_event(
-                "[+] Flask - Echec connexion à application.", logs_context
+                "[400] Flask - Echec connexion à application.", logs_context
             )
             flash("Identifiants invalides", "error")
             session.close()
             return redirect(url_for("index"))
 
+        if not response_json.get('success'):
+            logs_context = {"username": f"{username}", "email": f"{email}"}
+            log_events.log_event(
+                "[400] Flask - Echec vérification hCaptcha.", logs_context
+            )
+            flash("Echec vérification hCaptcha, essayez de nouveau.", "error")
+            session.close()
+            return render_template(
+                "login.html",
+                form=form,
+                is_authenticated=current_user.is_authenticated,
+            )
+
         if check_password_hash(user.hashed_password, password):
             login_user(user)
             flash(f"Vous nous avez manqué {user} 🫶")
             logs_context = {"username": f"{username}"}
-            log_events.log_event("[+] Flask - Connexion à application.", logs_context)
+            log_events.log_event("[200] Flask - Connexion à application.", logs_context)
             session.close()
             return redirect(url_for("index"))
 
         logs_context = {"username": f"{username}", "email": f"{email}"}
         log_events.log_event(
-            "[+] Flask - Echec connexion à application. Mot de passe invalide.",
+            "[400] Flask - Echec connexion à application. Mot de passe invalide.",
             logs_context,
         )
         flash("Mot de passe invalide", "error")
@@ -354,7 +359,7 @@ def register():
         user_email = session.query(User).filter_by(email=email).first()
 
         if user_email:
-            flash("Email existe deja en base", "error")
+            flash("Email existe déjà en base", "error")
         elif form.password.data != form.password_check.data:
             flash("Mots de passe ne correspondent pas", "error")
         else:
@@ -367,7 +372,7 @@ def register():
                 flash(f"Bienvenue {username} vous pouvez vous connecter", "info")
                 logs_context = {"username": f"{username}", "email": f"{email}"}
                 log_events.log_event(
-                    "[+] Flask - Création compte utilisateur.", logs_context
+                    "[201] Flask - Création compte utilisateur.", logs_context
                 )
                 session.close()
                 return render_template(
@@ -384,7 +389,7 @@ def register():
             user_email = session.query(User).filter_by(email=email).first()
 
             if user_email:
-                flash("Email existe deja en base", "error")
+                flash("Email existe déjà en base", "error")
             elif form.password.data != form.password_check.data:
                 flash("Mots de passe ne correspondent pas", "error")
             else:
@@ -397,11 +402,15 @@ def register():
                     flash(f"Bienvenue {username} vous pouvez vous connecter", "info")
                     logs_context = {"username": f"{username}", "email": f"{email}"}
                     log_events.log_event(
-                        "[+] Flask - Création compte utilisateur.", logs_context
+                        "[201] Flask - Création compte utilisateur.", logs_context
                     )
                     session.close()
                     return redirect(url_for("login"))
-                flash("Nom utilisateur existe deja, veuillez le modifier", "error")
+                logs_context = {"username": f"{username}", "email": f"{email}"}
+                log_events.log_event(
+                    "[400] Nom utilisateur existe déjà, veuillez le modifier.", logs_context
+                )
+                flash("Nom utilisateur existe déjà, veuillez le modifier", "error")
     session.close()
     return render_template(
         "register.html", form=form, is_authenticated=current_user.is_authenticated

@@ -12,7 +12,7 @@ def test_flask_login_route(client):
     """
     response = client.get("http://localhost/login/")
     assert response.status_code == 200
-    assert b"DUMMY BLOG - SE CONNECTER" in response.data
+    assert b"DUMMY OPS - SE CONNECTER" in response.data
 
 
 def test_flask_post_logout_route_without_authentication(client):
@@ -105,7 +105,7 @@ def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_to
         follow_redirects=True,
     )
     assert response.status_code == 200
-    assert b"Email existe deja en base" in response.data
+    assert b"Email existe d\xc3\xa9j\xc3\xa0 en base" in response.data
 
 
 def test_post_flask_register_route_with_passwords_mismatch(
@@ -155,7 +155,7 @@ def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_tok
         follow_redirects=False,
     )
     assert response.status_code == 200
-    assert b"Nom utilisateur existe deja, veuillez le modifier" in response.data
+    assert b"Nom utilisateur existe d\xc3\xa9j\xc3\xa0, veuillez le modifier" in response.data
 
 
 def test_post_flask_register_route_with_invalid_data(client):

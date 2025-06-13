@@ -37,7 +37,7 @@ def test_categories_stats(client, access_session):
     )
     assert response.status_code == 200
     assert b'DOCTYPE html' in response.data
-    assert b'DUMMY BLOG - LES CATEGORIES' in response.data
+    assert b'DUMMY OPS - LES CATEGORIES' in response.data
 
 
 def test_create_users_chart():
@@ -68,4 +68,4 @@ def test_users_stats(client, access_session):
     )
     assert response.status_code == 200
     assert b'DOCTYPE html' in response.data
-    assert b'DUMMY BLOG - LES UTILISATEURS' in response.data
+    assert b'DUMMY OPS - LES UTILISATEURS' in response.data

@@ -21,6 +21,7 @@
     <meta name="author" content="dummy-ops" />
     <title>{{ title }}</title>
     <link href="{{ swagger_static_prefix }}/swagger-ui.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
 </head>
 <body>
     <div id="swagger-ui"></div>
@@ -29,25 +30,6 @@
     <!-- Swagger UI standalone preset -->
     <script src="{{ swagger_static_prefix }}/swagger-ui-standalone-preset.js"></script>
     <!-- Init -->
-    <script>
-        window.onload = function() {
-            const ui = SwaggerUIBundle({
-                url: "{{ openapi_url }}",
-                dom_id: '#swagger-ui',
-                deepLinking: true,
-                presets: [
-                    SwaggerUIBundle.presets.apis,
-                    SwaggerUIStandalonePreset
-                ],
-                plugins: [
-                    SwaggerUIBundle.plugins.DownloadUrl
-                ],
-                layout: "BaseLayout",
-                defaultModelsExpandDepth: -1
-            });
-
-            window.ui = ui;
-        }
-    </script>
+    <script src="{{ swagger_static_prefix }}/swagger-init.js"></script>
 </body>
 </html>

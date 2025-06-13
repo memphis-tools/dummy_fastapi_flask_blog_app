@@ -53,7 +53,7 @@ def test_get_books_categories(client, access_session):
     }
     response = client.get("/books/categories/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
-    assert b'DUMMY BLOG - LES LIVRES PAR CATEGORIES' in response.data
+    assert b'DUMMY OPS - LES LIVRES PAR CATEGORIES' in response.data
 
 
 def test_get_books_categories_from_database_as_admin():
@@ -75,7 +75,7 @@ def test_get_valid_category_books(client, access_session):
     }
     response = client.get("/books/categories/1/", headers=headers, follow_redirects=True)
     assert response.status_code == 200
-    assert b'DUMMY BLOG - LES LIVRES DE LA CATEGORIE' in response.data
+    assert b'DUMMY OPS - LES LIVRES DE LA CATEGORIE' in response.data
 
 
 def test_get_unexisting_category_books(client, access_session_as_admin):

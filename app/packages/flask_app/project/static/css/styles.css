@@ -5,12 +5,29 @@
 }
 
 body {
-  font-family: "Truculenta", "Tahoma", sans-serif;
+  font-family: "Comfortaa", "Tahoma", sans-serif;
   font-style: normal;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   padding-top: 5%;
   color: #192a56;
+}
+
+.dummy_logo {
+  font-family: "Abel", "Tahoma", sans-serif;
+  font-size: 18px;
+}
+
+.dummy-nav {
+  font-family: "Abel", "Tahoma", sans-serif;
+  font-style: normal;
+  font-size: 16px;
+  font-weight: 600;
+  color: #192a56;
+}
+
+.ops-btn {
+  font-family: "Comfortaa", "Tahoma", sans-serif;
 }
 
 .provider-logo img {
@@ -66,6 +83,9 @@ input {
   margin-bottom: 2%;
 }
 
+figure img{
+  border-radius: 5%;
+}
 
 #categories-0 tr {
   display: flex;
@@ -131,16 +151,34 @@ input {
   list-style: none;
 }
 
+figcaption {
+  font-size: 80%;
+}
+
 .section_intro {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-bottom: 1px dashed blue;
   padding: 0 5% 2% 5%;
 }
 
 .section_intro p {
   margin-bottom: 0.5rem;
+}
+
+.index_introduction {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 4%;
+}
+
+.block_description {
+  margin: 5% 5%;
+}
+
+.dummy_ops_technos {
+  display: flex;
+  flex-direction: column;
 }
 
 .home-books-container {
@@ -151,6 +189,10 @@ input {
   justify-content: start;
   padding-bottom: 3%;
   padding-left: 5%;
+}
+
+.counters {
+  width: 100%;
 }
 
 .section_mooc {
@@ -254,14 +296,16 @@ legend {
   font-size: 0.8rem;
 }
 
-.post-title,
 .post-meta {
-  font-size: 1rem;
+  font-size: 70%;
   margin: 0;
 }
 
 .post-title {
   font-weight: bold;
+  font-size: 80%;
+  text-transform: uppercase;
+  margin: 0;
 }
 
 .flashes .error {
@@ -338,10 +382,6 @@ footer #footer_date {
     padding: 0% 0% 0% 2%;
   }
 
-  .dummy_logo {
-    width: 40%;
-  }
-
   .container {
     padding: 0% 0%;
   }
@@ -351,6 +391,7 @@ footer #footer_date {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    flex-wrap: nowrap;
   }
 
   .post-preview {
@@ -372,9 +413,29 @@ footer #footer_date {
     width: 100%;
     height: auto;
   }
+  .buttons_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    padding-top:5%;
+  }
+
+  .buttons_container:btn{
+    font-family: "Comfortaa", "Tahoma", sans-serif;
+    margin-bottom: 5%;
+  }
 }
 
 @media (max-width: 800px) {
+  h1, h2, h3, h4, h5 {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 2% 5% 2% 5%;
+    font-weight: bold;
+    font-size: 1.5em;
+  }
   .dummy_logo {
     display: flex;
     flex-direction: row;
@@ -388,6 +449,16 @@ footer #footer_date {
 
   .container {
     padding: 17% 0% 2% 0%;
+  }
+
+  .index_introduction {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4%;
+  }
+
+  .dummy_ops_technos {
+    margin: 3%;
   }
 
   .home-books-container {
@@ -410,6 +481,19 @@ footer #footer_date {
     height: auto;
   }
 
+  .buttons_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    padding-top:5%;
+  }
+
+  .buttons_container:btn{
+    font-family: "Comfortaa", "Tahoma", sans-serif;
+    margin-bottom: 5%;
+  }
+
   .run_image {
     width: 50%;
     height: auto;
@@ -430,12 +514,17 @@ footer #footer_date {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
   }
 
   .post-preview img {
     width: 150px;
     height: 225px;
     max-width: 150px;
+  }
+
+  .footer {
+    font-size: 80%;
   }
 
 }
@@ -446,6 +535,8 @@ footer #footer_date {
     flex-direction: row;
     justify-content: center;
     margin: 2% 5% 2% 5%;
+    font-weight: bold;
+    font-size: 1.5em;
   }
 
   .navbar-container {
@@ -483,12 +574,29 @@ footer #footer_date {
     padding: 0 10% 2% 10%;
   }
 
+  .index_introduction {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4%;
+  }
+
+  .block_illustration {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .dummy_ops_technos {
+    font-size: 80%;
+  }
+
   .home-books-container {
     width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-end;
+    padding-bottom: 0;
   }
 
   .op-container img {
@@ -524,6 +632,7 @@ footer #footer_date {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    border-bottom: 1px dashed blue;
   }
 
   .post-preview img {
@@ -538,14 +647,30 @@ footer #footer_date {
     height: auto;
   }
 
-  .buttons_container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  .book-image {
+    align-items: center;
   }
 
-  hr {
-    border: 1px solid red;
+  .buttons_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    padding-top:5%;
+  }
+
+  .buttons_container:btn{
+    font-family: "Comfortaa", "Tahoma", sans-serif;
+    margin-bottom: 5%;
+  }
+
+  .counters btn {
+    font-family: "Comfortaa", "Tahoma", sans-serif;
+    width: 100%;
+  }
+
+  .dummy_ops_technos {
+    font-size: 80%;
   }
 
   .footer-container  {
@@ -573,6 +698,10 @@ footer #footer_date {
     width: 100%;
     padding: 0%;
     margin: 0%;
+  }
+
+  .flaticon-logo {
+    font-size: 70%;
   }
 
   .pagination_block {
