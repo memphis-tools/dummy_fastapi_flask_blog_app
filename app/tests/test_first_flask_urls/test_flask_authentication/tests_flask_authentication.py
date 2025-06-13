@@ -12,7 +12,7 @@ def test_flask_login_route(client):
     """
     response = client.get("http://localhost/login/")
     assert response.status_code == 200
-    assert b"DUMMY BLOG - SE CONNECTER" in response.data
+    assert b"DUMMY OPS - SE CONNECTER" in response.data
 
 
 def test_flask_post_logout_route_without_authentication(client):

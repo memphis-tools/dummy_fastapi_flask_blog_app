@@ -33,7 +33,7 @@ def test_get_current_user_books(client, access_session):
         "/user/2/books/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 200
-    assert b"DUMMY BLOG - VOS LIVRES" in response.data
+    assert b"DUMMY OPS - VOS LIVRES" in response.data
 
 
 def test_get_any_valid_user_books(client, access_session):
@@ -46,7 +46,7 @@ def test_get_any_valid_user_books(client, access_session):
         "/user/3/books/", headers=headers, follow_redirects=True
     )
     assert response.status_code == 200
-    assert b"DUMMY BLOG - LIVRES DE " in response.data
+    assert b"DUMMY OPS - LIVRES DE " in response.data
 
 
 def test_get_invalid_user_books(client, access_session):

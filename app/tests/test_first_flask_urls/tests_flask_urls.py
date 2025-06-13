@@ -26,7 +26,7 @@ def test_flask_index_route(client):
     """
     response = client.get("http://localhost/home/")
     assert response.status_code == 200
-    assert b"DUMMY BLOG" in response.data
+    assert b"DUMMY OPS" in response.data
 
 
 def test_flask_ops_route(client):
@@ -35,7 +35,7 @@ def test_flask_ops_route(client):
     """
     response = client.get("http://localhost/ops/")
     assert response.status_code == 200
-    assert b"DUMMY BLOG - OPS" in response.data
+    assert b"DUMMY OPS - OPS" in response.data
 
 
 def test_flask_moocs_route(client):
@@ -44,7 +44,7 @@ def test_flask_moocs_route(client):
     """
     response = client.get("http://localhost/moocs/")
     assert response.status_code == 200
-    assert b"DUMMY BLOG - MOOCS" in response.data
+    assert b"DUMMY OPS - MOOCS" in response.data
 
 
 def test_flask_contact_route(client):
@@ -53,7 +53,7 @@ def test_flask_contact_route(client):
     """
     response = client.get("http://localhost/contact/")
     assert response.status_code == 200
-    assert b"DUMMY BLOG - CONTACTEZ NOUS" in response.data
+    assert b"DUMMY OPS - CONTACTEZ NOUS" in response.data
 
 
 def test_flask_books_route(client):

@@ -4,9 +4,10 @@ Notice that by default we already add dummies data through the application utils
 """
 
 import pytest
+from fastapi import HTTPException
 from app.packages.database.models.models import Book
 from app.packages.flask_app.project.book_routes_blueprint import check_book_fields
-
+from app.packages.fastapi.routes.routers.books import check_book_fields, get_user_email
 
 @pytest.mark.asyncio
 async def test_view_books_with_authentication(fastapi_client, fastapi_token):
@@ -176,11 +177,13 @@ async def test_check_book_fields():
         author="Carl Barks",
         summary="Donald a trouvé un emploi au musée : il doit dépoussiérer la collection de pierres.",
         content="what a great story sir",
-        year_of_publication="bebopalula",
+        year_of_publication="YYYY",
         category="art"
     )
-    response = check_book_fields(book)
-    assert "Saisie invalide, annee publication livre doit etre un entier" in response
+    with pytest.raises(HTTPException) as bad_book_year:
+        response = check_book_fields(book)
+        assert bad_book_year.value.status_code == 403
+        assert bad_book_year.value.detail == "Saisie invalide, annee publication livre doit etre un entier"
 
 
 @pytest.mark.asyncio
