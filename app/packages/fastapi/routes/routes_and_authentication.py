@@ -162,19 +162,11 @@ async def register(user: NewUserInDBModel):
     if user_in_db:
         logs_context = {"username": f"{str(user.username).lower()}"}
         log_events.log_event(
-<<<<<<< HEAD
             "[400] FastAPI - Nom d'utilisateur déjà utilisé.",
             logs_context,
         )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-=======
-            "[409] FastAPI - Nom d'utilisateur déjà utilisé.",
-            logs_context,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
->>>>>>> development
             detail="Nom utilisateur existe deja, veuillez le modifier",
         )
     user_email = (
@@ -183,19 +175,11 @@ async def register(user: NewUserInDBModel):
     if user_email:
         logs_context = {"email": f"{str(user.email).lower()}"}
         log_events.log_event(
-<<<<<<< HEAD
             "[400] FastAPI - Email déjà utilisé.",
             logs_context,
         )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Email existe deja en base"
-=======
-            "[409] FastAPI - Email déjà utilisé.",
-            logs_context,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail="Email existe deja en base"
->>>>>>> development
         )
     if user.password != user.password_check:
         raise HTTPException(

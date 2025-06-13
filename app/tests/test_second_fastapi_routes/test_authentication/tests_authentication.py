@@ -78,11 +78,7 @@ async def test_register_with_valid_datas_for_already_existing_username(
     }
 
     response = fastapi_client.post("/api/v1/register/", headers=headers, json=json)
-<<<<<<< HEAD
     assert response.status_code == 400
-=======
-    assert response.status_code == 409
->>>>>>> development
 
 
 @pytest.mark.asyncio
@@ -107,11 +103,7 @@ async def test_register_with_valid_datas_for_already_existing_email(
     }
 
     response = fastapi_client.post("/api/v1/register/", headers=headers, json=json)
-<<<<<<< HEAD
     assert response.status_code == 400
-=======
-    assert response.status_code == 409
->>>>>>> development
 
 
 @pytest.mark.asyncio
@@ -136,11 +128,7 @@ async def test_register_with_invalid_username_data(
     }
 
     response = fastapi_client.post("/api/v1/register/", headers=headers, json=json)
-<<<<<<< HEAD
     assert response.status_code == 400
-=======
-    assert response.status_code == 409
->>>>>>> development
 
 
 @pytest.mark.asyncio
