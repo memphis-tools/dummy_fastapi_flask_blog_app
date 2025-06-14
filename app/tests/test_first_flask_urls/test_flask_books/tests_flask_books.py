@@ -13,6 +13,26 @@ from app.packages.flask_app.project.shared_functions_and_decorators import get_p
 from app.packages.flask_app.project.book_routes_blueprint import check_book_fields
 
 
+def test_flask_get_an_unknow_book_without_authentication(client):
+    """
+    Description: check if we can reach an unknow book page without authentication
+    """
+    response = client.get("http://localhost/book/55555/", follow_redirects=True)
+    assert "Vous devez d&#39;abord vous connecter" in response.text
+    assert response.status_code == 200
+
+
+def test_flask_get_an_unknow_book_being_authenticated(
+    client, access_session
+):
+    """
+    Description: check if we can reach an unknow book page without authentication
+    """
+    response = client.get("http://localhost/book/55555/", follow_redirects=True)
+    assert "Livre id 55555 inexistant" in response.text
+    assert response.status_code == 200
+
+
 def test_flask_get_a_book_without_authentication(client):
     """
     Description: check if we can reach a book page without authentication

@@ -4,6 +4,7 @@ from datetime import timedelta
 import pytest
 from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
+from flask import template_rendered
 
 from app.packages.fastapi.routes import routes_and_authentication
 from app.packages.database.commands import session_commands
@@ -158,3 +159,15 @@ def mock_captcha_validation(mocker):
         "hostname": "dummy-ops.dev"
     }
     mocker.patch('requests.post', return_value=mocker.MagicMock(status_code=200, json=lambda: mock_hcaptcha_response))
+
+
+@pytest.fixture
+def captured_templates(app):
+    recorded = []
+
+    def record(sender, template, context, **extra):
+        recorded.append(template)
+
+    template_rendered.connect(record, app)
+    yield recorded
+    template_rendered.disconnect(record, app)

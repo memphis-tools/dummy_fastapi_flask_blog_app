@@ -108,7 +108,7 @@ def book(book_id):
         log_events.log_event("[404] Flask - Consultation livre inconnu.", logs_context)
         flash(f"Livre id {book_id} inexistant", "error")
         session.close()
-        abort(404)
+        return redirect(url_for('index'))
 
     comments = session.query(Comment).filter_by(book_id=a_book.id).all()
 
@@ -133,6 +133,7 @@ def book(book_id):
         logs_context = {
             "current_user": f"{current_user.username}",
             "book_title": a_book.title,
+            "comment": form.comment_text.data
         }
         log_events.log_event("[201] Flask - Ajout commentaire.", logs_context)
         session.add(new_comment)

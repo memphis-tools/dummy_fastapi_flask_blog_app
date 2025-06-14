@@ -176,6 +176,15 @@ class NewUserInDBModel(BaseModel):
     disabled: bool | None = False
 
 
+class RegisterNewUserInDBModel(BaseModel):
+    """FastAPI new User class"""
+
+    username: str
+    email: str
+    password: str
+    password_check: str
+
+
 class UpdateUserModel(BaseModel):
     """FastAPI update User class"""
 
