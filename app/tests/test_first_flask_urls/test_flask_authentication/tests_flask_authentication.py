@@ -158,6 +158,32 @@ def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_tok
     assert b"Nom utilisateur existe d\xc3\xa9j\xc3\xa0, veuillez le modifier" in response.data
 
 
+
+def test_post_flask_register_route_without_hcaptcha(client, get_flask_csrf_token):
+    """
+    Description: check if we can register new user without captcha validation
+    """
+    headers = {
+        "Content-Type": "multipart/form-data"
+    }
+    user_form = {
+        "login": "donald",
+        "email": "leon@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "",
+    }
+    response = client.post(
+        "/register/",
+        headers=headers,
+        data=user_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "Veuillez valider le captcha" in response.text
+
+
 def test_post_flask_register_route_with_invalid_data(client):
     """
     Description: check if we can register new user
@@ -195,6 +221,31 @@ def test_flask_login_with_valid_credentials(client, get_flask_csrf_token, mock_c
     )
     assert response.status_code == 200
     assert b"Vous nous avez manq" in response.data
+
+
+
+def test_flask_login_without_captcha_validation(client, get_flask_csrf_token):
+    """
+    Description: check the login
+    """
+    headers = {
+        "Content-Type": "multipart/form-data"
+    }
+    login_form = {
+        "login": "daisy",
+        "email": "daisy@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "",
+    }
+    response = client.post(
+        "/login/",
+        headers=headers,
+        data=login_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "Veuillez valider le captcha" in response.text
 
 
 def test_flask_login_with_invalid_login(client, get_flask_csrf_token, mock_captcha_validation):

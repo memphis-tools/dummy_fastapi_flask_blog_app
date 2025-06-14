@@ -92,7 +92,7 @@ def categories_stats():
             <head>
                 <meta charset='utf-8' />
                 <meta name='viewport' content='width=device-width, initial-scale=1, user-scaler=false' />
-                <meta name='description' content='A blog Python's app.' />
+                <meta name='description' content='Blog stats.' />
                 <meta name='author' content='dummy-ops' />
                 <title>STATS</title>
                 <link rel='icon' type='image/x-icon' href='/static/favicon.ico' />
@@ -233,7 +233,7 @@ def users_stats():
             <head>
                 <meta charset='utf-8' />
                 <meta name='viewport' content='width=device-width, initial-scale=1, user-scaler=false' />
-                <meta name='description' content='A blog Python's app.' />
+                <meta name='description' content='Blog stats.' />
                 <meta name='author' content='dummy-ops' />
                 <title>STATS</title>
                 <link rel='icon' type='image/x-icon' href='/static/favicon.ico' />

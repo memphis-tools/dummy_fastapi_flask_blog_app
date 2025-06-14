@@ -197,7 +197,7 @@ def delete_book_category(category_id):
         log_events.log_event("[404] Flask - Suppression catégorie livre inconnue.", logs_context)
         flash("Categorie livre non trouvée", "error")
         session.close()
-        return abort(404)
+        return redirect(url_for("index"))
 
     if form.validate_on_submit():
         logs_context = {
@@ -238,7 +238,7 @@ def update_book_category(category_id):
         log_events.log_event("[404] Flask - Mise à jour catégorie livre inconnue.", logs_context)
         flash("Categorie livre non trouvée", "error")
         session.close()
-        return abort(404)
+        return redirect(url_for("index"))
     edit_form = forms.UpdateBookCategoryForm(
         title=category_to_update.title,
     )
