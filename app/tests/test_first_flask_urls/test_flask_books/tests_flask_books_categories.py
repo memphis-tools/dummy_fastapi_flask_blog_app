@@ -190,7 +190,8 @@ def test_delete_unexisting_book_category_being_admin(
         data=data,
         follow_redirects=True
     )
-    assert response.status_code == 404
+    assert "Categorie livre non trouv" in response.text
+    assert response.status_code == 200
 
 
 def test_update_valid_book_category_without_being_admin(client, access_session, get_flask_csrf_token):
@@ -343,4 +344,5 @@ def test_update_unexisting_book_category_being_admin(
         data=data,
         follow_redirects=True
     )
-    assert response.status_code == 404
+    assert "Categorie livre non trouv" in response.text
+    assert response.status_code == 200

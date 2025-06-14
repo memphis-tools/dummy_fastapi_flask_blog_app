@@ -139,6 +139,7 @@ def update_password():
     Description: the update user password Flask route.
     """
     form = forms.UpdateUserPasswordForm()
+    username = current_user.username
     if form.validate_on_submit():
         current_password = form.current_password.data
         new_password = form.new_password.data
@@ -178,6 +179,7 @@ def update_password():
     return render_template(
         "update_password.html",
         form=form,
+        username=username,
         is_authenticated=current_user.is_authenticated,
     )
 

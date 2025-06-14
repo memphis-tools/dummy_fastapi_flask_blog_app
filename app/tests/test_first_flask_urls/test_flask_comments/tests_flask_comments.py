@@ -17,6 +17,40 @@ def test_flask_get_delete_comment(client):
     assert response.status_code == 302
 
 
+def test_flask_get_delete_comment_being_admin(
+    client, access_session_as_admin
+):
+    """
+    Description: check if we can reach the delete comment route with GET method being admin
+    """
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cookie": f"session={access_session_as_admin}",
+    }
+    response = client.get(
+        "http://localhost/comment/1/delete/", headers=headers, follow_redirects=True
+    )
+    assert "DUMMY OPS - SUPPRIMER COMMENTAIRE" in response.text
+    assert response.status_code == 200
+
+
+def test_flask_get_update_comment_being_admin(
+    client, access_session_as_admin
+):
+    """
+    Description: check if we can reach the update comment route with GET method being admin
+    """
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cookie": f"session={access_session_as_admin}",
+    }
+    response = client.get(
+        "http://localhost/comment/1/update/", headers=headers, follow_redirects=True
+    )
+    assert "DUMMY OPS - METTRE A JOUR COMMENTAIRE" in response.text
+    assert response.status_code == 200
+
+
 def test_flask_post_comments(client):
     """
     Description: check if we can reach the delete comment route with POST method

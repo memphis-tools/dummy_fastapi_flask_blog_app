@@ -29,13 +29,14 @@ def test_flask_index_route(client):
     assert b"DUMMY OPS" in response.data
 
 
-def test_flask_ops_route(client):
+def test_flask_ops_route(client, captured_templates):
     """
     Description: check if we can reach the ops route
     """
     response = client.get("http://localhost/ops/")
     assert response.status_code == 200
     assert b"DUMMY OPS - OPS" in response.data
+    assert captured_templates[0].name == "ops.html"
 
 
 def test_flask_moocs_route(client):
