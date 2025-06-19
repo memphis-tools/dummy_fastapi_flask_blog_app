@@ -61,7 +61,7 @@ vault write auth/jwt/role/gitlab_jwt - <<EOF
   "user_claim": "sub",
   "user_login": "${GITLAB_USER}",
   "groups_claims": "${GITLAB_GROUP}",
-	"bound_audiences": "https://dummy-ops.dev:443"
+	"bound_audiences": "https://dummy-ops.dev:443",
   "bound_claims_type": "glob",
   "bound_claims": {
     "project_id": "${GITLAB_PROJECT_ID}",
