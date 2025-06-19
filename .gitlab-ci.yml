@@ -154,7 +154,7 @@ deploy_init:
         docker compose -f deploy_vault_docker-compose.yml up -d --build ;
         sleep 5;
         echo '[+] vault built, we start it, create the secrets and unseal it' &&
-        docker exec vault bash vault/scripts/build_it_up.sh &&
+        docker exec vault bash vault/scripts/build_it_up.sh &>/dev/null &&
         echo '[+] the dummy vault is ready sir' "
 
 deploy:
@@ -170,12 +170,12 @@ deploy:
     - DISPLAY=0 SSH_ASKPASS=~/.ssh/tmp ssh-add $SSH_PRIVATE_KEY < /dev/null
   id_tokens:
       VAULT_ID_TOKEN:
-        aud: https://dummy-ops.dev:8200
+        aud: https://dummy-ops.dev:443
   variables:
     SCOPE: "production"
     GIT_COMMIT: $CI_COMMIT_SHORT_SHA
     POSTGRES_HOST: "db"
-    VAULT_ADDR: https://dummy-ops.dev:8200
+    VAULT_ADDR: https://dummy-ops.dev:443
   script:
     - scp -o StrictHostKeyChecking=no deploy_init-certbot-docker-compose.yml $HOST_USER@$HOST_IP:/home/$HOST_USER/
     - scp -o StrictHostKeyChecking=no set_docker_secrets.sh $HOST_USER@$HOST_IP:/home/$HOST_USER/

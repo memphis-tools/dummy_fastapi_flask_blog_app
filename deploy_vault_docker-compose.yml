@@ -5,15 +5,15 @@ services:
       dockerfile: Dockerfile
     container_name: vault
     ports:
-      - "8200:8200"
+      - "443:8200"
     cap_add:
       - IPC_LOCK
     volumes:
       - vault-data:/vault/data
       - certbot-etc:/etc/letsencrypt
     environment:
-      - VAULT_ADDR=https://dummy-ops.dev:8200
-      - VAULT_API_ADDR=https://dummy-ops.dev:8200
+      - VAULT_ADDR=https://dummy-ops.dev:443
+      - VAULT_API_ADDR=https://dummy-ops.dev:443
     command: /bin/bash /vault/scripts/build_it_up.sh
     networks:
       - vault-network

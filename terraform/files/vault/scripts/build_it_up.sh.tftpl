@@ -47,20 +47,21 @@ vault policy write gitlab_jwt /vault/policies/gitlab.json &>/dev/null
 vault write auth/approle/role/gitlab secret_id_ttl=15m  token_ttl=10m  token_max_tll=15m  token_policies="gitlab_jwt" &>/dev/null
 
 # Set the jwt auth config
-vault write auth/jwt/config jwt_supported_algs=RS256 oidc_discovery_url="https://gitlab.com" &>/dev/null
+vault write auth/jwt/config jwt_supported_algs=RS256 oidc_discovery_url="https://gitlab.com" bound_issuer="https://gitlab.com" &>/dev/null
 
 # Set the claims
 vault write auth/jwt/role/gitlab_jwt - <<EOF
 {
   "role_type": "jwt",
   "policies": ["gitlab_jwt"],
-  "token_explicit_max_ttl": 30,
+  "token_explicit_max_ttl": 60,
   "token_not_before": 0,
   "token_policies": "gitlab_jwt",
   "token_type": "default",
   "user_claim": "sub",
   "user_login": "${GITLAB_USER}",
   "groups_claims": "${GITLAB_GROUP}",
+	"bound_audiences": "https://dummy-ops.dev:443"
   "bound_claims_type": "glob",
   "bound_claims": {
     "project_id": "${GITLAB_PROJECT_ID}",
