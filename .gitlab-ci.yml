@@ -177,6 +177,7 @@ deploy:
     POSTGRES_HOST: "db"
     VAULT_ADDR: https://dummy-ops.dev:443
   script:
+    - echo "ID TOKEN: $VAULT_ID_TOKEN"
     - scp -o StrictHostKeyChecking=no deploy_init-certbot-docker-compose.yml $HOST_USER@$HOST_IP:/home/$HOST_USER/
     - scp -o StrictHostKeyChecking=no set_docker_secrets.sh $HOST_USER@$HOST_IP:/home/$HOST_USER/
     - ssh -o StrictHostKeyChecking=no $HOST_USER@$HOST_IP "
