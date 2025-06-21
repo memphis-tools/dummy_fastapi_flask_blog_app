@@ -106,6 +106,10 @@ Codacy
 
 Snyk
 
+Aikido Security
+
+Cursor
+
 TabNine
 
 Cloudflare
