@@ -29,7 +29,7 @@ vault kv put kv/dummy_vault \
 	POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
 	RABBITMQ_DEFAULT_PASS="${RABBITMQ_DEFAULT_PASS}" \
 	SECRET_KEY="${SECRET_KEY}" \
-	SENDGRID_API_KEY="${SENDGRID_API_KEY}" \ &> /dev/null
+	SENDGRID_API_KEY="${SENDGRID_API_KEY}" &> /dev/null
 
 # Enable audit logs
 vault audit enable file file_path=/vault/logs/audit.log &>/dev/null
@@ -67,8 +67,7 @@ vault write auth/jwt/role/gitlab_jwt - <<EOF
     "project_id": "${GITLAB_PROJECT_ID}",
     "ref_protected": "true",
     "ref": "master",
-    "ref_type": "branch",
-    "groups_direct": ["${GITLAB_GROUP}"]
+    "ref_type": "branch"
   }
 }
 EOF
