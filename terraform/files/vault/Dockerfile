@@ -14,7 +14,7 @@ RUN apk --no-cache add \
       curl
 
 # download and set up vault
-RUN wget --quiet --output-document=/tmp/vault.zip https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip && \
+RUN wget --quiet --max-redirect=0 --output-document=/tmp/vault.zip https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip && \
     unzip /tmp/vault.zip -d /vault && \
     rm -f /tmp/vault.zip && \
     chmod +x /vault

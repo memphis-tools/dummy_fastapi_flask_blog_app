@@ -16,6 +16,9 @@
             ga('send', 'pageview');
         </script>
 
+        <!-- Google AdSense -->
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8024784230098804" crossorigin="anonymous"></script>
+        
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scaler=false" />
         <meta name="description" content="A blog Python's app." />
@@ -25,7 +28,7 @@
         <!-- Google fonts-->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Truculenta:opsz,wght@12..72,100..900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
         <!--  Boostrap css -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
         <!-- Custom css -->
@@ -102,18 +105,19 @@
               </div>
             </nav>
           </header>
-          <div class="d-flex flex-row justify-content-center flash_messages pt-3" id="flash_messages">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <ul class=flashes>
-                        {% for category, message in messages %}
-                            <li class={{ category }}>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endwith %}
-            </div>
+
           <section>
+            <div class="d-flex flex-row justify-content-center flash_messages pt-3" id="flash_messages">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                      <ul class=flashes>
+                          {% for category, message in messages %}
+                              <li class={{ category }}>{{ message }}</li>
+                          {% endfor %}
+                      </ul>
+                  {% endif %}
+              {% endwith %}
+              </div>
               {% block content %}{% endblock content %}
           </section>
           <!-- Footer-->

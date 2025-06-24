@@ -97,7 +97,7 @@ def draw_book_details(c, book, x, y, width, image_size):
     return y  # Return the new y position after drawing
 
 
-def calculate_multiline_text_height(c, text, width):
+def calculate_multiline_text_height(text):
     """Calculate the height of the multiline text"""
     lines = text.split('\n')
     line_height = 15  # Adjust based on font size
@@ -152,7 +152,7 @@ def generate_a_pdf_to_consume() -> str:
     for book in books_list:
         # Calculate the space required for the current book
         description_text = f"DESCRIPTION: {book['content']}"
-        description_height = calculate_multiline_text_height(c, description_text, width - 100)
+        description_height = calculate_multiline_text_height(description_text)
         book_height = 90 + description_height  # Adjust based on book details height
 
         # Check if there is enough space left on the page

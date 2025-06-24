@@ -350,7 +350,7 @@ def delete_starred_book(user_id, book_id):
 @login_required
 def add_starred_book(user_id, book_id):
     """
-    Description: the remove starred book Flask route.
+    Description: the add starred book Flask route.
     """
     session = session_commands.get_a_database_session()
     form = forms.AddInstanceForm()
