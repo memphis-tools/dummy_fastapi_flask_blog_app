@@ -54,7 +54,7 @@
             <a class="about-book" href="{{ url_for('book_routes_blueprint.book', book_id=book.id) }}">A propos du livre</a>
         </p>
         <div class="book-image d-flex flex-column">
-            <img src='{{ url_for("static", filename="img/" + book.book_picture_name) }}' align="middle" />
+            <img src='{{ url_for("static", filename="img/" + book.book_picture_name) }}' align="middle" alt="book illustration"/>
             <legend>Auteur: {{ book.author }}</legend>
             <div class="counters">
                 <legend>Commentaires: {{ book.book_comments | length }}</legend>
@@ -83,7 +83,7 @@
         <p>Le provisionnement est effectué avec <a href="https://www.terraform.io/" target="_blank">Hashicorp Terraform</a>.</p>
         <p>Le domaine a été réservé sur <a href="https://www.namecheap.com/" target="_blank">NameCheap</a>.</p>
         <p>La gestion du consement utilisateur pour la collecte de données <a href="https://www.consentmanager.fr/" target="_blank">ConsentManager</a>.</p>
-        <p>Usage de <a href="https://betterstack.com/logs" target="_blank">Betterstack</a> pour adresser des logs.</p>
+        <p>Usage de <a href="https://betterstack.com/logs" target="_blank">Betterstack</a> pour adresser des logs, faire de la supervision.</p>
         <p>Usage de <a href="https://www.twilio.com" target="_blank">Twilio SendGrid</a> pour adresser des emails.</p>
         <p>Usage de <a href="https://docs.celeryq.dev/en/stable/" target="_blank">Celery</a> et <a href="https://www.rabbitmq.com/" target="_blank">RabbitMQ</a> pour la gestion des envois de mail en processus asynchrones.</p>
         <p>Usage de <a href="https://www.codacy.com/" target="_blank">Codacy</a> pour la qualité du code.</p>

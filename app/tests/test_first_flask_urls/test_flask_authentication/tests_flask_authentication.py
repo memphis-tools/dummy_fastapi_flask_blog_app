@@ -306,7 +306,7 @@ def test_flask_login_with_invalid_password(client, get_flask_csrf_token, mock_ca
     login_form = {
         "login": "daisy",
         "email": "daisy@localhost.fr",
-        "password": "bebopalula",
+        "password": f"{settings.TEST_USER_PWD}X",
         "csrf_token": get_flask_csrf_token,
         "h-captcha-response": "dummy_response",
     }

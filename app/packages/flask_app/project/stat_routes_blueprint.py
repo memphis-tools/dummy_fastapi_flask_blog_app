@@ -105,6 +105,8 @@ def categories_stats():
                 <link rel='stylesheet' href='/static/css/bootstrap.min.css'>
                 <!-- Custom css -->
                 <link rel='stylesheet' href='/static/css/styles.css'>
+                <!-- Google AdSense -->
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8024784230098804" crossorigin="anonymous"></script>
             </head>
             <body>
             <header>
@@ -246,6 +248,8 @@ def users_stats():
                 <link rel='stylesheet' href='/static/css/bootstrap.min.css'>
                 <!-- Custom css -->
                 <link rel='stylesheet' href='/static/css/styles.css'>
+                <!-- Google AdSense -->
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8024784230098804" crossorigin="anonymous"></script>
             </head>
             <body>
             <header>
