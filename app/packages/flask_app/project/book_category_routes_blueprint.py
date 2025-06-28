@@ -57,7 +57,7 @@ def categories():
     """
     session = session_commands.get_a_database_session()
     categories_list = []
-    categories_query = session.query(BookCategory).order_by(BookCategory.id).all()
+    categories_query = session.query(BookCategory).order_by(BookCategory.title).all()
     for category in categories_query:
         category_id = category.id
         category_books_query = session.query(Book).filter(
