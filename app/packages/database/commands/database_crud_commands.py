@@ -91,7 +91,7 @@ def view_all_user_comments(session, user_id):
 
 def view_all_categories_instances(session):
     """view all categories instances"""
-    categories_query = session.query(models.BookCategory).all()
+    categories_query = session.query(models.BookCategory).order_by(models.BookCategory.title).all()
     categories_list = []
     for category in categories_query:
         total_category_books = (
