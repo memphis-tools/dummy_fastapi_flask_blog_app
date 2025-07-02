@@ -18,6 +18,7 @@ services:
       - /etc/ssl/dhparam/dhparam.pem:/etc/ssl/dhparam/dhparam.pem
       - static_volume:/home/dummy-operator/flask/staticfiles
       - ./robots.txt:/usr/share/nginx/html/robots.txt
+      - ./ads.txt:/usr/share/nginx/html/ads.txt
 
   flask_front:
     image: memphistools/public_repo:dummy_fastapi_flask_blog_app-flask_front_$GIT_COMMIT

@@ -180,6 +180,7 @@ deploy:
     - scp -o StrictHostKeyChecking=no deploy_init-certbot-docker-compose.yml $HOST_USER@$HOST_IP:/home/$HOST_USER/
     - scp -o StrictHostKeyChecking=no set_docker_secrets.sh $HOST_USER@$HOST_IP:/home/$HOST_USER/
     - scp -o StrictHostKeyChecking=no robots.txt $HOST_USER@$HOST_IP:/home/$HOST_USER/
+    - scp -o StrictHostKeyChecking=no ads.txt $HOST_USER@$HOST_IP:/home/$HOST_USER/
     - ssh -o StrictHostKeyChecking=no $HOST_USER@$HOST_IP "
         echo 'export APP_FOLDER=\"$APP_FOLDER\"' > /home/dummy_user/.env &&
         echo 'export CELERY_RESULT_BACKEND=\"$CELERY_RESULT_BACKEND\"' >> /home/dummy_user/.env &&
