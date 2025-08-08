@@ -1,4 +1,4 @@
-FROM rabbitmq:4.1.0-management
+FROM rabbitmq:4.1.3-management
 
 COPY ./rabbitmq/rabbitmq.conf /etc/rabbitmq/conf.d/20-custom.conf
 COPY ./rabbitmq/rabbitmq-entrypoint.sh /usr/local/bin/
