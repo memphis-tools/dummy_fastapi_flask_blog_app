@@ -19,7 +19,6 @@ try:
     import log_events
     from database.models import models
     from app.fastapi.models.fastapi_models import (
-        NewUserInDBModel,
         RegisterNewUserInDBModel,
         Token,
     )
@@ -27,7 +26,6 @@ except ModuleNotFoundError:
     from app.packages import handle_passwords, log_events
     from app.packages.database.models import models
     from app.packages.fastapi.models.fastapi_models import (
-        NewUserInDBModel,
         RegisterNewUserInDBModel,
         Token,
     )

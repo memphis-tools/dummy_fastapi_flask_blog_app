@@ -1,4 +1,4 @@
-FROM rabbitmq:4.1.0-management
+FROM rabbitmq:4.2.1-management
 
 COPY ./rabbitmq/rabbitmq.conf /etc/rabbitmq/conf.d/20-custom.conf
 COPY ./rabbitmq/rabbitmq-entrypoint.sh /usr/local/bin/
@@ -12,3 +12,5 @@ EXPOSE 5672
 USER rabbitmq
 
 ENTRYPOINT ["/usr/local/bin/rabbitmq-entrypoint.sh"]
+
+LABEL maintainer="sanjuro@dummy-ops.dev"

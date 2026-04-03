@@ -6,8 +6,8 @@ Notice that by default we already add dummies data through the application utils
 import pytest
 from fastapi import HTTPException
 from app.packages.database.models.models import Book
-from app.packages.flask_app.project.book_routes_blueprint import check_book_fields
-from app.packages.fastapi.routes.routers.books import check_book_fields, get_user_email
+from app.packages.fastapi.routes.routers.books import check_book_fields
+
 
 @pytest.mark.asyncio
 async def test_view_books_with_authentication(fastapi_client, fastapi_token):
