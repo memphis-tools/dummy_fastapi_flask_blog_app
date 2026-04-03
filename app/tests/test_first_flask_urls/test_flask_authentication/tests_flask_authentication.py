@@ -158,7 +158,6 @@ def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_tok
     assert b"Nom utilisateur existe d\xc3\xa9j\xc3\xa0, veuillez le modifier" in response.data
 
 
-
 def test_post_flask_register_route_without_hcaptcha(client, get_flask_csrf_token):
     """
     Description: check if we can register new user without captcha validation
@@ -221,7 +220,6 @@ def test_flask_login_with_valid_credentials(client, get_flask_csrf_token, mock_c
     )
     assert response.status_code == 200
     assert b"Vous nous avez manq" in response.data
-
 
 
 def test_flask_login_without_captcha_validation(client, get_flask_csrf_token):
