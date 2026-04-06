@@ -98,6 +98,7 @@ def book(book_id):
             .first()
         )
     except:
+        session.close()
         pass
 
     if a_book is None:
