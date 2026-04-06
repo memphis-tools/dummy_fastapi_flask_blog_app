@@ -38,11 +38,11 @@ def get_engine(
     if not database_exists(url):
         print(f"[+] No existing database, we create one based on the {os.getenv('SCOPE')} scope sir.")
         create_database(url)
-        engine = create_engine(url)
+        engine = create_engine(url, pool_size=5, max_overflow=10, pool_timeout=30, pool_recycle=1800)
         models.BASE.metadata.create_all(engine)
         print(f"[+] Database and tables created for {os.getenv('SCOPE')} scope sir.")
     else:
-        engine = create_engine(url)
+        engine = create_engine(url, pool_size=5, max_overflow=10, pool_timeout=30, pool_recycle=1800)
         print(f"[+] Database exists for {os.getenv('SCOPE')} scope sir, nothing to do.")
     return engine
 
@@ -63,7 +63,7 @@ def get_a_database_session():
     host = os.getenv("POSTGRES_HOST")
     port = os.getenv("POSTGRES_PORT")
     url = f"postgresql+psycopg://{username}:{password}@{host}:{port}/{db_name}"
-    engine = create_engine(url)
+    engine = create_engine(url, pool_size=5, max_overflow=10, pool_timeout=30, pool_recycle=1800)
     session_maker = sessionmaker(bind=engine)
     session = session_maker()
     return session
@@ -114,6 +114,7 @@ def create_books_categories_if_not_exist(session):
             )
             session.add(book_category)
             session.commit()
+            session.close()
         return True
     return '[+] Books categories already set sir, nothing to do.'
 
@@ -147,6 +148,7 @@ def create_application_admin_user_if_not_exist(session):
         )
         session.add(admin_user)
         session.commit()
+        session.close()
     else:
         print(
             f'[+] Application {os.getenv("ADMIN_LOGIN")} account already exists sir, nothing to do.'
@@ -166,6 +168,7 @@ def update_default_postgres_password(session):
         updated_password = "'" + os.getenv("POSTGRES_PASSWORD") + "'"
     statement = f"ALTER USER {os.getenv('POSTGRES_USER')} WITH PASSWORD {updated_password};"
     session.execute(text(statement))
+    session.close()
     print(f'[+] Default {os.getenv("POSTGRES_USER")} password updated sir.')
     return True
 
@@ -189,4 +192,5 @@ def reset_and_populate_database(session):
     if donald is None:
         utils.call_dummy_setup(session)
         print("[+] All previous dummy datas deleted and the default ones recreated.")
+    session.close()
     return True
