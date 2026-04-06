@@ -114,7 +114,7 @@ def create_books_categories_if_not_exist(session):
             )
             session.add(book_category)
             session.commit()
-            sessiion.close()
+            session.close()
         return True
     return '[+] Books categories already set sir, nothing to do.'
 
