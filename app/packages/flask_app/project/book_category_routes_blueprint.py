@@ -163,6 +163,7 @@ def add_book_category():
             log_events.log_event("[201] Flask - Ajout catégorie livre.", logs_context)
             session.add(new_category)
             session.commit()
+            session.close()
             flash(f"Ajout catégorie {str(title).lower()}", "info")
         else:
             flash(category_is_valid, "error")
