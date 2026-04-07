@@ -73,7 +73,7 @@ Remember it's just a dummy project.
 ## TECHNOLOGIES
 Python 3.12 and later
 
-Postgresql 15 (driver psycopg 3)
+Postgresql 17 (driver psycopg 3)
 
 Gunicorn (for Flask)
 
