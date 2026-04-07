@@ -4,51 +4,130 @@
 
 {% block content %}
 <div class="container">
-    <h1>DUMMY OPS - MOOCS</h1>
-    <div class="d-flex flex-column align-items-center m-5">
-        <div class="moocs_container">
-            <h2>MOOCS SUGGERES</h2>
-            <div class="d-flex align-items-center flex-column">
-                <a href="https://www.cnam.fr/portail/conservatoire-national-des-arts-et-metiers-accueil-821166.kjsp" target="blank">CNAM</a>
-            </div>
-            <div class="d-flex align-items-center flex-column">
-                <a href="https://www.udemy.com" target="blank">UDEMY</a>
-            </div>
-            <div class="d-flex align-items-center flex-column">
-                <a href="https://www.stationx.net/" target="blank">STATION X</a>
-            </div>
-            <div class="d-flex align-items-center flex-column">
-                <a href="https://realpython.com/" target="blank">REAL PYTHON</a>
-            </div>
-            <div class="d-flex align-items-center flex-column">
-                <a href="https://testdriven.io/" target="blank">TEST DRIVEN</a>
-            </div>
-            <div class="d-flex align-items-center flex-column">
-                <a href="https://www.elephorm.com/" target="blank">ELEPHORM</a>
-            </div>
-            <div class="d-flex align-items-center flex-column">
-                <p class="dummy_icon">🗿</p>
-            </div>
-            <hr />
-            <h2>NEWS</h2>
-            <div class="d-flex align-items-center flex-column">
-                <a href="https://korben.info/" target="blank">KORBEN</a>
-            </div>
-            <div class="d-flex align-items-center flex-column">
-                <a href="https://www.phoenixjp.info/news/fr/" target="blank">PHOENIX JP</a>
-            </div>
-            <hr />
-            <h2>A FUIR</h2>
-            <p class="d-flex justify-content-center dummy_icon">💩</p>
-            <div class="run_fool_container">
-                <div class="d-flex flex-column align-items-center">
-                  <img class="run_image" src="/static/img/fuyez_pauvres_fous.jpg" alt="fuyez pauvres fous"/>
-                  <p class="pt-3">Titre RNCP obtenu. 4500€ CPF. Organisme viable, mais cycle trop fourre-tout.</p>
-                  <img class="run_mooc" src="/static/img/openclassroom_dev_python.png" />
+    <h1 class="text-center mb-4">DUMMY OPS - MOOCS & NEWS</h1>
+    <div class="moocs_container p-4 bg-light rounded shadow-sm">
+        <!-- Section MOOCS -->
+        <h2 class="mb-4 text-center">MOOCS RECOMMANDÉS <i class="bi bi-robot"></i></h2>
+        <div class="row g-4">
+            <!-- CNAM -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-scale">
+                    <div class="card-body text-center p-4">
+                        <img src="https://www.cnam.fr/uas/cnam/LOGO/CNAM_Logo-preprod.svg" alt="CNAM Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
+                        <h5 class="card-title">CNAM</h5>
+                        <p class="card-text">Formations professionnelles et diplômantes en ligne.</p>
+                        <a href="https://www.cnam.fr/portail/conservatoire-national-des-arts-et-metiers-accueil-821166.kjsp" target="_blank" class="btn btn-outline-primary">Visiter</a>
+                    </div>
                 </div>
             </div>
-            <hr />
+            <!-- UDEMY -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-scale">
+                    <div class="card-body text-center p-4">
+                        <img src="https://frontends.udemycdn.com/frontends-homepage/staticx/udemy/images/v7/logo-udemy.svg" alt="Udemy Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
+                        <h5 class="card-title">UDEMY</h5>
+                        <p class="card-text">Des milliers de cours sur tous les sujets, accessibles à vie.</p>
+                        <a href="https://www.udemy.com" target="_blank" class="btn btn-outline-primary">Visiter</a>
+                    </div>
+                </div>
+            </div>
+            <!-- STATION X -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-scale">
+                    <div class="card-body text-center p-4">
+                        <img src="https://www.stationx.net/wp-content/uploads/2022/02/StationX-blue-logo.svg" alt="StationX Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
+                        <h5 class="card-title">STATION X</h5>
+                        <p class="card-text">Cybersécurité et formations techniques avancées.</p>
+                        <a href="https://www.stationx.net/" target="_blank" class="btn btn-outline-primary">Visiter</a>
+                    </div>
+                </div>
+            </div>
+            <!-- REAL PYTHON -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-scale">
+                    <div class="card-body text-center p-4">
+                        <img src="https://realpython.com/static/real-python-logo.893c30edea53.svg" alt="Real Python Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
+                        <h5 class="card-title">REAL PYTHON</h5>
+                        <p class="card-text">Tutoriels et ressources pour maîtriser Python.</p>
+                        <a href="https://realpython.com/" target="_blank" class="btn btn-outline-primary">Visiter</a>
+                    </div>
+                </div>
+            </div>
+            <!-- TEST DRIVEN -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-scale">
+                    <div class="card-body text-center p-4">
+                        <img src="https://testdriven.io/static/images/test_driven_io_full_logo_white_text.4a6302a91a54.svg" alt="TestDriven Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
+                        <h5 class="card-title">TEST DRIVEN</h5>
+                        <p class="card-text">Développement logiciel et bonnes pratiques.</p>
+                        <a href="https://testdriven.io/" target="_blank" class="btn btn-outline-primary">Visiter</a>
+                    </div>
+                </div>
+            </div>
+            <!-- ELEPHORM -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-scale">
+                    <div class="card-body text-center p-4">
+                        <img src="https://www.elephorm.com/themes/custom/elephorm_theme/images/logo/elephorm-black.svg" alt="Elephorm Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
+                        <h5 class="card-title">ELEPHORM</h5>
+                        <p class="card-text">Formations vidéo pour créatifs et professionnels.</p>
+                        <a href="https://www.elephorm.com/" target="_blank" class="btn btn-outline-primary">Visiter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section NEWS -->
+        <hr class="my-5">
+        <h2 class="mb-4 text-center">NEWS TECH <i class="bi bi-newspaper"></i></h2>
+        <div class="row g-4">
+            <!-- KORBEN -->
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm hover-scale">
+                    <div class="card-body text-center p-4">
+                        <img src="https://korben.info/img/logo-small.svg" alt="Korben Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
+                        <h5 class="card-title">KORBEN</h5>
+                        <p class="card-text">Actualités tech, astuces et culture geek.</p>
+                        <a href="https://korben.info/" target="_blank" class="btn btn-outline-primary">Visiter</a>
+                    </div>
+                </div>
+            </div>
+            <!-- PHOENIX JP -->
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm hover-scale">
+                    <div class="card-body text-center p-4">
+                        <img src="https://www.phoenixjp.info/_next/image?url=%2Fimages%2FPJP_LOGO.png&w=256&q=75" alt="Phoenix JP Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
+                        <h5 class="card-title">PHOENIX JP</h5>
+                        <p class="card-text">News et analyses sur le Japon et la tech.</p>
+                        <a href="https://www.phoenixjp.info/news/fr/" target="_blank" class="btn btn-outline-primary">Visiter</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- CSS pour les effets et le responsive -->
+<style>
+    .hover-scale {
+        transition: transform 0.3s ease;
+    }
+    .hover-scale:hover {
+        transform: scale(1.03);
+    }
+    .card {
+        border-radius: 10px;
+    }
+    .card-title {
+        color: #2c3e50;
+    }
+    .btn-outline-primary {
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: white;
+    }
+</style>
 {% endblock content %}
