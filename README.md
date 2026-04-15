@@ -26,7 +26,7 @@ Application is simultaneously served as a Flask and a FastAPI front-end. Postgre
 
 Certbot and Nginx handle the HTTPS.
 
-Celery and RabbitMQ are set to be able to send mail through Twilio SendGrid, as asynchrinous tasks.
+Celery and RabbitMQ are set to be able to send mail through Twilio SendGrid, as asynchronous tasks.
 
 Redis lists Celery's tasks executions.
 
@@ -45,8 +45,6 @@ If the dummy example application is up you will find it at:
   Flask Front: https://dummy-ops.dev
 
   FastAPI Front: https://dummy-ops.dev/api/v1/docs
-
-A **visitor account** is created for anybody: visiteur / @pplepie94 / visiteur@localhost.fr
 
 **About Vault and sensitive datas**
 
@@ -340,6 +338,7 @@ You do not need to create a python virtualenv.
 
 ### HOW RUN IT IN PRODUCTION
 ----------------------------
+  - Remember this is a dummy-ops proof of concept website.
 
   - You must have a virtual machine. Here we used [DigitalOcean](https://www.digitalocean.com/) cloud provider.
 
