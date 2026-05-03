@@ -134,6 +134,7 @@ def set_dummies_users():
             username="donald",
             email="donald@localhost.fr",
             hashed_password=set_a_hash_password(settings.TEST_USER_PWD),
+            is_active=True,
             disabled=False,
         ),
         models.User(
@@ -141,6 +142,7 @@ def set_dummies_users():
             email="daisy@localhost.fr",
             hashed_password=set_a_hash_password(settings.TEST_USER_PWD),
             role="user",
+            is_active=True,
             disabled=False,
         ),
         models.User(
@@ -148,6 +150,7 @@ def set_dummies_users():
             email="loulou@localhost.fr",
             hashed_password=set_a_hash_password(settings.TEST_USER_PWD),
             role="user",
+            is_active=False,
             disabled=False,
         ),
         models.User(
@@ -167,19 +170,12 @@ def set_dummies_books():
     """
     dummy_books_list: List[models.Book] = [
         models.Book(
-            title="Neque porro quisquam est qui dolorem",
-            summary="Etiam dapibus ut erat id tincidunt. In nec lobortis lectus. Nunc sed consectetur enime.",
+            title="La Guerre hors limites",
+            summary="Document exceptionnel sur la réflexion stratégique chinoise actuelle",
             content="""
-            Vestibulum sed porta elit. Sed a posuere urna, eget maximus diam.
-            Fusce eu placerat enim, in volutpat erat.
-            Vivamus vitae erat vel ex porta pulvinar.
-            Curabitur vulputate velit in ligula suscipit, eget ultricies lorem condimentum.
-            In pulvinar aliquet elit, eu facilisis nibh egestas ut.
-            Suspendisse et purus leo. Nam sed imperdiet risus.
-            Vestibulum quis lectus erat.
-            Aenean viverra maximus velit, euismod imperdiet velit euismod et.
+            « La Guerre hors limites est un document exceptionnel sur la réflexion stratégique chinoise actuelle. Les auteurs, deux colonels de l'armée de l'air chinoise, nous éclairent sur la perception chinoise des nouveaux conflits et tensions dans le monde. Ils puisent l'essentiel de leurs déductions des opérations menées pendant la guerre du Golfe (1991), comme celles de Sunzi s'inspirèrent des guerres de l'époque des Printemps et des Automnes (VIIIe-Ve siècle avant J.-C.). Mais ils englobent aussi dans leur analyse les actes hostiles menés depuis la fin de la guerre froide sous toutes les formes, dans tous les domaines, économiques, financiers, religieux, écologiques, etc... Une telle combinaison de plus en plus complexe d'actes de guerre dépasse les limites habituelles des conflits menés jusqu'à une période récente uniquement par les militaires. Le changement de guerre et le changement du mode de guerre, leurs causes, leurs conséquences, sont le sujet du livre. Mais son contenu nous mène également au coeur d'une réflexion plus large sur les ambitions chinoises. » (Michel Jan)
             """,
-            author="John Doe",
+            author="Qiao Liang, Wang Xiangsui",
             year_of_publication="999",
             book_picture_name="dummy_blank_book.png",
             category=1,
@@ -368,7 +364,7 @@ def set_dummies_quotes():
         ),
         models.Quote(
             author="Inconnu",
-            book_title="Provers chinois",
+            book_title="Proverbes chinois",
             quote="En buvant l'eau du puits, n'oubliez pas ceux qui l'ont creusé \
                     (Heshui buwang juejingren)."
         ),

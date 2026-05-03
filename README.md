@@ -194,6 +194,7 @@ Cloudflare
 
     Set something like this:
 
+        export SCOPE="development"
         export ADMIN_LOGIN="admin"
         export ADMIN_PASSWORD="@pplepie94" #notice this is not the real password
         export ADMIN_EMAIL="admin@localhost.fr" #use a real email
@@ -206,6 +207,8 @@ Cloudflare
         export FLASK_DEBUG=1
         export HCAPTCHA_SITE_KEY="yourHcaptchaSiteSecret"
         export HCAPTCHA_SITE_SECRET="yourHcaptchaSecret"
+        export MAILTRAP_USER_NAME="your_mailtrap_user_name"
+        export MAILTRAP_USER_PASSWORD="your_mailtrap_user_password"
         export PDF_FOLDER_PATH="/tmp"
         export PDF_FILE_NAME="dummy_books"
         export POSTGRES_USER="postgres"
@@ -217,7 +220,6 @@ Cloudflare
         export RABBITMQ_DEFAULT_PASS="your_rabbitmq_password"
         export RABBITMQ_DEFAULT_VHOST="your_rabbitmq_vhost"
         export SECRET_KEY="YourSUperSecretKey123oclock"
-        export SCOPE="development"
         export SENDGRID_API_KEY="your sendgrid api key"
         export SWARM_IP="your_ip"
         export TEST_USER_PWD="@pplepie94"
@@ -291,7 +293,14 @@ You do not need to create a python virtualenv.
 
       SCOPE="test"
 
-      POSTGRES_HOST="your_local_ipv4"
+      ADMIN_EMAIL="admin@localhost.fr"
+
+      POSTGRES_HOST="127.0.0.1 (your_local_ipv4_with_port_5432)"
+
+      TEST_USER_PWD="postgres"
+
+      # (optional) Verify files to be checked
+      python -m pytest --collect-only
 
       python -m coverage run -m pytest -vs app/
 

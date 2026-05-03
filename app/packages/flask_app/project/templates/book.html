@@ -12,23 +12,29 @@
       </div>
       <!-- Post preview-->
       <div class="post-preview w-100 m-2">
-          <p>Titre: {{ book.title }}</p>
-          <p class="post-author d-flex flex-column">Auteur: {{ book.author }}</p>
-          <p>Catégorie: {{ book.category|format_book_category() }}</p>
-          <p>Année édition: {{ book.year_of_publication }}</p>
-          <p>Sous-titre: {{ book.summary }}</p>
-          <img style="width:200px;height:auto;" src='{{ url_for("static", filename="img/" + book.book_picture_name) }}' align="middle" alt="book illustration"/>
-          <p class="post-publisher w-100">
-              Publié par <a href="{{ url_for('user_routes_blueprint.user_books', user_id=book.user_id) }}">{{ book.user_id|format_user() }}</a>
-              le {{ book.publication_date|format_datetime() }}
-          </p>
-          <p>Description: {{ book.content }}</p>
-          {% if current_user.id == book.user_id or current_user.role == 'admin' %}
-            <div class="buttons_container">
-                <a class="ops-btn btn btn-primary ml-5 mr-5 mb-3" href="{{ url_for('book_routes_blueprint.delete_book', book_id=book.id)}}">SUPPRIMER LIVRE</a>
-                <a class="ops-btn btn btn-primary ml-5 mr-5 mb-3" href="{{ url_for('book_routes_blueprint.update_book', book_id=book.id)}}">METTRE A JOUR LIVRE</a>
-            </div>
-          {% endif %}
+          <div class="container">
+              <div class="">
+                  <p>Titre: {{ book.title }}</p>
+                  <p class="post-author d-flex flex-column">Auteur: {{ book.author }}</p>
+                  <p>Catégorie: {{ book.category|format_book_category() }}</p>
+                  <p>Année édition: {{ book.year_of_publication }}</p>
+                  <p>Sous-titre: {{ book.summary }}</p>
+                  <img style="width:200px;height:auto;" src='{{ url_for("static", filename="img/" + book.book_picture_name) }}' align="middle" alt="book illustration"/>
+                  <p class="post-publisher w-100">
+                      Publié par <a href="{{ url_for('user_routes_blueprint.user_books', user_id=book.user_id) }}">{{ book.user_id|format_user() }}</a>
+                      le {{ book.publication_date|format_datetime() }}
+                  </p>
+              </div>
+              <div class="">
+                  <p>Description: {{ book.content }}</p>
+                  {% if current_user.id == book.user_id or current_user.role == 'admin' %}
+                    <div class="buttons_container">
+                        <a class="ops-btn btn btn-primary ml-5 mr-5 mb-3" href="{{ url_for('book_routes_blueprint.delete_book', book_id=book.id)}}">SUPPRIMER LIVRE</a>
+                        <a class="ops-btn btn btn-primary ml-5 mr-5 mb-3" href="{{ url_for('book_routes_blueprint.update_book', book_id=book.id)}}">METTRE A JOUR LIVRE</a>
+                    </div>
+                  {% endif %}
+              </div>
+          </div>
           <div class="counters">
               <p>Commentaires: {{ book.book_comments | length }}</p>
               <p>Favoris: {{ book.starred | length }}</p>

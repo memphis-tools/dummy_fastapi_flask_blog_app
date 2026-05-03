@@ -157,6 +157,7 @@ class UserModel(BaseModel):
     role: Role
     disabled: bool | None = False
     books: BookReducedModel | None = None
+    is_active: bool | None = False
 
 
 class UserInDB(UserModel):

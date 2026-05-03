@@ -274,7 +274,8 @@ async def test_update_user_with_authentication_with_valid_datas(
         "password": settings.TEST_USER_PWD,
         "password_check": settings.TEST_USER_PWD,
         "role": "user",
-        "disabled": False
+        "disabled": False,
+        "is_active": True
     }
     access_token = fastapi_token_for_admin
     response = fastapi_client.put(
@@ -298,7 +299,8 @@ async def test_update_user_with_authentication_with_existing_email(
         "email": "donald@localhost.fr",
         "password": settings.TEST_USER_PWD,
         "password_check": settings.TEST_USER_PWD,
-        "role": "user"
+        "role": "user",
+        "is_active": True,
     }
     access_token = fastapi_token
     response = fastapi_client.put(
@@ -323,7 +325,8 @@ async def test_update_user_with_authentication_with_existing_username(
         "email": "donald.ducky@localhost.fr",
         "password": settings.TEST_USER_PWD,
         "password_check": settings.TEST_USER_PWD,
-        "role": "user"
+        "role": "user",
+        "is_active": True
     }
     access_token = fastapi_token
     response = fastapi_client.put(

@@ -3,6 +3,8 @@ All the tests functions for the users urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
+import html
+from itsdangerous import URLSafeTimedSerializer
 from app.packages.database.commands import session_commands
 from app.packages.database.models.models import User
 from app.packages import settings
@@ -315,6 +317,7 @@ def test_add_user_with_existing_username_being_admin(
         "password_check": settings.TEST_USER_PWD,
         "email": "dupond@localhost.fr",
         "csrf_token": get_flask_csrf_token,
+        "is_active": True,
     }
     response = client.post("/users/add/", headers=headers, data=data, follow_redirects=True)
     assert response.status_code == 200
@@ -498,3 +501,52 @@ def test_update_user_password_being_legitimate_user_with_mismatched_new_password
     )
     assert response.status_code == 200
     assert b"Mots de passes ne correspondent pas" in response.data
+
+
+def test_confirm_email(client):
+    """
+    Description: check the validation link sent during registration process
+    """
+    response = client.get(
+        "/confirm/123oclock", follow_redirects=True
+    )
+    assert response.status_code == 200
+    assert "Le lien de confirmation n'est pas valide ou a expiré." in html.unescape(
+        response.get_data(as_text=True)
+    )
+
+
+def test_confirm_email_valid_token_with_unkown_user(app, client, monkeypatch):
+    """
+    Description: check the validation link with unvalid user
+    """
+    import app.packages.flask_app.project as project
+
+    def mock_loads(token, salt, max_age):
+        return "user@test.com"
+
+    monkeypatch.setattr(project.sengrid_tokens_serializer, "loads", mock_loads)
+    response = client.get("/confirm/123oclock", follow_redirects=True)
+
+    assert response.status_code == 200
+    assert "Utilisateur None inexistant tente activation de compte" in html.unescape(
+        response.get_data(as_text=True)
+    )
+
+
+def test_confirm_email_valid_token_with_kown_user(app, client, monkeypatch):
+    """
+    Description: check the validation link with valid user
+    """
+    import app.packages.flask_app.project as project
+
+    def mock_loads(token, salt, max_age):
+        return "louloute@localhost.fr"
+
+    monkeypatch.setattr(project.sengrid_tokens_serializer, "loads", mock_loads)
+    response = client.get("/confirm/123oclock", follow_redirects=True)
+
+    assert response.status_code == 200
+    assert "Compte activé Louloute" in html.unescape(
+        response.get_data(as_text=True)
+    )

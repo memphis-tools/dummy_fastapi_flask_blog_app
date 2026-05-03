@@ -1,8 +1,13 @@
 """ The Flask app definition.Notice we do not use the app factory pattern """
 
+import os
 import requests
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+import textwrap
 from flask import (
     Flask,
     url_for,
@@ -22,6 +27,7 @@ from flask_login import (
 from flask_wtf import CSRFProtect
 from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import URLSafeTimedSerializer
 
 try:
     import handle_passwords
@@ -29,10 +35,12 @@ try:
     import settings
     from database.commands import session_commands
     from database.models.models import Book, User, BookCategory
+    from utils import get_secret
 except ModuleNotFoundError:
     from app.packages import handle_passwords, log_events, settings
     from app.packages.database.commands import session_commands
     from app.packages.database.models.models import Book, User, BookCategory
+    from app.packages.utils import get_secret
 from .user_routes_blueprint import user_routes_blueprint
 from .stat_routes_blueprint import stat_routes_blueprint
 from .book_routes_blueprint import book_routes_blueprint
@@ -62,9 +70,12 @@ login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = "/"
 login_manager.session_protection = "strong"
+SENDGRID_API_KEY = get_secret("/run/secrets/SENDGRID_API_KEY")
 WTF_CSRF_SECRET_KEY = app.config["SECRET_KEY"]
 MAX_BOOKS_ON_INDEX_PAGE = 3
+sengrid_tokens_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
+sendgrid_client = SendGridAPIClient(SENDGRID_API_KEY)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -190,35 +201,72 @@ def contact():
                 form=form,
                 is_authenticated=current_user.is_authenticated,
             )
-        username = form.name.data
-        email = form.email.data
-        message = form.message.data
+        input_username = form.name.data
+        input_email = form.email.data
+        input_message = form.message.data
 
-        message = Mail(
-            from_email="no-reply@dummy-ops.dev",
-            to_emails=f'{app.config["ADMIN_EMAIL"]}',
-            subject="Dummy-ops contact",
-            html_content=f"{username} with email {email} sent this message: {message}"
-        )
-
-        try:
-            sg = SendGridAPIClient(app.config["SENDGRID_API_KEY"])
-            sg.send(message)
-            return render_template(
-                "mail_sent.html",
-                name=username,
-                is_authenticated=current_user.is_authenticated,
+        if os.getenv("SCOPE") == "production":
+            message = Mail(
+                from_email=input_email,
+                to_emails=f'{app.config["ADMIN_EMAIL"]}',
+                subject="Dummy-ops contact",
+                html_content=f"{username} with email {input_email} sent this message: {input_message}"
             )
-        except Exception as e:
-            logs_context = {"username": f"{username}", "email": f"{email}"}
+
+            try:
+                sg = SendGridAPIClient(app.config["SENDGRID_API_KEY"])
+                sg.send(input_message)
+                return render_template(
+                    "mail_sent.html",
+                    name=input_username,
+                    is_authenticated=current_user.is_authenticated,
+                )
+            except Exception as e:
+                logs_context = {"username": f"{input_username}", "email": f"{input_email}"}
+                log_events.log_event(
+                    f"[400] Flask - Echec envoi email: {e}", logs_context
+                )
+                return render_template(
+                    "mail_not_sent.html",
+                    name=input_username,
+                    is_authenticated=current_user.is_authenticated,
+                )
+        elif os.getenv("SCOPE") == "development":
+            # We use smtplib and MailTrap
+            mailtrap_user_name = os.getenv("MAILTRAP_USER_NAME")
+            mailtrap_user_password = os.getenv("MAILTRAP_USER_PASSWORD")
+            # Email configuration
+            sender = input_email
+            receiver = "sandbox.smtp.mailtrap.io"
+            subject = "Dummy-ops contact"
+
+            msg = MIMEMultipart()
+            msg['Subject'] = "Dummy-ops books"
+            msg['To'] = receiver
+            msg['From'] = sender
+
+            html = f"""
+            <html>
+                <body>
+                    <p>{input_message}</p>
+                </body>
+            </html>
+            """
+            msg.attach(MIMEText(html, 'html'))
+
+            with smtplib.SMTP("sandbox.smtp.mailtrap.io", 2525) as server:
+                server.starttls()
+                server.login(mailtrap_user_name, mailtrap_user_password)
+                # https://docs.python.org/3/library/smtplib.html
+                # SMTP.send_message(msg, from_addr=None, to_addrs=None, mail_options=(), rcpt_options=())
+                server.send_message(msg, sender, receiver)
+            logs_context = {"sender": f"{input_email}"}
             log_events.log_event(
-                f"[400] Flask - Echec envoi email: {e}", logs_context
+                "[200] Flask - Envoi d'un message par contact.", logs_context
             )
-            return render_template(
-                "mail_not_sent.html",
-                name=username,
-                is_authenticated=current_user.is_authenticated,
-            )
+            flash("Message envoyé à l'équipe.", "error")
+            return redirect(url_for("index"))
+
     return render_template(
         "contact.html", form=form, is_authenticated=current_user.is_authenticated
     )
@@ -278,6 +326,13 @@ def login():
             )
 
         if check_password_hash(user.hashed_password, password):
+            if not user.is_active:
+                session.close()
+                flash(f"Compte {user} inactif. Pour l'activer, vous devez utiliser le lien renvoyé.")
+                send_activation_link(user.email)
+                logs_context = {"username": f"{username}", "email": f"{email}"}
+                log_events.log_event("[301] Flask - Compte utilisateur inactif, echec connexion.", logs_context)
+                return redirect(url_for("index"))
             login_user(user)
             flash(f"Vous nous avez manqué {user} 🫶")
             logs_context = {"username": f"{username}"}
@@ -287,10 +342,10 @@ def login():
 
         logs_context = {"username": f"{username}", "email": f"{email}"}
         log_events.log_event(
-            "[400] Flask - Echec connexion à application. Mot de passe invalide.",
+            "[400] Flask - Echec connexion à application. Mot de passe ou email invalide.",
             logs_context,
         )
-        flash("Mot de passe invalide", "error")
+        flash("Mot de passe ou email invalide.", "error")
         session.close()
     return render_template(
         "login.html", form=form, is_authenticated=current_user.is_authenticated
@@ -305,6 +360,97 @@ def logout():
     logout_user()
     flash("Vous n'êtes plus connecté 👋")
     return redirect(url_for("index"))
+
+
+@app.route('/confirm/<token>')
+def confirm_email(token):
+    try:
+        # Try to load the email from the token
+        email = sengrid_tokens_serializer.loads(token, salt='email-confirmation', max_age=86400)  # 1 day expiry
+    except Exception as e:
+        flash(f"Le lien de confirmation n'est pas valide ou a expiré.")
+        return redirect(url_for("index"))
+
+    # Ensure user exists and then activate his account
+    session = session_commands.get_a_database_session()
+    user = session.query(User).filter_by(email=email).first()
+    if not user:
+        session.close()
+        logs_context = {
+            "email": f"{email}",
+        }
+        log_events.log_event("[404] Flask - Utilisateur inconnu tente d'activer son compte", logs_context)
+        flash(f"Utilisateur {user} inexistant tente activation de compte", "error")
+        return redirect(url_for("index"))
+    user.is_active = True
+    session.commit()
+    logs_context = {
+        "current_user": f"{user.username}",
+    }
+    log_events.log_event("[200] Flask - Compte activé.", logs_context)
+    flash(f"Compte activé {user} 💪, vous pouvez maintenant vous connecter.")
+    session.close()
+    return redirect(url_for("index"))
+
+
+def send_activation_link(email):
+    # Create a token with email that expires in 24 hours
+    token = sengrid_tokens_serializer.dumps(email, salt='email-confirmation')
+
+    # Generate confirmation link
+    confirm_url = url_for('confirm_email', token=token, _external=True)
+
+    if os.getenv("SCOPE") == "production":
+        message = Mail(
+            from_email="no-reply@dummy-ops.dev",
+            to_emails=email,
+            subject="Dummy-ops books",
+            # plain_text_content=f"Click here to confirm your registration: {confirm_url}"
+            html_content=f"""
+                <p>Click sur le lien pour confirmer l'inscription : <a href="{ confirm_url }">valider l'inscription</a></p><br>
+            """
+        )
+
+        # Send the email
+        SENDGRID_API_KEY = get_secret("/run/secrets/SENDGRID_API_KEY")
+        try:
+            sg = SendGridAPIClient(SENDGRID_API_KEY)
+            sg.send(message)
+        except Exception:
+            return {"status": "failure", "message": "Mail sending failed"}
+
+    elif os.getenv("SCOPE") == "development":
+        # We use smtplib and MailTrap
+        mailtrap_user_name = os.getenv("MAILTRAP_USER_NAME")
+        mailtrap_user_password = os.getenv("MAILTRAP_USER_PASSWORD")
+        # Email configuration
+        sender = "no-reply@dummy-ops.dev"
+        receiver = "to@example.com"
+        subject = "Dummy-ops books"
+
+        msg = MIMEMultipart()
+        msg['Subject'] = "Dummy-ops books"
+        msg['To'] = receiver
+        msg['From'] = sender
+
+        html = f"""
+        <html>
+            <body>
+                <p>Votre lien pour valider l'inscription:</p>
+                <p><a href="{confirm_url}">Cliquez ici pour valider</a></p>
+            </body>
+        </html>
+        """
+        msg.attach(MIMEText(html, 'html'))
+
+        # Send the email
+        with smtplib.SMTP("sandbox.smtp.mailtrap.io", 2525) as server:
+            server.starttls()
+            server.login(mailtrap_user_name, mailtrap_user_password)
+            # server.send_message(msg, sender, receiver)
+            server.set_debuglevel(1)
+            result = server.send_message(msg, sender, receiver)
+            print("Scope development on log l'envoi:", result)
 
 
 @app.route("/register/", methods=["GET", "POST"])
@@ -359,7 +505,11 @@ def register():
         user_email = session.query(User).filter_by(email=email).first()
 
         if user_email:
-            flash("Email existe déjà en base", "error")
+            if user_email.is_active:
+                flash(f"Email existe déjà en base et compte actif", "error")
+            else:
+                flash(f"Compte inactif, lien d'activation renvoyé", "error")
+                send_activation_link(email)
         elif form.password.data != form.password_check.data:
             flash("Mots de passe ne correspondent pas", "error")
         else:
@@ -369,12 +519,13 @@ def register():
                 )
                 session.add(new_user)
                 session.commit()
-                flash(f"Bienvenue {username} vous pouvez vous connecter", "info")
+                session.close()
+                send_activation_link(email)
+                flash(f"Bienvenue {username}, avant de pouvoir vous connecter, utilisez le lien envoyé à {email}", "info")
                 logs_context = {"username": f"{username}", "email": f"{email}"}
                 log_events.log_event(
-                    "[201] Flask - Création compte utilisateur.", logs_context
+                    "[201] Flask - Création compte utilisateur en attente d'activation.", logs_context
                 )
-                session.close()
                 return render_template(
                     "register.html",
                     form=form,
@@ -399,10 +550,10 @@ def register():
                     )
                     session.add(new_user)
                     session.commit()
-                    flash(f"Bienvenue {username} vous pouvez vous connecter", "info")
+                    flash(f"Bienvenue {username}, avant de pouvoir vous connecter, utilisez le lien envoyé à {username.email}", "info")
                     logs_context = {"username": f"{username}", "email": f"{email}"}
                     log_events.log_event(
-                        "[201] Flask - Création compte utilisateur.", logs_context
+                        "[201] Flask - Création compte utilisateur en attente d'activation.", logs_context
                     )
                     session.close()
                     return redirect(url_for("login"))

@@ -162,6 +162,16 @@ def mock_captcha_validation(mocker):
 
 
 @pytest.fixture
+def mock_captcha_validation_error(mocker):
+    mock_hcaptcha_response = {
+        "success": False,
+        "challenge_ts": "2024-09-03T10:00:00.000000Z",
+        "hostname": "dummy-ops.dev"
+    }
+    mocker.patch('requests.post', return_value=mocker.MagicMock(status_code=200, json=lambda: mock_hcaptcha_response))
+
+
+@pytest.fixture
 def captured_templates(app):
     recorded = []
 

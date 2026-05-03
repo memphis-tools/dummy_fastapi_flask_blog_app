@@ -256,7 +256,7 @@ class User(BASE, UserMixin):
     hashed_password = Column(String(200), nullable=False)
     email = Column(EmailType, nullable=False)
     role = Column(String(20), default=Role.R2)
-    is_active = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=False)
     books = relationship(
         "Book", back_populates="user_books", cascade="all, delete-orphan"
     )
@@ -282,6 +282,7 @@ class User(BASE, UserMixin):
             "hashed_password": self.hashed_password,
             "email": self.email,
             "role": self.role,
+            "is_active": self.is_active
         }
 
     def get_restricted_json(self):
@@ -308,6 +309,7 @@ class User(BASE, UserMixin):
             "hashed_password": self.hashed_password,
             "email": self.email,
             "role": self.role,
+            "is_active": self.is_active
         }
 
     def get_id(self):

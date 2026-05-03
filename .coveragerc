@@ -17,8 +17,7 @@ omit = app/tests/conftest.py, \
   app/packages/logtail_handler.py, \
   app/__init__.py, \
   app/packages/log_events.py, \
-  app/packages/celery_client_and_worker/celery_app_folder/celery_app.py, \
-  app/packages/celery_client_and_worker/celery_app_folder/books_into_pdf.py, \
+  app/packages/celery_client_and_worker/*, \
   app/packages/flask_app/manage.py
 
 [xml]

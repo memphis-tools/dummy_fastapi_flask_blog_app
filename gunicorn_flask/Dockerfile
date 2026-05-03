@@ -41,6 +41,9 @@ COPY /app/packages/logtail_handler.py $APP_HOME/
 COPY /app/packages/settings.py $APP_HOME/
 COPY /app/packages/utils.py $APP_HOME/
 
+# copy the celery config
+COPY app/packages/celery_client_and_worker/celery_app_folder/celery_app.py $APP_HOME/flask_app/project/
+
 EXPOSE 8001
 
 # chown all the app files to the dummy-operator user

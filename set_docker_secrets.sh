@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# First arg is the dummy vault address (https://dummy-ops.dev:8200)
+# First arg is the dummy temporay vault address (https://dummy-ops.dev)
 # Second arg is the "VAULT_ID_TOKEN" (the payload used to get a VAULT_TOKEN and so to fetch secrets)
 export VAULT_TOKEN="$(vault write -address=$1 -field=token auth/jwt/login role=gitlab_jwt jwt=$2)"
 echo "$(vault kv get -address=$1 -field=ADMIN_EMAIL kv/dummy_vault)" | docker secret create ADMIN_EMAIL - &> /dev/null

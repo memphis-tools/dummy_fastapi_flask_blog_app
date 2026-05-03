@@ -21,6 +21,8 @@ services:
     environment:
       - CELERY_RESULT_BACKEND
       - HCAPTCHA_SITE_KEY
+      - MAILTRAP_USER_NAME
+      - MAILTRAP_USER_PASSWORD
       - POSTGRES_HOST
       - POSTGRES_PORT
       - POSTGRES_PRODUCTION_DB_NAME
@@ -77,6 +79,7 @@ services:
 
   db:
     image: postgres:17.5-alpine
+    stop_grace_period: 30s
     environment:
       - POSTGRES_HOST
       - POSTGRES_PORT
@@ -114,6 +117,7 @@ services:
       - RABBITMQ_DEFAULT_USER
       - RABBITMQ_DEFAULT_VHOST
       - RABBITMQ_DEFAULT_PERMISSIONS_REGEX=^.*$$
+      - SCOPE
     secrets:
       - RABBITMQ_DEFAULT_PASS
     depends_on:
@@ -132,6 +136,8 @@ services:
       - PDF_FOLDER_PATH
       - PDF_FILE_NAME
       - TIMEZONE
+      - MAILTRAP_USER_NAME
+      - MAILTRAP_USER_PASSWORD
       - POSTGRES_HOST
       - POSTGRES_PORT
       - POSTGRES_PRODUCTION_DB_NAME
