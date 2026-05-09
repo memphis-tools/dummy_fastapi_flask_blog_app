@@ -172,9 +172,7 @@ def set_dummies_books():
         models.Book(
             title="La Guerre hors limites",
             summary="Document exceptionnel sur la réflexion stratégique chinoise actuelle",
-            content="""
-            « La Guerre hors limites est un document exceptionnel sur la réflexion stratégique chinoise actuelle. Les auteurs, deux colonels de l'armée de l'air chinoise, nous éclairent sur la perception chinoise des nouveaux conflits et tensions dans le monde. Ils puisent l'essentiel de leurs déductions des opérations menées pendant la guerre du Golfe (1991), comme celles de Sunzi s'inspirèrent des guerres de l'époque des Printemps et des Automnes (VIIIe-Ve siècle avant J.-C.). Mais ils englobent aussi dans leur analyse les actes hostiles menés depuis la fin de la guerre froide sous toutes les formes, dans tous les domaines, économiques, financiers, religieux, écologiques, etc... Une telle combinaison de plus en plus complexe d'actes de guerre dépasse les limites habituelles des conflits menés jusqu'à une période récente uniquement par les militaires. Le changement de guerre et le changement du mode de guerre, leurs causes, leurs conséquences, sont le sujet du livre. Mais son contenu nous mène également au coeur d'une réflexion plus large sur les ambitions chinoises. » (Michel Jan)
-            """,
+            content="Ras lectus nisi, aliquet vel nulla eget. Vestibulum quis lectus erat.Etiam ultrices semper.",
             author="Qiao Liang, Wang Xiangsui",
             year_of_publication="999",
             book_picture_name="dummy_blank_book.png",

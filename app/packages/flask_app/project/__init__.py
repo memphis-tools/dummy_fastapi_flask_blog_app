@@ -7,7 +7,6 @@ from email.mime.multipart import MIMEMultipart
 import smtplib
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
-import textwrap
 from flask import (
     Flask,
     url_for,
@@ -76,6 +75,7 @@ MAX_BOOKS_ON_INDEX_PAGE = 3
 sengrid_tokens_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 sendgrid_client = SendGridAPIClient(SENDGRID_API_KEY)
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -210,7 +210,7 @@ def contact():
                 from_email=input_email,
                 to_emails=f'{app.config["ADMIN_EMAIL"]}',
                 subject="Dummy-ops contact",
-                html_content=f"{username} with email {input_email} sent this message: {input_message}"
+                html_content=f"{input_username} with email {input_email} sent this message: {input_message}"
             )
 
             try:
@@ -368,7 +368,7 @@ def confirm_email(token):
         # Try to load the email from the token
         email = sengrid_tokens_serializer.loads(token, salt='email-confirmation', max_age=86400)  # 1 day expiry
     except Exception as e:
-        flash(f"Le lien de confirmation n'est pas valide ou a expiré.")
+        flash("Le lien de confirmation n'est pas valide ou a expiré.")
         return redirect(url_for("index"))
 
     # Ensure user exists and then activate his account
@@ -506,9 +506,9 @@ def register():
 
         if user_email:
             if user_email.is_active:
-                flash(f"Email existe déjà en base et compte actif", "error")
+                flash("Email existe déjà en base et compte actif", "error")
             else:
-                flash(f"Compte inactif, lien d'activation renvoyé", "error")
+                flash("Compte inactif, lien d'activation renvoyé", "error")
                 send_activation_link(email)
         elif form.password.data != form.password_check.data:
             flash("Mots de passe ne correspondent pas", "error")
@@ -550,7 +550,9 @@ def register():
                     )
                     session.add(new_user)
                     session.commit()
-                    flash(f"Bienvenue {username}, avant de pouvoir vous connecter, utilisez le lien envoyé à {username.email}", "info")
+                    flash(
+                        f"Bienvenue avant de pouvoir vous connecter, utilisez le lien envoyé à {username.email}", "info"
+                    )
                     logs_context = {"username": f"{username}", "email": f"{email}"}
                     log_events.log_event(
                         "[201] Flask - Création compte utilisateur en attente d'activation.", logs_context

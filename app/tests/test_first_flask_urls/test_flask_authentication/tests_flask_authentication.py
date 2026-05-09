@@ -25,7 +25,8 @@ def test_flask_post_logout_route_without_authentication(client):
 
 
 def test_flask_post_logout_route_with_authentication(
-    client, access_session,
+    client,
+    access_session,
 ):
     """
     Description: check if we can reach the logout route
@@ -61,7 +62,9 @@ def test_flask_register_route(client):
     assert response.status_code == 200
 
 
-def test_flask_login_with_unactivated_account(app, client, get_flask_csrf_token, mock_captcha_validation):
+def test_flask_login_with_unactivated_account(
+    app, client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check if user can login whereas account unactivated
     """
@@ -84,7 +87,9 @@ def test_flask_login_with_unactivated_account(app, client, get_flask_csrf_token,
     assert b"Compte Louloute inactif." in response.data
 
 
-def test_flask_login_with_unactivated_account_and_captcha_error(app, client, get_flask_csrf_token, mock_captcha_validation_error):
+def test_flask_login_with_unactivated_account_and_captcha_error(
+    app, client, get_flask_csrf_token, mock_captcha_validation_error
+):
     """
     Description: check if user can login with captcha error
     """
@@ -109,7 +114,9 @@ def test_flask_login_with_unactivated_account_and_captcha_error(app, client, get
     )
 
 
-def test_post_flask_register_route(app, client, get_flask_csrf_token, mock_captcha_validation):
+def test_post_flask_register_route(
+    app, client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check if we can register new user
     """
@@ -130,10 +137,15 @@ def test_post_flask_register_route(app, client, get_flask_csrf_token, mock_captc
         follow_redirects=True,
     )
     assert response.status_code == 200
-    assert b"Bienvenue fafa, avant de pouvoir vous connecter, utilisez le lien" in response.data
+    assert (
+        b"Bienvenue fafa, avant de pouvoir vous connecter, utilisez le lien"
+        in response.data
+    )
 
 
-def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_token, mock_captcha_validation):
+def test_post_flask_register_route_with_existing_email(
+    client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check if we can register new user with an already existing email
     """
@@ -157,7 +169,9 @@ def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_to
     assert b"Email existe d\xc3\xa9j\xc3\xa0 en base" in response.data
 
 
-def test_post_flask_register_route_with_existing_email_and_unactivated_account(client, get_flask_csrf_token, mock_captcha_validation):
+def test_post_flask_register_route_with_existing_email_and_unactivated_account(
+    client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check if we can register new user with an already existing email but account unactivated
     """
@@ -207,7 +221,9 @@ def test_post_flask_register_route_with_passwords_mismatch(
     assert b"Mots de passe ne correspondent pas" in response.data
 
 
-def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_token, mock_captcha_validation):
+def test_post_flask_register_route_with_existing_user(
+    client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check if we can register new user with an already existing username
     """
@@ -228,16 +244,17 @@ def test_post_flask_register_route_with_existing_user(client, get_flask_csrf_tok
         follow_redirects=False,
     )
     assert response.status_code == 200
-    assert b"Nom utilisateur existe d\xc3\xa9j\xc3\xa0, veuillez le modifier" in response.data
+    assert (
+        b"Nom utilisateur existe d\xc3\xa9j\xc3\xa0, veuillez le modifier"
+        in response.data
+    )
 
 
 def test_post_flask_register_route_without_hcaptcha(client, get_flask_csrf_token):
     """
     Description: check if we can register new user without captcha validation
     """
-    headers = {
-        "Content-Type": "multipart/form-data"
-    }
+    headers = {"Content-Type": "multipart/form-data"}
     user_form = {
         "login": "donald",
         "email": "leon@localhost.fr",
@@ -265,13 +282,13 @@ def test_post_flask_register_route_with_invalid_data(client):
         "email": "fafa@localhost.fr",
         "password": settings.TEST_USER_PWD,
     }
-    response = client.post(
-        "http://localhost/register/", headers="", data=user_form
-    )
+    response = client.post("http://localhost/register/", headers="", data=user_form)
     assert response.status_code == 400
 
 
-def test_flask_register_with_captcha_error(app, client, get_flask_csrf_token, mock_captcha_validation_error):
+def test_flask_register_with_captcha_error(
+    app, client, get_flask_csrf_token, mock_captcha_validation_error
+):
     """
     Description: check if user can login with captcha error
     """
@@ -297,7 +314,9 @@ def test_flask_register_with_captcha_error(app, client, get_flask_csrf_token, mo
     )
 
 
-def test_flask_register_with_too_simple_password_(app, client, get_flask_csrf_token, mock_captcha_validation):
+def test_flask_register_with_too_simple_password_(
+    app, client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check if user can register with password too simple
     """
@@ -323,7 +342,9 @@ def test_flask_register_with_too_simple_password_(app, client, get_flask_csrf_to
     )
 
 
-def test_flask_register_with_existing_email(app, client, get_flask_csrf_token, mock_captcha_validation):
+def test_flask_register_with_existing_email(
+    app, client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check if user can register when email already used
     """
@@ -344,12 +365,12 @@ def test_flask_register_with_existing_email(app, client, get_flask_csrf_token, m
         follow_redirects=True,
     )
     assert response.status_code == 200
-    assert "Email existe déjà en base" in html.unescape(
-        response.get_data(as_text=True)
-    )
+    assert "Email existe déjà en base" in html.unescape(response.get_data(as_text=True))
 
 
-def test_flask_register_with_unmatching_passwords(app, client, get_flask_csrf_token, mock_captcha_validation):
+def test_flask_register_with_unmatching_passwords(
+    app, client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check if user can register when unmatching passwords
     """
@@ -357,7 +378,7 @@ def test_flask_register_with_unmatching_passwords(app, client, get_flask_csrf_to
         "login": "daddy",
         "email": "daddycool@localhost.fr",
         "password": settings.TEST_USER_PWD,
-        "password_check": f'{settings.TEST_USER_PWD}X',
+        "password_check": f"{settings.TEST_USER_PWD}X",
         "csrf_token": get_flask_csrf_token,
         "h-captcha-response": "dummy_response",
     }
@@ -375,7 +396,9 @@ def test_flask_register_with_unmatching_passwords(app, client, get_flask_csrf_to
     )
 
 
-def test_flask_register_successfully(app, client, get_flask_csrf_token, mock_captcha_validation):
+def test_flask_register_successfully(
+    app, client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check if user can register successfully
     """
@@ -396,18 +419,19 @@ def test_flask_register_successfully(app, client, get_flask_csrf_token, mock_cap
         follow_redirects=True,
     )
     assert response.status_code == 200
-    assert "Bienvenue mummy, avant de pouvoir vous connecter, utilisez le lien envoyé" in html.unescape(
-        response.get_data(as_text=True)
+    assert (
+        "Bienvenue mummy, avant de pouvoir vous connecter, utilisez le lien envoyé"
+        in html.unescape(response.get_data(as_text=True))
     )
 
 
-def test_flask_login_with_valid_credentials(client, get_flask_csrf_token, mock_captcha_validation):
+def test_flask_login_with_valid_credentials(
+    client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check the login
     """
-    headers = {
-        "Content-Type": "multipart/form-data"
-    }
+    headers = {"Content-Type": "multipart/form-data"}
     login_form = {
         "login": "daisy",
         "email": "daisy@localhost.fr",
@@ -429,9 +453,7 @@ def test_flask_login_without_captcha_validation(client, get_flask_csrf_token):
     """
     Description: check the login
     """
-    headers = {
-        "Content-Type": "multipart/form-data"
-    }
+    headers = {"Content-Type": "multipart/form-data"}
     login_form = {
         "login": "daisy",
         "email": "daisy@localhost.fr",
@@ -449,13 +471,13 @@ def test_flask_login_without_captcha_validation(client, get_flask_csrf_token):
     assert "Veuillez valider le captcha" in response.text
 
 
-def test_flask_login_with_invalid_login(client, get_flask_csrf_token, mock_captcha_validation):
+def test_flask_login_with_invalid_login(
+    client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check the login with invalid login
     """
-    headers = {
-        "Content-Type": "multipart/form-data"
-    }
+    headers = {"Content-Type": "multipart/form-data"}
     login_form = {
         "login": "tintin",
         "email": "donald@localhost.fr",
@@ -473,13 +495,13 @@ def test_flask_login_with_invalid_login(client, get_flask_csrf_token, mock_captc
     assert b"Identifiants invalides" in response.data
 
 
-def test_flask_login_with_invalid_email(client, get_flask_csrf_token, mock_captcha_validation):
+def test_flask_login_with_invalid_email(
+    client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check the login with invalid email
     """
-    headers = {
-        "Content-Type": "multipart/form-data"
-    }
+    headers = {"Content-Type": "multipart/form-data"}
     login_form = {
         "login": "donald",
         "email": "tintin@localhost.fr",
@@ -497,13 +519,13 @@ def test_flask_login_with_invalid_email(client, get_flask_csrf_token, mock_captc
     assert b"Identifiants invalides" in response.data
 
 
-def test_flask_login_with_invalid_password(client, get_flask_csrf_token, mock_captcha_validation):
+def test_flask_login_with_invalid_password(
+    client, get_flask_csrf_token, mock_captcha_validation
+):
     """
     Description: check the login with invalid password
     """
-    headers = {
-        "Content-Type": "multipart/form-data"
-    }
+    headers = {"Content-Type": "multipart/form-data"}
     login_form = {
         "login": "daisy",
         "email": "daisy@localhost.fr",
@@ -525,9 +547,9 @@ def test_flask_get_logout(client, access_session):
     """
     Description: check if logout works.
     """
-    headers = {
-        "Cookie": f"session={access_session}"
-    }
-    response = client.get("http://localhost/logout/", headers=headers, follow_redirects=True)
+    headers = {"Cookie": f"session={access_session}"}
+    response = client.get(
+        "http://localhost/logout/", headers=headers, follow_redirects=True
+    )
     assert response.status_code == 200
     assert b"plus connect" in response.data

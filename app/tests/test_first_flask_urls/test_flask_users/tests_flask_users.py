@@ -4,7 +4,6 @@ Notice that by default we already add dummies data through the application utils
 """
 
 import html
-from itsdangerous import URLSafeTimedSerializer
 from app.packages.database.commands import session_commands
 from app.packages.database.models.models import User
 from app.packages import settings
