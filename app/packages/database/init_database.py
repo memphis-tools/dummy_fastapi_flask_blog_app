@@ -87,7 +87,7 @@ def init_database():
 
     session_maker = sessionmaker(bind=engine)
     session = session_maker()
-    if os.getenv("SCOPE") == "test" or os.getenv("SCOPE") == "local_test":
+    if os.getenv("SCOPE") == "test" or os.getenv("SCOPE") == "development":
         models.BASE.metadata.drop_all(engine)
         models.BASE.metadata.create_all(engine)
         create_application_admin_user_if_not_exist(session)
@@ -116,6 +116,7 @@ def create_books_categories_if_not_exist(session):
             session.commit()
             session.close()
         return True
+    session.close()
     return '[+] Books categories already set sir, nothing to do.'
 
 
@@ -145,14 +146,15 @@ def create_application_admin_user_if_not_exist(session):
             hashed_password=utils.set_a_hash_password(admin_password),
             disabled=False,
             role=models.Role.R1,
+            is_active=True,
         )
         session.add(admin_user)
         session.commit()
-        session.close()
     else:
         print(
             f'[+] Application {os.getenv("ADMIN_LOGIN")} account already exists sir, nothing to do.'
         )
+    session.close()
 
 
 def update_default_postgres_password(session):

@@ -156,26 +156,28 @@ def update_password():
             flash("Mots de passes ne correspondent pas.")
         else:
             session = session_commands.get_a_database_session()
-            hashed_password = generate_password_hash(
+            new_hashed_password = generate_password_hash(
                 new_password, "pbkdf2:sha256", salt_length=8
             )
-            updated_user = User(
-                username=current_user.username,
-                hashed_password=hashed_password,
-                email=current_user.email,
-                role=current_user.role,
-            )
-            session.query(User).where(User.id == current_user.id).update(
-                updated_user.get_json_for_update()
-            )
-            session.commit()
+            user = session.query(User).filter_by(id=current_user.id).first()
+            if user:
+                hashed_password = new_hashed_password
+                session.commit()
+                session.close()
+                logs_context = {
+                    "current_user": f"{current_user.username}",
+                }
+                log_events.log_event("[200] Flask - Mot de passe mis à jour.", logs_context)
+                flash(f"Mot de passe mis a jour {current_user} 💪")
+                return redirect(url_for("index"))
+            session.close()
             logs_context = {
                 "current_user": f"{current_user.username}",
             }
-            log_events.log_event("[200] Flask - Mot de passe mis à jour.", logs_context)
-            flash(f"Mot de passe mis a jour {current_user} 💪")
-            session.close()
-        return redirect(url_for("index"))
+            log_events.log_event("[404] Flask - Utilisateur inconnu tente mise à jour de mot de passe.", logs_context)
+            flash(f"Utilisateur {user} inexistant", "error")
+            return redirect(url_for("index"))
+
     return render_template(
         "update_password.html",
         form=form,

@@ -3,6 +3,7 @@ All the tests functions for the authentication urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
+import html
 from app.packages import settings
 
 
@@ -60,6 +61,54 @@ def test_flask_register_route(client):
     assert response.status_code == 200
 
 
+def test_flask_login_with_unactivated_account(app, client, get_flask_csrf_token, mock_captcha_validation):
+    """
+    Description: check if user can login whereas account unactivated
+    """
+    user_form = {
+        "login": "louloute",
+        "email": "louloute@localhost.fr",
+        "password": f"{settings.TEST_USER_PWD}",
+        "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
+    }
+
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    response = client.post(
+        "http://localhost/login/",
+        headers=headers,
+        data=user_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"Compte Louloute inactif." in response.data
+
+
+def test_flask_login_with_unactivated_account_and_captcha_error(app, client, get_flask_csrf_token, mock_captcha_validation_error):
+    """
+    Description: check if user can login with captcha error
+    """
+    user_form = {
+        "login": "louloute",
+        "email": "louloute@localhost.fr",
+        "password": f"{settings.TEST_USER_PWD}",
+        "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
+    }
+
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    response = client.post(
+        "http://localhost/login/",
+        headers=headers,
+        data=user_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "Echec vérification hCaptcha, essayez de nouveau" in html.unescape(
+        response.get_data(as_text=True)
+    )
+
+
 def test_post_flask_register_route(app, client, get_flask_csrf_token, mock_captcha_validation):
     """
     Description: check if we can register new user
@@ -81,7 +130,7 @@ def test_post_flask_register_route(app, client, get_flask_csrf_token, mock_captc
         follow_redirects=True,
     )
     assert response.status_code == 200
-    assert b"Bienvenue fafa vous pouvez vous connecter" in response.data
+    assert b"Bienvenue fafa, avant de pouvoir vous connecter, utilisez le lien" in response.data
 
 
 def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_token, mock_captcha_validation):
@@ -106,6 +155,30 @@ def test_post_flask_register_route_with_existing_email(client, get_flask_csrf_to
     )
     assert response.status_code == 200
     assert b"Email existe d\xc3\xa9j\xc3\xa0 en base" in response.data
+
+
+def test_post_flask_register_route_with_existing_email_and_unactivated_account(client, get_flask_csrf_token, mock_captcha_validation):
+    """
+    Description: check if we can register new user with an already existing email but account unactivated
+    """
+    user_form = {
+        "login": "louloute",
+        "email": "louloute@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
+    }
+
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    response = client.post(
+        "http://localhost/register/",
+        headers=headers,
+        data=user_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"Compte inactif, lien " in response.data
 
 
 def test_post_flask_register_route_with_passwords_mismatch(
@@ -196,6 +269,136 @@ def test_post_flask_register_route_with_invalid_data(client):
         "http://localhost/register/", headers="", data=user_form
     )
     assert response.status_code == 400
+
+
+def test_flask_register_with_captcha_error(app, client, get_flask_csrf_token, mock_captcha_validation_error):
+    """
+    Description: check if user can login with captcha error
+    """
+    user_form = {
+        "login": "daddycool",
+        "email": "daddycool@localhost.fr",
+        "password": f"{settings.TEST_USER_PWD}",
+        "password_check": f"{settings.TEST_USER_PWD}",
+        "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
+    }
+
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    response = client.post(
+        "http://localhost/register/",
+        headers=headers,
+        data=user_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "Echec vérification hCaptcha, essayez de nouveau" in html.unescape(
+        response.get_data(as_text=True)
+    )
+
+
+def test_flask_register_with_too_simple_password_(app, client, get_flask_csrf_token, mock_captcha_validation):
+    """
+    Description: check if user can register with password too simple
+    """
+    user_form = {
+        "login": "daddy",
+        "email": "daddy@localhost.fr",
+        "password": "cool",
+        "password_check": "cool",
+        "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
+    }
+
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    response = client.post(
+        "http://localhost/register/",
+        headers=headers,
+        data=user_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "Mot de passe trop simple, essayez de nouveau" in html.unescape(
+        response.get_data(as_text=True)
+    )
+
+
+def test_flask_register_with_existing_email(app, client, get_flask_csrf_token, mock_captcha_validation):
+    """
+    Description: check if user can register when email already used
+    """
+    user_form = {
+        "login": "daddy",
+        "email": "donald@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
+    }
+
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    response = client.post(
+        "http://localhost/register/",
+        headers=headers,
+        data=user_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "Email existe déjà en base" in html.unescape(
+        response.get_data(as_text=True)
+    )
+
+
+def test_flask_register_with_unmatching_passwords(app, client, get_flask_csrf_token, mock_captcha_validation):
+    """
+    Description: check if user can register when unmatching passwords
+    """
+    user_form = {
+        "login": "daddy",
+        "email": "daddycool@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": f'{settings.TEST_USER_PWD}X',
+        "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
+    }
+
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    response = client.post(
+        "http://localhost/register/",
+        headers=headers,
+        data=user_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "Mots de passe ne correspondent pas" in html.unescape(
+        response.get_data(as_text=True)
+    )
+
+
+def test_flask_register_successfully(app, client, get_flask_csrf_token, mock_captcha_validation):
+    """
+    Description: check if user can register successfully
+    """
+    user_form = {
+        "login": "mummy",
+        "email": "mummycool@localhost.fr",
+        "password": settings.TEST_USER_PWD,
+        "password_check": settings.TEST_USER_PWD,
+        "csrf_token": get_flask_csrf_token,
+        "h-captcha-response": "dummy_response",
+    }
+
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    response = client.post(
+        "http://localhost/register/",
+        headers=headers,
+        data=user_form,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "Bienvenue mummy, avant de pouvoir vous connecter, utilisez le lien envoyé" in html.unescape(
+        response.get_data(as_text=True)
+    )
 
 
 def test_flask_login_with_valid_credentials(client, get_flask_csrf_token, mock_captcha_validation):
@@ -315,7 +518,7 @@ def test_flask_login_with_invalid_password(client, get_flask_csrf_token, mock_ca
         follow_redirects=True,
     )
     assert response.status_code == 200
-    assert b"Mot de passe invalide" in response.data
+    assert b"Mot de passe ou email invalide." in response.data
 
 
 def test_flask_get_logout(client, access_session):

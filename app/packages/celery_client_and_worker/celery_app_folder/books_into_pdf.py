@@ -108,7 +108,7 @@ def generate_a_pdf_to_consume() -> str:
     """A PDF generator function"""
     books_list = get_the_books_list_from_postgresql()
     margin = 50
-    header_image_size = 100
+    header_image_size = 80
     footer_image_size = 30
     space_between_books = 20  # Space between books
     pdf_folder_path = os.getenv("PDF_FOLDER_PATH")
@@ -156,9 +156,9 @@ def generate_a_pdf_to_consume() -> str:
         book_height = 90 + description_height  # Adjust based on book details height
 
         # Check if there is enough space left on the page
-        if y_position - (book_height + footer_image_size + space_between_books) < margin:
-            y_position = start_new_page()  # Start a new page if not enough space
-
+        # if y_position - (book_height + footer_image_size + space_between_books) < margin:
+        #     y_position = start_new_page()  # Start a new page if not enough space
+        y_position = start_new_page()
         # Draw book details
         y_position = draw_book_details(c, book, 50, y_position, width, header_image_size)
 

@@ -28,7 +28,8 @@ body {
 
 .ops-btn {
   font-family: "Comfortaa", "Tahoma", sans-serif;
-  margin-bottom: 5%;
+  margin-bottom: 1%;
+  width: 90%
 }
 
 .provider-logo img {
@@ -54,7 +55,7 @@ h1, h2, h3, h4, h5 {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin: 2% 0% 2% 0%;
+  margin: 0% 0% 2% 0%;
 }
 
 h2 {
@@ -85,7 +86,10 @@ input {
 }
 
 figure img{
-  border-radius: 5%;
+  border-radius: 1%;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+              0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
 #categories-0 tr {
@@ -148,12 +152,26 @@ figure img{
   text-decoration: none;
 }
 
+.flash_messages {
+  background-color: khaki;
+  width: 100%;
+}
+
 .flash_messages li {
   list-style: none;
 }
 
+.flash_messages ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 figcaption {
   font-size: 80%;
+}
+
+.container {
+  padding: 1% 0% 3% 0%;
 }
 
 .section_intro {
@@ -170,16 +188,54 @@ figcaption {
 .index_introduction {
   display: flex;
   flex-direction: row;
-  margin-bottom: 4%;
+  margin-bottom: 0%;
+  align-items: center;
+  /* height: 100vh; */
+}
+
+.blocks {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.blocks-3l {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.block-description {
+  padding: 0% 5%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.block-books {
+  display: flex;
+  flex-direction: row;
 }
 
 .block_description {
-  margin: 5% 5%;
+  width: 100%;
+}
+
+.block_description h1 {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.block-buttons {
+  width: 100%;
 }
 
 .dummy_ops_technos {
   display: flex;
   flex-direction: column;
+  /* height: 100vh; */
+  padding: 0% 5%;
+  /* margin-bottom: 3%; */
 }
 
 .home-books-container {
@@ -188,8 +244,16 @@ figcaption {
   flex-wrap: wrap;
   align-items: start;
   justify-content: start;
-  padding-bottom: 3%;
+  padding-bottom: 0%;
   padding-left: 5%;
+  /* height: 100vh; */
+}
+
+.a-propos-container {
+  padding-top: 1%;
+  display: flex;
+  flex-direction: column;
+  /* height: 100vh; */
 }
 
 .counters {
@@ -211,7 +275,7 @@ figcaption {
 .mooc_container {
   display: flex;
   justify-content: center;
-  height: 100vh;
+  /* height: 100vh; */
   flex-direction: column;
 }
 
@@ -310,13 +374,13 @@ legend {
 }
 
 .flashes .error {
-  color: red;
+  color: black;
   display: flex;
   justify-content: center;
 }
 
 .flashes .info {
-  color: green;
+  color: black;
 }
 
 .contact-message {
@@ -335,6 +399,12 @@ legend {
   flex-flow: nowrap;
   justify-content: space-around;
   align-items: center;
+}
+
+.contacts {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 footer {
@@ -383,7 +453,8 @@ footer #footer_date {
   }
 
   .container {
-    padding: 0% 0%;
+    padding: 5% 0% 2% 0%
+
   }
 
   .home-books-container {
@@ -420,7 +491,13 @@ footer #footer_date {
     width: 100%;
     padding-top:5%;
   }
-
+  .block_description {
+    width: 100%;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0% 5%;
+  }
 }
 
 @media (max-width: 800px) {
@@ -432,6 +509,7 @@ footer #footer_date {
     font-weight: bold;
     font-size: 1.5em;
   }
+
   .dummy_logo {
     display: flex;
     flex-direction: row;
@@ -443,12 +521,45 @@ footer #footer_date {
     width: 100%;
   }
 
+  .navbar {
+    flex-wrap: nowrap;
+  }
+
+  .navbar-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    font-size: 90%;
+    padding: 0% 0% 0% 2%;
+  }
+
+  .navbar-toggler {
+      border-radius: 1px;
+      padding: 7px 8px;
+  }
+
+
   .flash_messages {
     margin-top: 10%;
+    background-color: beige;
   }
 
   .container {
     padding: 1% 0% 2% 0%;
+  }
+
+  .blocks {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .block_description {
+    width: 100%;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0% 5%;
   }
 
   .index_introduction {
@@ -457,10 +568,24 @@ footer #footer_date {
     margin-bottom: 4%;
   }
 
+  .block-description {
+    padding: 0% 5%;
+    font-size: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
   .block_illustration {
     display: flex;
     flex-direction: row;
     justify-content: center;
+  }
+
+  .ops-btn {
+    font-family: "Comfortaa", "Tahoma", sans-serif;
+    margin-bottom: 5%;
+    width: 90%
   }
 
   .dummy_ops_technos {
@@ -472,7 +597,12 @@ footer #footer_date {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .block-books {
+    display: flex;
+    flex-direction: column;
   }
 
   .op-container img {
@@ -540,9 +670,19 @@ footer #footer_date {
     font-size: 1.5em;
   }
 
+  .container-fluid  {
+    display: flex;
+    flex-wrap: nowrap;
+  }
+
+  .navbar {
+    flex-wrap: nowrap;
+  }
+
   .navbar-container {
     display: flex;
     flex-direction: row;
+    flex-wrap: nowrap;
     font-size: 90%;
     padding: 0% 0% 0% 2%;
   }
@@ -564,11 +704,54 @@ footer #footer_date {
   }
 
   .flash_messages {
-    margin-top: 20%;
+    margin-top: 10%;
+    background-color: beige;
   }
 
   .container {
     padding: 0% 0% 0% 0%;
+  }
+
+  .blocks {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 90%;
+  }
+
+  .blocks-3l {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    font-size: 90%;
+  }
+
+  .block-description {
+    padding: 0% 5%;
+    font-size: 90%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .block_description {
+    width: 100%;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0% 5%;
+  }
+
+  figure {
+    margin: 0 0 1rem;
+    padding: 3% 5%;
+  }
+
+  figure img{
+    border-radius: 1%;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+                0 10px 20px rgba(0, 0, 0, 0.15);
   }
 
   .section_intro {
@@ -598,9 +781,9 @@ footer #footer_date {
     width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: flex-end;
+    justify-content: left;
     padding-bottom: 0;
+    flex-wrap: nowrap;
   }
 
   .op-container img {

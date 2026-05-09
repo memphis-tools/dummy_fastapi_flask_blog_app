@@ -2,6 +2,7 @@
 
 import os
 from celery import Celery
+
 from flask import (
     Blueprint,
     url_for,
@@ -16,11 +17,13 @@ from flask_login import (
     login_required,
 )
 from sqlalchemy.orm import joinedload
+from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
 
 try:
     import log_events
     import settings
+    # from celery_client_and_worker.celery_app_folder.celery_app import celery_app
     from database.commands import session_commands
     from database.models.models import (
         Book,
@@ -29,8 +32,10 @@ try:
         Starred,
     )
     from utils import get_secret
+    # from celery_app import celery_app
 except ModuleNotFoundError:
     from app.packages import log_events, settings
+    from app.packages.celery_client_and_worker.celery_app_folder.celery_app import celery_app
     from app.packages.database.commands import session_commands
     from app.packages.database.models.models import (
         Book,
@@ -39,6 +44,7 @@ except ModuleNotFoundError:
         Starred,
     )
     from app.packages.utils import get_secret
+    # from flask_app.project import celery_app
 from . import forms
 from .shared_functions_and_decorators import (
     return_pagination,
@@ -89,6 +95,10 @@ def book(book_id):
     delete_book_form = forms.DeleteInstanceForm()
     form = forms.CommentForm()
     a_book = None
+    logs_context = {
+        "current_user": f"{current_user.username}",
+        "book_id": book_id,
+    }
     try:
         a_book = (
             session.query(Book)
@@ -97,15 +107,13 @@ def book(book_id):
             .options(joinedload(Book.starred))
             .first()
         )
-    except:
+    except SQLAlchemyError:
+        log_events.log_event("[404] Flask - Consultation livre inconnu.", logs_context)
+        flash(f"Livre id {book_id} inexistant", "error")
         session.close()
-        pass
+        return redirect(url_for('index'))
 
     if a_book is None:
-        logs_context = {
-            "current_user": f"{current_user.username}",
-            "book_id": book_id,
-        }
         log_events.log_event("[404] Flask - Consultation livre inconnu.", logs_context)
         flash(f"Livre id {book_id} inexistant", "error")
         session.close()
@@ -473,10 +481,6 @@ def update_book(book_id):
 @login_required
 def mail_books():
     """send books published by email as a pdf"""
-    celery_app = Celery(
-        broker=get_secret("/run/secrets/CELERY_BROKER_URL"),
-        backend=os.getenv("CELERY_RESULT_BACKEND")
-    )
     celery_app.send_task("generate_pdf_and_send_email_task", args=(current_user.email,), retry=True)
     logs_context = {
         "current_user": f"{current_user.username}",

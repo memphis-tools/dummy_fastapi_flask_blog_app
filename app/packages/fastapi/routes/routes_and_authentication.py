@@ -134,6 +134,19 @@ async def login_for_access_token(
             detail="Nom utilisateur ou mot de passe invalide",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    if not user.is_active:
+        session.close()
+        logs_context = {"username": f"{str(form_data.username).lower()}"}
+        log_events.log_event(
+            "[401] FastAPI - Compte utilisateur inactif cherche à obtenir un token.",
+            logs_context,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Compte utilisateur inactif (non validé).",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+        
     logs_context = {"username": f"{str(form_data.username).lower()}"}
     log_events.log_event(
         "[200] FastAPI - Connexion à application.",

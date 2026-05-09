@@ -33,7 +33,7 @@ unit_tests_development_branch:
     - development
   image: python:3.12.8
   variables:
-    SCOPE: "local_test"
+    SCOPE: "test"
     ADMIN_LOGIN: "admin"
     ADMIN_PASSWORD: "$TEST_USER_PWD"
     ADMIN_EMAIL: "admin@localhost.fr"
@@ -70,7 +70,7 @@ unit_tests_master_branch:
     - master
   image: python:3.12.8
   variables:
-    SCOPE: "local_test"
+    SCOPE: "test"
     ADMIN_LOGIN: "admin"
     ADMIN_PASSWORD: "$TEST_USER_PWD"
     ADMIN_EMAIL: "admin@localhost.fr"
