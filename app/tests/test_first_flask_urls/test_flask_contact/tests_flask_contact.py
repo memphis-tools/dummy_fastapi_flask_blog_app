@@ -3,9 +3,6 @@ All the tests functions for the flask contact.
 """
 
 
-import pytest
-
-
 def test_flask_contact_route(client):
     """
     Description: check if we can reach the contact route

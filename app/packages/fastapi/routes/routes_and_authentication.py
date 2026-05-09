@@ -146,7 +146,7 @@ async def login_for_access_token(
             detail="Compte utilisateur inactif (non validé).",
             headers={"WWW-Authenticate": "Bearer"},
         )
-        
+
     logs_context = {"username": f"{str(form_data.username).lower()}"}
     log_events.log_event(
         "[200] FastAPI - Connexion à application.",

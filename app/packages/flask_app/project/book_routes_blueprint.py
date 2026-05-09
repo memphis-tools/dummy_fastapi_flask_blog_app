@@ -1,7 +1,6 @@
 """ The Book blueprint routes """
 
 import os
-from celery import Celery
 
 from flask import (
     Blueprint,
@@ -23,7 +22,6 @@ from werkzeug.utils import secure_filename
 try:
     import log_events
     import settings
-    # from celery_client_and_worker.celery_app_folder.celery_app import celery_app
     from database.commands import session_commands
     from database.models.models import (
         Book,
@@ -31,8 +29,6 @@ try:
         Comment,
         Starred,
     )
-    from utils import get_secret
-    # from celery_app import celery_app
 except ModuleNotFoundError:
     from app.packages import log_events, settings
     from app.packages.celery_client_and_worker.celery_app_folder.celery_app import celery_app
@@ -43,8 +39,6 @@ except ModuleNotFoundError:
         Comment,
         Starred,
     )
-    from app.packages.utils import get_secret
-    # from flask_app.project import celery_app
 from . import forms
 from .shared_functions_and_decorators import (
     return_pagination,

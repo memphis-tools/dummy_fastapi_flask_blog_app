@@ -3,12 +3,10 @@ All the tests functions for the books urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
-import pytest
 from pathlib import Path
 from werkzeug.datastructures import FileStorage
 from bs4 import BeautifulSoup
 from sqlalchemy.orm import joinedload
-from sqlalchemy.exc import SQLAlchemyError
 from app.packages.database.models.models import Book, User
 from app.packages.flask_app.project.shared_functions_and_decorators import get_pie_colors
 from app.packages.flask_app.project.book_routes_blueprint import check_book_fields
