@@ -91,7 +91,7 @@ def send_email(recipient, pdf_file_path):
         # Attach the body
         msg.attach(MIMEText(body, 'plain'))
 
-        filename = f"{ pdf_file_path }"
+        filename = f"{pdf_file_path}"
         attachment = open(filename, "rb")
 
         part = MIMEBase('application', 'octet-stream')
