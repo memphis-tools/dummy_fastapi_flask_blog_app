@@ -519,17 +519,17 @@ def register():
                 )
                 session.add(new_user)
                 session.commit()
-                session.close()
                 send_activation_link(email)
-                flash(f"Bienvenue {username}, avant de pouvoir vous connecter, utilisez le lien envoyé à {email}", "info")
-                logs_context = {"username": f"{username}", "email": f"{email}"}
+                flash(f"Bienvenue {new_user.username}, avant de pouvoir vous connecter, utilisez le lien envoyé à {email}", "info")
+                logs_context = {"username": f"{new_user.username}", "email": f"{email}"}
+                session.close()
                 log_events.log_event(
                     "[201] Flask - Création compte utilisateur en attente d'activation.", logs_context
                 )
                 return render_template(
                     "register.html",
                     form=form,
-                    is_authenticated=current_user.is_authenticated,
+                    is_authenticated=new_user.is_authenticated,
                 )
             username = str(form.login.data).lower()
             hashed_password = generate_password_hash(
