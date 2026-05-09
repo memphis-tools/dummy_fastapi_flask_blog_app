@@ -11,6 +11,8 @@ from email import encoders
 from celery_app import celery_app
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+from python_http_client.exceptions import HTTPError
+import requests.exceptions
 
 from books_into_pdf import generate_a_pdf_to_consume
 try:
@@ -67,8 +69,13 @@ def send_email(recipient, pdf_file_path):
         try:
             sg = SendGridAPIClient(SENDGRID_API_KEY)
             sg.send(message)
-        except Exception:
-            return {"status": "failure", "message": "Mail sending failed"}
+        except HTTPError as e:
+            return {"status": "failure", "message": f"SendGrid HTTP error: {e}"}
+        except requests.exceptions.RequestException as e:
+            return {"status": "failure", "message": f"Request failed: {e}"}
+        except Exception as e:
+            # Fallback for unexpected errors
+            return {"status": "failure", "message": f"Unexpected error: {e}"}
     elif os.getenv("SCOPE") == "development":
         # We use smtplib and MailTrap
         mailtrap_user_name = os.getenv("MAILTRAP_USER_NAME")
