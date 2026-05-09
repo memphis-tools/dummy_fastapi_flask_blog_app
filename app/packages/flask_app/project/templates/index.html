@@ -23,42 +23,6 @@
         </div>
     </div>
     <hr>
-<<<<<<< HEAD
-    <div class="index_introduction">
-        <div class="block_description">
-            <p>Les utilisateurs peuvent utiliser un navigateur, ou faire des appels "API REST".</p>
-        </div>
-        <div class="block_illustration">
-          <figure>
-              <img src='{{ url_for("static", filename="img/craiyon_a_software_production_behind_the_scene_cartoon.png" )}}' alt="a free public cartoon from craiyon ai">
-              <figcaption>credits: <a href="https://www.craiyon.com" target="_blank">www.craiyon.com</a></figcaption>
-          </figure>
-        </div>
-    </div>
-    <hr>
-    <div class="d-flex flex-row space-around m-3">
-        <p>En "A PROPOS", les options de prise de contact, et une présentation d'un lab perso (un cluster <a href="https://www.proxmox.com/en/">Proxmox <i class="fa-solid fa-server"></i></a>), mes travaux ..,</p>
-    </div>
-    <hr>
-    <h1>DUMMY OPS - LES LIVRES</h1>
-    <div class="home-books-container">
-      <hr />
-      {% for book in books %}
-      <div class="post-preview">
-        <p class="post-title m-0">{{ book.title }}</p>
-        <p class="post-meta m-0">
-          Publié par <a href="{{ url_for('user_routes_blueprint.user_books', user_id=book.user_id) }}">{{ book.user_id|format_user() }}</a> le {{ book.publication_date|format_datetime() }}
-        </p>
-        <p>
-            <a class="about-book" href="{{ url_for('book_routes_blueprint.book', book_id=book.id) }}">A propos du livre</a>
-        </p>
-        <div class="book-image d-flex flex-column">
-            <img src='{{ url_for("static", filename="img/" + book.book_picture_name) }}' align="middle" alt="book illustration"/>
-            <legend>Auteur: {{ book.author }}</legend>
-            <div class="counters">
-                <legend>Commentaires: {{ book.book_comments | length }}</legend>
-                <legend>Favoris: {{ book.starred | length }}</legend>
-=======
     <div class="blocks-3l">
         <div class="blocks">
             <div class="block_description">
@@ -71,7 +35,6 @@
                   <img src='{{ url_for("static", filename="img/a_connected_books_lab.png" )}}' alt="a free public cartoon generated with midjourney ai">
                   <figcaption>credits: <a href="https://www.midjourney.com" target="_blank">www.midjourney.com</a></figcaption>
               </figure>
->>>>>>> development
             </div>
         </div>
     </div>
