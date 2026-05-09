@@ -407,7 +407,7 @@ def send_activation_link(email):
             subject="Dummy-ops books",
             # plain_text_content=f"Click here to confirm your registration: {confirm_url}"
             html_content=f"""
-                <p>Click sur le lien pour confirmer l'inscription : <a href="{ confirm_url }">valider l'inscription</a></p><br>
+                <p>Click sur le lien pour confirmer l'inscription : <a href="{confirm_url}">valider l'inscription</a></p><br>
             """
         )
 
