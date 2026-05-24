@@ -105,7 +105,7 @@ def unauthorized():
     method = request.method
 
     log_events.log_event(
-        f"[403] Flask - Unauthorized access attempt | IP={ip} | "
+        f"[403] Flask - Utilisateur doit se connecter | IP={ip} | "
         f"Method={method} | Path={path}"
     )
 
