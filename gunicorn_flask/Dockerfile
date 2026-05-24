@@ -1,4 +1,4 @@
-FROM python:3.14.4-slim-bookworm 
+FROM python:3.14.4-slim-bookworm
 
 # create directory for the dummy-operator user
 RUN mkdir -p /home/dummy-operator
@@ -47,7 +47,8 @@ COPY app/packages/celery_client_and_worker/celery_app_folder/celery_app.py $APP_
 EXPOSE 8001
 
 # chown all the app files to the dummy-operator user
-RUN chown -R dummy-operator:dummy-operator $APP_HOME
+RUN chown -R dummy-operator:dummy-operator $HOME
 RUN chown -R dummy-operator:dummy-operator /var/log/gunicorn/
+RUN chmod 0700 $HOME
 
 USER dummy-operator

@@ -52,6 +52,7 @@ header {
 }
 
 h1, h2, h3, h4, h5 {
+  font-size: 1rem;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -222,6 +223,7 @@ figcaption {
 }
 
 .block_description h1 {
+  font-size: 1rem;
   display: flex;
   justify-content: flex-start;
 }
