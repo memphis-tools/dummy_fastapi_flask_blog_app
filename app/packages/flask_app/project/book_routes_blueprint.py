@@ -18,7 +18,7 @@ from flask_login import (
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
-
+from PIL import Image
 try:
     import log_events
     import settings
@@ -48,6 +48,20 @@ from .shared_functions_and_decorators import (
 
 
 book_routes_blueprint = Blueprint("book_routes_blueprint", __name__)
+
+
+def is_file_an_image(file_path):
+    try:
+        img = Image.open(file_path)
+        print(type(img))
+        print(img.format)
+        img.verify()
+        # Reset cursor after verify()
+        file_path.seek(0)
+        return True
+    except Exception as e:
+        # file_path.seek(0)
+        return False
 
 
 @book_routes_blueprint.route("/books/")
@@ -203,6 +217,14 @@ def add_book():
             user_id=current_user.get_id(),
         )
         book_is_valid = check_book_fields(new_book)
+        if not is_file_an_image(filename):
+            logs_context = {
+                "current_user": f"{current_user.username}",
+            }
+            log_events.log_event("[403] Flask - Format image non autorisé.", logs_context)
+            flash("Type image non accepté", "error")
+            return redirect(url_for("index"))
+
         if book_is_valid is True:
             if filename != "":
                 file_ext = os.path.splitext(filename)[1]
@@ -220,6 +242,7 @@ def add_book():
                         )
                     )
                 else:
+
                     new_book.book_picture_name = "dummy_blank_book.png"
                 session.add(new_book)
                 session.commit()
