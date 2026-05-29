@@ -137,9 +137,10 @@ def test_post_flask_register_route(
         follow_redirects=True,
     )
     assert response.status_code == 200
+    # assert b"Bienvenue fafa, pour vous connecter, utilisez le lien" in response.data
     assert (
-        b"Bienvenue fafa, avant de pouvoir vous connecter, utilisez le lien"
-        in response.data
+        "Bienvenue fafa, pour vous connecter utilisez le lien envoyé"
+        in html.unescape(response.get_data(as_text=True))
     )
 
 
@@ -420,7 +421,7 @@ def test_flask_register_successfully(
     )
     assert response.status_code == 200
     assert (
-        "Bienvenue mummy, avant de pouvoir vous connecter, utilisez le lien envoyé"
+        "Bienvenue mummy, pour vous connecter utilisez le lien"
         in html.unescape(response.get_data(as_text=True))
     )
 
