@@ -88,12 +88,27 @@ def load_user(user_id):
     return loaded
 
 
+# @login_manager.unauthorized_handler
+# def unauthorized():
+#     """
+#     Description: disable access to protected uri.
+#     """
+#     log_events.log_event("[403] Flask - Utilisateur doit se connecter.")
+#     flash("Vous devez d'abord vous connecter", "error")
+#     return redirect(url_for("login"))
+
+
 @login_manager.unauthorized_handler
 def unauthorized():
-    """
-    Description: disable access to protected uri.
-    """
-    log_events.log_event("[403] Flask - Utilisateur doit se connecter.")
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    path = request.path
+    method = request.method
+
+    log_events.log_event(
+        f"[403] Flask - Utilisateur doit se connecter | IP={ip} | "
+        f"Method={method} | Path={path}"
+    )
+
     flash("Vous devez d'abord vous connecter", "error")
     return redirect(url_for("login"))
 
@@ -520,7 +535,7 @@ def register():
                 session.add(new_user)
                 session.commit()
                 send_activation_link(email)
-                flash(f"Bienvenue {new_user.username}, avant de pouvoir vous connecter, utilisez le lien envoyé à {email}", "info")
+                flash(f"Bienvenue {new_user.username}, pour vous connecter utilisez le lien envoyé à {email}", "info")
                 logs_context = {"username": f"{new_user.username}", "email": f"{email}"}
                 session.close()
                 log_events.log_event(
