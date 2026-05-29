@@ -3,6 +3,8 @@ All the tests functions for the books urls.
 Notice that by default we already add dummies data through the application utils module.
 """
 
+import html
+import pytest
 from pathlib import Path
 from werkzeug.datastructures import FileStorage
 from bs4 import BeautifulSoup
@@ -46,6 +48,78 @@ def test_flask_get_a_book_without_authentication_following_redirect(client):
     """
     response = client.get("http://localhost/book/1/", follow_redirects=True)
     assert response.status_code == 200
+
+
+def test_flask_post_add_book_with_bad_category_with_authentication(
+    client, access_session
+):
+    """
+    Description:
+    Check if we can add a book being authenticated with non existing category.
+    """
+    # get the resources folder in the tests folder
+    # rb flag means "Open in binary mode (read/write using byte data)" - https://realpython.com/read-write-files-python/
+    resources = Path(__file__).parent
+
+    url = "http://localhost/books/add/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+
+    headers = {
+        "Content-Type": "multipart/form-data",
+        "Cookie": f"session={access_session}",
+    }
+    book_form = {
+        "title": "This is a dummy title sir",
+        "summary": "This is a dummy summary sir",
+        "content": "This is a dummy content sir",
+        "author": "Dummy Sapiens",
+        "categories": "99999999999998888888888888777777777777777777777777777777",
+        "year_of_publication": "1999",
+        "photo": (resources / "photo_pexels.com_by_inga_seliverstova.jpg").open(
+            "rb"
+        ),
+        "csrf_token": csrf_token,
+    }
+    with pytest.raises(Exception):
+        response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
+        assert response.status_code == 200
+        assert "Saisie invalide, categorie livre non prevue" in response.data
+
+
+def test_flask_post_add_book_with_forbidden_image_format_with_authentication(
+    client, access_session
+):
+    """
+    Description: check if we can add a book being authenticated, with a bad image format.
+    """
+    # get the resources folder in the tests folder
+    # rb flag means "Open in binary mode (read/write using byte data)" - https://realpython.com/read-write-files-python/
+    resources = Path(__file__).parent
+
+    url = "http://localhost/books/add/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+
+    headers = {
+        "Content-Type": "multipart/form-data",
+        "Cookie": f"session={access_session}",
+    }
+    book_form = {
+        "title": "This is a dummy title sir",
+        "summary": "This is a dummy summary sir",
+        "content": "This is a dummy content sir",
+        "author": "Dummy Sapiens",
+        "categories": "2",
+        "year_of_publication": "1999",
+        "photo": (resources / "wrong_image.jpg").open(
+            "rb"
+        ),
+        "csrf_token": csrf_token,
+    }
+    response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Type image non accept\xc3\xa9" in response.data
 
 
 def test_flask_post_add_book_with_authentication(
@@ -440,7 +514,9 @@ def test_add_book_check_book_fields(
         follow_redirects=True,
     )
     assert response.status_code == 200
-    assert b"Saisie invalide, mot clef string non utilisable" in response.data
+    assert "Type image non accepté" in html.unescape(
+        response.get_data(as_text=True)
+    )
 
 
 def test_check_book_fields():

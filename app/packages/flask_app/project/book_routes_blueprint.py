@@ -53,11 +53,9 @@ book_routes_blueprint = Blueprint("book_routes_blueprint", __name__)
 def is_file_an_image(file_path):
     try:
         img = Image.open(file_path)
-        print(type(img))
-        print(img.format)
         img.verify()
         # Reset cursor after verify()
-        file_path.seek(0)
+        # file_path.seek(0)
         return True
     except Exception as e:
         # file_path.seek(0)
@@ -205,7 +203,10 @@ def add_book():
             )
         year_of_publication = form.year_of_publication.data
         book_picture = form.photo.data
-        filename = secure_filename(book_picture.filename)
+        print("book_picture $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ book_picture $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+        print(book_picture)
+        filename = book_picture.filename
+        # filename = secure_filename(book_picture.filename)
         new_book = Book(
             title=title,
             summary=summary,
