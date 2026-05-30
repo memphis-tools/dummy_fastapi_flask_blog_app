@@ -229,8 +229,8 @@ def contact():
             )
 
             try:
-                sg = SendGridAPIClient(app.config["SENDGRID_API_KEY"])
-                sg.send(input_message)
+                sg = get_secret("/run/secrets/SENDGRID_API_KEY")
+                sg.send(message)
                 return render_template(
                     "mail_sent.html",
                     name=input_username,
