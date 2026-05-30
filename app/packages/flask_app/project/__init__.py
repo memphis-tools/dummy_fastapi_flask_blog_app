@@ -228,8 +228,9 @@ def contact():
                 html_content=f"{input_username} with email {input_email} sent this message: {input_message}"
             )
 
+            SENDGRID_API_KEY = get_secret("/run/secrets/SENDGRID_API_KEY")
             try:
-                sg = get_secret("/run/secrets/SENDGRID_API_KEY")
+                sg = SendGridAPIClient(SENDGRID_API_KEY)
                 sg.send(message)
                 return render_template(
                     "mail_sent.html",
