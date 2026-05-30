@@ -217,7 +217,7 @@ def contact():
                 is_authenticated=current_user.is_authenticated,
             )
         input_username = form.name.data
-        input_email = form.email.data
+        input_email = str(form.email.data).lower()
         input_message = form.message.data
 
         if os.getenv("SCOPE") == "production":
@@ -225,7 +225,9 @@ def contact():
                 from_email=input_email,
                 to_emails=f'{app.config["ADMIN_EMAIL"]}',
                 subject="Dummy-ops contact",
-                html_content=f"{input_username} with email {input_email} sent this message: {input_message}"
+                html_content=f"""
+                    <p>{input_username} with email {input_email} sent this message: {input_message}</p>
+                """
             )
 
             SENDGRID_API_KEY = get_secret("/run/secrets/SENDGRID_API_KEY")
