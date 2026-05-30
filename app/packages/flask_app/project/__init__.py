@@ -223,7 +223,7 @@ def contact():
         if os.getenv("SCOPE") == "production":
             message = Mail(
                 from_email=input_email,
-                to_emails=f'{app.config["ADMIN_EMAIL"]}',
+                to_emails="roussetni@protonmail.com",
                 subject="Dummy-ops contact",
                 html_content=f"""
                     <p>{input_username} with email {input_email} sent this message: {input_message}</p>
