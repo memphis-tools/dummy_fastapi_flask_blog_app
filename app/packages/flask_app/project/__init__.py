@@ -242,7 +242,7 @@ def contact():
             except Exception as e:
                 logs_context = {"username": f"{input_username}", "email": f"{input_email}"}
                 log_events.log_event(
-                    f"[400] Flask - Echec envoi email: {e}", logs_context
+                    f"[400] Flask - Echec envoi email {type(sg)} {type(message)} {SENDGRID_API_KEY}: {e}", logs_context
                 )
                 return render_template(
                     "mail_not_sent.html",
