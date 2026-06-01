@@ -528,7 +528,8 @@ def test_confirm_email_valid_token_with_unkown_user(app, client, monkeypatch):
     response = client.get("/confirm/123oclock", follow_redirects=True)
 
     assert response.status_code == 200
-    assert "Utilisateur None inexistant tente activation de compte" in html.unescape(
+    assert b"Le lien de confirmation n&#39;est pas valide ou a expir\xc3\xa9." in response.data
+    assert "Le lien de confirmation n'est pas valide ou a expiré" in html.unescape(
         response.get_data(as_text=True)
     )
 
