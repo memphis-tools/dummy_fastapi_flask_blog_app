@@ -37,15 +37,19 @@ def return_pagination(items_to_paginate):
     # Get the 'page' query parameter from the URL
     page = request.args.get("page", 1, type=int)
     per_page = settings.POSTS_PER_PAGE
+
+    # Calculate the total number of pages
+    total_pages = len(items_to_paginate) // per_page + (
+        1 if len(items_to_paginate) % per_page > 0 else 0
+    )
+    if page > total_pages or page < 1:
+        items = 2
+        page = 1
     # Calculate the start and end indices of the items to display
     start = (page - 1) * per_page
     end = start + per_page
     # Get the subset of items for the current page
     items = items_to_paginate[start:end]
-    # Calculate the total number of pages
-    total_pages = len(items_to_paginate) // per_page + (
-        1 if len(items_to_paginate) % per_page > 0 else 0
-    )
     return items, page, per_page, total_pages
 
 
