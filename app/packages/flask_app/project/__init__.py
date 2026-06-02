@@ -223,7 +223,7 @@ def contact():
         if os.getenv("SCOPE") == "production":
             message = Mail(
                 from_email=input_email,
-                to_emails="roussetni@protonmail.com",
+                to_emails=get_secret("/run/secrets/ADMIN_EMAIL"),
                 subject="Dummy-ops contact",
                 html_content=f"""
                     <p>{input_username} with email {input_email} sent this message: {input_message}</p>
@@ -317,6 +317,15 @@ def login():
         response = requests.post(verify_url, data=payload)
         response_json = response.json()
 
+        if not response_json.get('success'):
+            flash("Echec vérification hCaptcha, essayez de nouveau.", "error")
+            session.close()
+            return render_template(
+                "login.html",
+                form=form,
+                is_authenticated=current_user.is_authenticated,
+            )
+
         email = str(form.email.data).lower()
         username = str(form.login.data).lower()
         password = form.password.data
@@ -398,7 +407,7 @@ def confirm_email(token):
             "email": f"{email}",
         }
         log_events.log_event("[404] Flask - Utilisateur inconnu tente d'activer son compte", logs_context)
-        flash(f"Utilisateur {user} inexistant tente activation de compte", "error")
+        flash("Le lien de confirmation n'est pas valide ou a expiré.", "error")
         return redirect(url_for("index"))
     user.is_active = True
     session.commit()
@@ -544,11 +553,7 @@ def register():
                 log_events.log_event(
                     "[201] Flask - Création compte utilisateur en attente d'activation.", logs_context
                 )
-                return render_template(
-                    "register.html",
-                    form=form,
-                    is_authenticated=new_user.is_authenticated,
-                )
+                return redirect(url_for("index"))
             username = str(form.login.data).lower()
             hashed_password = generate_password_hash(
                 form.password.data, "pbkdf2:sha256", salt_length=8
