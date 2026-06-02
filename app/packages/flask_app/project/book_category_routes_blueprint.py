@@ -84,17 +84,22 @@ def category_books(category_id):
     Description: the books from a category Flask route.
     """
     session = session_commands.get_a_database_session()
-    category = (
-        session.query(BookCategory).filter(BookCategory.id == category_id).first()
-    )
-    if not category:
+    try:
+        category = (
+            session.query(BookCategory).filter(BookCategory.id == category_id).first()
+        )
+        if category is None:
+            raise Exception()
+
+    except Exception:
         logs_context = {
-            "current_user": f"{current_user.username}",
+            "category_id": f"{category_id}",
         }
         log_events.log_event("[404] Flask - Catégorie livre inconnue.", logs_context)
         flash(f"Categorie id {category_id} inexistante", "error")
         session.close()
         return redirect(url_for("index"))
+
     books = (
         session.query(Book)
         .filter(
@@ -189,29 +194,32 @@ def delete_book_category(category_id):
     """
     form = forms.DeleteInstanceForm()
     session = session_commands.get_a_database_session()
-    category_to_delete = session.get(BookCategory, category_id)
-    if category_to_delete is None:
+    category_to_delete = None
+
+    try:
+        category_to_delete = session.get(BookCategory, category_id)
+        if form.validate_on_submit():
+            logs_context = {
+                "current_user": f"{current_user.username}",
+                "category_to_delete": category_to_delete.title,
+            }
+            log_events.log_event("[204] Flask - Suppression catégorie livre.", logs_context)
+            flash(f"Suppression catégorie livre {category_to_delete.title}", "info")
+            session.delete(category_to_delete)
+            session.commit()
+            session.close()
+            return redirect(
+                url_for("book_category_routes_blueprint.manage_books_categories")
+            )
+    except Exception as e:
         logs_context = {
-            "current_user": f"{current_user.username}",
+            "category_id": f"{category_id}",
         }
         log_events.log_event("[404] Flask - Suppression catégorie livre inconnue.", logs_context)
         flash("Categorie livre non trouvée", "error")
         session.close()
         return redirect(url_for("index"))
 
-    if form.validate_on_submit():
-        logs_context = {
-            "current_user": f"{current_user.username}",
-            "category_to_delete": category_to_delete.title,
-        }
-        log_events.log_event("[204] Flask - Suppression catégorie livre.", logs_context)
-        flash(f"Suppression catégorie livre {category_to_delete.title}", "info")
-        session.delete(category_to_delete)
-        session.commit()
-        session.close()
-        return redirect(
-            url_for("book_category_routes_blueprint.manage_books_categories")
-        )
     return render_template(
         "delete_book_category.html",
         category_to_delete=category_to_delete,
@@ -230,46 +238,51 @@ def update_book_category(category_id):
     Description: update a book category Flask route.
     """
     session = session_commands.get_a_database_session()
-    category_to_update = session.get(BookCategory, category_id)
-    if category_to_update is None:
+    category_to_update = None
+
+    try:
+        category_to_update = session.get(BookCategory, category_id)
+        edit_form = forms.UpdateBookCategoryForm(
+            title=category_to_update.title,
+        )
+
+        if edit_form.validate_on_submit():
+            title = edit_form.title.data
+            updated_category = BookCategory(
+                title=title,
+            )
+            session.query(BookCategory).where(BookCategory.id == category_id).update(
+                updated_category.get_json_for_update()
+            )
+            if str(title).lower() != "strinGZEg":
+            #if str(title).lower() != "string":
+                logs_context = {
+                    "current_user": f"{current_user.username}",
+                    "updated_category_old": category_to_update.title,
+                    "updated_category_new": updated_category.title,
+                }
+                log_events.log_event(
+                    "[200] Flask - Mise à jour catégorie livre.", logs_context
+                )
+                session.commit()
+                session.close()
+                flash(f"Mise à jour catégorie livre {updated_category.title}.", "info")
+                return redirect(
+                    url_for("book_category_routes_blueprint.manage_books_categories")
+                )
+
+            flash("Saisie invalide, mot clef string non utilisable.", "error")
+            session.close()
+            return redirect(url_for("index"))
+    except Exception as e:
         logs_context = {
-            "current_user": f"{current_user.username}",
+            "category_id": f"{category_id}",
         }
         log_events.log_event("[404] Flask - Mise à jour catégorie livre inconnue.", logs_context)
         flash("Categorie livre non trouvée", "error")
         session.close()
         return redirect(url_for("index"))
-    edit_form = forms.UpdateBookCategoryForm(
-        title=category_to_update.title,
-    )
 
-    if edit_form.validate_on_submit():
-        title = edit_form.title.data
-        updated_category = BookCategory(
-            title=title,
-        )
-        session.query(BookCategory).where(BookCategory.id == category_id).update(
-            updated_category.get_json_for_update()
-        )
-        if str(title).lower() != "string":
-            logs_context = {
-                "current_user": f"{current_user.username}",
-                "updated_category_old": category_to_update.title,
-                "updated_category_new": updated_category.title,
-            }
-            log_events.log_event(
-                "[200] Flask - Mise à jour catégorie livre.", logs_context
-            )
-            session.commit()
-            session.close()
-            flash(f"Mise à jour catégorie livre {updated_category.title}.", "info")
-            return redirect(
-                url_for("book_category_routes_blueprint.manage_books_categories")
-            )
-
-        flash("Saisie invalide, mot clef string non utilisable.", "error")
-        session.close()
-        return redirect(url_for("index"))
     return render_template(
         "update_book_category.html",
         category_to_update=category_to_update,

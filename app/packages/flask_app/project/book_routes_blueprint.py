@@ -78,17 +78,19 @@ def books():
     session.close()
     total_books = len(all_books)
     items, page, per_page, total_pages = return_pagination(all_books)
-    random_quote = return_random_quote()
-    return render_template(
-        "books.html",
-        random_quote=random_quote,
-        books=items,
-        page=page,
-        total_books=total_books,
-        per_page=per_page,
-        total_pages=total_pages,
-        is_authenticated=current_user.is_authenticated,
-    )
+    if len(items) > 1:
+        random_quote = return_random_quote()
+        return render_template(
+            "books.html",
+            random_quote=random_quote,
+            books=items,
+            page=page,
+            total_books=total_books,
+            per_page=per_page,
+            total_pages=total_pages,
+            is_authenticated=current_user.is_authenticated,
+        )
+    return redirect(url_for('index'))
 
 
 @book_routes_blueprint.route("/book/<int:book_id>/", methods=["GET", "POST"])
