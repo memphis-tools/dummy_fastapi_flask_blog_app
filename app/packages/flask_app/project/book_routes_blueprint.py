@@ -78,7 +78,7 @@ def books():
     session.close()
     total_books = len(all_books)
     items, page, per_page, total_pages = return_pagination(all_books)
-    if items > 1:
+    if len(items) > 1:
         random_quote = return_random_quote()
         return render_template(
             "books.html",
