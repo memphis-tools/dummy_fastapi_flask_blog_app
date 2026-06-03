@@ -254,8 +254,7 @@ def update_book_category(category_id):
             session.query(BookCategory).where(BookCategory.id == category_id).update(
                 updated_category.get_json_for_update()
             )
-            if str(title).lower() != "strinGZEg":
-            #if str(title).lower() != "string":
+            if str(title).lower() != "string":
                 logs_context = {
                     "current_user": f"{current_user.username}",
                     "updated_category_old": category_to_update.title,
