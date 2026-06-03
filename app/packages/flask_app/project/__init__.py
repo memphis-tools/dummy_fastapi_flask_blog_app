@@ -222,7 +222,7 @@ def contact():
 
         if os.getenv("SCOPE") == "production":
             message = Mail(
-                from_email=input_email,
+                from_email="no-reply@dummy-ops.dev",
                 to_emails=get_secret("/run/secrets/ADMIN_EMAIL"),
                 subject="Dummy-ops contact",
                 html_content=f"""
