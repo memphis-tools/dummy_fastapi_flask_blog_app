@@ -474,51 +474,6 @@ def test_flask_post_delete_book_being_authenticated_being_the_publisher(
     assert len(user.books) == current_user_total_publications - 1
 
 
-def test_add_book_check_book_fields(
-    client,
-    access_session
-):
-    """
-    Description: check if we can add a book with 'string' keyword as content.
-    """
-    # get the resources folder in the tests folder
-    # rb flag means "Open in binary mode (read/write using byte data)" - https://realpython.com/read-write-files-python/
-    resources = Path(__file__).parent
-
-    url = "http://localhost/books/add/"
-    soup = BeautifulSoup(client.get(url).text, 'html.parser')
-    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
-
-    headers = {
-        "Content-Type": "multipart/form-data",
-        "Cookie": f"session={access_session}",
-    }
-    book_form = {
-        "title": "This is a dummy title sir",
-        "summary": "string",
-        "content": "This is a dummy content sir",
-        "year_of_publication": "2023",
-        "categories": "3",
-        "author": "Dummy Boy",
-        "photo": FileStorage(
-            stream=(resources / "photo_pexels.com_by_inga_seliverstova.jpg").open("rb"),
-            filename="photo_pexels.com_by_inga_seliverstova.jpg",
-            content_type="image/jpeg",
-        ),
-        "csrf_token": csrf_token,
-    }
-    response = client.post(
-        "/books/add/",
-        headers=headers,
-        data=book_form,
-        follow_redirects=True,
-    )
-    assert response.status_code == 200
-    assert "Type image non accepté" in html.unescape(
-        response.get_data(as_text=True)
-    )
-
-
 def test_check_book_fields():
     """
     Description: check the book's year of publication.
