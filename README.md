@@ -297,7 +297,7 @@ You do not need to create a python virtualenv.
 
       POSTGRES_HOST="127.0.0.1" (your_local_ipv4_with_port_5432)
 
-      TEST_USER_PWD="postgres"
+      TEST_USER_PWD="p@stgres76"
 
       # (optional) Verify files to be checked
       python -m pytest --collect-only

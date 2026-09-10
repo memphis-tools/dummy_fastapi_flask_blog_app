@@ -50,15 +50,15 @@ from .shared_functions_and_decorators import (
 book_routes_blueprint = Blueprint("book_routes_blueprint", __name__)
 
 
-def is_file_an_image(file_path):
+def is_file_an_image(file):
     try:
-        img = Image.open(file_path)
+        img = Image.open(file)
         img.verify()
         # Reset cursor after verify()
-        # file_path.seek(0)
+        file.seek(0)
         return True
     except Exception as e:
-        # file_path.seek(0)
+        file.seek(0)
         return False
 
 
@@ -205,10 +205,8 @@ def add_book():
             )
         year_of_publication = form.year_of_publication.data
         book_picture = form.photo.data
-        print("book_picture $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ book_picture $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        print(book_picture)
         filename = book_picture.filename
-        # filename = secure_filename(book_picture.filename)
+
         new_book = Book(
             title=title,
             summary=summary,
@@ -220,12 +218,12 @@ def add_book():
             user_id=current_user.get_id(),
         )
         book_is_valid = check_book_fields(new_book)
-        if not is_file_an_image(filename):
+        if not is_file_an_image(book_picture):
             logs_context = {
                 "current_user": f"{current_user.username}",
             }
             log_events.log_event("[403] Flask - Format image non autorisé.", logs_context)
-            flash("Type image non accepté", "error")
+            flash(f"Type image non accepté cas 1 {filename}", "error")
             return redirect(url_for("index"))
 
         if book_is_valid is True:
@@ -236,7 +234,7 @@ def add_book():
                         "current_user": f"{current_user.username}",
                     }
                     log_events.log_event("[403] Flask - Format image non autorisé.", logs_context)
-                    flash("Type image non accepté", "error")
+                    flash("Type image non accepté cas 2", "error")
                     return redirect(url_for("index"))
                 if os.getenv("SCOPE") == "production":
                     book_picture.save(
