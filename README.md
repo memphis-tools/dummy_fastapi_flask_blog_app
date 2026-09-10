@@ -162,7 +162,7 @@ Cloudflare
   - Password must match the POSTGRES_PASSWORD defined in the .envrc.* files. So you may have to update it.
 
         [postgres@sanjurolab ~]$ psql
-        psql (15.1)
+        psql (17.5)
         Type "help" for help.
 
         postgres=# \password postgres
