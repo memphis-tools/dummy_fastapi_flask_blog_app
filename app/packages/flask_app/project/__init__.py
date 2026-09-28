@@ -88,16 +88,6 @@ def load_user(user_id):
     return loaded
 
 
-# @login_manager.unauthorized_handler
-# def unauthorized():
-#     """
-#     Description: disable access to protected uri.
-#     """
-#     log_events.log_event("[403] Flask - Utilisateur doit se connecter.")
-#     flash("Vous devez d'abord vous connecter", "error")
-#     return redirect(url_for("login"))
-
-
 @login_manager.unauthorized_handler
 def unauthorized():
     ip = request.headers.get("X-Forwarded-For", request.remote_addr)
@@ -105,7 +95,7 @@ def unauthorized():
     method = request.method
 
     log_events.log_event(
-        f"[403] Flask - Utilisateur doit se connecter | IP={ip} | "
+        f"[401] Flask - Utilisateur doit se connecter | IP={ip} | "
         f"Method={method} | Path={path}"
     )
 
