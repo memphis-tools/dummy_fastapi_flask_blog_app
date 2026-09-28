@@ -69,7 +69,8 @@ Remember it's just a dummy project.
 **A default virtual machine with 1vcpu and 2gb RAM is needed**
 
 ## TECHNOLOGIES
-Python 3.12 and later
+
+Python 3.11
 
 Postgresql 17 (driver psycopg 3)
 
