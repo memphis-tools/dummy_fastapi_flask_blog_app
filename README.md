@@ -100,13 +100,13 @@ Twilio SendGrid
 
 hCaptcha
 
-Codacy
-
 Snyk
 
 Aikido Security
 
 Cloudflare
+
+Vibe (used since 2026 to improve test coverage rates)
 
 ## HOW TO SET IT, HOW IT WORKS
 
