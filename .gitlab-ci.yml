@@ -31,7 +31,7 @@ unit_tests_development_branch:
   stage: test_development_branch
   only:
     - development
-  image: python:3.12.8
+  image: python:3.11.7
   variables:
     SCOPE: "test"
     ADMIN_LOGIN: "admin"
@@ -58,7 +58,7 @@ report:
   stage: report
   only:
     - development
-  image: python:3.12.8
+  image: python:3.11.7
   script:
     - python-codacy-coverage -r coverage.xml
   dependencies:
@@ -68,7 +68,7 @@ unit_tests_master_branch:
   stage: test_master_branch
   only:
     - master
-  image: python:3.12.8
+  image: python:3.11.7
   variables:
     SCOPE: "test"
     ADMIN_LOGIN: "admin"
