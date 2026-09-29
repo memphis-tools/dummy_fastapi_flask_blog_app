@@ -98,8 +98,6 @@ Redis
 
 Twilio SendGrid
 
-Lynis (for the virtual machine, droplet, hardening)
-
 hCaptcha
 
 Codacy
@@ -107,10 +105,6 @@ Codacy
 Snyk
 
 Aikido Security
-
-Cursor
-
-TabNine
 
 Cloudflare
 
