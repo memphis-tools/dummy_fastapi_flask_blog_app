@@ -735,3 +735,267 @@ def test_update_book_with_corrupted_image_type(
         follow_redirects=True,
     )
     assert response.status_code == 200
+
+# ------------------------------------------------------------------
+# Supplementary tests proposed by Vibe (powered by glm-5-latest-short)
+# on 2026-09-29 — v2: fixed module-shadowing monkeypatch paths,
+# empty-filename form stub, flash patching (no request context).
+# Goal: raise book_routes_blueprint.py coverage from 79% to max.
+# ------------------------------------------------------------------
+from importlib import import_module
+from unittest.mock import MagicMock
+
+from flask_wtf.file import FileField
+from werkzeug.exceptions import HTTPException
+
+from app.packages.flask_app.project import forms as project_forms
+from app.packages.flask_app.project.book_routes_blueprint import (
+    FileData,
+    create_updated_book,
+    get_book_by_id,
+    get_category_id,
+    get_updated_fields,
+    handle_file_upload_and_removal,
+    save_updated_book,
+)
+
+
+def _get_book_routes_blueprint_module():
+    """
+    Description: return the book_routes_blueprint MODULE. The project's
+    __init__ shadows the module name with the Blueprint instance, so we
+    go through import_module/sys.modules to get the real module object.
+    """
+    return import_module("app.packages.flask_app.project.book_routes_blueprint")
+
+
+def test_flask_books_redirect_when_one_book(client, monkeypatch):
+    """
+    Description: covers line 81 -> 93: books() redirects to index when
+    pagination returns 0 or 1 book. The dummy DB always has several books,
+    so we mock return_pagination.
+    """
+    monkeypatch.setattr(
+        _get_book_routes_blueprint_module(),
+        "return_pagination",
+        lambda items_to_paginate: ([], 1, 6, 1),
+    )
+    response = client.get("http://localhost/books/", follow_redirects=False)
+    assert response.status_code == 302
+
+
+def test_flask_post_comment_on_a_book(client, access_session, get_session):
+    """
+    Description: covers line 146 -> 147: comment form submitted on book page.
+    The created comment is removed at the end of the test.
+    """
+    from app.packages.database.models.models import Comment
+
+    url = "http://localhost/book/1/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cookie": f"session={access_session}",
+    }
+    data = {"csrf_token": csrf_token, "comment_text": "What a great dummy book sir!"}
+    response = client.post(url, headers=headers, data=data, follow_redirects=False)
+    assert response.status_code == 302
+
+    # cleanup: remove the comment we just added
+    comment = (
+        get_session.query(Comment)
+        .filter_by(text="What a great dummy book sir!", book_id=1)
+        .first()
+    )
+    assert comment is not None
+    get_session.delete(comment)
+    get_session.commit()
+
+
+def test_flask_post_add_book_with_invalid_fields(client, access_session):
+    """
+    Description: covers line 229 -> 261: check_book_fields returns an error
+    (title keyword "string"), so the book is not added.
+    """
+    resources = Path(__file__).parent
+    url = "http://localhost/books/add/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+    headers = {
+        "Content-Type": "multipart/form-data",
+        "Cookie": f"session={access_session}",
+    }
+    book_form = {
+        "title": "string",
+        "summary": "This is a dummy summary sir",
+        "content": "This is a dummy content sir",
+        "categories": "2",
+        "year_of_publication": "1999",
+        "author": "Dummy Sapiens",
+        "photo": (resources / "photo_pexels.com_by_inga_seliverstova.jpg").open("rb"),
+        "csrf_token": csrf_token,
+    }
+    response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"mot clef string non utilisable" in response.data
+    assert b"Livre ajout\xc3\xa9." not in response.data
+
+
+def _patch_book_form_photo_validators(monkeypatch):
+    """
+    Helper: replace BookForm with a subclass whose photo field has no
+    FileRequired/FileAllowed validator, so we can post forbidden
+    extensions through the route (the form blocks them otherwise).
+    """
+
+    class BookFormWithoutPhotoValidators(project_forms.BookForm):
+        photo = FileField("IMAGE")
+
+    monkeypatch.setattr(project_forms, "BookForm", BookFormWithoutPhotoValidators)
+
+
+class _FakeField:
+    def __init__(self, data):
+        self.data = data
+
+
+class _FakeBookForm:
+    """
+    A form stub bypassing CSRF/WTF validation so the route can run with a
+    FileStorage whose filename is "" (an empty-filename upload never
+    survives werkzeug parsing, so a real form cannot produce it).
+    """
+
+    def __init__(self, books_categories=None):
+        resources = Path(__file__).parent
+        self.title = _FakeField("This is a dummy title sir")
+        self.summary = _FakeField("This is a dummy summary sir")
+        self.content = _FakeField("This is a dummy content sir")
+        self.author = _FakeField("Dummy Sapiens")
+        self.categories = _FakeField("2")
+        self.year_of_publication = _FakeField(1999)
+        self.photo = _FakeField(
+            FileStorage(
+                stream=(resources / "photo_pexels.com_by_inga_seliverstova.jpg").open("rb"),
+                filename="",
+                content_type="image/jpeg",
+            )
+        )
+
+    def validate_on_submit(self):
+        return True
+
+
+def test_flask_post_add_book_with_forbidden_extension_but_valid_image(
+    client, access_session, monkeypatch
+):
+    """
+    Description: covers line 232 -> 233 ("cas 2"): a valid image (PIL can open it)
+    with a forbidden extension (.gif). The form validator is bypassed on purpose.
+    """
+    _patch_book_form_photo_validators(monkeypatch)
+    resources = Path(__file__).parent
+    url = "http://localhost/books/add/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+    headers = {
+        "Content-Type": "multipart/form-data",
+        "Cookie": f"session={access_session}",
+    }
+    book_form = {
+        "title": "This is a dummy title sir",
+        "summary": "This is a dummy summary sir",
+        "content": "This is a dummy content sir",
+        "categories": "2",
+        "year_of_publication": "1999",
+        "author": "Dummy Sapiens",
+        "photo": FileStorage(
+            stream=(resources / "photo_pexels.com_by_inga_seliverstova.gif").open("rb"),
+            filename="photo_pexels.com_by_inga_seliverstova.gif",
+            content_type="image/gif",
+        ),
+        "csrf_token": csrf_token,
+    }
+    response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"cas 2" in response.data
+
+
+def test_flask_post_add_book_in_production_scope(
+    client, access_session, get_session, monkeypatch
+):
+    """
+    Description: covers line 239 -> 240: SCOPE=production saves the uploaded
+    file on disk. We mock FileStorage.save and the session factory so no
+    file is written and no production DB connection is attempted.
+    """
+    monkeypatch.setenv("SCOPE", "production")
+    monkeypatch.setattr(
+        "app.packages.database.commands.session_commands.get_a_database_session",
+        lambda: get_session,
+    )
+    monkeypatch.setattr(
+        "werkzeug.datastructures.FileStorage.save",
+        lambda self, dst, timeout=None: None,
+    )
+    resources = Path(__file__).parent
+    url = "http://localhost/books/add/"
+    soup = BeautifulSoup(client.get(url).text, 'html.parser')
+    csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
+    headers = {
+        "Content-Type": "multipart/form-data",
+        "Cookie": f"session={access_session}",
+    }
+    book_form = {
+        "title": "This is a dummy production title sir",
+        "summary": "This is a dummy summary sir",
+        "content": "This is a dummy content sir",
+        "categories": "2",
+        "year_of_publication": "1999",
+        "author": "Dummy Sapiens",
+        "photo": (resources / "photo_pexels.com_by_inga_seliverstova.jpg").open("rb"),
+        "csrf_token": csrf_token,
+    }
+    response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Livre ajout\xc3\xa9." in response.data
+
+
+def test_get_category_id_without_categories_key(get_session):
+    """
+    Description: covers line 359 -> 360: no "categories" key in form dict.
+    """
+    response = get_category_id({"title": "a title"}, get_session)
+    assert response is None
+
+
+def test_handle_file_upload_and_removal_with_dummy_picture():
+    """
+    Description: covers line 426 -> exit: filename is dummy_blank_book.png,
+    so nothing is done.
+    """
+    result = handle_file_upload_and_removal("dummy_blank_book.png", "old.png", None)
+    assert result is None
+
+
+def test_handle_file_upload_and_removal_with_forbidden_extension():
+    """
+    Description: covers line 428 -> 429: forbidden extension aborts with 400.
+    """
+    with pytest.raises(HTTPException) as exc_info:
+        handle_file_upload_and_removal("invalid_picture.txt", "old.png", None)
+    assert exc_info.value.code == 400
+
+
+def test_handle_file_upload_and_removal_in_production(monkeypatch):
+    """
+    Description: covers line 430 -> 431: in production the uploaded file is
+    saved and the old picture removed (missing old file is ignored).
+    """
+    monkeypatch.setenv("SCOPE", "production")
+    fake_uploaded_file = MagicMock()
+    handle_file_upload_and_removal(
+        "new_picture.jpg", "zzz_unexisting_picture.png", fake_uploaded_file
+    )
+    fake_uploaded_file.save.assert_called_once()

@@ -260,3 +260,102 @@ def test_authenticate_unexisting_user():
     password = settings.TEST_USER_PWD
     response = authenticate_user(username, password)
     assert response is False
+
+
+# ------------------------------------------------------------------
+# Supplementary tests proposed by Vibe (powered by glm-5-latest-short)
+# on 2026-09-29 — goal: raise dependencies.py coverage from 84% to 100%.
+# Covers: SCOPE branch, token without "sub", unknown user in token,
+# disabled user, invalid JWT, and get_current_* happy paths.
+# ------------------------------------------------------------------
+import importlib
+from datetime import timedelta  # already imported above; kept for block autonomy
+import pytest  # already imported above
+
+from fastapi import HTTPException
+
+from app.packages.fastapi.routes import dependencies
+from app.packages.fastapi.routes.dependencies import get_current_user, get_current_active_user
+
+
+def _make_token(data):
+    """helper: craft a signed token with an arbitrary payload."""
+    return routes_and_authentication.create_access_token(
+        data=data,
+        expires_delta=timedelta(minutes=routes_and_authentication.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_with_valid_token():
+    """covers get_current_user happy path."""
+    token = _make_token({"sub": "donald"})
+    user = await get_current_user(token)
+    assert isinstance(user, fastapi_models.UserInDB)
+    assert user.username == "donald"
+
+
+@pytest.mark.asyncio
+async def test_get_current_active_user_with_valid_token():
+    """covers get_current_active_user happy path (line 89 -> return)."""
+    token = _make_token({"sub": "donald"})
+    current_user = await get_current_active_user(await get_current_user(token))
+    assert current_user.username == "donald"
+
+
+@pytest.mark.asyncio
+async def test_get_current_active_user_with_disabled_user():
+    """covers line 89 -> 90: disabled user raises HTTP 400.
+    Notice: User.get_json() omits "disabled", so UserInDB always gets
+    disabled=False from get_user(); the branch is only reachable by
+    calling get_current_active_user directly with a disabled UserModel.
+    """
+    disabled_user = fastapi_models.UserModel(
+        id=4, username="louloute", role="user", disabled=True, is_active=True
+    )
+    with pytest.raises(HTTPException) as exc_info:
+        await get_current_active_user(disabled_user)
+    assert exc_info.value.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_with_token_without_sub_claim(fastapi_client):
+    """covers line 74 -> 75: valid token but no 'sub' claim."""
+    headers = {"Authorization": f"Bearer {_make_token({'foo': 'bar'})}"}
+    response = fastapi_client.get("/api/v1/books/", headers=headers)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_with_unknown_user_in_token(fastapi_client):
+    """covers line 80 -> 81: valid token, user not in db."""
+    headers = {"Authorization": f"Bearer {_make_token({'sub': 'fantomas'})}"}
+    response = fastapi_client.get("/api/v1/books/", headers=headers)
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_with_garbage_token(fastapi_client):
+    """covers the except branch of jwt.decode."""
+    headers = {"Authorization": "Bearer not.a.valid.jwt"}
+    response = fastapi_client.get("/api/v1/books/", headers=headers)
+    assert response.status_code == 401
+
+
+def test_secret_key_loaded_from_docker_secret(monkeypatch):
+    """covers line 34 -> 35: SECRET_KEY read from /run/secrets when SCOPE is set.
+    We patch the session factory so the module reload reuses the existing
+    session instead of opening a new (failing) DB connection.
+    """
+    monkeypatch.setattr("app.packages.utils.get_secret", lambda path: "dummy-secret")
+    monkeypatch.setattr(
+        "app.packages.database.commands.session_commands.init_and_get_a_database_session",
+        lambda: dependencies.session,
+    )
+    monkeypatch.setenv("SCOPE", "development")
+    try:
+        importlib.reload(dependencies)
+        assert dependencies.SECRET_KEY == "dummy-secret"
+    finally:
+        monkeypatch.delenv("SCOPE", raising=False)
+        importlib.reload(dependencies)

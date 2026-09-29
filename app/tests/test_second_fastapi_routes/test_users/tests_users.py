@@ -637,3 +637,141 @@ async def test_get_invalid_user_books(fastapi_client, fastapi_token):
         headers={"Authorization": f"Bearer {fastapi_token}"}
     )
     assert response.status_code == 404
+
+# ------------------------------------------------------------------
+# Supplementary tests proposed by Vibe (powered by glm-5-latest-short)
+# on 2026-09-29 — goal: raise dependencies.py coverage from 35% to max
+# for the tests_users.py run. Covers: verify_password, authenticate_user
+# branches, get_current_user error branches, get_current_active_user
+# disabled branch, SCOPE secret-key branch.
+# ------------------------------------------------------------------
+import importlib
+
+from fastapi import HTTPException
+
+from app.packages.fastapi.routes import dependencies
+from app.packages.fastapi.routes.dependencies import authenticate_user
+
+
+def _make_token(data):
+    """
+    Description: helper crafting a signed token with an arbitrary payload.
+    """
+    return routes_and_authentication.create_access_token(
+        data=data,
+        expires_delta=timedelta(minutes=routes_and_authentication.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
+
+
+def test_authenticate_user_with_good_credentials(get_session):
+    """
+    Description: covers authenticate_user happy path + verify_password.
+    Tests are not idempotent: a previous test may have deleted, renamed
+    donald or changed his password, so we (re)create him or reset his
+    password before authenticating.
+    """
+    from werkzeug.security import check_password_hash
+
+    from app.packages.database.models.models import User
+    from app.packages.utils import set_a_hash_password
+
+    user = get_session.query(User).filter_by(username="donald").first()
+    if user is None:
+        get_session.add(
+            User(
+                username="donald",
+                email="donald.fastapi.test@localhost.fr",
+                hashed_password=set_a_hash_password(settings.TEST_USER_PWD),
+                is_active=True,
+                disabled=False,
+            )
+        )
+        get_session.commit()
+    elif not check_password_hash(user.hashed_password, settings.TEST_USER_PWD):
+        user.hashed_password = set_a_hash_password(settings.TEST_USER_PWD)
+        get_session.commit()
+    response = authenticate_user("donald", settings.TEST_USER_PWD)
+    assert isinstance(response, fastapi_models.UserInDB)
+
+
+def test_authenticate_user_with_bad_password():
+    """
+    Description: covers authenticate_user when verify_password fails.
+    """
+    response = authenticate_user("donald", "a-very-bad-password")
+    assert response is False
+
+
+def test_authenticate_user_with_unknown_user():
+    """
+    Description: covers authenticate_user when user does not exist.
+    """
+    response = authenticate_user("fantomas", settings.TEST_USER_PWD)
+    assert response is False
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_with_token_without_sub_claim():
+    """
+    Description: covers the "username is None" branch of get_current_user.
+    """
+    with pytest.raises(HTTPException) as exc_info:
+        await get_current_user(_make_token({"foo": "bar"}))
+    assert exc_info.value.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_with_unknown_user_in_token():
+    """
+    Description: covers the "user is None" branch of get_current_user.
+    """
+    with pytest.raises(HTTPException) as exc_info:
+        await get_current_user(_make_token({"sub": "fantomas"}))
+    assert exc_info.value.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_with_garbage_token():
+    """
+    Description: covers the except branch of jwt.decode in get_current_user.
+    """
+    with pytest.raises(HTTPException) as exc_info:
+        await get_current_user("not.a.valid.jwt")
+    assert exc_info.value.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_current_active_user_with_disabled_user():
+    """
+    Description: covers the disabled branch of get_current_active_user.
+    User.get_json() omits "disabled", so UserInDB built from get_user()
+    always has disabled=False; the branch is only reachable by calling
+    get_current_active_user directly with a disabled UserModel.
+    """
+    disabled_user = fastapi_models.UserModel(
+        id=4, username="louloute", role="user", disabled=True, is_active=True
+    )
+    with pytest.raises(HTTPException) as exc_info:
+        await get_current_active_user(disabled_user)
+    assert exc_info.value.status_code == 400
+
+
+def test_secret_key_loaded_from_docker_secret(monkeypatch):
+    """
+    Description: covers line 34 -> 35: SECRET_KEY read from /run/secrets
+    when SCOPE is set. The session factory is patched so the module reload
+    reuses the existing session instead of opening a new (failing) DB
+    connection.
+    """
+    monkeypatch.setattr("app.packages.utils.get_secret", lambda path: "dummy-secret")
+    monkeypatch.setattr(
+        "app.packages.database.commands.session_commands.init_and_get_a_database_session",
+        lambda: dependencies.session,
+    )
+    monkeypatch.setenv("SCOPE", "development")
+    try:
+        importlib.reload(dependencies)
+        assert dependencies.SECRET_KEY == "dummy-secret"
+    finally:
+        monkeypatch.delenv("SCOPE", raising=False)
+        importlib.reload(dependencies)
