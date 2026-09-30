@@ -1,10 +1,10 @@
-FROM python:3.11.15-slim-bookworm
+FROM python:3.14-rc-alpine3.20
 
 # create directory for the dummy-operator user
 RUN mkdir -p /home/dummy-operator
 
 # create the dummy-operator user
-RUN addgroup --system dummy-operator && adduser --system --group dummy-operator
+RUN addgroup -S dummy-operator && adduser -S -G dummy-operator dummy-operator
 
 # create the appropriate directories
 ENV HOME=/home/dummy-operator

@@ -1,10 +1,10 @@
-FROM python:3.11.15-slim-bookworm
+FROM python:3.14-rc-alpine3.20
 
 # create directory for the dummy-operator user
 RUN mkdir -p /home/dummy-operator
 
 # create the dummy-operator user
-RUN addgroup --system dummy-operator && adduser --system --group dummy-operator
+RUN addgroup -S dummy-operator && adduser -S -G dummy-operator dummy-operator
 
 WORKDIR /code
 ENV APP_HOME=/code/app
@@ -17,6 +17,7 @@ ENV PYTHONUNBUFFERED 1
 
 COPY ./app/packages/fastapi/requirements.txt /code/requirements.txt
 
+RUN apk add --no-cache build-base
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 RUN mkdir -p /code/app/fastapi
 COPY ./app/packages/fastapi $APP_HOME/fastapi
