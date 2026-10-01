@@ -7386,14 +7386,14 @@ body {
   width: 100%;
 }
 
-.flaticon-logo {
+.midjourney-logo {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.flaticon-logo img {
+.midjourney-logo img {
   width: 10%;
 }
 
@@ -8248,7 +8248,7 @@ footer li,
     margin: 0%;
   }
 
-  .flaticon-logo {
+  .midjourney-logo {
     font-size: 70%;
   }
 
