@@ -46,8 +46,7 @@ def test_flask_moocs_route(client):
     """
     response = client.get("/moocs/")
     assert response.status_code == 200
-    assert b'ops-portfolio' in response.data
-    assert b'id="ops-hero"' in response.data
+    assert b'HAVE I BEEN PWNED' in response.data
 
 
 def test_flask_contact_route(client):
