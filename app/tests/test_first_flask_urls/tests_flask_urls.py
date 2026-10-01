@@ -33,9 +33,10 @@ def test_flask_ops_route(client, captured_templates):
     """
     Description: check if we can reach the ops route
     """
-    response = client.get("http://localhost/ops/")
+    response = client.get("/ops/")
     assert response.status_code == 200
-    assert b"DUMMY OPS - OPS" in response.data
+    assert b'ops-portfolio' in response.data
+    assert b'id="ops-hero"' in response.data
     assert captured_templates[0].name == "ops.html"
 
 
@@ -43,9 +44,9 @@ def test_flask_moocs_route(client):
     """
     Description: check if we can reach the moocs route
     """
-    response = client.get("http://localhost/moocs/")
+    response = client.get("/moocs/")
     assert response.status_code == 200
-    assert b"DUMMY OPS - MOOCS" in response.data
+    assert b'HAVE I BEEN PWNED' in response.data
 
 
 def test_flask_contact_route(client):
