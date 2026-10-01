@@ -1,161 +1,318 @@
 {% extends "base.html" %}
 
-{% block title %}OPS{% endblock title %}
+{% block title %}MOOCS & NEWS{% endblock title %}
 
 {% block content %}
-<div class="container">
-    <h1 class="text-center mb-4">DUMMY OPS - MOOCS & NEWS</h1>
-    <div class="moocs_container p-4 bg-light rounded shadow-sm">
-        <!-- Section MOOCS -->
-        <h2 class="mb-4 text-center">MOOCS RECOMMANDÉS <i class="bi bi-robot"></i></h2>
-        <div class="row g-4">
-            <!-- CNAM -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm hover-scale">
-                    <div class="card-body text-center p-4">
-                        <img src="https://www.cnam.fr/uas/cnam/LOGO/CNAM_Logo-preprod.svg" alt="CNAM Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
-                        <h5 class="card-title">CNAM</h5>
-                        <p class="card-text">Formations professionnelles et diplômantes en ligne.</p>
-                        <a href="https://www.cnam.fr/portail/conservatoire-national-des-arts-et-metiers-accueil-821166.kjsp" target="_blank" class="btn btn-outline-primary">Visiter</a>
-                    </div>
-                </div>
+
+<div class="ops-portfolio" id="moocs-top">
+
+    <div class="ops-global-grid" aria-hidden="true"></div>
+    <div class="ops-global-scanlines" aria-hidden="true"></div>
+
+
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+    <section class="ops-screen moocs-hero" id="moocs-hero">
+
+        <div class="ops-grid" aria-hidden="true"></div>
+        <div class="ops-hero-glow" aria-hidden="true"></div>
+        <div class="ops-scanline" aria-hidden="true"></div>
+
+        <div class="ops-hero-content">
+
+            <div class="ops-status">
+                <span class="status-dot"></span>
+                LEARNING NODE / ONLINE
             </div>
-            <!-- UDEMY -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm hover-scale">
-                    <div class="card-body text-center p-4">
-                        <img src="https://frontends.udemycdn.com/frontends-homepage/staticx/udemy/images/v7/logo-udemy.svg" alt="Udemy Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
-                        <h5 class="card-title">UDEMY</h5>
-                        <p class="card-text">Des milliers de cours sur tous les sujets, accessibles à vie.</p>
-                        <a href="https://www.udemy.com" target="_blank" class="btn btn-outline-primary">Visiter</a>
-                    </div>
-                </div>
+
+            <p class="ops-overline">
+                MOOCS · NEWS · SECURITY · OPEN SOURCES
+            </p>
+
+            <h1>
+                LEARNING
+                <span>FEED</span>
+            </h1>
+
+            <p class="ops-kicker">
+                TRAINING · TECH WATCH · OSINT · STAY SAFE
+            </p>
+
+            <p class="ops-hero-intro">
+                Curated sources I actually use to keep learning.
+            </p>
+
+            <div class="ops-command">
+                <span class="terminal-prompt">$</span>
+                <span>cat ~/sources/curated.list</span>
+                <span class="cursor">_</span>
             </div>
-            <!-- STATION X -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm hover-scale">
-                    <div class="card-body text-center p-4">
-                        <img src="https://www.stationx.net/wp-content/uploads/2022/02/StationX-blue-logo.svg" alt="StationX Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
-                        <h5 class="card-title">STATION X</h5>
-                        <p class="card-text">Cybersécurité et formations techniques avancées.</p>
-                        <a href="https://www.stationx.net/" target="_blank" class="btn btn-outline-primary">Visiter</a>
-                    </div>
-                </div>
-            </div>
-            <!-- REAL PYTHON -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm hover-scale">
-                    <div class="card-body text-center p-4">
-                        <img src="https://realpython.com/static/real-python-logo.893c30edea53.svg" alt="Real Python Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
-                        <h5 class="card-title">REAL PYTHON</h5>
-                        <p class="card-text">Tutoriels et ressources pour maîtriser Python.</p>
-                        <a href="https://realpython.com/" target="_blank" class="btn btn-outline-primary">Visiter</a>
-                    </div>
-                </div>
-            </div>
-            <!-- TEST DRIVEN -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm hover-scale">
-                    <div class="card-body text-center p-4">
-                        <img src="https://testdriven.io/static/images/test_driven_io_full_logo_white_text.4a6302a91a54.svg" alt="TestDriven Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
-                        <h5 class="card-title">TEST DRIVEN</h5>
-                        <p class="card-text">Développement logiciel et bonnes pratiques.</p>
-                        <a href="https://testdriven.io/" target="_blank" class="btn btn-outline-primary">Visiter</a>
-                    </div>
-                </div>
-            </div>
-            <!-- ELEPHORM -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm hover-scale">
-                    <div class="card-body text-center p-4">
-                        <img src="https://www.elephorm.com/themes/custom/elephorm_theme/images/logo/elephorm-black.svg" alt="Elephorm Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
-                        <h5 class="card-title">ELEPHORM</h5>
-                        <p class="card-text">Formations vidéo pour créatifs et professionnels.</p>
-                        <a href="https://www.elephorm.com/" target="_blank" class="btn btn-outline-primary">Visiter</a>
-                    </div>
-                </div>
-            </div>
+
         </div>
 
-        <!-- Section NEWS -->
-        <hr class="my-5">
-        <h2 class="mb-4 text-center">NEWS TECH <i class="bi bi-newspaper"></i></h2>
-        <div class="row g-4">
-            <!-- KORBEN -->
-            <div class="col-md-6">
-                <div class="card h-100 border-0 shadow-sm hover-scale">
-                    <div class="card-body text-center p-4">
-                        <img src="https://korben.info/img/logo-small.svg" alt="Korben Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
-                        <h5 class="card-title">KORBEN</h5>
-                        <p class="card-text">Actualités tech, astuces et culture geek.</p>
-                        <a href="https://korben.info/" target="_blank" class="btn btn-outline-primary">Visiter</a>
-                    </div>
+        <a class="scroll-cue" href="#moocs-list">
+            <span>EXPLORE SOURCES</span>
+            <i class="fa-solid fa-chevron-down"></i>
+        </a>
+
+    </section>
+
+
+    <!-- =========================================================
+         SOURCE LIST
+    ========================================================== -->
+    <section class="ops-section ops-screen moocs-section" id="moocs-list">
+
+        <div class="section-watermark" aria-hidden="true">SRC</div>
+        <div class="section-number">CURATED / LEARNING SOURCES</div>
+
+        <div class="section-heading reveal">
+
+            <div>
+                <div class="eyebrow">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    MOOCS / TRAINING
                 </div>
+
+                <h2>
+                    Learn from
+                    <span>the sources.</span>
+                </h2>
             </div>
-            <!-- PHOENIX JP -->
-            <div class="col-md-6">
-                <div class="card h-100 border-0 shadow-sm hover-scale">
-                    <div class="card-body text-center p-4">
-                        <img src="https://www.phoenixjp.info/_next/image?url=%2Fimages%2FPJP_LOGO.png&w=256&q=75" alt="Phoenix JP Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
-                        <h5 class="card-title">PHOENIX JP</h5>
-                        <p class="card-text">News et analyses sur la tech.</p>
-                        <a href="https://www.phoenixjp.info/news/fr/" target="_blank" class="btn btn-outline-primary">Visiter</a>
-                    </div>
-                </div>
+
+            <div class="section-state">
+                <span class="status-dot"></span>
+                10 SOURCES
             </div>
+
         </div>
 
-        <!-- Section Security -->
-        <hr class="my-5">
-        <h2 class="mb-4 text-center">STAY SAFE <i class="bi bi-newspaper"></i></h2>
-        <div class="row g-4">
-            <!-- KORBEN -->
-            <div class="col-md-6">
-                <div class="card h-100 border-0 shadow-sm hover-scale">
-                    <div class="card-body text-center p-4">
-                        <img src="https://osintfr.com/wp-content/uploads/2025/01/Logo2025med.png" alt="OSINT-FR Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
-                        <h5 class="card-title">OSINT-FR</h5>
-                        <p class="card-text">Comprendre le monde en sources ouvertes.</p>
-                        <a href="https://osintfr.com/" target="_blank" class="btn btn-outline-primary">Visiter</a>
-                    </div>
-                </div>
+
+        <!-- ---------- MOOCS ---------- -->
+        <div class="moocs-block reveal">
+
+            <div class="map-title">
+                <span>MOOCS RECOMMANDÉS</span>
+                <small>TRAINING / CERTIFICATION</small>
             </div>
-            <!-- PHOENIX JP -->
-            <div class="col-md-6">
-                <div class="card h-100 border-0 shadow-sm hover-scale">
-                    <div class="card-body text-center p-4">
-                        <img src="https://haveibeenpwned.com/Images/HibpLogo.svg?v=w1UPiLz7TzzzyTflCj6n2lzgzKj-UhDA7827u2P4wb8" alt="Have I Been Pwned Logo" class="img-fluid mb-3 rounded" style="max-height: 60px;">
-                        <h5 class="card-title">HAVE I BEEN PWNED</h5>
-                        <p class="card-text">Check if your email address is in a data breach.</p>
-                        <a href="https://haveibeenpwned.com/" target="_blank" class="btn btn-outline-primary">Visiter</a>
+
+            <div class="moocs-grid">
+
+                <a class="moocs-tile" href="https://www.cnam.fr/portail/conservatoire-national-des-arts-et-metiers-accueil-821166.kjsp"
+                    target="_blank" rel="noopener noreferrer">
+                    <div class="moocs-logo">
+                        <img src="https://www.cnam.fr/uas/cnam/LOGO/CNAM_Logo-preprod.svg"
+                            alt="CNAM Logo" loading="lazy">
                     </div>
-                </div>
+                    <strong>CNAM</strong>
+                    <p>
+                        Formations professionnelles et diplômantes
+                        en ligne.
+                    </p>
+                    <span class="moocs-cat">DIPLOMAS</span>
+                    <span class="moocs-go">
+                        VISITER
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </span>
+                </a>
+
+                <a class="moocs-tile" href="https://www.udemy.com"
+                    target="_blank" rel="noopener noreferrer">
+                    <div class="moocs-logo">
+                        <img src="https://frontends.udemycdn.com/frontends-homepage/staticx/udemy/images/v7/logo-udemy.svg"
+                            alt="Udemy Logo" loading="lazy">
+                    </div>
+                    <strong>UDEMY</strong>
+                    <p>
+                        Des milliers de cours sur tous les sujets,
+                        accessibles à vie.
+                    </p>
+                    <span class="moocs-cat">CATALOG</span>
+                    <span class="moocs-go">
+                        VISITER
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </span>
+                </a>
+
+                <a class="moocs-tile" href="https://www.stationx.net/"
+                    target="_blank" rel="noopener noreferrer">
+                    <div class="moocs-logo">
+                        <img src="https://www.stationx.net/wp-content/uploads/2022/02/StationX-blue-logo.svg"
+                            alt="StationX Logo" loading="lazy">
+                    </div>
+                    <strong>STATION X</strong>
+                    <p>
+                        Cybersécurité et formations techniques
+                        avancées.
+                    </p>
+                    <span class="moocs-cat">CYBERSEC</span>
+                    <span class="moocs-go">
+                        VISITER
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </span>
+                </a>
+
+                <a class="moocs-tile" href="https://realpython.com/"
+                    target="_blank" rel="noopener noreferrer">
+                    <div class="moocs-logo">
+                        <img src="https://realpython.com/static/real-python-logo.893c30edea53.svg"
+                            alt="Real Python Logo" loading="lazy">
+                    </div>
+                    <strong>REAL PYTHON</strong>
+                    <p>
+                        Tutoriels et ressources pour maîtriser
+                        Python.
+                    </p>
+                    <span class="moocs-cat">PYTHON</span>
+                    <span class="moocs-go">
+                        VISITER
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </span>
+                </a>
+
+                <a class="moocs-tile" href="https://testdriven.io/"
+                    target="_blank" rel="noopener noreferrer">
+                    <div class="moocs-logo">
+                        <img src="https://testdriven.io/static/images/test_driven_io_full_logo_white_text.4a6302a91a54.svg"
+                            alt="TestDriven Logo" loading="lazy">
+                    </div>
+                    <strong>TEST DRIVEN</strong>
+                    <p>
+                        Développement logiciel et bonnes pratiques.
+                    </p>
+                    <span class="moocs-cat">ENGINEERING</span>
+                    <span class="moocs-go">
+                        VISITER
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </span>
+                </a>
+
+                <a class="moocs-tile" href="https://www.elephorm.com/"
+                    target="_blank" rel="noopener noreferrer">
+                    <div class="moocs-logo">
+                        <img src="https://www.elephorm.com/themes/custom/elephorm_theme/images/logo/elephorm-black.svg"
+                            alt="Elephorm Logo" loading="lazy">
+                    </div>
+                    <strong>ELEPHORM</strong>
+                    <p>
+                        Formations vidéo pour créatifs et
+                        professionnels.
+                    </p>
+                    <span class="moocs-cat">VIDEO</span>
+                    <span class="moocs-go">
+                        VISITER
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </span>
+                </a>
+
             </div>
+
         </div>
-    </div>
+
+
+        <!-- ---------- NEWS TECH ---------- -->
+        <div class="moocs-block reveal">
+
+            <div class="map-title">
+                <span>NEWS TECH</span>
+                <small>TECH WATCH</small>
+            </div>
+
+            <div class="moocs-grid">
+
+                <a class="moocs-tile" href="https://korben.info/"
+                    target="_blank" rel="noopener noreferrer">
+                    <div class="moocs-logo">
+                        <img src="https://korben.info/img/logo-small.svg"
+                            alt="Korben Logo" loading="lazy">
+                    </div>
+                    <strong>KORBEN</strong>
+                    <p>
+                        Actualités tech, astuces et culture geek.
+                    </p>
+                    <span class="moocs-cat">NEWS</span>
+                    <span class="moocs-go">
+                        VISITER
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </span>
+                </a>
+
+                <a class="moocs-tile" href="https://www.phoenixjp.info/news/fr/"
+                    target="_blank" rel="noopener noreferrer">
+                    <div class="moocs-logo">
+                        <img src="https://www.phoenixjp.info/_next/image?url=%2Fimages%2FPJP_LOGO.png&w=256&q=75"
+                            alt="Phoenix JP Logo" loading="lazy">
+                    </div>
+                    <strong>PHOENIX JP</strong>
+                    <p>
+                        News et analyses sur la tech.
+                    </p>
+                    <span class="moocs-cat">NEWS</span>
+                    <span class="moocs-go">
+                        VISITER
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </span>
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- ---------- STAY SAFE ---------- -->
+        <div class="moocs-block reveal">
+
+            <div class="map-title">
+                <span>STAY SAFE</span>
+                <small>OSINT / BREACH CHECK</small>
+            </div>
+
+            <div class="moocs-grid">
+
+                <a class="moocs-tile" href="https://osintfr.com/"
+                    target="_blank" rel="noopener noreferrer">
+                    <div class="moocs-logo">
+                        <img src="https://osintfr.com/wp-content/uploads/2025/01/Logo2025med.png"
+                            alt="OSINT-FR Logo" loading="lazy">
+                    </div>
+                    <strong>OSINT-FR</strong>
+                    <p>
+                        Comprendre le monde en sources ouvertes.
+                    </p>
+                    <span class="moocs-cat">OSINT</span>
+                    <span class="moocs-go">
+                        VISITER
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </span>
+                </a>
+
+                <a class="moocs-tile" href="https://haveibeenpwned.com/"
+                    target="_blank" rel="noopener noreferrer">
+                    <div class="moocs-logo">
+                        <img src="https://haveibeenpwned.com/Images/HibpLogo.svg?v=w1UPiLz7TzzzyTflCj6n2lzgzKj-UhDA7827u2P4wb8"
+                            alt="Have I Been Pwned Logo" loading="lazy">
+                    </div>
+                    <strong>HAVE I BEEN PWNED</strong>
+                    <p>
+                        Check if your email address is in a data
+                        breach.
+                    </p>
+                    <span class="moocs-cat">BREACH</span>
+                    <span class="moocs-go">
+                        VISITER
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </span>
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
 </div>
 
-<!-- CSS pour les effets et le responsive -->
-<style>
-    .hover-scale {
-        transition: transform 0.3s ease;
-    }
-    .hover-scale:hover {
-        transform: scale(1.03);
-    }
-    .card {
-        border-radius: 10px;
-    }
-    .card-title {
-        color: #2c3e50;
-    }
-    .btn-outline-primary {
-        border-color: #0d6efd;
-        color: #0d6efd;
-    }
-    .btn-outline-primary:hover {
-        background-color: #0d6efd;
-        color: white;
-    }
-</style>
+<script src="{{ url_for('static', filename='js/ops.js') }}"></script>
+
 {% endblock content %}

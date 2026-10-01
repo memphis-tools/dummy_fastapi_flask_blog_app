@@ -3,88 +3,1481 @@
 {% block title %}OPS{% endblock title %}
 
 {% block content %}
-<div class="container">
-    <h1>DUMMY OPS - OPS</h1>
-    <div class="section_intro"></div>
-    <p>Côté OPS mise en place d'une infra pour l'apprentissage (notamment pour les programmes LPIC).</p>
-    <div class="d-flex flex-column justify-content-center">
-        <div class="ops-container d-flex flex-column justify-content-center">
-            <div class="op-container d-flex flex-column justify-content-start">
-                <p>Usage de <a href="https://www.proxmox.com/en/" target="blank">Proxmox</a>, en cluster (sans ceph).</p>
-                <p>1er noeud</p>
-                <img src="{{ url_for('static', filename='img/proxlab_noeud_1.png') }}" align="middle" alt="vue noeud1"/>
-                <p>2eme noeud</p>
-                <img src="{{ url_for('static', filename='img/proxlab_noeud_2.png') }}" align="middle" alt="vue noeud2"/>
-                <p>Noeud Odroid (NAS pour sauvegarder les snapshots et dump)</p>
-                <img src="{{ url_for('static', filename='img/proxlab_noeud_3.png') }}" align="middle" alt="vue odroid"/>
-                <p>Vue logique des 2 noeuds</p>
-                <img src="{{ url_for('static', filename='img/proxlab_vue_logique.png') }}" align="middle" alt="vue logique"/>
+
+<div class="ops-portfolio" id="ops-top">
+
+    <div class="ops-global-grid" aria-hidden="true"></div>
+    <div class="ops-global-scanlines" aria-hidden="true"></div>
+
+
+    <!-- =========================================================
+         HERO
+    ========================================================== -->
+    <section class="ops-hero ops-screen" id="ops-hero">
+
+        <div class="ops-grid" aria-hidden="true"></div>
+        <div class="ops-hero-glow" aria-hidden="true"></div>
+        <div class="ops-scanline" aria-hidden="true"></div>
+
+        <div class="ops-orbit orbit-1" aria-hidden="true"><span></span></div>
+        <div class="ops-orbit orbit-2" aria-hidden="true"><span></span></div>
+
+        <div class="ops-earth" aria-hidden="true">
+            <div class="earth-glow"></div>
+
+            <div class="earth-globe">
+                <div class="earth-wire"></div>
+                <span class="earth-node n1"></span>
+                <span class="earth-node n2"></span>
+                <span class="earth-node n3"></span>
+                <span class="earth-node n4"></span>
             </div>
-            <hr />
-            <h3>Résumé des technologies utilisées</h3>
-            <table>
-                <tr>
-                  <td>
-                    <ul>
-                      <li>ANSIBLE</li>
-                      <li>APACHE</li>
-                      <li>CLUSTER GALERA</li>
-                      <li>CLUSTER GLUSTERFS</li>
-                      <li>CLUSTER PCS</li>
-                      <li>DJANGO</li>
-                      <li>DNS</li>
-                      <li>DHCP</li>
-                      <li>DOCKER, DOCKER SWARM</li>
-                      <li>DOVECOT</li>
-                    </ul>
-                  </td>
-                  <td>
-                    <ul>
-                      <li>ELASTIC-SEARCH</li>
-                      <li>FASTAPI</li>
-                      <li>FLASK</li>
-                      <li>GALERA</li>
-                      <li>GITLAB</li>
-                      <li>GLPI</li>
-                      <li>GLUSTER FS</li>
-                      <li>GRAFANA</li>
-                      <li>HAPROXY</li>
-                      <li>JENKINS</li>
-                    </ul>
-                  </td>
-                  <td>
-                    <ul>
-                      <li>MARIADB</li>
-                      <li>MAXSCALE</li>
-                      <li>MEDIAWIKI</li>
-                      <li>MEMCACHED</li>
-                      <li>NAGIOS</li>
-                      <li>NEXUS SONATYPE</li>
-                      <li>NGINX</li>
-                      <li>OPENLDAP</li>
-                      <li>OPENSCAP</li>
-                      <li>OPENVAS</li>
-                    </ul>
-                  </td>
-                  <td>
-                    <ul>
-                      <li>POSTGRESQL</li>
-                      <li>PROMETHEUS</li>
-                      <li>RUNDECK</li>
-                      <li>SQUID</li>
-                      <li>TERRAFORM</li>
-                      <li>VARNISH</li>
-                      <li>VAULT</li>
-                      <li>WILDFLY</li>
-                    </ul>
-                  </td>
-                </tr>
-            </table>
-            <hr />
-            <h3>Distributions Linux utilisées</h3>
-            <p>Volontairement, des versions obsolètes sont laissées en place</p>
-            <img src="{{ url_for('static', filename='img/proxlab_grafana_vue_os.png') }}" align="middle" alt="vue grafana"/>
+
+            <div class="earth-shell"></div>
+            <div class="earth-data-ring"></div>
+
+            <!-- orbit 1: two micro data satellites -->
+            <div class="orbit-tilt t-a">
+                <div class="orbit-ring">
+                    <span class="sat-orb a"></span>
+                    <span class="sat-orb b bottom"></span>
+                </div>
+            </div>
+
+            <!-- orbit 2: hexagonal drone -->
+            <div class="orbit-tilt t-b">
+                <div class="orbit-ring">
+                    <span class="sat-hex"></span>
+                </div>
+            </div>
+
+            <!-- orbit 3: paired orbs -->
+            <div class="orbit-tilt t-c">
+                <div class="orbit-ring">
+                    <span class="sat-orb a"></span>
+                    <span class="sat-orb a bottom"></span>
+                </div>
+            </div>
+
+            <!-- orbit 4: hexagonal drone, opposite direction -->
+            <div class="orbit-tilt t-d">
+                <div class="orbit-ring reverse">
+                    <span class="sat-hex"></span>
+                    <span class="sat-orb b"></span>
+                </div>
+            </div>
+
+            <span class="earth-beam b1" style="--r:-30deg"></span>
+            <span class="earth-beam b2" style="--r:25deg"></span>
         </div>
-    </div>
+
+        <div class="ops-hero-decoration ops-hero-decoration-left" aria-hidden="true">
+            <span>SYS / OPS</span>
+            <span>LINUX</span>
+            <span>AUTOMATION</span>
+        </div>
+
+        <div class="ops-hero-decoration ops-hero-decoration-right" aria-hidden="true">
+            <span>PYTHON</span>
+            <span>CLOUD</span>
+            <span>CI/CD</span>
+        </div>
+
+        <div class="ops-hero-content">
+
+            <div class="ops-status">
+                <span class="status-dot"></span>
+                PORTFOLIO NODE / ONLINE
+            </div>
+
+            <p class="ops-overline">LABS · PROJECTS · INFRASTRUCTURE · EXPERIMENTS</p>
+
+            <h1>DUMMY <span>OPS</span></h1>
+
+            <p class="ops-kicker">LINUX · PYTHON · DEVOPS · CLOUD · AUTOMATION</p>
+
+            <p class="ops-hero-intro">
+                Build it. Break it. Understand it. Automate it.
+            </p>
+
+            <div class="ops-command hero-terminal">
+                <span class="terminal-prompt">$</span>
+                <span class="js-hero-command"></span>
+                <span class="cursor">_</span>
+            </div>
+
+            <div class="ops-hero-actions">
+
+                <a href="https://github.com/memphis-tools" target="_blank"
+                    rel="noopener noreferrer" class="ops-button">
+                    <i class="fa-brands fa-github"></i>
+                    <span>GITHUB</span>
+                </a>
+
+                <a href="https://www.digitalocean.com/?refcode=4f541e02cfe5&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"
+                    target="_blank" rel="noopener noreferrer"
+                    class="ops-button ops-button-primary">
+                    <i class="fa-solid fa-cloud"></i>
+                    <span>DIGITALOCEAN</span>
+                </a>
+
+                <a href="#lab-production" class="ops-button">
+                    <i class="fa-solid fa-arrow-down"></i>
+                    <span>ENTER LABS</span>
+                </a>
+
+            </div>
+
+            <div class="ops-hero-icons" aria-hidden="true">
+                <i class="fa-brands fa-linux"></i>
+                <i class="fa-brands fa-python"></i>
+                <i class="fa-brands fa-docker"></i>
+                <i class="fa-brands fa-github"></i>
+                <i class="fa-solid fa-network-wired"></i>
+                <i class="fa-solid fa-cloud"></i>
+            </div>
+
+        </div>
+
+        <a class="scroll-cue" href="#lab-production">
+            <span>EXPLORE PORTFOLIO</span>
+            <i class="fa-solid fa-chevron-down"></i>
+        </a>
+
+    </section>
+
+
+    <!-- =========================================================
+         01 / REAL WORLD APPLICATION
+    ========================================================== -->
+    <section class="ops-section ops-screen production-section" id="lab-production">
+
+        <div class="section-watermark" aria-hidden="true">01</div>
+        <div class="section-number">01 / REAL WORLD APPLICATION</div>
+
+        <div class="section-heading reveal">
+
+            <div>
+                <div class="eyebrow">
+                    <i class="fa-solid fa-circle-nodes"></i>
+                    PRODUCTION EXPERIENCE
+                </div>
+                <h2>
+                    A project that
+                    <span>actually runs.</span>
+                </h2>
+            </div>
+
+            <div class="section-state">
+                <span class="status-dot"></span>
+                RUNNING
+            </div>
+
+        </div>
+
+
+        <div class="production-layout">
+
+            <!-- js-prose: paragraphs appear progressively, one by one -->
+            <div class="production-copy js-prose reveal">
+
+                <p class="lead">
+                    Not a mockup. Not a tutorial. A Flask + FastAPI
+                    micro-social platform on Docker Swarm — designed,
+                    broken, secured, and kept alive in production for
+                    years.
+                </p>
+
+                <p>
+                    Nginx fronts the stack, Certbot delivers free HTTPS,
+                    hCaptcha keeps bots out. Behind the curtain: PostgreSQL,
+                    Celery chewing through a RabbitMQ broker with a Redis
+                    backend, HashiCorp Vault guarding the secrets, and
+                    SendGrid + Mailtrap carrying every email.
+                </p>
+
+                <p>
+                    GitLab runs the CI/CD heartbeat — tests, build,
+                    publish on every master push. Terraform raises the
+                    DigitalOcean droplet, Cloudflare takes the hits,
+                    NameCheap owns the name, ConsentManager handles
+                    consent. Betterstack watches the logs, Codacy judges
+                    the code, Snyk + Aikido hunt app-level flaws and
+                    Lynis audits the system.
+                </p>
+
+                <p>
+                    Even the tests have a story: TabNine and Cursor helped
+                    build the suite — and since 2026, Mistral-vibe finishes
+                    the test coverage. Fully AI-assisted, human-verified.
+                </p>
+
+                <div class="metrics">
+
+                    <div class="metric">
+                        <strong class="js-counter" data-counter="3" data-suffix="+">3+</strong>
+                        <small>YEARS IN PRODUCTION</small>
+                        <div class="metric-bar"><span></span></div>
+                    </div>
+
+                    <div class="metric">
+                        <strong class="js-counter" data-counter="90" data-suffix="+">90+</strong>
+                        <small>REAL BOOKS IN THE CATALOG</small>
+                        <div class="metric-bar"><span></span></div>
+                    </div>
+
+                    <div class="metric">
+                        <strong class="js-counter" data-counter="17" data-suffix="+">17+</strong>
+                        <small>STACK COMPONENTS</small>
+                        <div class="metric-bar"><span></span></div>
+                    </div>
+
+                </div>
+
+                <div class="tech-tags">
+                    <span>DOCKER SWARM</span>
+                    <span>NGINX</span>
+                    <span>FLASK</span>
+                    <span>FASTAPI</span>
+                    <span>POSTGRESQL</span>
+                    <span>CELERY</span>
+                    <span>RABBITMQ</span>
+                    <span>REDIS</span>
+                    <span>VAULT</span>
+                    <span>TERRAFORM</span>
+                    <span>CLOUDFLARE</span>
+                    <span>SENDGRID</span>
+                    <span>BETTERSTACK</span>
+                    <span>HCAPTCHA</span>
+                    <span>CERTBOT</span>
+                </div>
+
+                <div class="ops-links">
+
+                    <a href="https://github.com/memphis-tools/dummy_fastapi_flask_blog_app"
+                        target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-github"></i>
+                        PUBLIC REPOSITORY
+                    </a>
+
+                    <a href="/">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        LIVE APPLICATION
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="ops-carousel reveal" data-carousel data-autoscroll="6000"
+                aria-label="Dummy Ops application illustrations">
+
+                <div class="carousel-header">
+                    <div>
+                        <span class="carousel-title">LIVE PLATFORM</span>
+                        <small>REAL SCREENSHOTS / AUTO-ROTATING</small>
+                    </div>
+                    <div class="carousel-counter">
+                        <span data-carousel-current>01</span>
+                        <span>/</span>
+                        <span data-carousel-total>06</span>
+                    </div>
+                </div>
+
+                <div class="carousel-progress"><span></span></div>
+
+                <div class="carousel-viewport">
+                    <div class="carousel-track">
+
+                        <figure class="carousel-slide lab-image">
+                            <div class="image-label">CATALOG / STATS</div>
+                            <img src="https://raw.githubusercontent.com/memphis-tools/dummy_fastapi_flask_blog_app/master/illustrations/dummy_ops_books_categories_stats.png"
+                                alt="Books and categories statistics" loading="lazy">
+                        </figure>
+
+                        <figure class="carousel-slide lab-image">
+                            <div class="image-label">USERS / STATS</div>
+                            <img src="https://raw.githubusercontent.com/memphis-tools/dummy_fastapi_flask_blog_app/master/illustrations/dummy_ops_users_stats.png"
+                                alt="Users statistics" loading="lazy">
+                        </figure>
+
+                        <figure class="carousel-slide lab-image">
+                            <div class="image-label">CLOUDFLARE / SHIELD</div>
+                            <img src="https://raw.githubusercontent.com/memphis-tools/dummy_fastapi_flask_blog_app/master/illustrations/cloudflare_security_events.png"
+                                alt="Cloudflare security events" loading="lazy">
+                        </figure>
+
+                        <figure class="carousel-slide lab-image">
+                            <div class="image-label">BETTERSTACK / LOGS</div>
+                            <img src="https://raw.githubusercontent.com/memphis-tools/dummy_fastapi_flask_blog_app/master/illustrations/betterstack_dummyops_logs.png"
+                                alt="Betterstack logs" loading="lazy">
+                        </figure>
+
+                        <figure class="carousel-slide lab-image">
+                            <div class="image-label">SONARQUBE / QUALITY</div>
+                            <img src="https://raw.githubusercontent.com/memphis-tools/dummy_fastapi_flask_blog_app/master/illustrations/sonarqube_stats.png"
+                                alt="SonarQube statistics" loading="lazy">
+                        </figure>
+
+                        <figure class="carousel-slide lab-image">
+                            <div class="image-label">OWASP ZAP / SCAN</div>
+                            <img src="https://raw.githubusercontent.com/memphis-tools/dummy_fastapi_flask_blog_app/master/illustrations/zap_stats.png"
+                                alt="OWASP ZAP scan statistics" loading="lazy">
+                        </figure>
+
+                    </div>
+                </div>
+
+                <div class="carousel-footer">
+                    <div class="carousel-dots" data-carousel-dots></div>
+                    <div class="carousel-controls">
+                        <button type="button" data-carousel-prev aria-label="Previous illustration">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button type="button" data-carousel-next aria-label="Next illustration">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="architecture-card reveal">
+
+            <div class="architecture-header">
+                <span>LIVE APPLICATION / LOGICAL PATH</span>
+                <span class="architecture-live">
+                    <i class="fa-solid fa-circle"></i>
+                    ONLINE
+                </span>
+            </div>
+
+            <div class="architecture-flow">
+
+                <div class="architecture-node">
+                    <i class="fa-solid fa-user"></i>
+                    <b>USER</b>
+                    <small>HTTPS</small>
+                </div>
+
+                <div class="data-link"><span></span></div>
+
+                <div class="architecture-node">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <b>CLOUDFLARE</b>
+                    <small>EDGE</small>
+                </div>
+
+                <div class="data-link"><span></span></div>
+
+                <div class="architecture-node">
+                    <i class="fa-solid fa-cloud"></i>
+                    <b>DIGITALOCEAN</b>
+                    <small>COMPUTE</small>
+                </div>
+
+                <div class="data-link"><span></span></div>
+
+                <div class="architecture-node">
+                    <i class="fa-brands fa-docker"></i>
+                    <b>SWARM</b>
+                    <small>RUNTIME</small>
+                </div>
+
+                <div class="data-link"><span></span></div>
+
+                <div class="architecture-node">
+                    <i class="fa-brands fa-python"></i>
+                    <b>FLASK / API</b>
+                    <small>APPLICATION</small>
+                </div>
+
+                <div class="data-link"><span></span></div>
+
+                <div class="architecture-node">
+                    <i class="fa-solid fa-database"></i>
+                    <b>POSTGRESQL</b>
+                    <small>DATA</small>
+                </div>
+
+            </div>
+
+            <div class="architecture-services">
+                <span><i class="fa-solid fa-gears"></i> CELERY</span>
+                <span><i class="fa-solid fa-tower-broadcast"></i> RABBITMQ</span>
+                <span><i class="fa-solid fa-bolt"></i> REDIS</span>
+                <span><i class="fa-solid fa-key"></i> VAULT</span>
+                <span><i class="fa-solid fa-envelope"></i> SENDGRID</span>
+                <span><i class="fa-solid fa-tv"></i> BETTERSTACK</span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         02 / LINUX LABORATORY
+    ========================================================== -->
+    <section class="ops-section ops-screen linux-section" id="lab-linux">
+
+        <div class="section-watermark" aria-hidden="true">02</div>
+        <div class="section-number">02 / LINUX LABORATORY</div>
+
+        <div class="linux-layout">
+
+            <div class="terminal reveal" data-terminal data-terminal-loop="true">
+
+                <div class="terminal-bar">
+                    <div class="terminal-buttons">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <label>root@lpic-lab:~</label>
+                    <small>SSH</small>
+                </div>
+
+                <div class="terminal-body">
+                    <div class="terminal-script" data-terminal-script
+                        data-lines='[
+                            {"prompt":"root@lab:~# ","text":"vagrant status","output":"17 machines running (virtualbox)\\ndns-primary dns-secondary nas-san kdc ansible..."},
+                            {"prompt":"root@lab:~# ","text":"ansible all -m ping","output":"dns01 | SUCCESS => pong\\nbastion | SUCCESS => pong\\nkdc01 | SUCCESS => pong"},
+                            {"prompt":"root@lab:~# ","text":"firewall-cmd --list-services","output":"dns kerberos kpasswd ldaps openvpn ssh"},
+                            {"prompt":"root@lab:~# ","text":"squid -k check && echo OK","output":"ssl-bump active, CA trusted"},
+                            {"prompt":"root@lab:~# ","text":"systemctl --failed","output":"0 loaded units listed."},
+                            {"prompt":"root@lab:~# ","text":"journalctl -p err -b --no-pager","output":"-- No critical entries --"}
+                        ]'></div>
+                </div>
+
+            </div>
+
+
+            <div class="section-copy js-prose reveal">
+
+                <div class="eyebrow">
+                    <i class="fa-brands fa-linux"></i>
+                    LPIC / SYSTEM ADMINISTRATION
+                </div>
+
+                <h2>
+                    Learn it.
+                    <span>Repeat it.</span>
+                </h2>
+
+                <p class="lead">
+                    17 virtual machines. One command: <b>vagrant up</b>.
+                    A disposable Linux laboratory for LPIC certification —
+                    and for breaking things on purpose.
+                </p>
+
+                <p>
+                    DNS primary and secondary, Kerberos KDC, OpenLDAP,
+                    vsFTP, Squid with and without SSL bumping, Dovecot
+                    mail, OpenVPN, a bastion with its own SSH certificate
+                    authority, Bacula backups, NAS storage and a log
+                    analyzer — every machine plays a real infrastructure
+                    role, provisioned by Ansible.
+                </p>
+
+                <p>
+                    From RHEL 4-era habits to today's systemd and
+                    firewall-cmd world: LUKS, self-signed CAs, TSIG keys,
+                    nmap, SELinux thinking. A lab built to be destroyed
+                    and rebuilt — that's the point.
+                </p>
+
+                <div class="lab-points">
+                    <div><i class="fa-solid fa-network-wired"></i><span>DNS / DHCP</span></div>
+                    <div><i class="fa-solid fa-server"></i><span>VSFTP / SQUID</span></div>
+                    <div><i class="fa-solid fa-user-shield"></i><span>KERBEROS / LDAP</span></div>
+                    <div><i class="fa-solid fa-hard-drive"></i><span>NAS / LUKS</span></div>
+                    <div><i class="fa-solid fa-gears"></i><span>ANSIBLE</span></div>
+                    <div><i class="fa-solid fa-bug"></i><span>NMAP / BACULA</span></div>
+                </div>
+
+                <div class="ops-links">
+                    <a href="https://github.com/memphis-tools/dummy_vagrant_virtualbox_lpic_lab"
+                        target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-github"></i>
+                        VIEW LAB REPOSITORY
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="ops-carousel virtual-lab reveal" data-carousel data-autoscroll="7000"
+            aria-label="LPIC lab screenshots">
+
+            <div class="carousel-header">
+                <div>
+                    <span class="carousel-title">LAB EVIDENCE</span>
+                    <small>REAL SESSIONS / 17 VMS</small>
+                </div>
+                <div class="carousel-counter">
+                    <span data-carousel-current>01</span>
+                    <span>/</span>
+                    <span data-carousel-total>06</span>
+                </div>
+            </div>
+
+            <div class="carousel-progress"><span></span></div>
+
+            <div class="carousel-viewport">
+                <div class="carousel-track">
+
+                    <figure class="carousel-slide lab-image">
+                        <div class="image-label">ANSIBLE / PING</div>
+                        <img src="https://raw.githubusercontent.com/memphis-tools/dummy_vagrant_virtualbox_lpic_lab/main/images/ansible_ping.png"
+                            alt="Ansible ping across lab nodes" loading="lazy">
+                    </figure>
+
+                    <figure class="carousel-slide lab-image">
+                        <div class="image-label">BASTION / SSH CA</div>
+                        <img src="https://raw.githubusercontent.com/memphis-tools/dummy_vagrant_virtualbox_lpic_lab/main/images/bastion_ssh_ca.png"
+                            alt="Bastion SSH certificate authority" loading="lazy">
+                    </figure>
+
+                    <figure class="carousel-slide lab-image">
+                        <div class="image-label">SQUID / SSL BUMP</div>
+                        <img src="https://raw.githubusercontent.com/memphis-tools/dummy_vagrant_virtualbox_lpic_lab/main/images/squid_ssl_bump.png"
+                            alt="Squid SSL bumping" loading="lazy">
+                    </figure>
+
+                    <figure class="carousel-slide lab-image">
+                        <div class="image-label">DNS / TSIG</div>
+                        <img src="https://raw.githubusercontent.com/memphis-tools/dummy_vagrant_virtualbox_lpic_lab/main/images/tsig.png"
+                            alt="DNS TSIG keys" loading="lazy">
+                    </figure>
+
+                    <figure class="carousel-slide lab-image">
+                        <div class="image-label">OPENLDAP</div>
+                        <img src="https://raw.githubusercontent.com/memphis-tools/dummy_vagrant_virtualbox_lpic_lab/main/images/openldap.png"
+                            alt="OpenLDAP directory" loading="lazy">
+                    </figure>
+
+                    <figure class="carousel-slide lab-image">
+                        <div class="image-label">BACULA / BACKUP</div>
+                        <img src="https://raw.githubusercontent.com/memphis-tools/dummy_vagrant_virtualbox_lpic_lab/main/images/bacula.png"
+                            alt="Bacula backup console" loading="lazy">
+                    </figure>
+
+                </div>
+            </div>
+
+            <div class="carousel-footer">
+                <div class="carousel-dots" data-carousel-dots></div>
+                <div class="carousel-controls">
+                    <button type="button" data-carousel-prev aria-label="Previous lab screenshot">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button type="button" data-carousel-next aria-label="Next lab screenshot">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="tech-tags reveal" style="margin-top: 0.7rem;">
+            <span>LUKS</span><span>BIND</span><span>VSFTPD</span><span>SQUID</span>
+            <span>SSL BUMPING</span><span>SELF-SIGNED CA</span><span>SSH CA</span>
+            <span>ANSIBLE</span><span>OPENVPN</span><span>APACHE</span>
+            <span>NGINX</span><span>KERBEROS</span><span>OPENLDAP</span>
+            <span>BASTION</span><span>BACULA</span><span>NMAP</span>
+            <span>FIREWALL-CMD</span>
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         03 / CI-CD · AWS
+    ========================================================== -->
+    <section class="ops-section ops-screen aws-section" id="lab-aws">
+
+        <div class="section-watermark" aria-hidden="true">03</div>
+        <div class="section-number">03 / CI-CD · AWS</div>
+
+        <div class="section-heading reveal">
+
+            <div>
+                <div class="eyebrow">
+                    <i class="fa-solid fa-code-branch"></i>
+                    DELIVERY LABORATORY
+                </div>
+                <h2>
+                    Commit to
+                    <span>cloud.</span>
+                </h2>
+            </div>
+
+            <div class="section-state">DEMO / LEARNING</div>
+
+        </div>
+
+
+        <div class="aws-layout">
+
+            <div class="aws-pipeline reveal">
+
+                <div class="pipeline-header">
+                    <span>PIPELINE / EXECUTION PATH</span>
+                    <small>LIVE SIMULATION</small>
+                </div>
+
+                <div class="pipeline-chain" data-pipeline>
+
+                    <div class="pipeline-step">
+                        <i class="fa-brands fa-github"></i>
+                        <b>GITHUB</b>
+                        <small>WEBHOOK</small>
+                    </div>
+
+                    <div class="pipeline-connector"><span></span></div>
+
+                    <div class="pipeline-step">
+                        <i class="fa-brands fa-jenkins"></i>
+                        <b>JENKINS</b>
+                        <small>PIPELINE</small>
+                    </div>
+
+                    <div class="pipeline-connector"><span></span></div>
+
+                    <div class="pipeline-step">
+                        <i class="fa-solid fa-hammer"></i>
+                        <b>MAVEN</b>
+                        <small>WAR BUILD</small>
+                    </div>
+
+                    <div class="pipeline-connector"><span></span></div>
+
+                    <div class="pipeline-step">
+                        <i class="fa-brands fa-docker"></i>
+                        <b>DOCKER</b>
+                        <small>DOCKERHUB</small>
+                    </div>
+
+                    <div class="pipeline-connector"><span></span></div>
+
+                    <div class="pipeline-step">
+                        <i class="fa-solid fa-dharmachakra"></i>
+                        <b>EKS</b>
+                        <small>KUBERNETES</small>
+                    </div>
+
+                    <div class="pipeline-connector"><span></span></div>
+
+                    <div class="pipeline-step">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                        <b>ALB</b>
+                        <small>ROUTING</small>
+                    </div>
+
+                </div>
+
+                <div class="pipeline-console">
+
+                    <div class="pipeline-console-head">
+                        <span>jenkins@controller</span>
+                        <span class="console-state">LIVE / 4 ROUTES</span>
+                    </div>
+
+                    <div class="pipeline-console-body" data-pipeline-console></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="aws-project reveal">
+
+                <div class="project-preview">
+
+                    <div class="project-preview-bar">
+                        <span>AWS LAB / LIVE POC</span>
+                        <i class="fa-solid fa-circle-play"></i>
+                    </div>
+
+                    <div class="ops-carousel mini-carousel crook-carousel"
+                        data-carousel data-autoscroll="5000"
+                        aria-label="AWS lab illustrations">
+
+                        <div class="carousel-viewport">
+                            <div class="carousel-track">
+
+                                <figure class="carousel-slide lab-image">
+                                    <div class="image-label">EKS / CLUSTER</div>
+                                    <img src="https://raw.githubusercontent.com/memphis-tools/dummy_devops_on_aws/main/pictures/eks.png"
+                                        alt="EKS cluster" loading="lazy">
+                                </figure>
+
+                                <figure class="carousel-slide lab-image">
+                                    <div class="image-label">JENKINS / CI</div>
+                                    <img src="https://raw.githubusercontent.com/memphis-tools/dummy_devops_on_aws/main/pictures/jenkins.png"
+                                        alt="Jenkins pipeline" loading="lazy">
+                                </figure>
+
+                                <figure class="carousel-slide lab-image">
+                                    <div class="image-label">AWS / CONSOLE</div>
+                                    <img src="https://raw.githubusercontent.com/memphis-tools/dummy_devops_on_aws/main/pictures/aws_console.png"
+                                        alt="AWS console" loading="lazy">
+                                </figure>
+
+                                <figure class="carousel-slide lab-image">
+                                    <div class="image-label">WAZUH / MONITORING</div>
+                                    <img src="https://raw.githubusercontent.com/memphis-tools/dummy_devops_on_aws/main/pictures/wazuh.png"
+                                        alt="Wazuh security monitoring" loading="lazy">
+                                </figure>
+
+                            </div>
+                        </div>
+
+                        <div class="carousel-footer">
+                            <div class="carousel-dots" data-carousel-dots></div>
+                            <div class="carousel-controls">
+                                <button type="button" data-carousel-prev aria-label="Previous">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+                                <button type="button" data-carousel-next aria-label="Next">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="project-description js-prose">
+
+                    <p>
+                        Three pipelines, one GitHub push: Tomcat standalone
+                        (Maven WAR), Docker containers to DockerHub, and
+                        Kubernetes on EKS. An Application Load Balancer
+                        routes HTTPS by path prefix to whichever target
+                        you want to watch.
+                    </p>
+
+                    <p>
+                        Packer bakes the golden image, Terraform raises
+                        the infrastructure (state in S3), Ansible finishes
+                        the configuration. Wazuh watches over everything.
+                        Costs mean the lab wakes on demand — as a live POC
+                        of the whole chain.
+                    </p>
+
+                    <div class="project-mini-grid">
+
+                        <a href="https://github.com/memphis-tools/dummy_devops_on_aws"
+                            target="_blank" rel="noopener noreferrer">
+                            <i class="fa-brands fa-aws"></i>
+                            <span>
+                                <b>AWS LAB</b>
+                                <small>INFRA / DEVOPS</small>
+                            </span>
+                        </a>
+
+                        <a href="https://github.com/memphis-tools/crook-ops"
+                            target="_blank" rel="noopener noreferrer">
+                            <i class="fa-brands fa-github"></i>
+                            <span>
+                                <b>CROOK OPS</b>
+                                <small>PAYLOAD APP</small>
+                            </span>
+                        </a>
+
+                    </div>
+
+                </div>
+
+                <div class="music-placeholder">
+                    <div class="music-icon">
+                        <i class="fa-solid fa-music"></i>
+                    </div>
+                    <div>
+                        <small>SOUNDTRACK SLOT</small>
+                        <strong>SUNO MUSIC / COMING HERE</strong>
+                    </div>
+                    <button type="button" aria-label="Music placeholder">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         04 / CLOUD DELIVERY — CIRCLECI + RENDER
+    ========================================================== -->
+    <section class="ops-section ops-screen circle-section" id="lab-circle">
+
+        <div class="section-watermark" aria-hidden="true">04</div>
+        <div class="section-number">04 / CLOUD DELIVERY</div>
+
+        <div class="circle-layout">
+
+            <div class="delivery-visual reveal">
+
+                <div class="delivery-ring ring-outer"></div>
+                <div class="delivery-ring ring-middle"></div>
+                <div class="delivery-ring ring-inner"></div>
+
+                <div class="delivery-center">
+                    <i class="fa-solid fa-rocket"></i>
+                    <strong>RENDER</strong>
+                    <small>DEPLOY</small>
+                </div>
+
+                <div class="delivery-item delivery-item-a">
+                    <i class="fa-brands fa-github"></i> GITHUB
+                </div>
+                <div class="delivery-item delivery-item-b">
+                    <i class="fa-solid fa-circle-check"></i> TEST
+                </div>
+                <div class="delivery-item delivery-item-c">
+                    <i class="fa-solid fa-arrows-rotate"></i> CIRCLECI
+                </div>
+                <div class="delivery-item delivery-item-d">
+                    <i class="fa-brands fa-python"></i> POETRY
+                </div>
+                <div class="delivery-item delivery-item-e">
+                    <i class="fa-solid fa-chart-simple"></i> COVERALLS
+                </div>
+
+            </div>
+
+
+            <div class="section-copy js-prose reveal">
+
+                <div class="eyebrow">
+                    <i class="fa-solid fa-bolt"></i>
+                    SMALL PIPELINE / FAST FEEDBACK
+                </div>
+
+                <h2>
+                    Build small.
+                    <span>Ship often.</span>
+                </h2>
+
+                <p class="lead">
+                    A Django blog, backend-first, pushed to Render by
+                    CircleCI — the same DevOps ideas, deliberately fewer
+                    moving parts.
+                </p>
+
+                <p>
+                    In production: native Python on Render. No Docker, no
+                    Gunicorn, no Nginx. Locally: the full container
+                    experience with Gunicorn and Nginx via docker-compose.
+                    CircleCI runs the workflow, Coveralls tracks coverage,
+                    Poetry keeps dependencies honest.
+                </p>
+
+                <p>
+                    And the honest lesson of free tiers: instances spin
+                    down when idle, so the first visitor after a nap waits
+                    50+ seconds. Cold starts, live, as a feature.
+                </p>
+
+                <div class="tech-tags">
+                    <span>PYTHON 3.12</span><span>DJANGO</span><span>SQLITE3</span>
+                    <span>POETRY</span><span>DOCKER</span><span>GUNICORN</span>
+                    <span>NGINX</span><span>CIRCLECI</span><span>COVERALLS</span>
+                    <span>RENDER</span>
+                </div>
+
+                <div class="ops-links">
+                    <a href="https://github.com/memphis-tools/dummy_django_app_on_render"
+                        target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-github"></i>
+                        REPOSITORY
+                    </a>
+                    <a href="https://dummy-django-app-on-render.onrender.com/"
+                        target="_blank" rel="noopener noreferrer">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        LIVE DEMO
+                    </a>
+                </div>
+
+                <div class="mini-carousel ops-carousel" data-carousel data-autoscroll="8000"
+                    aria-label="CircleCI lab media">
+
+                    <div class="carousel-header">
+                        <div>
+                            <span class="carousel-title">PIPELINE MEDIA</span>
+                            <small>LIVE DEMO / SCREENSHOT</small>
+                        </div>
+                        <div class="carousel-counter">
+                            <span data-carousel-current>01</span>
+                            <span>/</span>
+                            <span data-carousel-total>01</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-progress"><span></span></div>
+
+                    <div class="carousel-viewport">
+                        <div class="carousel-track">
+                            <figure class="carousel-slide lab-image">
+                                <div class="image-label">DJANGO / RENDER</div>
+                                <img src="https://raw.githubusercontent.com/memphis-tools/dummy_django_app_on_render/main/illustrations/dummy_django_app_on_render.png"
+                                    alt="Django app on Render" loading="lazy">
+                            </figure>
+                        </div>
+                    </div>
+
+                    <div class="carousel-footer">
+                        <div class="carousel-dots" data-carousel-dots></div>
+                        <div class="carousel-controls">
+                            <button type="button" data-carousel-prev aria-label="Previous">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <button type="button" data-carousel-next aria-label="Next">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         05 / HOMELAB — PROXMOX (rotating schemes)
+    ========================================================== -->
+    <section class="ops-section proxmox-section ops-screen" id="lab-proxmox">
+
+        <div class="section-watermark" aria-hidden="true">05</div>
+        <div class="section-number">05 / HOMELAB</div>
+
+        <div class="proxmox-shell">
+
+            <div class="proxmox-header">
+
+                <div>
+                    <div class="eyebrow">
+                        <i class="fa-solid fa-server"></i>
+                        INFRASTRUCTURE LAB
+                    </div>
+                    <h2>
+                        Proxmox
+                        <span>Laboratory</span>
+                    </h2>
+                    <p>
+                        Proxmox since v6 — six to seven years of homelab.
+                        Today the cluster explores Ceph for distributed
+                        storage, and the LPIC lab runs live topologies
+                        inside it.
+                    </p>
+                </div>
+
+                <div class="cluster-status">
+                    <span class="status-dot"></span>
+                    CLUSTER ONLINE
+                </div>
+
+            </div>
+
+            <div class="proxmox-dashboard">
+
+                <div class="cluster-map">
+
+                    <div class="map-title">
+                        <span data-scheme-title>CLUSTER TOPOLOGY</span>
+                        <small data-scheme-sub>WITH CEPH</small>
+                    </div>
+
+                    <!-- Scheme stage: rebuilt by JS every 20s -->
+                    <div class="cluster-nodes" data-scheme-stage></div>
+
+                    <div class="scheme-caption" data-scheme-caption></div>
+
+                </div>
+
+                <div class="proxmox-stats">
+                    <div>
+                        <i class="fa-solid fa-server"></i>
+                        <strong>02</strong>
+                        <small>PROXMOX NODES</small>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-hard-drive"></i>
+                        <strong>01</strong>
+                        <small>NAS NODE</small>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-network-wired"></i>
+                        <strong>01</strong>
+                        <small>CLUSTER</small>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="ops-carousel proxmox-images" data-carousel data-autoscroll="7000"
+                aria-label="Proxmox laboratory screenshots">
+
+                <div class="carousel-header">
+                    <div>
+                        <span class="carousel-title">LAB ILLUSTRATIONS</span>
+                        <small>PROXMOX / NODES / LOGICAL VIEW</small>
+                    </div>
+                    <div class="carousel-counter">
+                        <span data-carousel-current>01</span>
+                        <span>/</span>
+                        <span data-carousel-total>04</span>
+                    </div>
+                </div>
+
+                <div class="carousel-progress"><span></span></div>
+
+                <div class="carousel-viewport">
+                    <div class="carousel-track">
+
+                        <figure class="carousel-slide lab-image">
+                            <div class="image-label">NODE 01</div>
+                            <img src="{{ url_for('static', filename='img/proxlab_noeud_1.png') }}"
+                                alt="Vue noeud 1" loading="lazy">
+                        </figure>
+
+                        <figure class="carousel-slide lab-image">
+                            <div class="image-label">NODE 02</div>
+                            <img src="{{ url_for('static', filename='img/proxlab_noeud_2.png') }}"
+                                alt="Vue noeud 2" loading="lazy">
+                        </figure>
+
+                        <figure class="carousel-slide lab-image">
+                            <div class="image-label">ODROID / NAS</div>
+                            <img src="{{ url_for('static', filename='img/proxlab_noeud_3.png') }}"
+                                alt="Vue Odroid" loading="lazy">
+                        </figure>
+
+                        <figure class="carousel-slide lab-image">
+                            <div class="image-label">LOGICAL VIEW</div>
+                            <img src="{{ url_for('static', filename='img/proxlab_vue_logique.png') }}"
+                                alt="Vue logique des deux noeuds" loading="lazy">
+                        </figure>
+
+                    </div>
+                </div>
+
+                <div class="carousel-footer">
+                    <div class="carousel-dots" data-carousel-dots></div>
+                    <div class="carousel-controls">
+                        <button type="button" data-carousel-prev aria-label="Previous Proxmox screenshot">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button type="button" data-carousel-next aria-label="Next Proxmox screenshot">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="proxmox-technologies">
+
+                <div class="map-title">
+                    <span>TECHNOLOGY INVENTORY</span>
+                    <small>LAB ENVIRONMENT</small>
+                </div>
+
+                <div class="tech-cloud">
+                    <span>ANSIBLE</span><span>APACHE</span><span>GALERA</span>
+                    <span>GLUSTERFS</span><span>PCS</span><span>DJANGO</span>
+                    <span>DNS</span><span>DHCP</span><span>DOCKER</span>
+                    <span>DOCKER SWARM</span><span>DOVECOT</span>
+                    <span>ELASTICSEARCH</span><span>FASTAPI</span><span>FLASK</span>
+                    <span>GITLAB</span><span>GLPI</span><span>GRAFANA</span>
+                    <span>HAPROXY</span><span>JENKINS</span><span>MARIADB</span>
+                    <span>MAXSCALE</span><span>MEDIAWIKI</span><span>MEMCACHED</span>
+                    <span>NAGIOS</span><span>NEXUS</span><span>NGINX</span>
+                    <span>OPENLDAP</span><span>OPENSCAP</span><span>OPENVAS</span>
+                    <span>POSTGRESQL</span><span>PROMETHEUS</span><span>RUNDECK</span>
+                    <span>SQUID</span><span>TERRAFORM</span><span>VARNISH</span>
+                    <span>VAULT</span><span>WILDFLY</span><span>CEPH</span>
+                </div>
+
+            </div>
+
+            <div class="proxmox-os">
+
+                <div class="section-copy">
+                    <div class="eyebrow">
+                        <i class="fa-solid fa-chart-line"></i>
+                        MONITORING
+                    </div>
+                    <h3>Linux distributions</h3>
+                    <p>
+                        Volontairement, des versions obsolètes sont laissées
+                        en place.
+                    </p>
+                </div>
+
+                <div class="grafana-frame">
+                    <img src="{{ url_for('static', filename='img/proxlab_grafana_vue_os.png') }}"
+                        alt="Vue Grafana des systèmes Linux" loading="lazy">
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         05/01 / TECH RADAR — ROTATING NEWS
+    ========================================================== -->
+    <section class="ops-section ops-screen news-section" id="lab-news">
+
+        <div class="section-watermark" aria-hidden="true">05.1</div>
+        <div class="section-number">05 / 01 · TECH RADAR</div>
+
+        <div class="section-heading reveal">
+
+            <div>
+                <div class="eyebrow">
+                    <i class="fa-solid fa-satellite-dish"></i>
+                    INSTANT NEWS / ONE PICK
+                </div>
+                <h2>
+                    One signal from
+                    <span>the noise.</span>
+                </h2>
+            </div>
+
+            <div class="section-state">
+                <span class="status-dot"></span>
+                AUTO / 30s
+            </div>
+
+        </div>
+
+        <div class="news-card reveal">
+
+            <div class="news-head">
+                <div class="news-meta">
+                    <span class="news-tag" data-news-tag></span>
+                    <span class="news-pick" id="news-pick">
+                        <i class="fa-solid fa-dice"></i>
+                        ROLL NOW
+                    </span>
+                </div>
+            </div>
+
+            <div class="news-progress"><span></span></div>
+
+            <div class="news-body" data-news-item>
+
+                <figure class="news-visual">
+                    <div class="news-image-frame">
+                        <img data-news-image src="" alt="News illustration">
+                    </div>
+                    <figcaption data-news-credit></figcaption>
+                </figure>
+
+                <div class="news-content">
+                    <h3 data-news-title></h3>
+                    <p data-news-summary></p>
+                    <div class="news-source">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        <a data-news-link href="#" target="_blank"
+                            rel="noopener noreferrer"></a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         06 / CONTINUOUS LEARNING + OTHER PROJECTS
+    ========================================================== -->
+    <section class="ops-section ops-screen learning-section" id="lab-learning">
+
+        <div class="section-watermark" aria-hidden="true">06</div>
+        <div class="section-number">06 / CONTINUOUS LEARNING</div>
+
+        <div class="learning-layout">
+
+            <div class="learning-intro reveal">
+
+                <div class="eyebrow">
+                    <i class="fa-solid fa-brain"></i>
+                    ABOUT / CURRENTLY EXPLORING
+                </div>
+
+                <h2>
+                    The lab is
+                    <span>never finished.</span>
+                </h2>
+
+                <p class="lead">
+                    Infrastructure is an excuse to keep learning.
+                </p>
+
+                <p>
+                    Operating systems, Python, networking, cloud,
+                    automation, security — they only make sense when
+                    they're wired together through real projects.
+                </p>
+
+                <div class="learning-signal">
+                    <div>
+                        <small>CURRENT MODE</small>
+                        <strong>BUILD / TEST / REPEAT</strong>
+                    </div>
+                    <span class="learning-pulse"></span>
+                </div>
+
+                <div class="ops-dna" aria-hidden="true">
+                    <div class="dna-stage">
+                        <div class="dna-rung" style="--y:0%;--i:0"><i></i></div>
+                        <div class="dna-rung" style="--y:10%;--i:1"><i></i></div>
+                        <div class="dna-rung" style="--y:20%;--i:2"><i></i></div>
+                        <div class="dna-rung" style="--y:30%;--i:3"><i></i></div>
+                        <div class="dna-rung" style="--y:40%;--i:4"><i></i></div>
+                        <div class="dna-rung" style="--y:50%;--i:5"><i></i></div>
+                        <div class="dna-rung" style="--y:60%;--i:6"><i></i></div>
+                        <div class="dna-rung" style="--y:70%;--i:7"><i></i></div>
+                        <div class="dna-rung" style="--y:80%;--i:8"><i></i></div>
+                        <div class="dna-rung" style="--y:90%;--i:9"><i></i></div>
+                    </div>
+                </div>
+
+                <div class="terminal learning-terminal" data-terminal data-terminal-loop="true">
+
+                    <div class="terminal-bar">
+                        <div class="terminal-buttons">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <label>user@dummy-ops:~/projects</label>
+                    </div>
+
+                    <div class="terminal-body">
+                        <div class="terminal-script" data-terminal-script
+                            data-lines='[
+                                {"prompt":"$ ","text":"git status --short","output":"M  ideas/new_lab.md\\n?? experiments/next_project/"},
+                                {"prompt":"$ ","text":"ansible-inventory --graph","output":"@all:\\n  |--@glpi_dynamic_hosts"},
+                                {"prompt":"$ ","text":"docker compose ps","output":"lab-web      running\\nlab-db       healthy"},
+                                {"prompt":"$ ","text":"echo $NEXT","output":"learn -> build -> document -> repeat"}
+                            ]'></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="learning-projects reveal">
+
+                <div class="projects-heading">
+                    <div>
+                        <span>OTHER PROJECTS</span>
+                        <small>OPEN SOURCE / EXPERIMENTS</small>
+                    </div>
+                    <a href="https://github.com/memphis-tools" target="_blank"
+                        rel="noopener noreferrer">
+                        VIEW ALL
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                </div>
+
+                <div class="project-grid">
+
+                    <a class="project-tile" href="https://github.com/memphis-tools/ansible_inventory_through_glpi"
+                        target="_blank" rel="noopener noreferrer">
+                        <div class="project-tile-icon">
+                            <i class="fa-solid fa-gears"></i>
+                        </div>
+                        <small>ANSIBLE / GLPI / PANDAS</small>
+                        <strong>Dynamic Inventory</strong>
+                        <p>
+                            CMDB to automation: an Ansible inventory
+                            generated straight from GLPI, one Pandas
+                            transformation at a time.
+                        </p>
+                        <span>
+                            OPEN REPOSITORY
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a class="project-tile" href="https://github.com/memphis-tools/dummy_flask_rabbitmq_celery"
+                        target="_blank" rel="noopener noreferrer">
+                        <div class="project-tile-icon">
+                            <i class="fa-solid fa-tower-broadcast"></i>
+                        </div>
+                        <small>FLASK / RABBITMQ / CELERY</small>
+                        <strong>Async Task Lab</strong>
+                        <p>
+                            The Flask + RabbitMQ + Celery pattern from the
+                            main webapp, distilled to its simplest moving
+                            parts.
+                        </p>
+                        <span>
+                            OPEN REPOSITORY
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a class="project-tile" href="https://github.com/memphis-tools/dummy_dockerized_dvwa_fork"
+                        target="_blank" rel="noopener noreferrer">
+                        <div class="project-tile-icon">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <small>DOCKER / FAIL2BAN / MODSECURITY</small>
+                        <strong>Dockerized DVWA</strong>
+                        <p>
+                            Two projects in one: run the deliberately
+                            vulnerable app, then learn to jail it with
+                            fail2ban and filter it with ModSecurity.
+                        </p>
+                        <span>
+                            OPEN REPOSITORY
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a class="project-tile" href="https://github.com/memphis-tools/dummy_devops_on_aws"
+                        target="_blank" rel="noopener noreferrer">
+                        <div class="project-tile-icon">
+                            <i class="fa-brands fa-aws"></i>
+                        </div>
+                        <small>PACKER / TERRAFORM / ANSIBLE</small>
+                        <strong>AWS CI/CD POC</strong>
+                        <p>
+                            Golden image, provisioned infra, post-config —
+                            then a micro CI/CD chain at work. A live "how"
+                            demonstration, on demand.
+                        </p>
+                        <span>
+                            OPEN REPOSITORY
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a class="project-tile" href="https://github.com/memphis-tools/crook-ops"
+                        target="_blank" rel="noopener noreferrer">
+                        <div class="project-tile-icon">
+                            <i class="fa-solid fa-user-secret"></i>
+                        </div>
+                        <small>SPRING / TOMCAT / EKS</small>
+                        <strong>Crook Ops</strong>
+                        <p>
+                            A satirical single page about the bad IT habits
+                            we all meet in prod — shipped through Jenkins,
+                            Ansible and EKS.
+                        </p>
+                        <span>
+                            OPEN REPOSITORY
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a class="project-tile" href="https://github.com/memphis-tools/implement_compiled_softwares_signatures_file_with_ansible"
+                        target="_blank" rel="noopener noreferrer">
+                        <div class="project-tile-icon">
+                            <i class="fa-solid fa-fingerprint"></i>
+                        </div>
+                        <small>ANSIBLE / AUDIT</small>
+                        <strong>Compiled Software Signatures</strong>
+                        <p>
+                            Because package managers can't see what was
+                            compiled by hand: a JSON fingerprint file,
+                            set and updated by Ansible.
+                        </p>
+                        <span>
+                            OPEN REPOSITORY
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <article class="project-tile project-tile-wide project-private">
+                        <div class="project-tile-icon pirate-icon">
+                            <i class="fa-solid fa-skull-crossbones"></i>
+                        </div>
+                        <small>PRIVATE / CYBERSECURITY LAB</small>
+                        <strong>Ethical Hacking Playground</strong>
+                        <p>
+                            StationX and Udemy training turned into code:
+                            ARP spoofer, port scanner, keyloggers, C2
+                            backdoor, hash cracker, brute-forcer,
+                            vulnerability scanner. Written to think like an
+                            attacker — obsolete now, but the homework was
+                            done.
+                        </p>
+                        <div class="project-quote" data-quote-box>
+                            <p data-quote-text></p>
+                            <small data-quote-author></small>
+                        </div>
+                        <span>NOT YET ON SCM</span>
+                    </article>
+
+                </div>
+
+                <div class="learning-stack">
+                    <span>LINUX</span><span>PYTHON</span><span>DEVOPS</span>
+                    <span>NETWORKING</span><span>ANSIBLE</span><span>DOCKER</span>
+                    <span>KUBERNETES</span><span>CLOUD</span>
+                    <span>SECURITY</span><span>MONITORING</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         FLOATING PAGE NAVIGATION
+    ========================================================== -->
+    <nav class="ops-scroll-nav" aria-label="OPS portfolio page controls">
+
+        <button type="button" data-scroll-action="top"
+            aria-label="Go to top" title="Top">
+            <i class="fa-solid fa-angles-up"></i>
+        </button>
+
+        <button type="button" data-scroll-action="up"
+            aria-label="Previous screen" title="Previous screen">
+            <i class="fa-solid fa-chevron-up"></i>
+        </button>
+
+        <button type="button" data-scroll-action="down"
+            aria-label="Next screen" title="Next screen">
+            <i class="fa-solid fa-chevron-down"></i>
+        </button>
+
+        <button type="button" data-scroll-action="bottom"
+            aria-label="Go to bottom" title="Bottom">
+            <i class="fa-solid fa-angles-down"></i>
+        </button>
+
+    </nav>
+
 </div>
+
+<script src="{{ url_for('static', filename='js/ops.js') }}"></script>
+
 {% endblock content %}
