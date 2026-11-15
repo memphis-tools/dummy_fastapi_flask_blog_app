@@ -83,7 +83,7 @@ pytest==9.2.0
 pytest-asyncio==1.5.0
 pytest-mock==3.17.0
 pytest-postgresql==10.0.0
-python-dateutil==2.9.0
+python-dateutil==2.9.0.post0
 python-dotenv==1.2.4
 python-gettext==5.0
 python-multipart==0.0.33

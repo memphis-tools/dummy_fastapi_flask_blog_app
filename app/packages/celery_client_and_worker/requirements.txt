@@ -27,7 +27,7 @@ psycopg-binary==3.3.9
 psycopg-pool==3.3.3
 pycparser==3.12
 PyPDF2==3.0.1
-python-dateutil==2.9.0
+python-dateutil==2.9.0.post0
 python-dotenv==1.2.4
 python-http-client==3.3.7
 redis==8.1.0
