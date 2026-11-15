@@ -583,12 +583,12 @@ def register():
     )
 
 
-@app.route("/ops/")
-def ops():
+@app.route("/misc/")
+def misc():
     """
-    Description: the ops Flask route.
+    Description: the miscellaneous Flask route.
     """
-    return render_template("ops.html", is_authenticated=current_user.is_authenticated)
+    return redirect("https://dummy-sudoku-resolver-front.onrender.com")
 
 
 @app.route("/moocs/")
@@ -597,3 +597,13 @@ def moocs():
     Description: the moocs Flask route.
     """
     return render_template("moocs.html", is_authenticated=current_user.is_authenticated)
+
+
+@app.route("/ops/")
+def ops():
+    """
+    Description: the ops Flask route.
+    """
+    return render_template("ops.html", is_authenticated=current_user.is_authenticated)
+
+
