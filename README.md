@@ -1,4 +1,4 @@
-![Screenshot](https://img.shields.io/badge/python-v3.12-blue?logo=python&logoColor=yellow)
+![Screenshot](https://img.shields.io/badge/python-v3.14.10-blue?logo=python&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/fastapi--blue?logo=fastapi&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/flask--blue?logo=gitlab&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/sqlalchemy--blue?logo=fastapi&logoColor=yellow)
@@ -7,8 +7,10 @@
 ![Screenshot](https://img.shields.io/badge/gitlab-ci:cd-blue?logo=gitlab&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/terraform--blue?logo=hashicorp&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/vault--blue?logo=hashicorp&logoColor=yellow)
+$$$$$ CHECKER VERSIONS AUSSI
 ![Screenshot](https://img.shields.io/badge/celery-5.4.0-blue?logo=celery&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/rabbitmq-4-blue?logo=rabbitmq&logoColor=yellow)
+$$$$
 ![Screenshot](https://img.shields.io/badge/digitalocean--black?logo=digitalocean&logoColor=yellow&color=blue)
 ![Screenshot](https://img.shields.io/badge/betterstack--blue)
 ![Screenshot](https://img.shields.io/badge/coveralls--blue?logo=coveralls&logoColor=yellow)

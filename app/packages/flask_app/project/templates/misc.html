@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}MISCELLANEOUS{% endblock title %}
+
+{% block content %}
+
+<div class="ops-portfolio" id="moocs-top">
+
+    <div class="ops-global-grid" aria-hidden="true"></div>
+    <div class="ops-global-scanlines" aria-hidden="true"></div>
+
+
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+    <section class="ops-screen moocs-hero" id="moocs-hero">
+
+        <div class="ops-grid" aria-hidden="true"></div>
+        <div class="ops-hero-glow" aria-hidden="true"></div>
+        <div class="ops-scanline" aria-hidden="true"></div>
+
+        <div class="ops-hero-content">
+            <div class="ops-status">
+                <span class="status-dot"></span>
+                SUDOKU RESOLVER <v1 class="2"></v1>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- =========================================================
+         SOURCE LIST
+    ========================================================== -->
+    <section class="ops-section ops-screen moocs-section" id="moocs-list">
+
+        <div class="section-watermark" aria-hidden="true">SRC</div>
+        <div class="section-number">CURATED / LEARNING SOURCES</div>
+        <div class="section-heading reveal">
+            <div>
+                <div class="eyebrow">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    SUDOKU RESOLVER
+                </div>
+
+                <h2>
+                    Home made Sudoku Solver built with Python.
+                    <span>2025</span>
+                </h2>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script src="{{ url_for('static', filename='js/ops.js') }}"></script>
+
+{% endblock content %}

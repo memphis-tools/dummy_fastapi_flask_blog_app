@@ -29,6 +29,7 @@ try:
         Comment,
         Starred,
     )
+
 except ModuleNotFoundError:
     from app.packages import log_events, settings
     from app.packages.celery_client_and_worker.celery_app_folder.celery_app import celery_app
