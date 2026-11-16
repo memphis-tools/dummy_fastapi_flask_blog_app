@@ -55,10 +55,11 @@ def send_email(recipient, pdf_file_path):
         message = Mail(
             from_email="no-reply@dummy-ops.dev",
             to_emails=recipient,
-            subject="Dummy-ops books",
+            subject="Lectures",
             html_content=textwrap.dedent("""
-                Find attached a list of the books published on dummy-ops.dev.
-                Thank you for your interest.
+                Bonjour,
+                Voici la liste des livres publiés sur https://www.dummy-ops.dev.
+                Cordialement.
             """)
         )
 
