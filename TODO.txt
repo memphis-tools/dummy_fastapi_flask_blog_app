@@ -1,0 +1,28 @@
+>>> MENAGE DES REQUIREMENTS ?? 85-flask-fastapi-check-and-remove-unncessary-python-packages
+
+>>> noms images non prédictibles / à saler-hacher
+15-flask-fastapi-Controler et homogénéiser les noms des images d'illustrations
+
+>>> passer de postgres 17.5 à postgres 18
+
+>>> il faut empêcher l'envoi de mails provenant des domaines suivants, de même interdire l'inscription à quelqu'un avec ce mail :
+premiummail.online
+highmail.site
+expressmail.online
+ccmail.online
+
+>>>> Faire une liste des assertsions: tout ce qui est contrôlé, à revoir, ou à envisager
+>>>> exposer tout scores : site viertueux, environnement etc, assez sécurisé ?
+>>>  Trier livre: les + en favoris, les + commentés
+>>> Liste auteurs et (total publication sur site)
+
+>>> books/ : montrer total des livres
+
+>> footer mistral-ai, betterstack
+>>> status page better stack
+>>> si plusieurs auteurs pour un livre, il faut "1 champ auteur(s)", mais en bdd on aura n auteurs enregistrés
+
+>>> Utilisateur doit pouvoir supprimer son compte
+>>> Utilisateur doit pouvoir mettre à jour son mot de passe (pas son "password")
+>>> Utilisateur doit pouvoir mettre à jour son email
+>>> RGPD: quelle mesure à mettre en place pour respecter RGPD si utilisateur demande ses données ou suppression ? Mentions légales, sauvegarde ?

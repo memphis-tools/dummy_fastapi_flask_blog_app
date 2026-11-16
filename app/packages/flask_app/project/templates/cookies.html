@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}COOKIES{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="section_intro"></div>
+    <div class="legal-page">
+        <h1>DUMMY OPS - COOKIES</h1>
+        <p class="legal-updated">Dernière mise à jour : novembre 2026</p>
+
+        <h2>1. Qu'est-ce qu'un cookie ?</h2>
+        <p>Un cookie est un petit fichier déposé sur votre terminal lors de la visite d'un site. Il permet notamment de mémoriser vos préférences et de mesurer la fréquentation.</p>
+
+        <h2>2. Les cookies utilisés sur dummy-ops.dev</h2>
+        <ul>
+            <li><strong>Strictement nécessaires</strong> (session de connexion Flask) : exemptés de consentement, indispensables au fonctionnement du site.</li>
+            <li><strong>Mesure d'audience</strong> (Google Analytics) : déposés uniquement après votre consentement.</li>
+            <li><strong>Publicité</strong> (Google AdSense) : déposés uniquement après votre consentement.</li>
+            <li><strong>Gestion du consentement</strong> (ConsentManager) : mémorise votre choix de consentement.</li>
+        </ul>
+        <p>Durée maximale de dépôt : 13 mois, conformément aux recommandations de la CNIL. Pour en savoir plus sur les données associées : <a href="{{ url_for('politique_confidentialite') }}">Politique de confidentialité</a>.</p>
+
+        <h2>3. Gérer vos choix</h2>
+        <p>À tout moment, vous pouvez modifier ou retirer votre consentement :</p>
+        <p><button type="button" id="cmp-reopen" class="btn btn-primary text-uppercase\">Gérer mes cookies</button></p>
+        <script>
+        // Coller ici le snippet officiel de réouverture du bandeau fourni dans le
+        // tableau de bord ConsentManager (rubrique « Afficher à nouveau le consentement »),
+        // puis appeler cette fonction au clic du bouton ci-dessus.
+        document.getElementById("cmp-reopen").addEventListener("click", function () {
+            /* cmpmngr: réouverture du panneau de consentement */
+        });
+        </script>
+        <p>Vous pouvez également configurer votre navigateur pour bloquer ou supprimer les cookies.</p>
+    </div>
+</div>
+{% endblock content %}

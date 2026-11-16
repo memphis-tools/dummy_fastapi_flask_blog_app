@@ -206,7 +206,7 @@ def test_send_activation_link_in_development(app, monkeypatch):
 
 
 ##
-# 16/11/2016 - Ajout 2 tests identifiés par Mistral-ai
+# 16/11/2016 - Ajout tests identifiés par Mistral-ai
 def test_flask_misc_route(client):
     """
     Description: covers line 591: the misc route redirects to the
@@ -237,3 +237,61 @@ def test_send_activation_link_in_production_with_failure(app, monkeypatch):
         result = project.send_activation_link("someone@localhost.fr")
     assert result == {"status": "failure", "message": "Mail sending failed"}
     assert send_mock.call_count == 1
+
+
+def test_flask_misc_route(client):
+    """
+    Description: the misc route redirects (302) to the sudoku resolver front.
+    Do not follow redirects: the target is an external URL.
+    """
+    response = client.get("http://localhost/misc/")
+    assert response.status_code == 302
+    assert (
+        "https://dummy-sudoku-resolver-front.onrender.com"
+        in response.headers["Location"]
+    )
+
+
+def test_flask_status_route(client):
+    """
+    Description: the status route redirects (302) to the external status page.
+    """
+    response = client.get("http://localhost/status/")
+    assert response.status_code == 302
+    assert "https://status.dummy-ops.dev/" in response.headers["Location"]
+
+
+def test_flask_mentions_legales_route(client, captured_templates):
+    """
+    Description: check if we can reach the mentions legales route
+    """
+    response = client.get("http://localhost/mentions-legales/")
+    assert response.status_code == 200
+    assert captured_templates[0].name == "mentions_legales.html"
+
+
+def test_flask_politique_confidentialite_route(client, captured_templates):
+    """
+    Description: check if we can reach the privacy policy route
+    """
+    response = client.get("http://localhost/politique-de-confidentialite/")
+    assert response.status_code == 200
+    assert captured_templates[0].name == "politique_confidentialite.html"
+
+
+def test_flask_cookies_route(client, captured_templates):
+    """
+    Description: check if we can reach the cookies route
+    """
+    response = client.get("http://localhost/cookies/")
+    assert response.status_code == 200
+    assert captured_templates[0].name == "cookies.html"
+
+
+def test_flask_cgu_route(client, captured_templates):
+    """
+    Description: check if we can reach the CGU route
+    """
+    response = client.get("http://localhost/cgu/")
+    assert response.status_code == 200
+    assert captured_templates[0].name == "cgu.html"

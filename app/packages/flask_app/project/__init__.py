@@ -676,3 +676,23 @@ def status_page():
     Description: the status Flask route.
     """
     return redirect("https://status.dummy-ops.dev/")
+
+
+@app.route("/mentions-legales/")
+def mentions_legales():
+    return render_template("mentions_legales.html", is_authenticated=current_user.is_authenticated)
+
+
+@app.route("/politique-de-confidentialite/")
+def politique_confidentialite():
+    return render_template("politique_confidentialite.html", is_authenticated=current_user.is_authenticated)
+
+
+@app.route("/cookies/")
+def cookies():
+    return render_template("cookies.html", is_authenticated=current_user.is_authenticated)
+
+
+@app.route("/cgu/")
+def cgu():
+    return render_template("cgu.html", is_authenticated=current_user.is_authenticated)

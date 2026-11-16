@@ -6419,31 +6419,22 @@ body:has(.ops-portfolio) {
 
 .moocs-logo {
     display: grid;
-
     place-items: center;
-
     min-height: 64px;
-
     padding: 0.5rem;
-
     border:
         1px solid
         var(--ops-border);
-
-    background:
-        rgba(255, 255, 255, 0.92);
 }
 
 .moocs-logo img {
     max-height: 44px;
     max-width: 80%;
-
     width: auto;
 }
 
 .moocs-tile > strong {
     color: #bdd7de;
-
     font:
         800
         0.62rem / 1
@@ -6454,11 +6445,8 @@ body:has(.ops-portfolio) {
 
 .moocs-tile p {
     margin: 0;
-
     color: var(--ops-muted);
-
     font-size: 0.72rem;
-
     line-height: 1.45;
 }
 
@@ -7366,12 +7354,13 @@ body {
 }
 
 .dummy_logo {
-  font-family: "Abel", "Tahoma", sans-serif;
+  font-family: "Comfortaa", "Tahoma", sans-serif;   /* "Abel" → "Comfortaa" */
   font-size: 18px;
+  font-weight: 700;                                  /* optionnel : le logo ressort mieux en gras */
 }
 
 .dummy-nav {
-  font-family: "Abel", "Tahoma", sans-serif;
+  font-family: "Comfortaa", "Tahoma", sans-serif;   /* "Abel" → "Comfortaa" */
   font-style: normal;
   font-size: 16px;
   font-weight: 600;
@@ -7761,45 +7750,146 @@ legend {
   justify-content: space-between;
 }
 
+/* ===== FOOTER (ajouter EN FIN de styles.css) ===== */
 footer {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: white;
+  display: block;
+  margin-top: 3rem;
+  padding: 3rem 1.5rem 1.5rem;
+  color: #dff8ff;
+  border-top: 1px solid rgba(77, 232, 255, 0.17);
 }
 
 footer ul {
   display: flex;
-  flex-direction: row;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
 }
 
-footer li,
-.comments li {
+footer li {
   list-style: none;
 }
 
-.commentText p {
-  padding: 0;
-  margin: 0;
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.comment_user {
-  color: #192a56;
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.8fr 1.1fr 1fr 1fr;
+  gap: 2rem;
+  padding-bottom: 2rem;
 }
 
-.comment {
-  color: #000000;
+.footer-title {
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  color: #253c73;
+  margin: 0 0 0.75rem;
+  justify-content: flex-start;
+}
+
+footer a {
+  color: #7897a2;
+  text-decoration: none;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+footer a i {
+  width: 1.1rem;
+  text-align: center;
+  color: #4de8ff;
+}
+
+footer a .tech-badge {
+  height: 1rem;
+  width: auto;
+}
+
+footer a:hover {
+  color: #4de8ff;
 }
 
 .footer-bar {
-    display: flex;
-    flex-direction: line;   /* small screens: stacked */
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  border-top: 1px solid rgba(77, 232, 255, 0.12);
+  padding-top: 1.25rem;
+  font-size: 0.8rem;
+  color: #7897a2;
+}
+
+.provider-logo img {
+  width: 150px;
+  height: auto;
+}
+
+.midjourney-logo {
+  display: flex;
+  align-items: center;
+}
+
+.midjourney-logo img {
+  width: 28px;
+  height: auto;
+}
+
+@media (max-width: 1250px) {
+  .footer-grid { grid-template-columns: repeat(3, 1fr); }
+  .provider-logo img { width: 150px; height: auto; }
+}
+
+@media (max-width: 800px) {
+  .footer-grid { grid-template-columns: repeat(2, 1fr); }
+  .provider-logo img { width: 150px; height: auto; }
+}
+
+@media (max-width: 600px) {
+  .footer-grid { grid-template-columns: 1fr; text-align: center; }
+  footer ul { align-items: center; }
+  .provider-logo img { width: 150px; height: auto; }
+}
+
+.social-networks ul {
+  display: flex;
+  flex-direction: row;
+  gap: 0.6rem;
+  padding: 0;
+  margin: 0.9rem 0 0;
+}
+
+.social-networks a {
+  color: #dff8ff;
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(77, 232, 255, 0.25);
+  border-radius: 50%;
+}
+
+.social-networks a:hover {
+  color: #0b0f14;
+  background-color: #4de8ff;
+}
+
+.provider-logo img {
+  width: 150px;
+  height: auto;
+}
+
+.midjourney-logo img {
+  width: 28px;
+  height: auto;
 }
 
 @media (max-width: 1250px) {
@@ -8266,3 +8356,81 @@ footer li,
     height: auto;
   }
 }
+
+
+.footer-subgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+
+.footer-subtitle {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: #6e461c;
+  opacity: 0.85;
+  margin: 0 0 0.4rem;
+  justify-content: flex-start;
+}
+
+.footer-grid {
+  grid-template-columns: 1fr 2.8fr 1fr 1fr 1fr;
+}
+
+@media (max-width: 1250px) {
+  .footer-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-col-tech { grid-column: 1 / -1; }
+}
+
+@media (max-width: 800px) {
+  .footer-grid { grid-template-columns: 1fr; }
+}
+
+/*  16/11/2026 pour sous menu LEGAL du footer */
+.legal-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #1c2833;
+}
+
+.legal-page h1 {
+  font-size: 1.4rem;
+  color: #192a56;
+  margin: 1rem 0 1.5rem;
+}
+
+.legal-page h2 {
+  font-size: 1.05rem;
+  color: #192a56;
+  justify-content: flex-start;
+  margin: 1.5rem 0 0.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid rgba(25, 42, 86, 0.15);
+}
+
+.legal-page p {
+  margin-bottom: 0.75rem;
+}
+
+.legal-page ul {
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.legal-page li {
+  margin-bottom: 0.3rem;
+}
+
+.legal-page a {
+  color: #6e461c;
+}
+
+.legal-page .legal-updated {
+  color: #7897a2;
+  font-size: 0.8rem;
+  text-align: center;
+}
+

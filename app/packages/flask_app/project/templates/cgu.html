@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}CGU{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="section_intro"></div>
+    <div class="legal-page">
+        <h1>DUMMY OPS - CONDITIONS GÉNÉRALES D'UTILISATION</h1>
+        <p class="legal-updated">Dernière mise à jour : novembre 2026</p>
+
+        <h2>1. Objet</h2>
+        <p>Les présentes CGU régissent l'accès et l'utilisation de dummy-ops.dev, blog technique avec espace compte (ajout de lectures, commentaires, favoris). Il ne s'agit pas d'un site de vente : aucune commande, aucun paiement, aucune liste d'abonnement n'y est proposée.</p>
+
+        <h2>2. Accès au site</h2>
+        <p>Le site est accessible gratuitement, 24h/24, sauf maintenance (voir la <a href="{{ url_for('status_page') }}" target="_blank" rel="noopener">page de statut</a>). L'éditeur se réserve le droit de suspendre ou modifier l'accès pour des raisons de maintenance ou de sécurité.</p>
+
+        <h2>3. Compte utilisateur</h2>
+        <ul>
+            <li>L'inscription requiert une adresse e-mail valide ; un captcha hCaptcha protège les formulaires contre les robots.</li>
+            <li>Vous êtes responsable de la confidentialité de votre mot de passe et de toute activité effectuée depuis votre compte.</li>
+            <li>En cas d'usage abusif, le compte peut être suspendu ou supprimé.</li>
+        </ul>
+
+        <h2>4. Contenus publiés par les utilisateurs</h2>
+        <p>Les livres, citations et commentaires ajoutés par les utilisateurs n'engagent que leur auteur. L'éditeur peut modérer ou supprimer tout contenu illicite, offensant ou contraire aux présentes CGU.</p>
+
+        <h2>5. Propriété intellectuelle</h2>
+        <p>Le code source est open source (<a href="https://gitlab.com/memphis-tools/dummy_fastapi_flask_blog_app" target="_blank" rel="noopener">GitLab</a> / <a href="https://github.com/memphis-tools/dummy_fastapi_flask_blog_app" target="_blank" rel="noopener">GitHub</a>), sous MIT License.</p>
+
+        <h2>6. Responsabilité et liens externes</h2>
+        <p>Le site peut contenir des liens vers des sites tiers dont l'éditeur n'est pas responsable. L'éditeur ne garantit pas l'absence d'erreurs ou d'interruption et limite sa responsabilité aux dommages directs, dans les limites légales.</p>
+
+        <h2>7. Modification des CGU</h2>
+        <p>L'éditeur peut modifier les présentes CGU à tout moment ; la version en ligne fait foi. L'utilisation continue du site vaut acceptation de la version à jour.</p>
+
+        <h2>8. Droit applicable et litiges</h2>
+        <p>Droit français applicable. En cas de litige, contact amiable préalable via le <a href="{{ url_for('contact') }}">formulaire de contact</a>.</p>
+    </div>
+</div>
+{% endblock content %}
