@@ -83,7 +83,11 @@ class Comment(BASE):
     publication_date = Column(
         DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC)
     )
-    author_id = Column(Integer, ForeignKey("users_table.id"))
+    author_id = Column(
+        Integer,
+        ForeignKey("users_table.id", ondelete="CASCADE"),
+        nullable=False
+    )
     book_id = Column(Integer, ForeignKey("books_table.id"))
     comment_author = relationship("User", back_populates="comments")
     comment_book = relationship("Book", back_populates="book_comments")
@@ -167,7 +171,11 @@ class Book(BASE):
     publication_date = Column(
         DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC)
     )
-    user_id = Column(Integer, ForeignKey("users_table.id"))
+    user_id = Column(
+        Integer,
+        ForeignKey("users_table.id", ondelete="CASCADE"),
+        nullable=False
+    )
     user_books = relationship("User", back_populates="books")
     book_comments = relationship(
         "Comment", back_populates="comment_book", cascade="all, delete-orphan"

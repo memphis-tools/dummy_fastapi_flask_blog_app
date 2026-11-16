@@ -3,7 +3,7 @@
 from enum import Enum
 import datetime as dt
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class Token(BaseModel):
@@ -42,6 +42,7 @@ class StarredModel(BaseModel):
     """FastAPI Starred class"""
 
     user_id: int
+    book_id: int
 
 
 class CommentModel(BaseModel):
@@ -93,6 +94,7 @@ class NewQuoteModel(BaseModel):
 
 class BookModel(BaseModel):
     """FastAPI Book class"""
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     title: str
@@ -103,12 +105,13 @@ class BookModel(BaseModel):
     year_of_publication: int
     publication_date: dt.datetime
     user_id: int
-    book_comments: CommentReducedModel | None = None
-    starred: StarredModel | None = None
+    book_comments: list[CommentReducedModel] = Field(default_factory=list)
+    starred: list[StarredModel] = Field(default_factory=list)
 
 
 class BookReducedModel(BaseModel):
     """FastAPI Reduced Book class"""
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     title: str
@@ -116,8 +119,8 @@ class BookReducedModel(BaseModel):
     category: str
     year_of_publication: int
     publication_date: dt.datetime
-    book_comments: CommentReducedModel | None = None
-    starred: StarredModel | None = None
+    book_comments: list[CommentReducedModel] = Field(default_factory=list)
+    starred: list[StarredModel] = Field(default_factory=list)
 
 
 class NewBookModel(BaseModel):
@@ -152,13 +155,14 @@ class Role(str, Enum):
 class UserModel(BaseModel):
     """FastAPI User class"""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     username: str
     role: Role
     disabled: bool | None = False
-    books: BookReducedModel | None = None
+    books: list[BookReducedModel] = Field(default_factory=list)
     is_active: bool | None = False
-
 
 class UserInDB(UserModel):
     """FastAPI User password class"""
