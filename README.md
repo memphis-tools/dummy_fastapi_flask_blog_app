@@ -227,11 +227,16 @@ Vibe (used since 2026 to improve test coverage rates)
 
     Notice:
 
-    POSTGRES_HOST refers to the postgresql service name
+    POSTGRES_HOST refers to the postgresql service name.
 
     SCOPE: for a local execution you set "development".
 
-    Anything else than "production" or "development" allow tests to be run.
+    For tests, replace these variables:
+
+        export SCOPE="test"
+        export ADMIN_EMAIL="admin@localhost.fr"
+        export POSTGRES_HOST="127.0.0.1"
+
 
 ### HOW RUN IT LOCALLY
 ----------------------------------------------
@@ -294,9 +299,7 @@ You do not need to create a python virtualenv.
 
       ADMIN_EMAIL="admin@localhost.fr"
 
-      POSTGRES_HOST="127.0.0.1" (your_local_ipv4_with_port_5432)
-
-      TEST_USER_PWD="p@stgres76"
+      POSTGRES_HOST="127.0.0.1" 
 
       # (optional) Verify files to be checked
       python -m pytest --collect-only
