@@ -3,7 +3,7 @@
 from typing import Annotated
 from werkzeug.security import generate_password_hash
 from fastapi import APIRouter
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Response
 
 try:
     import handle_passwords
@@ -454,10 +454,7 @@ async def delete_user(
         log_events.log_event("[+] FastAPI - Suppression utilisateur.", logs_context)
         session.delete(user)
         session.commit()
-        raise HTTPException(
-            status_code=status.HTTP_204_NO_CONTENT,
-            detail=f"Utilisateur avec id {user_id} supprimé",
-        )
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     logs_context = {
         "current_user": f"{current_user.username}",
