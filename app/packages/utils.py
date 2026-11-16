@@ -182,7 +182,15 @@ def set_dummies_books():
         models.Book(
             title="Aenean viverra maximus velit",
             summary="Maecenas tempus, erat posuere vehicula fringilla",
-            content="Ras lectus nisi, aliquet vel nulla eget. Vestibulum quis lectus erat.Etiam ultrices semper.",
+            content="""
+            Donec vitae enim diam. Vivamus dignissim risus.
+            Cras ac rhoncus neque. Suspendisse malesuada consequat odio, et consequat ipsum tempor quis. 
+            Integer nec magna vel ipsum lacinia finibus. Sed vel odio ac turpis fringilla finibus nec et dui. 
+            Donec convallis gravida dolor. 
+            Proin mattis, ante in tempor pretium, ante nulla molestie velit, eget sagittis arcu elit nec elit. 
+            Pellentesque molestie eget nisl pretium vulputate. 
+            Nunc eget odio imperdiet, mollis ligula ut, mollis nibh. 
+            """,
             author="Cathy Doe",
             year_of_publication="999",
             book_picture_name="dummy_blank_book.png",
@@ -202,7 +210,15 @@ def set_dummies_books():
         models.Book(
             title="Au commencement était la guerre",
             summary="De brèves histoires autour de l'histoire du monde, une guerre incessante",
-            content="Donec vitae enim diam. Vivamus dignissim risus.",
+            content="""
+            Donec vitae enim diam. Vivamus dignissim risus.
+            Cras ac rhoncus neque. Suspendisse malesuada consequat odio, et consequat ipsum tempor quis. 
+            Integer nec magna vel ipsum lacinia finibus. Sed vel odio ac turpis fringilla finibus nec et dui. 
+            Donec convallis gravida dolor. 
+            Proin mattis, ante in tempor pretium, ante nulla molestie velit, eget sagittis arcu elit nec elit. 
+            Pellentesque molestie eget nisl pretium vulputate. 
+            Nunc eget odio imperdiet, mollis ligula ut, mollis nibh. 
+            """,
             author="Alain Bauer",
             year_of_publication="999",
             book_picture_name="dummy_blank_book.png",
@@ -269,6 +285,20 @@ def set_dummies_books():
             et le Golfe, ainsi que les « banlieues de l’islam » de l’Hexagone et de l’Europe. Kepel fut en effet
             le premier à identifier et à étudier les mouvements islamistes, lors de l’assassinat de Sadate,
             en 1981, et à observer la naissance de l’islam en France dans ses significations multiformes.
+            Donec vitae enim diam. Vivamus dignissim risus.
+            Cras ac rhoncus neque. Suspendisse malesuada consequat odio, et consequat ipsum tempor quis. 
+            Integer nec magna vel ipsum lacinia finibus. Sed vel odio ac turpis fringilla finibus nec et dui. 
+            Donec convallis gravida dolor. 
+            Proin mattis, ante in tempor pretium, ante nulla molestie velit, eget sagittis arcu elit nec elit. 
+            Pellentesque molestie eget nisl pretium vulputate. 
+            Nunc eget odio imperdiet, mollis ligula ut, mollis nibh. 
+            Donec vitae enim diam. Vivamus dignissim risus.
+            Cras ac rhoncus neque. Suspendisse malesuada consequat odio, et consequat ipsum tempor quis. 
+            Integer nec magna vel ipsum lacinia finibus. Sed vel odio ac turpis fringilla finibus nec et dui. 
+            Donec convallis gravida dolor. 
+            Proin mattis, ante in tempor pretium, ante nulla molestie velit, eget sagittis arcu elit nec elit. 
+            Pellentesque molestie eget nisl pretium vulputate. 
+            Nunc eget odio imperdiet, mollis ligula ut, mollis nibh. 
             """,
             author="Gilles Kepel",
             year_of_publication="999",

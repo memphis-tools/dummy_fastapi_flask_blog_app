@@ -5,6 +5,7 @@ env
 .envrc.local
 .envrc.docker
 .envrc.docker.local
+.env.tests
 venv
 .venv
 __pycache__
