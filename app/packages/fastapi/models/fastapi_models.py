@@ -71,7 +71,7 @@ class NewCommentModel(BaseModel):
 class UpdateCommentModel(BaseModel):
     """FastAPI update Comment class"""
 
-    text: str
+    text: Optional[str] = None
 
 
 class QuoteModel(BaseModel):

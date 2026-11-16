@@ -1,6 +1,7 @@
 """ The Book blueprint routes """
 
 import os
+import secrets
 
 from flask import (
     Blueprint,
@@ -62,6 +63,15 @@ def is_file_an_image(file):
     except Exception as e:
         file.seek(0)
         return False
+
+
+def generate_random_image_name(original_filename):
+    """Return a random safe image name, keeping the validated extension."""
+    safe_name = secure_filename(original_filename)
+    if not safe_name:
+        return ""
+    file_ext = os.path.splitext(safe_name)[1].lower()
+    return f"{secrets.token_hex(16)}{file_ext}"  # 32 caractères hex + extension
 
 
 @book_routes_blueprint.route("/books/")
@@ -207,8 +217,11 @@ def add_book():
             )
         year_of_publication = form.year_of_publication.data
         book_picture = form.photo.data
-        filename = book_picture.filename
-
+        filename = secure_filename(book_picture.filename)
+        if not filename:
+            flash("Nom de fichier image invalide", "error")
+            return redirect(url_for("index"))
+        
         new_book = Book(
             title=title,
             summary=summary,
@@ -229,8 +242,8 @@ def add_book():
             return redirect(url_for("index"))
 
         if book_is_valid is True:
-            if filename != "":
-                file_ext = os.path.splitext(filename)[1]
+            if filename:
+                file_ext = os.path.splitext(filename)[1].lower()
                 if file_ext not in settings.UPLOAD_EXTENSIONS:
                     logs_context = {
                         "current_user": f"{current_user.username}",
@@ -239,9 +252,11 @@ def add_book():
                     flash("Type image non accepté cas 2", "error")
                     return redirect(url_for("index"))
                 if os.getenv("SCOPE") == "production":
+                    stored_name = generate_random_image_name(filename)
+                    new_book.book_picture_name = stored_name
                     book_picture.save(
                         os.path.join(
-                            settings.INSTANCE_PATH, "staticfiles/img", filename
+                            settings.INSTANCE_PATH, "staticfiles/img", stored_name
                         )
                     )
                 else:
@@ -294,7 +309,11 @@ def delete_book(book_id):
     if form.validate_on_submit():
         book_picture_name = book_to_delete.book_picture_name
         session.delete(book_to_delete)
-        os.remove(f"{settings.INSTANCE_PATH}staticfiles/img/{book_picture_name}")
+        if book_picture_name and book_picture_name != "dummy_blank_book.png":
+            try:
+                os.remove(os.path.join(settings.INSTANCE_PATH, "staticfiles/img", book_picture_name))
+            except OSError:
+                pass
         logs_context = {
             "current_user": f"{current_user.username}",
             "book_title": book_to_delete.title,
@@ -378,10 +397,12 @@ def render_invalid_category_response(edit_form):
 
 
 def handle_book_picture(book_picture_filename):
-    """Return the book illustration image name if set. Else use the old one."""
+    """Return the uploaded file with a random safe name. Else use the old one."""
     try:
         uploaded_file = request.files["photo"]
-        filename = secure_filename(uploaded_file.filename)
+        filename = generate_random_image_name(uploaded_file.filename)
+        if not filename:
+            return None, book_picture_filename
         return uploaded_file, filename
     except Exception:
         return None, book_picture_filename
@@ -410,31 +431,44 @@ def log_book_update(updated_book):
 
 def save_updated_book(session, book_id, updated_book, book_picture_filename, file_data):
     """save the updated book if all datas validated"""
-    if book_picture_filename != file_data.filename:
-        handle_file_upload_and_removal(file_data.filename, book_picture_filename, file_data.uploaded_file)
+    book_is_valid = check_book_fields(updated_book)
+    if book_is_valid is not True:
+        flash(book_is_valid, "error")
+        session.close()
+        return
+    if file_data.uploaded_file is not None:
+        save_book_picture(file_data.filename, file_data.uploaded_file)
     session.query(Book).where(Book.id == book_id).update(updated_book.get_json_for_update())
-    if check_book_fields(updated_book):
-        session.commit()
-        session.close()
-        log_book_update(updated_book)
-        flash("Mise à jour livre.", "info")
-    else:
-        flash("Erreur avec image illustration", "error")
-        session.close()
+    session.commit()
+    session.close()
+    if file_data.uploaded_file is not None and book_picture_filename != file_data.filename:
+        remove_old_book_picture(book_picture_filename)
+    log_book_update(updated_book)
+    flash("Mise \u00e0 jour livre.", "info")
 
 
-def handle_file_upload_and_removal(filename, book_picture_filename, uploaded_file):
-    """check if image file is valid"""
-    if filename and filename != "dummy_blank_book.png":
-        file_ext = os.path.splitext(filename)[1]
-        if file_ext not in settings.UPLOAD_EXTENSIONS:
-            abort(400, "Image invalide")
-        if os.getenv("SCOPE") == "production":
-            uploaded_file.save(os.path.join(settings.INSTANCE_PATH, "staticfiles/img", filename))
-            try:
-                os.remove(os.path.join(settings.INSTANCE_PATH, "staticfiles/img", book_picture_filename))
-            except FileNotFoundError:
-                pass
+def save_book_picture(filename, uploaded_file):
+    """validate the uploaded image (extension + real content) and save it (production only)"""
+    if not filename or filename == "dummy_blank_book.png":
+        abort(400, "Image invalide")
+    file_ext = os.path.splitext(filename)[1].lower()
+    if file_ext not in settings.UPLOAD_EXTENSIONS:
+        abort(400, "Image invalide")
+    if not is_file_an_image(uploaded_file):
+        abort(400, "Image invalide")
+    if os.getenv("SCOPE") == "production":
+        uploaded_file.save(os.path.join(settings.INSTANCE_PATH, "staticfiles/img", filename))
+
+
+def remove_old_book_picture(book_picture_filename):
+    """delete the previous illustration after the DB update is committed (best effort)"""
+    if not book_picture_filename or book_picture_filename == "dummy_blank_book.png":
+        return
+    if os.getenv("SCOPE") == "production":
+        try:
+            os.remove(os.path.join(settings.INSTANCE_PATH, "staticfiles/img", book_picture_filename))
+        except OSError:
+            pass
 
 
 class FileData:

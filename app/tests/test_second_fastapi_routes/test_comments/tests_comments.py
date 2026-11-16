@@ -366,7 +366,7 @@ async def test_delete_comment_with_authentication_with_unexisting_comment(fastap
         "accept": "application/json"
     }
     response = fastapi_client.delete(
-        "/api/v1/books/1/comments/55555555/",
+        "/api/v1/books/2/comments/55555555/",
         headers=headers
     )
     assert response.status_code == 404
@@ -437,3 +437,40 @@ async def test_view_unexisting_user_comments_being_authenticated(fastapi_client,
         headers=headers
     )
     assert response.status_code == 404
+
+
+# --- nouveau test (couvre comments.py:76-84, branche 404 de add_comment) ---
+@pytest.mark.asyncio
+async def test_post_comment_with_authentication_with_unexisting_book(
+    fastapi_client,
+    fastapi_token
+):
+    """
+    Description: test add comment to an unexisting book route with FastAPI TestClient with token.
+    Book does not exist, so we expect a 404.
+    """
+    access_token = fastapi_token
+    json = {"text": "such a great book sir"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = fastapi_client.post("/api/v1/books/comments/?book_id=55555555", headers=headers, json=json)
+    assert response.status_code == 404
+
+# --- nouveau test (couvre l'arc 105->107, text is None) ---
+@pytest.mark.asyncio
+async def test_update_comment_with_authentication_with_empty_datas(fastapi_client, fastapi_token):
+    """
+    Description: test update_comment id 5 route with FastAPI TestClient with token and an empty json body.
+    The comment has been published by authenticated user, and its text is left unchanged.
+    """
+    access_token = fastapi_token
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = fastapi_client.put("/api/v1/books/comments/5/", headers=headers, json={})
+    assert response.status_code == 200

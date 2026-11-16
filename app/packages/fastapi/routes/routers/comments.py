@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 
-try:
+try:  # pragma: no cover
     import log_events
     from database.commands import database_crud_commands
     from database.models import models
@@ -13,7 +13,7 @@ try:
         NewCommentModel,
         UpdateCommentModel,
     )
-except ModuleNotFoundError:
+except ModuleNotFoundError:  # pragma: no cover
     from app.packages import log_events
     from app.packages.database.commands import database_crud_commands
     from app.packages.database.models import models
@@ -75,7 +75,6 @@ async def add_comment(
 
     logs_context = {
         "current_user": f"{current_user.username}",
-        "book_title": updated_book.title,
     }
     log_events.log_event("[404] FastAPI - Ajout commentaire sur livre inconnu.", logs_context)
     raise HTTPException(

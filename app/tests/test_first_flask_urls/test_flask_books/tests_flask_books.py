@@ -706,7 +706,8 @@ def test_update_book_with_corrupted_image_type(
     get_flask_csrf_token
 ):
     """
-    Description: check if we can add a book with an invalid image type.
+    Description: check that updating a book with a corrupted image
+    (valid .png extension, invalid content) is rejected with 400 by the PIL content check.
     Notice only types accepted: .jpg, .jpeg, .png
     """
     resources = Path(__file__).parent
@@ -734,7 +735,8 @@ def test_update_book_with_corrupted_image_type(
         data=book_form,
         follow_redirects=True,
     )
-    assert response.status_code == 200
+    # nouveau comportement : le contenu non-image est rejeté (vérif PIL) -> 400
+    assert response.status_code == 400
 
 # ------------------------------------------------------------------
 # Supplementary tests proposed by Vibe (powered by glm-5-latest-short)
@@ -742,6 +744,9 @@ def test_update_book_with_corrupted_image_type(
 # empty-filename form stub, flash patching (no request context).
 # Goal: raise book_routes_blueprint.py coverage from 79% to max.
 # ------------------------------------------------------------------
+import io
+import os
+import re
 from importlib import import_module
 from unittest.mock import MagicMock
 
@@ -752,10 +757,14 @@ from app.packages.flask_app.project import forms as project_forms
 from app.packages.flask_app.project.book_routes_blueprint import (
     FileData,
     create_updated_book,
+    generate_random_image_name,
     get_book_by_id,
     get_category_id,
     get_updated_fields,
-    handle_file_upload_and_removal,
+    handle_book_picture,
+    is_file_an_image,
+    remove_old_book_picture,
+    save_book_picture,
     save_updated_book,
 )
 
@@ -960,6 +969,14 @@ def test_flask_post_add_book_in_production_scope(
     response = client.post(url, data=book_form, headers=headers, follow_redirects=True)
     assert response.status_code == 200
     assert b"Livre ajout\xc3\xa9." in response.data
+    from app.packages.database.models.models import Book as BookModel
+    stored = (
+        get_session.query(BookModel)
+        .filter_by(title="This is a dummy production title sir")
+        .first()
+    )
+    assert stored is not None
+    assert re.fullmatch(r"[0-9a-f]{32}\.jpg", stored.book_picture_name)
 
 
 def test_get_category_id_without_categories_key(get_session):
@@ -970,32 +987,301 @@ def test_get_category_id_without_categories_key(get_session):
     assert response is None
 
 
-def test_handle_file_upload_and_removal_with_dummy_picture():
+def test_save_book_picture_with_dummy_picture():
     """
-    Description: covers line 426 -> exit: filename is dummy_blank_book.png,
-    so nothing is done.
-    """
-    result = handle_file_upload_and_removal("dummy_blank_book.png", "old.png", None)
-    assert result is None
-
-
-def test_handle_file_upload_and_removal_with_forbidden_extension():
-    """
-    Description: covers line 428 -> 429: forbidden extension aborts with 400.
+    Description: the shared dummy image must never be overwritten: abort 400.
     """
     with pytest.raises(HTTPException) as exc_info:
-        handle_file_upload_and_removal("invalid_picture.txt", "old.png", None)
+        save_book_picture("dummy_blank_book.png", MagicMock())
     assert exc_info.value.code == 400
 
 
-def test_handle_file_upload_and_removal_in_production(monkeypatch):
+def test_save_book_picture_with_empty_filename():
     """
-    Description: covers line 430 -> 431: in production the uploaded file is
-    saved and the old picture removed (missing old file is ignored).
+    Description: an empty (over-sanitized) filename is rejected: abort 400.
+    """
+    with pytest.raises(HTTPException) as exc_info:
+        save_book_picture("", MagicMock())
+    assert exc_info.value.code == 400
+
+
+def test_save_book_picture_with_forbidden_extension():
+    """
+    Description: a forbidden extension aborts with 400 before any content check.
+    """
+    with pytest.raises(HTTPException) as exc_info:
+        save_book_picture("invalid_picture.txt", MagicMock())
+    assert exc_info.value.code == 400
+
+
+def test_save_book_picture_with_non_image_content():
+    """
+    Description: a .jpg-named file whose content is not a real image is rejected
+    by the PIL content check: abort 400 (new control on the update route).
+    wrong_image.jpg is an empty file, so Image.open fails.
+    """
+    resources = Path(__file__).parent
+    with (resources / "wrong_image.jpg").open("rb") as fake_image:
+        uploaded = FileStorage(
+            stream=fake_image, filename="wrong_image.jpg", content_type="image/jpeg"
+        )
+        with pytest.raises(HTTPException) as exc_info:
+            save_book_picture("wrong_image.jpg", uploaded)
+    assert exc_info.value.code == 400
+
+
+def test_save_book_picture_with_valid_image_in_production(monkeypatch):
+    """
+    Description: in production scope a valid image passes every check and is saved.
     """
     monkeypatch.setenv("SCOPE", "production")
-    fake_uploaded_file = MagicMock()
-    handle_file_upload_and_removal(
-        "new_picture.jpg", "zzz_unexisting_picture.png", fake_uploaded_file
+    saved_dsts = []
+    monkeypatch.setattr(
+        "werkzeug.datastructures.FileStorage.save",
+        lambda self, dst, timeout=None: saved_dsts.append(dst),
     )
-    fake_uploaded_file.save.assert_called_once()
+    resources = Path(__file__).parent
+    with (resources / "photo_pexels.com_by_inga_seliverstova.jpg").open("rb") as img:
+        uploaded = FileStorage(
+            stream=img, filename="new_picture.jpg", content_type="image/jpeg"
+        )
+        save_book_picture("new_picture.jpg", uploaded)
+    assert len(saved_dsts) == 1
+    assert saved_dsts[0].endswith(os.path.join("staticfiles", "img", "new_picture.jpg"))
+
+
+def test_save_book_picture_with_valid_image_not_in_production(monkeypatch):
+    """
+    Description: outside production the image is validated but not written to disk.
+    """
+    monkeypatch.delenv("SCOPE", raising=False)
+    save_mock = MagicMock()
+    monkeypatch.setattr("werkzeug.datastructures.FileStorage.save", save_mock)
+    resources = Path(__file__).parent
+    with (resources / "photo_pexels.com_by_inga_seliverstova.jpg").open("rb") as img:
+        uploaded = FileStorage(
+            stream=img, filename="new_picture.jpg", content_type="image/jpeg"
+        )
+        save_book_picture("new_picture.jpg", uploaded)
+    save_mock.assert_not_called()
+
+
+def test_remove_old_book_picture_never_deletes_dummy_or_empty(monkeypatch):
+    """
+    Description: the shared dummy image (or an empty name) is never deleted.
+    """
+    monkeypatch.setenv("SCOPE", "production")
+    remove_mock = MagicMock()
+    monkeypatch.setattr(os, "remove", remove_mock)
+    remove_old_book_picture("dummy_blank_book.png")
+    remove_old_book_picture("")
+    remove_mock.assert_not_called()
+
+
+def test_remove_old_book_picture_in_production(monkeypatch):
+    """
+    Description: in production the previous illustration is deleted after commit.
+    """
+    monkeypatch.setenv("SCOPE", "production")
+    remove_mock = MagicMock()
+    monkeypatch.setattr(os, "remove", remove_mock)
+    remove_old_book_picture("old_picture.png")
+    remove_mock.assert_called_once()
+    assert remove_mock.call_args[0][0].endswith(
+        os.path.join("staticfiles", "img", "old_picture.png")
+    )
+
+
+def test_remove_old_book_picture_ignores_os_errors(monkeypatch):
+    """
+    Description: a missing/unreadable old file must not raise (best effort).
+    """
+    monkeypatch.setenv("SCOPE", "production")
+    monkeypatch.setattr(os, "remove", MagicMock(side_effect=OSError))
+    remove_old_book_picture("zzz_missing.png")
+
+
+def test_remove_old_book_picture_not_in_production(monkeypatch):
+    """
+    Description: outside production nothing is deleted from disk.
+    """
+    monkeypatch.delenv("SCOPE", raising=False)
+    remove_mock = MagicMock()
+    monkeypatch.setattr(os, "remove", remove_mock)
+    remove_old_book_picture("old_picture.png")
+    remove_mock.assert_not_called()
+
+
+def _make_valid_updated_book():
+    book = MagicMock()
+    book.title = "A valid title"
+    book.author = "A valid author"
+    book.summary = "A valid summary"
+    book.content = "A valid content"
+    book.year_of_publication = 2020
+    return book
+
+
+def _patch_save_updated_book_dependencies(monkeypatch):
+    module = _get_book_routes_blueprint_module()
+    save_mock = MagicMock()
+    remove_mock = MagicMock()
+    monkeypatch.setattr(module, "save_book_picture", save_mock)
+    monkeypatch.setattr(module, "remove_old_book_picture", remove_mock)
+    monkeypatch.setattr(module, "flash", lambda *args, **kwargs: None)
+    monkeypatch.setattr(module, "log_book_update", lambda *args, **kwargs: None)
+    return save_mock, remove_mock
+
+
+def test_save_updated_book_with_new_picture_saves_then_removes_old(monkeypatch):
+    """
+    Description: new order: validate fields -> save new picture -> DB update ->
+    commit -> then remove the old picture (different names).
+    """
+    save_mock, remove_mock = _patch_save_updated_book_dependencies(monkeypatch)
+    session = MagicMock()
+    file_data = FileData("new_picture.png", MagicMock())
+    save_updated_book(session, 1, _make_valid_updated_book(), "old_picture.png", file_data)
+    save_mock.assert_called_once_with("new_picture.png", file_data.uploaded_file)
+    session.query.return_value.where.return_value.update.assert_called_once()
+    session.commit.assert_called_once()
+    remove_mock.assert_called_once_with("old_picture.png")
+
+
+def test_save_updated_book_with_same_filename_overwrites_without_removal(monkeypatch):
+    """
+    Description: same filename = overwrite: the new file is saved and the old one
+    is NOT removed (replacement now works even with an identical name).
+    """
+    save_mock, remove_mock = _patch_save_updated_book_dependencies(monkeypatch)
+    session = MagicMock()
+    file_data = FileData("old_picture.png", MagicMock())
+    save_updated_book(session, 1, _make_valid_updated_book(), "old_picture.png", file_data)
+    save_mock.assert_called_once_with("old_picture.png", file_data.uploaded_file)
+    session.commit.assert_called_once()
+    remove_mock.assert_not_called()
+
+
+def test_save_updated_book_without_new_picture_keeps_old_one(monkeypatch):
+    """
+    Description: no uploaded file: nothing saved, nothing removed, DB still updated
+    (the old illustration is kept).
+    """
+    save_mock, remove_mock = _patch_save_updated_book_dependencies(monkeypatch)
+    session = MagicMock()
+    file_data = FileData("old_picture.png", None)
+    save_updated_book(session, 1, _make_valid_updated_book(), "old_picture.png", file_data)
+    save_mock.assert_not_called()
+    session.commit.assert_called_once()
+    remove_mock.assert_not_called()
+
+
+def test_save_updated_book_with_invalid_fields_touches_nothing(monkeypatch):
+    """
+    Description: check_book_fields failure -> flash error, no file operation and
+    no DB update (the old illustration stays on disk).
+    """
+    save_mock, remove_mock = _patch_save_updated_book_dependencies(monkeypatch)
+    session = MagicMock()
+    bad_book = _make_valid_updated_book()
+    bad_book.title = "string"
+    file_data = FileData("new_picture.png", MagicMock())
+    save_updated_book(session, 1, bad_book, "old_picture.png", file_data)
+    save_mock.assert_not_called()
+    remove_mock.assert_not_called()
+    session.query.assert_not_called()
+    session.close.assert_called_once()
+
+
+def test_handle_book_picture_without_upload_keeps_old_name(monkeypatch):
+    """
+    Description: no "photo" part in the request -> keep the old illustration name.
+    """
+    module = _get_book_routes_blueprint_module()
+    fake_request = MagicMock()
+    fake_request.files = {}
+    monkeypatch.setattr(module, "request", fake_request)
+    uploaded_file, filename = handle_book_picture("old_picture.png")
+    assert uploaded_file is None
+    assert filename == "old_picture.png"
+
+
+def test_handle_book_picture_sanitizes_filename(monkeypatch):
+    """
+    Description: the uploaded filename is randomized and sanitized (no path traversal).
+    """
+    module = _get_book_routes_blueprint_module()
+    fake_request = MagicMock()
+    fake_request.files = {
+        "photo": FileStorage(
+            stream=io.BytesIO(b"fake"),
+            filename="../../evil.png",
+            content_type="image/png",
+        )
+    }
+    monkeypatch.setattr(module, "request", fake_request)
+    uploaded_file, filename = handle_book_picture("old_picture.png")
+    assert re.fullmatch(r"[0-9a-f]{32}\.png", filename)
+    assert filename != "evil.png"
+    assert "/" not in filename and "\\" not in filename
+    assert len(filename) <= 250  # Book.book_picture_name is String(250)
+    assert uploaded_file is fake_request.files["photo"]
+
+
+def test_handle_book_picture_with_empty_sanitized_filename_keeps_old_name(monkeypatch):
+    """
+    Description: a filename that sanitizes to "" falls back to the old name
+    (the book must not end up with book_picture_name="").
+    """
+    module = _get_book_routes_blueprint_module()
+    fake_request = MagicMock()
+    fake_request.files = {
+        "photo": FileStorage(
+            stream=io.BytesIO(b"fake"), filename="$$$", content_type="image/png"
+        )
+    }
+    monkeypatch.setattr(module, "request", fake_request)
+    uploaded_file, filename = handle_book_picture("old_picture.png")
+    assert uploaded_file is None
+    assert filename == "old_picture.png"
+
+
+def test_generate_random_image_name_is_unique():
+    """
+    Description: two uploads of the same original file get different stored names.
+    """
+    name1 = generate_random_image_name("cover.png")
+    name2 = generate_random_image_name("cover.png")
+    assert name1 != name2
+    assert re.fullmatch(r"[0-9a-f]{32}\.png", name1)
+    assert re.fullmatch(r"[0-9a-f]{32}\.png", name2)
+
+
+def test_generate_random_image_name_keeps_lowercased_extension():
+    """
+    Description: the validated extension is kept, lowercased.
+    """
+    assert re.fullmatch(r"[0-9a-f]{32}\.jpg", generate_random_image_name("photo.JPG"))
+    assert re.fullmatch(r"[0-9a-f]{32}\.jpeg", generate_random_image_name("a.JPEG"))
+    assert re.fullmatch(r"[0-9a-f]{32}\.png", generate_random_image_name("a.png"))
+
+
+def test_generate_random_image_name_with_unsafe_original():
+    """
+    Description: an original filename that sanitizes to "" yields "" (caller falls
+    back to the old picture name).
+    """
+    assert generate_random_image_name("$$$") == ""
+    assert generate_random_image_name("") == ""
+
+
+def test_is_file_an_image_with_valid_image():
+    resources = Path(__file__).parent
+    with (resources / "photo_pexels.com_by_inga_seliverstova.jpg").open("rb") as img:
+        assert is_file_an_image(img) is True
+
+
+def test_is_file_an_image_with_non_image_content():
+    resources = Path(__file__).parent
+    with (resources / "wrong_image.jpg").open("rb") as img:
+        assert is_file_an_image(img) is False
