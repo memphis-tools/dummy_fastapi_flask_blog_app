@@ -22,6 +22,7 @@ from PIL import Image
 try:
     import log_events
     import settings
+    from . import celery_app 
     from database.commands import session_commands
     from database.models.models import (
         Book,
@@ -500,7 +501,7 @@ def update_book(book_id):
 @login_required
 def mail_books():
     """send books published by email as a pdf"""
-    celery_app.send_task("generate_pdf_and_send_email_task", args=(current_user.email,), retry=True)
+    celery_app.celery_app.send_task("generate_pdf_and_send_email_task", args=(current_user.email,), retry=True)
     logs_context = {
         "current_user": f"{current_user.username}",
     }
