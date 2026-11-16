@@ -202,3 +202,38 @@ def test_send_activation_link_in_development(app, monkeypatch):
         project.send_activation_link("someone@localhost.fr")
     assert mock_smtp.called is True
     mock_smtp.return_value.__enter__.assert_called_once()
+
+
+
+##
+# 16/11/2016 - Ajout 2 tests identifiés par Mistral-ai
+def test_flask_misc_route(client):
+    """
+    Description: covers line 591: the misc route redirects to the
+    dummy sudoku resolver front hosted on render.
+    """
+    response = client.get("http://localhost/misc/")
+    assert response.status_code == 302
+    assert (
+        "https://dummy-sudoku-resolver-front.onrender.com"
+        in response.headers["Location"]
+    )
+
+
+def test_send_activation_link_in_production_with_failure(app, monkeypatch):
+    """
+    Description: covers lines 436-437: in production, when the SendGrid send
+    fails, send_activation_link returns a failure dict. get_secret and
+    SendGridAPIClient.send are patched so no real secret/network is used.
+    """
+    import app.packages.flask_app.project as project
+
+    monkeypatch.setenv("SCOPE", "production")
+    monkeypatch.setattr(project, "get_secret", lambda path: "dummy-secret")
+    send_mock = MagicMock(side_effect=Exception("dummy sendgrid failure"))
+    monkeypatch.setattr("sendgrid.SendGridAPIClient.send", send_mock)
+    with app.test_request_context("/"):
+        # url_for(..., _external=True) needs a request context
+        result = project.send_activation_link("someone@localhost.fr")
+    assert result == {"status": "failure", "message": "Mail sending failed"}
+    assert send_mock.call_count == 1

@@ -110,3 +110,14 @@ def test_check_book_fields_with_invalid_field():
     )
     response = check_book_fields(new_book)
     assert "Saisie invalide, mot clef string non utilisable." == response
+
+
+##
+# 16/11/2016 - Ajout 1 test(s) identifié(s) par Mistral-ai
+def test_swagger_ui_oauth2_redirect_uri(fastapi_client):
+    """
+    Description: test the get oauth2 redirect uri used by the custom /docs uri.
+    """
+    response = fastapi_client.get(app.swagger_ui_oauth2_redirect_url)
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/html")

@@ -5,8 +5,10 @@ Notice that by default we already add dummies data through the application utils
 
 import pytest
 from fastapi import HTTPException
+from unittest.mock import MagicMock
 from app.packages.database.models.models import Book
 from app.packages.fastapi.routes.routers.books import check_book_fields
+from app.packages.fastapi.routes.routers import books as books_router
 
 
 @pytest.mark.asyncio
@@ -552,3 +554,64 @@ async def test_full_update_book_with_authentication_with_invalid_keyword_string(
     }
     response = fastapi_client.put("/api/v1/books/2/", headers=headers, json=json)
     assert response.status_code == 403
+
+
+
+
+##
+# 16/11/2016 - Ajout 4 test(s) identifié(s) par Mistral-ai
+@pytest.mark.asyncio
+async def test_download_books_with_authentication(fastapi_client, fastapi_token, monkeypatch):
+    """Couvre get_user_email (72-75) et download_books (86-95). Celery mocké."""
+    monkeypatch.setattr(books_router, "Celery", lambda *a, **k: MagicMock())
+    response = fastapi_client.get(
+        "/api/v1/books/download/",
+        headers={"Authorization": f"Bearer {fastapi_token}"},
+    )
+    assert response.status_code == 200
+    assert "donald@localhost.fr" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_download_books_without_authentication(fastapi_client):
+    response = fastapi_client.get(
+        "/api/v1/books/download/",
+        headers={"Authorization": "Bearer dummyToken"},
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_partial_update_book_with_unknown_category(fastapi_client, fastapi_token):
+    """Couvre le except du PATCH (221-227). Livre 5 = donald, catégorie inconnue -> 404."""
+    headers = {
+        "Authorization": f"Bearer {fastapi_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = fastapi_client.patch(
+        "/api/v1/books/5/", headers=headers, json={"category": "supplication"}
+    )
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Saisie invalide, categorie livre non prevue."
+
+
+@pytest.mark.asyncio
+async def test_full_update_book_with_unknown_category(fastapi_client, fastapi_token):
+    """Couvre le except du PUT (289-295). Payload valide mais catégorie inconnue -> 404."""
+    headers = {
+        "Authorization": f"Bearer {fastapi_token}",
+        "accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    json = {
+        "title": "Perdus dans les Andes",
+        "author": "Walt Disney",
+        "summary": "Donald a trouve un emploi au musee.",
+        "content": "what a great story sir",
+        "year_of_publication": "1984",
+        "category": "supplication",
+    }
+    response = fastapi_client.put("/api/v1/books/5/", headers=headers, json=json)
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Saisie invalide, categorie livre non connue."
