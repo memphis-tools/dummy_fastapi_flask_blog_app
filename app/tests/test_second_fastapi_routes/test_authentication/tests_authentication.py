@@ -4,8 +4,9 @@ Notice that by default we already add dummies data through the application utils
 """
 
 import os
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 import pytest
+import jwt
 
 from app.packages import settings
 from app.packages.fastapi.models import fastapi_models
@@ -359,3 +360,38 @@ def test_secret_key_loaded_from_docker_secret(monkeypatch):
     finally:
         monkeypatch.delenv("SCOPE", raising=False)
         importlib.reload(dependencies)
+
+
+
+##
+# 16/11/2016 - Ajout 2 test(s) identifié(s) par Mistral-ai
+def test_create_access_token_with_default_expiration():
+    """
+    Description: check if we can create an access token without expires_delta (default 15 minutes).
+    """
+    username = "donald"
+    user = get_user(username)
+    access_token = routes_and_authentication.create_access_token(data={"sub": user.username})
+    assert isinstance(access_token, str)
+    payload = jwt.decode(
+        access_token,
+        key=routes_and_authentication.SECRET_KEY,
+        algorithms=[routes_and_authentication.ALGORITHM],
+    )
+    expire = datetime.fromtimestamp(payload["exp"], tz=timezone.utc)
+    assert timedelta(minutes=14) < expire - datetime.now(timezone.utc) < timedelta(minutes=16)
+
+
+@pytest.mark.asyncio
+async def test_get_token_for_inactive_user(fastapi_client):
+    """
+    Description: test a get token for an inactive (not validated) user.
+    """
+    form_data = dict(
+        username="loulou",
+        password=settings.TEST_USER_PWD
+    )
+    response = fastapi_client.post("/api/v1/token/", data=form_data, follow_redirects=True)
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Nom utilisateur ou mot de passe invalide"
+    assert response.headers["WWW-Authenticate"] == "Bearer"

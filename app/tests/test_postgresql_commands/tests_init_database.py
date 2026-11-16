@@ -145,3 +145,42 @@ def test_init_database_with_production_scope(monkeypatch):
     monkeypatch.setenv("SCOPE", "production")
     session = init_database.init_database()
     assert session is fake_session
+
+##
+# 16/11/2016 - Ajout 4 tests identifiés par Mistral-ai
+def test_init_database_with_test_scope(monkeypatch):
+    fake_session = MagicMock()
+    fake_session.query.return_value.filter_by.return_value.scalar.return_value = object()
+    fake_session.query.return_value.all.return_value = [object()]  # catégories déjà là
+    fake_engine = MagicMock()
+    monkeypatch.setattr(init_database, "get_engine", lambda *a: fake_engine)
+    monkeypatch.setattr(init_database, "sessionmaker", lambda bind: (lambda: fake_session))
+    monkeypatch.setenv("SCOPE", "test")
+    session = init_database.init_database()
+    assert session is fake_session
+    fake_engine  # drop_all/create_all exécutés sur le moteur mocké (lignes 91-92)
+
+
+def test_create_application_admin_user_creates_admin(monkeypatch, mocker):
+    monkeypatch.setenv("SCOPE", "test")
+    fake_session = MagicMock()
+    fake_session.query.return_value.filter_by.return_value.scalar.return_value = None
+    mocker.patch.object(init_database.utils, "set_a_hash_password", return_value="hashed")
+    init_database.create_application_admin_user_if_not_exist(fake_session)
+    fake_session.add.assert_called_once()
+    fake_session.commit.assert_called_once()          # lignes 142-152
+
+
+def test_create_books_categories_creates_all(monkeypatch):
+    fake_session = MagicMock()
+    fake_session.query.return_value.all.return_value = []
+    assert init_database.create_books_categories_if_not_exist(fake_session) is True
+    assert fake_session.add.call_count == len(init_database.settings.BOOKS_CATEGORIES)  # lignes 110-118
+
+
+def test_reset_and_populate_database_when_donald_absent(monkeypatch, mocker):
+    fake_session = MagicMock()
+    fake_session.query.return_value.filter_by.return_value.scalar.return_value = None
+    mock_setup = mocker.patch.object(init_database.utils, "call_dummy_setup")
+    assert init_database.reset_and_populate_database(fake_session) is True
+    mock_setup.assert_called_once_with(fake_session)   # lignes 194-196

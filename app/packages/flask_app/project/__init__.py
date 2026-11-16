@@ -5,6 +5,7 @@ import requests
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import smtplib
+from markupsafe import escape
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from flask import (
@@ -69,12 +70,14 @@ login_manager = LoginManager(app)
 login_manager.init_app(app)
 login_manager.login_view = "/"
 login_manager.session_protection = "strong"
+CONTACT_TOKEN_SALT = "contact-confirmation"
+CONTACT_TOKEN_MAX_AGE = 86400  # 1 jour
 SENDGRID_API_KEY = get_secret("/run/secrets/SENDGRID_API_KEY")
 WTF_CSRF_SECRET_KEY = app.config["SECRET_KEY"]
 MAX_BOOKS_ON_INDEX_PAGE = 3
 sengrid_tokens_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-
 sendgrid_client = SendGridAPIClient(SENDGRID_API_KEY)
+
 
 
 @login_manager.user_loader
@@ -174,28 +177,128 @@ def index():
     )
 
 
+def _send_email(to_email, subject, html_content):
+    """
+    Description: send an email via SendGrid (production) or Mailtrap (development).
+    """
+    if os.getenv("SCOPE") == "production":
+        message = Mail(
+            from_email="no-reply@dummy-ops.dev",
+            to_emails=to_email,
+            subject=subject,
+            html_content=html_content,
+        )
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
+        sg.send(message)
+    elif os.getenv("SCOPE") == "development":
+        msg = MIMEMultipart()
+        msg["Subject"] = subject
+        msg["To"] = to_email
+        msg["From"] = "no-reply@dummy-ops.dev"
+        msg.attach(MIMEText(html_content, "html"))
+        with smtplib.SMTP("sandbox.smtp.mailtrap.io", 2525) as server:
+            server.starttls()
+            server.login(
+                os.getenv("MAILTRAP_USER_NAME"),
+                os.getenv("MAILTRAP_USER_PASSWORD"),
+            )
+            server.send_message(msg, "no-reply@dummy-ops.dev", [to_email])
+
+
+def send_contact_validation_link(name, email, message):
+    """
+    Description: email the visitor a signed link to validate their email address
+    before their contact message is forwarded to the admin.
+    """
+    token = sengrid_tokens_serializer.dumps(
+        {"name": name, "email": email, "message": message},
+        salt=CONTACT_TOKEN_SALT,
+    )
+    confirm_url = url_for("confirm_contact", token=token, _external=True)
+    _send_email(
+        email,
+        "Dummy-ops - validez votre message de contact",
+        f"""
+        <p>Bonjour {escape(name)},</p>
+        <p>Cliquez sur le lien pour valider votre adresse email et envoyer votre message :</p>
+        <p><a href="{confirm_url}">Valider mon message</a></p>
+        """,
+    )
+    
+
+
+def forward_contact_message(name, email, message):
+    """
+    Description: forward the validated contact message to the admin inbox.
+    """
+    _send_email(
+        get_secret("/run/secrets/ADMIN_EMAIL"),
+        "Dummy-ops contact",
+        f"<p>{escape(name)} ({escape(email)}) a envoyé ce message : {escape(message)}</p>",
+    )
+
+
+@app.route("/contact/confirm/<token>")
+def confirm_contact(token):
+    """
+    Description: validates the visitor's email via the signed token, then
+    forwards the contact message to the admin.
+    """
+    try:
+        payload = sengrid_tokens_serializer.loads(
+            token, salt=CONTACT_TOKEN_SALT, max_age=CONTACT_TOKEN_MAX_AGE
+        )
+        name = payload["name"]
+        email = payload["email"]
+        message = payload["message"]
+    except Exception:
+        flash("Le lien de validation n'est pas valide ou a expiré.", "error")
+        return redirect(url_for("contact"))
+
+    try:
+        forward_contact_message(name, email, message)
+    except Exception as e:
+        app.logger.exception("Echec envoi du message contact après validation")
+        log_events.log_event(
+            f"[400] Flask - Echec envoi du message contact après validation: {e}",
+            {"username": name, "email": email},
+        )
+        return render_template(
+            "mail_not_sent.html",
+            name=name,
+            is_authenticated=current_user.is_authenticated,
+        )
+
+    log_events.log_event(
+        "[200] Flask - Message de contact transmis après validation de l'email.",
+        {"username": name, "email": email},
+    )
+    return render_template(
+        "mail_sent.html",
+        name=name,
+        is_authenticated=current_user.is_authenticated,
+    )
+
+
 @app.route("/contact/", methods=["GET", "POST"])
 def contact():
     """
-    Description: the contact Flask route.
+    Description: the contact Flask route. Sends the visitor a validation email;
+    the message reaches the admin only after the email is confirmed.
     """
     form = forms.ContactForm()
     if form.validate_on_submit():
-        # Retrieve hCaptcha response token from the form data
         hcaptcha_response = request.form.get('h-captcha-response')
         if not hcaptcha_response:
             flash("Veuillez valider le captcha.", "error")
             return render_template("contact.html", form=form)
 
-        # hCaptcha verification
         hcaptcha_secret_key = app.config["HCAPTCHA_SITE_SECRET"]
         verify_url = app.config["HCAPTCHA_VERIFY_URL"]
         payload = {
             "secret": hcaptcha_secret_key,
             "response": hcaptcha_response
         }
-
-        # Make POST request to hCaptcha API
         response = requests.post(verify_url, data=payload)
         response_json = response.json()
 
@@ -206,74 +309,34 @@ def contact():
                 form=form,
                 is_authenticated=current_user.is_authenticated,
             )
+
         input_username = form.name.data
         input_email = str(form.email.data).lower()
         input_message = form.message.data
 
-        if os.getenv("SCOPE") == "production":
-            message = Mail(
-                from_email="no-reply@dummy-ops.dev",
-                to_emails=get_secret("/run/secrets/ADMIN_EMAIL"),
-                subject="Dummy-ops contact",
-                html_content=f"""
-                    <p>{input_username} with email {input_email} sent this message: {input_message}</p>
-                """
-            )
-
-            SENDGRID_API_KEY = get_secret("/run/secrets/SENDGRID_API_KEY")
-            try:
-                sg = SendGridAPIClient(SENDGRID_API_KEY)
-                sg.send(message)
-                return render_template(
-                    "mail_sent.html",
-                    name=input_username,
-                    is_authenticated=current_user.is_authenticated,
-                )
-            except Exception as e:
-                logs_context = {"username": f"{input_username}", "email": f"{input_email}"}
-                log_events.log_event(
-                    f"[400] Flask - Echec envoi email {type(sg)} {type(message)} {SENDGRID_API_KEY}: {e}", logs_context
-                )
-                return render_template(
-                    "mail_not_sent.html",
-                    name=input_username,
-                    is_authenticated=current_user.is_authenticated,
-                )
-        elif os.getenv("SCOPE") == "development":
-            # We use smtplib and MailTrap
-            mailtrap_user_name = os.getenv("MAILTRAP_USER_NAME")
-            mailtrap_user_password = os.getenv("MAILTRAP_USER_PASSWORD")
-            # Email configuration
-            sender = input_email
-            receiver = "sandbox.smtp.mailtrap.io"
-            subject = "Dummy-ops contact"
-
-            msg = MIMEMultipart()
-            msg['Subject'] = "Dummy-ops books"
-            msg['To'] = receiver
-            msg['From'] = sender
-
-            html = f"""
-            <html>
-                <body>
-                    <p>{input_message}</p>
-                </body>
-            </html>
-            """
-            msg.attach(MIMEText(html, 'html'))
-
-            with smtplib.SMTP("sandbox.smtp.mailtrap.io", 2525) as server:
-                server.starttls()
-                server.login(mailtrap_user_name, mailtrap_user_password)
-                # https://docs.python.org/3/library/smtplib.html
-                # SMTP.send_message(msg, from_addr=None, to_addrs=None, mail_options=(), rcpt_options=())
-                server.send_message(msg, sender, receiver)
-            logs_context = {"sender": f"{input_email}"}
+        try:
+            send_contact_validation_link(input_username, input_email, input_message)
+        except Exception as e:
+            app.logger.exception("Echec envoi email de validation contact")
             log_events.log_event(
-                "[200] Flask - Envoi d'un message par contact.", logs_context
+                f"[400] Flask - Echec envoi email de validation contact: {e}",
+                {"username": input_username, "email": input_email},
             )
-            flash("Message envoyé à l'équipe.", "error")
-            return redirect(url_for("index"))
+            return render_template(
+                "mail_not_sent.html",
+                name=input_username,
+                is_authenticated=current_user.is_authenticated,
+            )
+
+        log_events.log_event(
+            "[200] Flask - Email de validation de contact envoyé.",
+            {"username": input_username, "email": input_email},
+        )
+        return render_template(
+            "contact_validation_sent.html",
+            name=input_username,
+            is_authenticated=current_user.is_authenticated,
+        )
 
     return render_template(
         "contact.html", form=form, is_authenticated=current_user.is_authenticated
