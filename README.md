@@ -7,10 +7,8 @@
 ![Screenshot](https://img.shields.io/badge/gitlab-ci:cd-blue?logo=gitlab&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/terraform--blue?logo=hashicorp&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/vault--blue?logo=hashicorp&logoColor=yellow)
-$$$$$ CHECKER VERSIONS AUSSI
 ![Screenshot](https://img.shields.io/badge/celery-5.4.0-blue?logo=celery&logoColor=yellow)
 ![Screenshot](https://img.shields.io/badge/rabbitmq-4-blue?logo=rabbitmq&logoColor=yellow)
-$$$$
 ![Screenshot](https://img.shields.io/badge/digitalocean--black?logo=digitalocean&logoColor=yellow&color=blue)
 ![Screenshot](https://img.shields.io/badge/betterstack--blue)
 ![Screenshot](https://img.shields.io/badge/coveralls--blue?logo=coveralls&logoColor=yellow)
@@ -40,7 +38,7 @@ Also the Gitlab subscription is the free default one.
 
 **Focus is more on technologies and how bind it for a project. This is the aim.**
 
-Do not pay much attention to the HTML-CSS-JS part.
+Do not pay much attention to the HTML-CSS-JS part (either basic, or made by mistral-ai since 2026).
 
 **Look at GitHub issues to see what has to be done, what should be updated.**
 
@@ -74,9 +72,9 @@ Remember it's just a dummy project.
 
 ## TECHNOLOGIES
 
-Python 3.11
+Python
 
-Postgresql 17 (driver psycopg 3)
+Postgresql
 
 Gunicorn (for Flask)
 
@@ -86,7 +84,7 @@ Nginx
 
 Docker (docker compose), DockerHub, Docker Scout
 
-Gitlab (the CI/CD chain is engaged throuh the Gitlab repo)
+Gitlab (the CI/CD workflow is initiated via the GitLab repository.)
 
 Terraform
 
@@ -110,11 +108,9 @@ Aikido Security
 
 Cloudflare
 
-Vibe (used since 2026 to improve test coverage rates)
+Vibe (used since 2026 to improve test coverage rates and enhance graphics)
 
 ## HOW TO SET IT, HOW IT WORKS
-
-  Notice: if you use VisualCode remember that you can preview the markdown from VisualCode by running: Ctrl+Shift+V
 
   Notice: currently the postgres password is the default one.
 
