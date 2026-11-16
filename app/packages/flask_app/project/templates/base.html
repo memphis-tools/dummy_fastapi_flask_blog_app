@@ -128,44 +128,105 @@
               {% block content %}{% endblock content %}
           </section>
           <!-- Footer-->
-          <footer class="border-top">
-              <div class="footer-container">
-                  <div class="d-flex flex-column justify-content-center">
-                    <div class="social-networks">
-                        <ul>
-                            <li>
-                              <a class="d-flex" href="https://gitlab.com/memphis-tools/dummy_fastapi_flask_blog_app" target="_blank">
-                                  <span class="fa-stack fa-lg">
-                                      <i class="fas fa-circle fa-stack-2x"></i>
-                                      <i class="fab fa-gitlab fa-stack-1x fa-inverse"></i>
-                                  </span>
-                            </li>
-                            <li>
-                              </a>
-                                <a class="d-flex" href="https://github.com/memphis-tools/dummy_fastapi_flask_blog_app" target="_blank">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fas fa-circle fa-stack-2x"></i>
-                                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                        </ul>
+          <footer>
+            <div class="footer-container">
+                <div class="footer-grid">
+                    <nav class="footer-col footer-col-tech" aria-label="Technologies">
+                        <h2 class="footer-title">TECHNOLOGIES</h2>
+                        <div class="footer-subgrid">
+                            <div>
+                                <h3 class="footer-subtitle">HÉBERGEMENT &amp; INFRA</h3>
+                                <ul>
+                                    <li><a href="https://m.do.co/c/4f541e02cfe5" target="_blank" rel="noopener"><img class="tech-badge" src="https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%202.svg" alt="DigitalOcean"> DigitalOcean</a></li>
+                                    <li><a href="https://www.namecheap.com/" target="_blank" rel="noopener"><i class="fas fa-tag"></i> Namecheap</a></li>
+                                    <li><a href="https://www.cloudflare.com/" target="_blank" rel="noopener"><i class="fab fa-cloudflare"></i> Cloudflare</a></li>
+                                    <li><a href="https://certbot.eff.org/" target="_blank" rel="noopener"><i class="fas fa-certificate"></i> Certbot</a></li>
+                                    <li><a href="https://www.hashicorp.com/products/vault" target="_blank" rel="noopener"><i class="fas fa-key"></i> HashiCorp</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="footer-subtitle">SÉCURITÉ &amp; QUALITÉ</h3>
+                                <ul>
+                                    <li><a href="https://aikido.dev/" target="_blank" rel="noopener"><i class="fas fa-shield-halved"></i> Aikido</a></li>
+                                    <li><a href="https://snyk.io/" target="_blank" rel="noopener"><i class="fas fa-bug"></i> Snyk</a></li>
+                                    <li><a href="https://www.codacy.com/" target="_blank" rel="noopener"><i class="fas fa-code"></i> Codacy</a></li>
+                                    <li><a href="https://www.hcaptcha.com/" target="_blank" rel="noopener"><i class="fas fa-user-check"></i> Hcaptcha</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="footer-subtitle">SUPERVISION &amp; MESURE</h3>
+                                <ul>
+                                    <li><a href="https://betterstack.com/" target="_blank" rel="noopener"><i class="fas fa-heart-pulse"></i> BetterStack</a></li>
+                                    <li><a href="https://analytics.google.com/" target="_blank" rel="noopener"><i class="fas fa-chart-line"></i> Google Analytics</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="footer-subtitle">SERVICES, SOURCE &amp; IA</h3>
+                                <ul>
+                                    <li><a href="https://www.twilio.com/" target="_blank" rel="noopener"><i class="fas fa-sms"></i> Twilio</a></li>
+                                    <li><a href="https://mailtrap.io/" target="_blank" rel="noopener"><i class="fas fa-inbox"></i> Mailtrap</a></li>
+                                    <li><a href="https://github.com/" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a></li>
+                                    <li><a href="https://gitlab.com/" target="_blank" rel="noopener"><i class="fab fa-gitlab"></i> GitLab</a></li>
+                                    <li><a href="https://mistral.ai/" target="_blank" rel="noopener"><i class="fas fa-wind"></i> Mistral AI — Vibe</a></li>
+                                    <li><a href="https://www.midjourney.com/" target="_blank" rel="noopener"><i class="fas fa-image"></i> Midjourney</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                    <div class="footer-subgrid">
+                        <nav class="footer-col" aria-label="Navigation">
+                            <h2 class="footer-title">NAVIGATION</h2>
+                            <ul>
+                                <li><a href="{{ url_for('index') }}"><i class="fas fa-house"></i> ACCUEIL</a></li>
+                                <li><a href="/api/v1/docs/" target="_blank" rel="noopener"><i class="fas fa-code"></i> API</a></li>
+                                <li><a href="{{ url_for('book_routes_blueprint.books') }}"><i class="fas fa-book"></i> LIVRES</a></li>
+                                <li><a href="{{ url_for('book_category_routes_blueprint.categories') }}"><i class="fas fa-layer-group"></i> CATEGORIES</a></li>
+                                <li><a href="{{ url_for('ops') }}"><i class="fas fa-terminal"></i> OPS</a></li>
+                                <li><a href="{{ url_for('moocs') }}"><i class="fas fa-graduation-cap"></i> MOOCS</a></li>
+                                <li><a href="{{ url_for('misc') }}" target="_blank" rel="noopener"><i class="fas fa-flask"></i> MISC</a></li>
+                                <li><a href="{{ url_for('status_page') }}" target="_blank" rel="noopener"><i class="fas fa-satellite-dish"></i> STATUS</a></li>
+                            </ul>
+                        </nav>
+                        <nav class="footer-col" aria-label="Lab">
+                            <h2 class="footer-title">LAB</h2>
+                            <ul>
+                                <li><a href="https://github.com/memphis-tools/dummy_fastapi_flask_blog_app" target="_blank" rel="noopener"><i class="fab fa-github"></i> GITHUB</a></li>
+                                <li><a href="https://gitlab.com/memphis-tools/dummy_fastapi_flask_blog_app" target="_blank" rel="noopener"><i class="fab fa-gitlab"></i> GITLAB</a></li>
+                            </ul>
+                        </nav>
                     </div>
-                    <div class="footer-bar" id="footer_bar">
-                        <a class="contacts_item" href="{{ url_for('contact') }}">CONTACT</a>
-                        <div class="text-center" id="footer_date"></div>
-                        <a class="contacts_item" href="https://forms.gle/bNJqv3PGSHuaSvTq5" target="_blank">SUGGESTIONS</a>
+                    <div class="footer-subgrid">
+                        <nav class="footer-col" aria-label="Légal">
+                            <h2 class="footer-title">LEGAL</h2>
+                            <ul>
+                                <li><a href="{{ url_for('mentions_legales') }}"><i class="fas fa-scale-balanced"></i> Mentions</a></li>
+                                <li><a href="{{ url_for('politique_confidentialite') }}"><i class="fas fa-user-shield"></i> Confidentialité</a></li>
+                                <li><a href="{{ url_for('cookies') }}"><i class="fas fa-cookie"></i> Cookies</a></li>
+                                <li><a href="{{ url_for('cgu') }}"><i class="fas fa-file-contract"></i> CGU</a></li>
+                            </ul>
+                        </nav>
+                        <nav class="footer-col" aria-label="Contact">
+                            <h2 class="footer-title">CONTACT</h2>
+                            <ul>
+                                <li><a class="contacts_item" href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contactez-nous</a></li>
+                                <li><a class="contacts_item" href="https://forms.gle/bNJqv3PGSHuaSvTq5" target="_blank" rel="noopener"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
+                            </ul>
+                        </nav>
                     </div>
+                </div>
+                <div class="footer-bar" id="footer_bar">
+                    <div class="text-center" id="footer_date"></div>
                     <div class="provider-logo">
-                        <a href="https://www.digitalocean.com/?refcode=4f541e02cfe5&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%202.svg" alt="DigitalOcean Referral Badge" /></a>
+                        <a href="https://m.do.co/c/4f541e02cfe5" target="_blank" rel="noopener"><img src="https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%202.svg" alt="DigitalOcean" /></a>
                     </div>
                     <div class="midjourney-logo">
-                      <a href="hhttps://www.midjourney.com/" title="Midjourney">Logo by Midjourney</a>
-                        <img src="/static/favicon.ico" alt="the dummy blog logo">
+                        <a href="https://www.midjourney.com/" target="_blank" rel="noopener" title="Midjourney"><img src="{{ url_for('static', filename='favicon.ico') }}" alt="Midjourney" /></a>
                     </div>
-                  </div>
-              </div>
-          </footer>
+                </div>
+            </div>
+        </footer>
+
+
           <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
           <script src="{{ url_for('static', filename='js/all.js') }}"></script>
           <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>

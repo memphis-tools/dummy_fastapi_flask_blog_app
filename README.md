@@ -275,8 +275,16 @@ You do not need to create a python virtualenv.
 
   Avoid to change tests order (particulary about the session cookie in tests_flask_urls).
 
-  To run test for a local execution (**ensure postgresql service is started, and the .env file created**):
+  **ensure postgresql service is started, and the .env file created**
 
+      SCOPE="test"
+
+      ADMIN_EMAIL="admin@localhost.fr"
+
+      POSTGRES_HOST="127.0.0.1" 
+
+  Run test for a local execution :
+  
       python -m venv venv
 
       source venv/bin/activate
@@ -290,12 +298,6 @@ You do not need to create a python virtualenv.
       pip install -r app/packages/fastapi/requirements.txt
 
       pip install -r app/packages/flask_app/requirements.txt
-
-      SCOPE="test"
-
-      ADMIN_EMAIL="admin@localhost.fr"
-
-      POSTGRES_HOST="127.0.0.1" 
 
       # (optional) Verify files to be checked
       python -m pytest --collect-only

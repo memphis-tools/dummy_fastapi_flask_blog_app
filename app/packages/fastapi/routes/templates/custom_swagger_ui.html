@@ -30,6 +30,40 @@
     <title>{{ title }}</title>
     <link href="{{ swagger_static_prefix }}/swagger-ui.css" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <style>
+        /* Reprend le rendu du footer Flask (styles.css footer/.footer-container/.footer-bar),
+            en autonome car la page docs FastAPI ne charge pas styles.css de Flask. */
+        .api-footer {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            border-top: 1px solid #dee2e6; /* équivalent .border-top de Bootstrap */
+            font-size: 80%;
+        }
+        .api-footer .footer-container {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
+        }
+        .api-footer .footer-bar {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .api-footer .footer-bar a { color: #0d6efd; text-decoration: none; }
+        .api-footer .footer-bar a:hover { text-decoration: underline; }
+        @media (max-width: 1250px) {
+            .api-footer .footer-bar { flex-direction: column; gap: 30px; }
+        }
+        </style>
 </head>
 <body>
     <div id="swagger-ui"></div>
@@ -39,5 +73,17 @@
     <script src="{{ swagger_static_prefix }}/swagger-ui-standalone-preset.js"></script>
     <!-- Init -->
     <script src="{{ swagger_static_prefix }}/swagger-init.js"></script>
+    <!-- Footer identique à celui de Flask (base.html), limité aux mentions légales -->
+    <footer class="api-footer border-top">
+    <div class="footer-container">
+        <div class="footer-bar" id="footer_bar">
+        <a class="contacts_item" href="/mentions-legales/">Mentions légales</a>
+        <a class="contacts_item" href="/politique-de-confidentialite/">Politique de confidentialité</a>
+        <a class="contacts_item" href="/cookies/">Cookies</a>
+        <a class="contacts_item" href="/cgu/">CGU</a>
+        <a class="contacts_item" href="/contact/">Contact</a>
+        </div>
+    </div>
+    </footer>
 </body>
 </html>
