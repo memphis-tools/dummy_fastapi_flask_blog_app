@@ -670,3 +670,9 @@ def ops():
     return render_template("ops.html", is_authenticated=current_user.is_authenticated)
 
 
+@app.route("/status/")
+def status_page():
+    """
+    Description: the status Flask route.
+    """
+    return redirect("https://status.dummy-ops.dev/")
