@@ -15,6 +15,7 @@ from flask import (
     flash,
     redirect,
     request,
+    abort,
 )
 
 from flask_bootstrap import Bootstrap
@@ -23,6 +24,7 @@ from flask_login import (
     login_user,
     logout_user,
     current_user,
+    login_required,
 )
 from flask_wtf import CSRFProtect
 from sqlalchemy.orm import joinedload
@@ -72,6 +74,9 @@ login_manager.login_view = "/"
 login_manager.session_protection = "strong"
 CONTACT_TOKEN_SALT = "contact-confirmation"
 CONTACT_TOKEN_MAX_AGE = 86400  # 1 jour
+ACCOUNT_DELETION_TOKEN_SALT = "account-deletion-confirmation"
+EMAIL_CHANGE_TOKEN_SALT = "email-change-confirmation"
+ACCOUNT_TOKEN_MAX_AGE = 86400  # 1 jour
 SENDGRID_API_KEY = get_secret("/run/secrets/SENDGRID_API_KEY")
 WTF_CSRF_SECRET_KEY = app.config["SECRET_KEY"]
 MAX_BOOKS_ON_INDEX_PAGE = 3
@@ -235,6 +240,46 @@ def forward_contact_message(name, email, message):
         get_secret("/run/secrets/ADMIN_EMAIL"),
         "Dummy-ops contact",
         f"<p>{escape(name)} ({escape(email)}) a envoyé ce message : {escape(message)}</p>",
+    )
+
+
+def send_account_deletion_link(user):
+    """
+    Description: email the user a signed link to validate the deletion of his account.
+    """
+    token = sengrid_tokens_serializer.dumps(
+        {"user_id": user.id, "email": user.email},
+        salt=ACCOUNT_DELETION_TOKEN_SALT,
+    )
+    confirm_url = url_for("confirm_account_deletion", token=token, _external=True)
+    _send_email(
+        user.email,
+        "Dummy-ops - validez la suppression de votre compte",
+        f"""
+        <p>Bonjour {escape(user.username)},</p>
+        <p>Cliquez sur le lien pour confirmer la suppression de votre compte :</p>
+        <p><a href="{confirm_url}">Valider la suppression de mon compte</a></p>
+        """,
+    )
+
+
+def send_email_change_link(user, new_email):
+    """
+    Description: email the new email address a signed link to validate the email change.
+    """
+    token = sengrid_tokens_serializer.dumps(
+        {"user_id": user.id, "new_email": new_email},
+        salt=EMAIL_CHANGE_TOKEN_SALT,
+    )
+    confirm_url = url_for("confirm_email_change", token=token, _external=True)
+    _send_email(
+        new_email,
+        "Dummy-ops - validez votre nouvelle adresse email",
+        f"""
+        <p>Bonjour {escape(user.username)},</p>
+        <p>Cliquez sur le lien pour valider votre nouvelle adresse email :</p>
+        <p><a href="{confirm_url}">Valider mon nouvel email</a></p>
+        """,
     )
 
 
@@ -531,6 +576,199 @@ def send_activation_link(email):
             server.set_debuglevel(1)
             result = server.send_message(msg, sender, receiver)
             print("Scope development on log l'envoi:", result)
+
+
+@app.route("/account/delete/", methods=["GET", "POST"])
+@login_required
+def delete_account():
+    """
+    Description: the delete own account Flask route. A confirmation link is
+    emailed to the user; the account is deleted only after validation.
+    """
+    if current_user.id == 1:
+        logs_context = {
+            "current_user": f"{current_user.username}",
+        }
+        log_events.log_event("[403] Flask - Suppression compte admin refusée.", logs_context)
+        return abort(403)
+    form = forms.DeleteInstanceForm()
+    if form.validate_on_submit():
+        try:
+            send_account_deletion_link(current_user)
+        except Exception as e:
+            app.logger.exception("Echec envoi email de validation suppression compte")
+            log_events.log_event(
+                f"[400] Flask - Echec envoi email de validation suppression compte: {e}",
+                {"username": f"{current_user.username}", "email": f"{current_user.email}"},
+            )
+            return render_template(
+                "mail_not_sent.html",
+                name=current_user.username,
+                is_authenticated=current_user.is_authenticated,
+            )
+        log_events.log_event(
+            "[200] Flask - Email de validation de suppression de compte envoyé.",
+            {"username": f"{current_user.username}", "email": f"{current_user.email}"},
+        )
+        return render_template(
+            "account_deletion_link_sent.html",
+            name=current_user.username,
+            is_authenticated=current_user.is_authenticated,
+        )
+    return render_template(
+        "delete_account.html",
+        form=form,
+        is_authenticated=current_user.is_authenticated,
+    )
+
+
+@app.route("/account/delete/confirm/<token>")
+def confirm_account_deletion(token):
+    """
+    Description: validates the account deletion via the signed token sent by
+    email, then deletes the account and logs the user out.
+    """
+    try:
+        payload = sengrid_tokens_serializer.loads(
+            token, salt=ACCOUNT_DELETION_TOKEN_SALT, max_age=ACCOUNT_TOKEN_MAX_AGE
+        )
+        user_id = payload["user_id"]
+        email = payload["email"]
+    except Exception:
+        flash("Le lien de confirmation n'est pas valide ou a expiré.", "error")
+        return redirect(url_for("index"))
+
+    session = session_commands.get_a_database_session()
+    user = session.get(User, user_id)
+    if not user or user.email != email:
+        session.close()
+        log_events.log_event(
+            "[404] Flask - Utilisateur inconnu tente de supprimer son compte.",
+            {"email": f"{email}"},
+        )
+        flash("Le lien de confirmation n'est pas valide ou a expiré.", "error")
+        return redirect(url_for("index"))
+    if user.id == 1:
+        session.close()
+        log_events.log_event(
+            "[403] Flask - Suppression compte admin refusée.",
+            {"current_user": f"{user.username}"},
+        )
+        return abort(403)
+    username = user.username
+    session.delete(user)
+    session.commit()
+    session.close()
+    logout_user()
+    log_events.log_event(
+        "[204] Flask - Compte utilisateur supprimé après validation email.",
+        {"deleted_user": f"{username}", "email": f"{email}"},
+    )
+    flash(f"Compte {username} supprimé 👋")
+    return redirect(url_for("index"))
+
+
+@app.route("/account/email/", methods=["GET", "POST"])
+@login_required
+def update_email():
+    """
+    Description: the update own email Flask route. A confirmation link is sent
+    to the new email address; the email is updated only after validation.
+    """
+    form = forms.UpdateUserEmailForm()
+    if form.validate_on_submit():
+        new_email = str(form.new_email.data).lower()
+        new_email_check = str(form.new_email_check.data).lower()
+        if new_email != new_email_check:
+            flash("Les emails ne correspondent pas.", "error")
+        elif new_email == str(current_user.email).lower():
+            flash("Le nouvel email est identique à l'actuel.", "error")
+        else:
+            session = session_commands.get_a_database_session()
+            existing_email = session.query(User).filter_by(email=new_email).first()
+            if existing_email:
+                session.close()
+                flash("Email existe deja en base", "error")
+            else:
+                try:
+                    send_email_change_link(current_user, new_email)
+                except Exception as e:
+                    session.close()
+                    app.logger.exception("Echec envoi email de validation changement d'email")
+                    log_events.log_event(
+                        f"[400] Flask - Echec envoi email de validation changement d'email: {e}",
+                        {"username": f"{current_user.username}", "new_email": f"{new_email}"},
+                    )
+                    return render_template(
+                        "mail_not_sent.html",
+                        name=current_user.username,
+                        is_authenticated=current_user.is_authenticated,
+                    )
+                session.close()
+                log_events.log_event(
+                    "[200] Flask - Email de validation de changement d'email envoyé.",
+                    {"username": f"{current_user.username}", "new_email": f"{new_email}"},
+                )
+                return render_template(
+                    "email_change_link_sent.html",
+                    name=current_user.username,
+                    is_authenticated=current_user.is_authenticated,
+                )
+    return render_template(
+        "update_email.html",
+        form=form,
+        username=current_user.username,
+        is_authenticated=current_user.is_authenticated,
+    )
+
+
+@app.route("/account/email/confirm/<token>")
+def confirm_email_change(token):
+    """
+    Description: validates the email change via the signed token sent to the new
+    email address, then updates the user's email.
+    """
+    try:
+        payload = sengrid_tokens_serializer.loads(
+            token, salt=EMAIL_CHANGE_TOKEN_SALT, max_age=ACCOUNT_TOKEN_MAX_AGE
+        )
+        user_id = payload["user_id"]
+        new_email = str(payload["new_email"]).lower()
+    except Exception:
+        flash("Le lien de confirmation n'est pas valide ou a expiré.", "error")
+        return redirect(url_for("index"))
+
+    session = session_commands.get_a_database_session()
+    user = session.get(User, user_id)
+    if not user:
+        session.close()
+        log_events.log_event(
+            "[404] Flask - Utilisateur inconnu tente de changer son email.",
+            {"email": f"{new_email}"},
+        )
+        flash("Le lien de confirmation n'est pas valide ou a expiré.", "error")
+        return redirect(url_for("index"))
+    username = user.username          # ← capturé tant que l'instance est attachée et non expirée
+    existing_email = session.query(User).filter_by(email=new_email).first()
+    if existing_email and existing_email.id != user.id:
+        session.close()
+        log_events.log_event(
+            "[400] Flask - Email deja utilise lors de la validation du changement d'email.",
+            {"username": f"{username}", "new_email": f"{new_email}"},
+        )
+        flash("Cet email est deja utilisé par un autre compte.", "error")
+        return redirect(url_for("index"))
+    old_email = user.email
+    username = user.username          # ← capturé avant commit/close
+    user.email = new_email
+    session.commit()
+    session.close()
+    log_events.log_event(
+        "[200] Flask - Email utilisateur mis à jour après validation.",
+        {"current_user": f"{username}", "old_email": f"{old_email}", "new_email": f"{new_email}"},
+    )
+    flash(f"Email mis à jour : {new_email} 💪")
+    return redirect(url_for("index"))
 
 
 @app.route("/register/", methods=["GET", "POST"])

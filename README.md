@@ -347,7 +347,7 @@ You do not need to create a python virtualenv.
 
 ### HOW RUN IT IN PRODUCTION
 ----------------------------
-  - Remember this is a dummy-ops proof of concept website.
+  - Remember this is a real world dummy-ops appliation proof of concept website. You can choose any cloud provider.
 
   - You must have a virtual machine. Here we used [DigitalOcean](https://www.digitalocean.com/) cloud provider.
 
@@ -512,6 +512,8 @@ https://fastapi.tiangolo.com/tutorial/bigger-applications/
 https://pypi.org/project/pytest-postgresql/
 
 https://gitlab.com/gitlab-examples/postgres/-/blob/master/.gitlab-ci.yml?ref_type=heads
+
+https://docs.gitlab.com/user/profile/#use-an-automatically-generated-private-commit-email
 
 https://medium.com/metro-platform/continuous-integration-for-python-3-in-gitlab-e1b4446be76b
 
