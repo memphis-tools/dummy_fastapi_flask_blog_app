@@ -347,7 +347,7 @@ You do not need to create a python virtualenv.
 
 ### HOW RUN IT IN PRODUCTION
 ----------------------------
-  - Remember this is a dummy-ops proof of concept website.
+  - Remember this is a real world dummy-ops appliation proof of concept website. You can choose any cloud provider.
 
   - You must have a virtual machine. Here we used [DigitalOcean](https://www.digitalocean.com/) cloud provider.
 
