@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}DELETE_ACCOUNT_LINK_SENT{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="section_intro"></div>
+    <h1>DUMMY OPS - MAIL</h1>
+    <div class="d-flex flex-row justify-content-center m-5">
+        <div class=" flex-column justify-content-center">
+          <p>{{ name|upper }}, un email de validation vient de vous être envoyé, cliquez sur le lien pour confirmer la suppression de votre compte<p>
+            <div class="d-flex justify-content-center mb-4"><a class="btn btn-primary text-uppercase" href="{{ url_for('book_routes_blueprint.books') }}">RETOUR AUX LIVRES</a></div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

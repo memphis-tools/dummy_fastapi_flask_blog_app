@@ -23,8 +23,8 @@
         <h2>3. Durées de conservation</h2>
         <ul>
             <li>Compte : jusqu'à suppression du compte ou 3 ans après la dernière connexion.</li>
-            <li>Messages du formulaire de contact : 1 an après le dernier échange.</li>
-            <li>Logs : 30 jours chez BetterStack.</li>
+            <li>Messages du formulaire de contact : non conservé sur le serveur, transmis uniquement par e-mail. </li>
+            <li>Logs : 2 jours chez BetterStack.</li>
             <li>Cookies : 13 mois maximum (recommandation CNIL).</li>
         </ul>
 
@@ -33,7 +33,7 @@
         <p>Certains sous-traitants (Cloudflare, Twilio, Google) sont situés hors Union européenne ; les transferts sont encadrés par des clauses contractuelles types de la Commission européenne.</p>
 
         <h2>5. Sécurité</h2>
-        <p>Connexion HTTPS (certificat Let's Encrypt via Certbot, derrière Cloudflare), mots de passe hashés, secrets applicatifs stockés dans HashiCorp Vault, captcha hCaptcha sur les formulaires, supervision des vulnérabilités (Aikido, Snyk, Lynis).</p>
+        <p>Sécurité : connexions chiffrées (HTTPS), mots de passe stockés uniquement sous forme de hash, jetons d'authentification à durée de vie limitée, routes protégées par authentification, formulaires protégés par captcha. supervision des vulnérabilités (Aikido, Snyk, Lynis).</p>
 
         <h2>6. Vos droits</h2>
         <p>Conformément au RGPD et à la loi Informatique et Libertés, vous disposez de droits d'<strong>accès, rectification, effacement, limitation, opposition et portabilité</strong> sur vos données, ainsi que du droit de définir des directives post-mortem. Pour les exercer : <a href="{{ url_for('contact') }}">formulaire de contact</a>. Vous pouvez également introduire une réclamation auprès de la <a href="https://www.cnil.fr/" target="_blank" rel="noopener">CNIL</a>.</p>
