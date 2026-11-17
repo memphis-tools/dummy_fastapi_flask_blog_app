@@ -99,7 +99,9 @@
                                 </a>
                                 <ul class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownMenuLink">
                                   <li><a class="dropdown-item disabled_link" href="#">PROFILE</a></li>
-                                  <li><a class="dropdown-item" href="{{ url_for('user_routes_blueprint.update_password') }}">UPDATE PASSWORD</a></li>
+                                  <li><a class="dropdown-item" href="{{ url_for('user_routes_blueprint.update_password') }}">CHANGER MOT DE PASSE</a></li>
+                                  <li><a class="dropdown-item" href="{{ url_for('update_email') }}">CHANGER MON EMAIL</a></li>
+                                  <li><a class="dropdown-item" href="{{ url_for('delete_account') }}">SUPPRIMER MON COMPTE</a></li>
                                   <li><a class="dropdown-item" href="{{ url_for('logout') }}">SE DECONNECTER</a></li>
                                 </ul>
                             </li>

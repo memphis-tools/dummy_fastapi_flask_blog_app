@@ -513,6 +513,8 @@ https://pypi.org/project/pytest-postgresql/
 
 https://gitlab.com/gitlab-examples/postgres/-/blob/master/.gitlab-ci.yml?ref_type=heads
 
+https://docs.gitlab.com/user/profile/#use-an-automatically-generated-private-commit-email
+
 https://medium.com/metro-platform/continuous-integration-for-python-3-in-gitlab-e1b4446be76b
 
 To avoid log warning "AttributeError: module 'bcrypt' has no attribute '__about__'" i followed theses links:
