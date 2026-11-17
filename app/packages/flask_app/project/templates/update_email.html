@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}UPDATE EMAIL{% endblock title %}
+
+{% block content %}
+<div class="container">
+  <div class="section_intro"></div>
+  <h1>DUMMY OPS - MISE A JOUR EMAIL</h1>
+  <h2>Votre nom d'utilisateur: {{ username }}</h2>
+  <div class="d-flex flex-column justify-content-center align-items-center">
+    <div class="d-flex flex-column justify-content-center w-50">
+      <form class="form" action="" method="post">
+        {{ form.csrf_token }}
+        <label for="new_email">{{ form.new_email.label }}</label>{{ form.new_email }}
+        <label for="new_email_check">{{ form.new_email_check.label }}</label>{{ form.new_email_check }}
+        <button type="submit" class="btn btn-primary" name="button">METTRE A JOUR</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}

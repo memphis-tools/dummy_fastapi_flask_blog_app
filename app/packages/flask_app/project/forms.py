@@ -247,3 +247,14 @@ class DeleteInstanceForm(FlaskForm):
     """
     Description: a delete instance FlaskForm form.
     """
+
+
+class UpdateUserEmailForm(FlaskForm):
+    """
+    Description: the update user email FlaskForm form.
+    """
+
+    new_email = EmailField("NOUVEL EMAIL", validators=[DataRequired(), Email()])
+    new_email_check = EmailField(
+        "CONFIRMER NOUVEL EMAIL", validators=[DataRequired(), Email()]
+    )
